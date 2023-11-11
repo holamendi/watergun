@@ -10,7 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_11_073540) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_11_192020) do
+  create_table "memberships", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "org_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["org_id"], name: "index_memberships_on_org_id"
+    t.index ["user_id", "org_id"], name: "index_memberships_on_user_id_and_org_id", unique: true
+    t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "orgs", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "servers", force: :cascade do |t|
     t.string "provider", null: false
     t.string "name", null: false
@@ -18,7 +34,33 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_11_073540) do
     t.string "status", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "data", default: {}
+    t.integer "org_id", null: false
     t.index ["dokku_token"], name: "index_servers_on_dokku_token", unique: true
+    t.index ["org_id"], name: "index_servers_on_org_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "token", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_sessions_on_expires_at"
+    t.index ["token"], name: "index_sessions_on_token", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "password_digest", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "memberships", "orgs"
+  add_foreign_key "memberships", "users"
+  add_foreign_key "servers", "orgs"
+  add_foreign_key "sessions", "users"
 end
