@@ -157,6 +157,8 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.9)
+    nokogiri (1.15.4-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.15.4-x86_64-linux)
       racc (~> 1.4)
     oj (3.16.1)
@@ -256,6 +258,7 @@ GEM
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    sqlite3 (1.6.8-aarch64-linux)
     sqlite3 (1.6.8-x86_64-linux)
     standard (1.32.0)
       language_server-protocol (~> 3.17.0.2)
@@ -298,6 +301,7 @@ GEM
     zeitwerk (2.6.12)
 
 PLATFORMS
+  aarch64-linux
   x86_64-linux
 
 DEPENDENCIES
