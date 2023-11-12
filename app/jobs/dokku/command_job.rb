@@ -1,5 +1,5 @@
 module Dokku
-  class AppLogStreamJob < ApplicationJob
+  class CommandJob < ApplicationJob
     queue_as :default
 
     def perform(*args)
