@@ -10,7 +10,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_11_192020) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
+  create_table "apps", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "name", null: false
+    t.string "dokku_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["org_id"], name: "index_apps_on_org_id"
+    t.index ["server_id"], name: "index_apps_on_server_id"
+  end
+
+  create_table "dokku_events", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "eventable_type", null: false
+    t.integer "eventable_id", null: false
+    t.integer "membership_id"
+    t.text "command", null: false
+    t.string "status", null: false
+    t.string "job_id", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["eventable_type", "eventable_id"], name: "index_dokku_events_on_eventable"
+    t.index ["membership_id"], name: "index_dokku_events_on_membership_id"
+    t.index ["org_id"], name: "index_dokku_events_on_org_id"
+    t.index ["server_id"], name: "index_dokku_events_on_server_id"
+  end
+
+  create_table "dokku_logs", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "dokku_event_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dokku_event_id"], name: "index_dokku_logs_on_dokku_event_id"
+    t.index ["id", "dokku_event_id"], name: "index_dokku_logs_on_id_and_dokku_event_id", unique: true
+    t.index ["org_id"], name: "index_dokku_logs_on_org_id"
+  end
+
+  create_table "dokku_users", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.text "private_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "server_id"], name: "index_dokku_users_on_id_and_server_id", unique: true
+    t.index ["org_id"], name: "index_dokku_users_on_org_id"
+    t.index ["private_key"], name: "index_dokku_users_on_private_key", unique: true
+    t.index ["server_id"], name: "index_dokku_users_on_server_id"
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "org_id", null: false
@@ -59,6 +111,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_11_192020) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "apps", "orgs"
+  add_foreign_key "apps", "servers"
+  add_foreign_key "dokku_events", "memberships"
+  add_foreign_key "dokku_events", "orgs"
+  add_foreign_key "dokku_events", "servers"
+  add_foreign_key "dokku_logs", "dokku_events"
+  add_foreign_key "dokku_logs", "orgs"
+  add_foreign_key "dokku_users", "orgs"
+  add_foreign_key "dokku_users", "servers"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
   add_foreign_key "servers", "orgs"

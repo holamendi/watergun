@@ -261,6 +261,7 @@ GEM
     ruby2_keywords (0.0.5)
     sqlite3 (1.6.8-aarch64-linux)
     sqlite3 (1.6.8-x86_64-linux)
+    sshkey (3.0.0)
     standard (1.32.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -321,6 +322,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.1.2)
   rspec-rails
+  sshkey
   standard
   store_attribute
   tzinfo-data
