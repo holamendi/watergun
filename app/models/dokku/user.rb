@@ -5,4 +5,8 @@ class Dokku::User < ApplicationRecord
   attribute :private_key, default: -> { SSHKey.generate.private_key }
 
   validates :private_key, presence: true, uniqueness: true
+
+  def ssh_private_key
+    SSHKey.new(private_key)
+  end
 end

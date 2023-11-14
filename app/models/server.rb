@@ -6,7 +6,7 @@ class Server < ApplicationRecord
     deprovisioning: "deprovisioning",
     error: "error",
     provisioning: "provisioning"
-  }, prefix: true, default: "provisioning"
+  }, _prefix: true, _default: "provisioning"
 
   belongs_to :org
 
@@ -14,10 +14,8 @@ class Server < ApplicationRecord
 
   has_many :apps
   has_many :dokku_events, class_name: "Dokku::Event", dependent: :destroy
-  has_many :dokku_logs, class_name: "Dokku::Log", dependent: :destroy
 
   store_attribute :data, :public_ip, :string
 
-  after_create :create_dokku_user
+  after_create -> { create_dokku_user!(org:) }
 end
-z

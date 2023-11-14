@@ -56,7 +56,7 @@ end
 
 gem "httpx"
 gem "litestack"
-gem "net-http"
+gem "net-ssh"
 gem "sshkey"
 gem "store_attribute"
 gem "vite_rails"
