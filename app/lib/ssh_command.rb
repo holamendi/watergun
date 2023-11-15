@@ -1,7 +1,7 @@
 class SshCommand
   attr_reader :host, :user, :command, :key, :session
 
-  def initialize(host:, command:, key:, user: "dokku", session: SecureRandom.uuid)
+  def initialize(host:, command:, key:, user: "watergun", session: SecureRandom.uuid)
     @host = host
     @user = user
     @command = command
