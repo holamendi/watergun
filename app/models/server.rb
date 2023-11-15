@@ -23,4 +23,10 @@ class Server < ApplicationRecord
   store_attribute :data, :public_ip, :string
 
   after_create -> { create_dokku_user!(org:) }
+
+  def ssh_command!(command)
+    Net::SSH.start(public_ip, "watergun", key_data: [dokku_user.private_key], keys_only: true, non_interactive: true) do |ssh|
+      ssh.exec!(command)
+    end
+  end
 end
