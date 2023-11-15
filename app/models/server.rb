@@ -1,6 +1,11 @@
 class Server < ApplicationRecord
   has_secure_token :dokku_token, length: 32
 
+  enum provider: {
+    digitalocean: "digitalocean",
+    hetzner: "hetzner"
+  }, _prefix: true
+
   enum status: {
     active: "active",
     deprovisioning: "deprovisioning",

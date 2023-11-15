@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_14_085243) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -59,7 +59,6 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
     t.datetime "updated_at", null: false
     t.index ["id", "server_id"], name: "index_dokku_users_on_id_and_server_id", unique: true
     t.index ["org_id"], name: "index_dokku_users_on_org_id"
-    t.index ["private_key"], name: "index_dokku_users_on_private_key", unique: true
     t.index ["server_id"], name: "index_dokku_users_on_server_id"
   end
 
