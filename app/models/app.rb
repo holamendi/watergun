@@ -1,20 +1,15 @@
 class App < ApplicationRecord
-  belongs_to :org
-  belongs_to :server
-
-  has_many :dokku_events, as: :eventable, class_name: "Dokku::Event", dependent: :destroy
+  include BelongsToOrg
+  include BelongsToServer
+  include ServerEventable
 
   validates :name, presence: true, uniqueness: {scope: :server_id}
 
-  before_validation -> { self.dokku_name = name&.parameterize }, on: :create
-  after_create_commit :create_dokku_app!
-  after_destroy_commit :destroy_dokku_app!
+  before_validation :set_dokku_name, on: :create
 
-  def create_dokku_app!
-    Dokku::CommandJob.perform_later(server:, eventable: self, command: "apps:create #{dokku_name}")
-  end
+  private
 
-  def destroy_dokku_app!
-    Dokku::CommandJob.perform_later(server:, eventable: server, command: "apps:destroy --force #{dokku_name}")
+  def set_dokku_name
+    self.dokku_name = name&.parameterize
   end
 end

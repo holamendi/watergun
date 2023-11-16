@@ -1,4 +1,5 @@
 class Membership < ApplicationRecord
+  include BelongsToOrg
+
   belongs_to :user
-  belongs_to :org
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_14_085243) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -22,39 +22,10 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_14_085243) do
     t.index ["server_id"], name: "index_apps_on_server_id"
   end
 
-  create_table "dokku_events", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "server_id", null: false
-    t.string "eventable_type", null: false
-    t.integer "eventable_id", null: false
-    t.integer "membership_id"
-    t.text "command", null: false
-    t.string "status", null: false
-    t.string "job_id", null: false
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["eventable_type", "eventable_id"], name: "index_dokku_events_on_eventable"
-    t.index ["membership_id"], name: "index_dokku_events_on_membership_id"
-    t.index ["org_id"], name: "index_dokku_events_on_org_id"
-    t.index ["server_id"], name: "index_dokku_events_on_server_id"
-  end
-
-  create_table "dokku_logs", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "dokku_event_id", null: false
-    t.text "content"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["dokku_event_id"], name: "index_dokku_logs_on_dokku_event_id"
-    t.index ["id", "dokku_event_id"], name: "index_dokku_logs_on_id_and_dokku_event_id", unique: true
-    t.index ["org_id"], name: "index_dokku_logs_on_org_id"
-  end
-
   create_table "dokku_users", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
-    t.text "private_key", null: false
+    t.text "ssh_private_key", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["id", "server_id"], name: "index_dokku_users_on_id_and_server_id", unique: true
@@ -76,6 +47,36 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_14_085243) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "server_event_logs", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_event_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "server_event_id"], name: "index_server_event_logs_on_id_and_server_event_id", unique: true
+    t.index ["org_id"], name: "index_server_event_logs_on_org_id"
+    t.index ["server_event_id"], name: "index_server_event_logs_on_server_event_id"
+  end
+
+  create_table "server_events", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "eventable_type"
+    t.integer "eventable_id"
+    t.integer "membership_id"
+    t.string "event_type", null: false
+    t.string "source", null: false
+    t.string "status", null: false
+    t.string "job_id", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["eventable_type", "eventable_id"], name: "index_server_events_on_eventable"
+    t.index ["membership_id"], name: "index_server_events_on_membership_id"
+    t.index ["org_id"], name: "index_server_events_on_org_id"
+    t.index ["server_id"], name: "index_server_events_on_server_id"
   end
 
   create_table "servers", force: :cascade do |t|
@@ -112,15 +113,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_14_085243) do
 
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
-  add_foreign_key "dokku_events", "memberships"
-  add_foreign_key "dokku_events", "orgs"
-  add_foreign_key "dokku_events", "servers"
-  add_foreign_key "dokku_logs", "dokku_events"
-  add_foreign_key "dokku_logs", "orgs"
   add_foreign_key "dokku_users", "orgs"
   add_foreign_key "dokku_users", "servers"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
+  add_foreign_key "server_event_logs", "orgs"
+  add_foreign_key "server_event_logs", "server_events"
+  add_foreign_key "server_events", "memberships"
+  add_foreign_key "server_events", "orgs"
+  add_foreign_key "server_events", "servers"
   add_foreign_key "servers", "orgs"
   add_foreign_key "sessions", "users"
 end
