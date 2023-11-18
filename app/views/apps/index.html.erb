@@ -1,0 +1,24 @@
+<div class="flex justify-between mb-6">
+  <h1 class="text-xl">apps</h1>
+  <%= link_to "create app", new_app_path, class: "link"  %>
+</div>
+<div class="overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr class="uppercase">
+        <th>Name</th>
+        <th>Last Deployed</th>
+        <th>Running processes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @apps.each do |app| %>
+        <tr>
+          <th><%= app.name %></th>
+          <td><%= l Time.current %></td>
+          <td><%= 3 %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>

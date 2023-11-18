@@ -14,5 +14,6 @@ class Current < ActiveSupport::CurrentAttributes
 
     self.membership = user.memberships.first
     self.org = membership.org
+    self.server = org.servers.first
   end
 end

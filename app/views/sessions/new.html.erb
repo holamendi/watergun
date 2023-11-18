@@ -1,31 +1,17 @@
-<!--
-  This example requires some changes to your config:
-
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
-<!--
-  This example requires updating your template:
-
-  ```
-  <html class="h-full bg-gray-900">
-  <body class="h-full">
-  ```
--->
-<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <%= render "form" %>
-    <p class="mt-10 text-center text-sm text-gray-400">
-      Not a member?
-      <a href="#" class="font-semibold leading-6 text-indigo-400 hover:text-indigo-300">Start a 14 day free trial</a>
-    </p>
+<div class="flex flex-col justify-center min-h-full px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <%= form_with(scope: :session, url: sessions_path, class: "space-y-6") do |form| %>
+      <div class="w-full form-control">
+        <%= form.label :email, class: "label" %>
+        <%= form.text_field :email, class: "input input-bordered" %>
+      </div>
+      <div class="w-full form-control">
+        <%= form.label :password, class: "label" %>
+        <%= form.password_field :password, class: "input input-bordered" %>
+      </div>
+      <div>
+        <%= form.submit "Sign in", class: "btn btn-primary w-full text-white" %>
+      </div>
+    <% end %>
   </div>
 </div>

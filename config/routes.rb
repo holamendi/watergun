@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
-  resources :sessions, only: %i[new create destroy]
+  resources :apps
   resources :memberships
-  resources :users
   resources :orgs
   resources :servers
+  resources :sessions, only: %i[new create destroy]
+  resources :users
+  resources :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
