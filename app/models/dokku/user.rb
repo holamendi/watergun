@@ -1,8 +1,12 @@
-class Dokku::User < ApplicationRecord
-  include BelongsToOrg
-  include BelongsToServer
+module Dokku
+  class User < ApplicationRecord
+    include BelongsToOrg
+    include BelongsToServer
 
-  attribute :ssh_private_key, default: -> { SSHKey.generate.private_key }
+    self.table_name = "dokku_users"
 
-  validates :ssh_private_key, presence: true, uniqueness: true
+    attribute :ssh_private_key, default: -> { SSHKey.generate.private_key }
+
+    validates :ssh_private_key, presence: true, uniqueness: true
+  end
 end
