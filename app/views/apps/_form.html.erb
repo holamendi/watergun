@@ -1,7 +1,8 @@
 <%= form_with model: app, class: "space-y-6" do |form| %>
+  <h1 class="font-bold">hello</h1>
   <div class="w-1/2 form-control">
-    <%= form.label :name, "name", class: "label" %>
-    <%= form.text_field :name, class: "input input-bordered" %>
+    <%= form.label :name, "name", class: "label text-sm" %>
+    <%= form.text_field :name, class: "input input-sm input-bordered" %>
   </div>
-  <%= form.submit "save", class: "btn" %>
+  <%= form.submit "save", class: "btn btn-sm" %>
 <% end %>
