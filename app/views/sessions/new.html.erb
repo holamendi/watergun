@@ -2,15 +2,15 @@
   <div class="sm:mx-auto sm:w-full sm:max-w-sm">
     <%= form_with(scope: :session, url: sessions_path, class: "space-y-6") do |form| %>
       <div class="w-full form-control">
-        <%= form.label :email, class: "label" %>
+        <%= form.label :email, "email", class: "label" %>
         <%= form.text_field :email, class: "input input-bordered" %>
       </div>
       <div class="w-full form-control">
-        <%= form.label :password, class: "label" %>
+        <%= form.label :password, "password", class: "label" %>
         <%= form.password_field :password, class: "input input-bordered" %>
       </div>
       <div>
-        <%= form.submit "Sign in", class: "btn btn-primary w-full text-white" %>
+        <%= form.submit "log in", class: "btn btn-primary w-full text-white" %>
       </div>
     <% end %>
   </div>
