@@ -7,7 +7,6 @@ Rails.application.routes.draw do
   end
   resources :memberships
   resources :orgs
-  resources :servers
   resources :sessions, only: %i[new create destroy]
   resources :users
   resources :users

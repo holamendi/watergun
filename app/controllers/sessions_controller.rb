@@ -13,6 +13,8 @@ class SessionsController < ApplicationController
 
   # GET /sessions/new
   def new
+    redirect_to root_path if cookies.encrypted[:session_token].present?
+
     @session = Session.new
   end
 
@@ -27,7 +29,7 @@ class SessionsController < ApplicationController
     if @user
       Current.session = @user.sessions.create!
       cookies.encrypted[:session_token] = {value: Current.session.token, expires: Current.session.expires_at}
-      redirect_to servers_path
+      redirect_to root_path
     else
       render :new, status: :unprocessable_entity
     end
