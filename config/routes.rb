@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :apps
+  resources :apps do
+    member do
+      get :logs
+      get :metrics
+    end
+  end
   resources :memberships
   resources :orgs
   resources :servers
@@ -13,5 +18,5 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
 
   # Defines the root path route ("/")
-  root "servers#index"
+  root "apps#index"
 end

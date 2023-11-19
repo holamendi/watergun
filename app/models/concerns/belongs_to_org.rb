@@ -4,6 +4,6 @@ module BelongsToOrg
   included do
     belongs_to :org
 
-    attribute :org_id, defaut: -> { Current.org&.id }
+    after_initialize -> { self.org ||= Current.org }, if: :new_record?
   end
 end

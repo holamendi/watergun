@@ -1,0 +1,13 @@
+<div class="mb-6">
+  <h1 class="text-2xl"><%= app.name %></h1>
+</div>
+<div class="flex">
+  <div role="tablist" class="w-3xl tabs tabs-lifted tabs-lg">
+    <%= link_to "overview", app_path(@app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
+    <%= link_to "metrics", metrics_app_path(@app), class: class_names("tab", "tab-active" => action_name  == "metrics"), role: "tab" %>
+    <%= link_to "logs", logs_app_path(@app), class: class_names("tab", "tab-active" => action_name  == "logs"), role: "tab" %>
+    <%= link_to "settings", edit_app_path(@app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
+  </div>
+  <div class="w-full border-b border-base-300">
+  </div>
+</div>

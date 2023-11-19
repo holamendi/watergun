@@ -4,6 +4,6 @@ module BelongsToServer
   included do
     belongs_to :server
 
-    attribute :server_id, defaut: -> { Current.server&.id }
+    after_initialize -> { self.server ||= Current.server }, if: :new_record?
   end
 end

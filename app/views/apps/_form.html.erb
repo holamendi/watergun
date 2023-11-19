@@ -1,0 +1,7 @@
+<%= form_with model: app, class: "space-y-6" do |form| %>
+  <div class="w-1/2 form-control">
+    <%= form.label :name, "name", class: "label" %>
+    <%= form.text_field :name, class: "input input-bordered" %>
+  </div>
+  <%= form.submit "save", class: "btn" %>
+<% end %>
