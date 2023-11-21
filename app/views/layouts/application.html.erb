@@ -12,20 +12,14 @@
       document.documentElement.setAttribute('data-theme', window.localStorage.getItem('theme'))
     </script>
   </head>
-  <body class="h-full font-mono">
+  <body class="h-full bg-base-200">
     <% if controller_name == "sessions" %>
       <%= yield %>
     <% else %>
       <%= render "shared/navbar" %>
-      <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="flex max-w-4xl mx-auto space-x-5">
-          <div class="hidden w-1/4 lg:flex">
-            <ul class="w-56 menu bg-base-100 rounded-box">
-              <li><a>apps</a></li>
-              <li><a>services</a></li>
-            </ul>
-          </div>
-          <div class="w-full">
+      <div class="px-4 mx-auto max-w-8xl sm:px-6 lg:px-8">
+        <div class="flex max-w-3xl mx-auto space-x-5">
+          <div class="w-full p-8 mt-6 rounded-lg bg-base-100">
             <%= yield %>
           </div>
         </div>

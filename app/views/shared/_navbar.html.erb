@@ -1,39 +1,40 @@
-<div class="w-full">
-  <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <div class="p-0 mb-8 navbar">
-        <div class="navbar-start">
-          <div class="dropdown">
-            <label tabindex="0" class="btn btn-ghost lg:hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-            </label>
-            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-              <li><a>Item 1</a></li>
-              <li>
-                <a>Parent</a>
-                <ul class="p-2">
-                  <li><a>Submenu 1</a></li>
-                  <li><a>Submenu 2</a></li>
-                </ul>
-              </li>
-              <li><a>Item 3</a></li>
-            </ul>
-          </div>
-          <div class="h-6">
-            <%= link_to root_path do %>
-              <svg class="w-full h-full" viewBox="132.84 235.85 667.16 328.29" width="667.16" height="328.29" xmlns="http://www.w3.org/2000/svg">
-                <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
-              </svg>
-            <% end %>
-          </div>
-        </div>
-        <div class="hidden navbar-start lg:flex">
-          <ul class="px-1 menu menu-horizontal">
-            <li><%= link_to "apps", apps_path, class: class_names(active: controller_name == "apps") %></li>
-            <li><a>databases</a></li>
+<div class="navbar bg-base-100">
+  <div class="navbar-start">
+    <div class="dropdown">
+      <label tabindex="0" class="btn btn-ghost lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+      </label>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+        <li><a>Item 1</a></li>
+        <li>
+          <a>Parent</a>
+          <ul class="p-2">
+            <li><a>Submenu 1</a></li>
+            <li><a>Submenu 2</a></li>
           </ul>
-        </div>
-      </div>
+        </li>
+        <li><a>Item 3</a></li>
+      </ul>
     </div>
+    <a class="text-xl btn btn-ghost">daisyUI</a>
+  </div>
+  <div class="hidden navbar-center lg:flex">
+    <ul class="px-1 menu menu-horizontal">
+      <li><%= link_to "apps", apps_path, class: class_names(active: controller_name == "apps") %></li>
+      <li><a>Item 3</a></li>
+    </ul>
+  </div>
+  <div class="navbar-end">
+    <ul class="menu menu-horizontal">
+       <li tabindex="0">
+        <details>
+          <summary>hola@mendi.cl</summary>
+          <ul class="p-2">
+            <li><a>Submenu 1</a></li>
+            <li><a>Submenu 2</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
   </div>
 </div>
