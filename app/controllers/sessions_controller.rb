@@ -20,8 +20,9 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    @session.destroy!
-    redirect_to sessions_url, notice: "Session was successfully destroyed.", status: :see_other
+    Current.session&.destroy
+    cookies.delete(:session_token)
+    redirect_to login_path, notice: "Logged out", status: :see_other
   end
 
   private
