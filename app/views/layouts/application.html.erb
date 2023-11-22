@@ -12,7 +12,7 @@
       document.documentElement.setAttribute('data-theme', window.localStorage.getItem('theme'))
     </script>
   </head>
-  <body class="h-full bg-base-200">
+  <body class="h-full font-mono bg-base-200">
     <% if controller_name == "sessions" %>
       <%= yield %>
     <% else %>
