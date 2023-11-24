@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_24_183852) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -18,6 +18,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
     t.string "dokku_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "data", default: {}, null: false
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
   end
@@ -69,10 +70,12 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_13_174844) do
     t.string "event_type", null: false
     t.string "source", null: false
     t.string "status", null: false
-    t.string "job_id", null: false
+    t.string "job_id"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "params", default: {}, null: false
+    t.datetime "running_at"
     t.index ["eventable_type", "eventable_id"], name: "index_server_events_on_eventable"
     t.index ["membership_id"], name: "index_server_events_on_membership_id"
     t.index ["org_id"], name: "index_server_events_on_org_id"

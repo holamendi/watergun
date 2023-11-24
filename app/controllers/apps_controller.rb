@@ -12,6 +12,13 @@ class AppsController < ApplicationController
   def create
     @app = Current.server.apps.new(app_params)
     if @app.save
+      @app.server_events.create!(
+        event_type: "app_create",
+        source: "web",
+        params: {
+          dokku_app_name: @app.dokku_name
+        }
+      ).enqueue!
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new

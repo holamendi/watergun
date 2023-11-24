@@ -8,15 +8,13 @@ class ServerEvent < ApplicationRecord
   has_one :server_event_log, dependent: :destroy
 
   enum status: {
+    pending: "pending",
     running: "running",
     success: "success",
     failure: "failure"
-  }, _prefix: true
+  }, _prefix: true, _default: "pending"
 
-  enum event_type: {
-    app_create: "app_create",
-    app_destroy: "app_destroy",
-    server_create: "server_create",
-    server_provision: "server_provision"
-  }, _prefix: true
+  def enqueue!
+    update(job_id: ServerEvents::ProcessJob.perform_later(self))
+  end
 end

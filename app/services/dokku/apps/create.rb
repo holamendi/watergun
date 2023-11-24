@@ -1,11 +1,12 @@
-module ServerEvents
+module Dokku
   module Apps
-    class Restart < ApplicationService
+    class Create
       def initialize(app)
         @app = app
       end
 
       def call
+        status, output = app.server.ssh_command!("dokku apps:create #{app.name}")
       end
     end
   end

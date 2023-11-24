@@ -21,4 +21,15 @@ class Server < ApplicationRecord
   has_many :server_events, dependent: :destroy
 
   store_attribute :data, :public_ip, :string
+
+  def ssh_command!(command)
+    status = {}
+    output = nil
+
+    Net::SSH.start(public_ip, "watergun", key_data: [dokku_user.ssh_private_key], keys_only: true, non_interactive: true) do |ssh|
+      output = ssh.exec!(command, status:)
+    end
+
+    [status[:exit_code], output]
+  end
 end
