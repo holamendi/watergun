@@ -2,6 +2,13 @@ class ServerEvent < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer
 
+  EVENT_TYPES = %w[
+    apps.create
+    apps.deploy
+    apps.destroy
+    apps.restart
+  ]
+
   belongs_to :eventable, polymorphic: true, optional: true
   belongs_to :membership, optional: true
 
@@ -14,7 +21,15 @@ class ServerEvent < ApplicationRecord
     failure: "failure"
   }, _prefix: true, _default: "pending"
 
-  def enqueue!
-    update(job_id: ServerEvents::ProcessJob.perform_later(self))
+  validates :event_type, inclusion: {in: EVENT_TYPES}
+
+  after_create_commit :enqueue
+
+  def enqueue
+    ServerEvents::ProcessJob.perform_later(self)
+  end
+
+  def event_processor
+    "ServerEvents::#{event_type.split(".").map(&:camelize).join("::")}".constantize
   end
 end

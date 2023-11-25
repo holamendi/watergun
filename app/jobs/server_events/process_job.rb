@@ -3,8 +3,10 @@ module ServerEvents
     queue_as :default
 
     def perform(server_event)
-      klass = "ServerEvents::#{server_event.event_type.camelize}".constantize
-      klass.new(server_event).call
+      return unless server_event.status_pending?
+
+      server_event.update!(job_id:)
+      server_event.event_processor.new(server_event).call
     end
   end
 end

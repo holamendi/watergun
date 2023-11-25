@@ -74,7 +74,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_24_183852) do
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.json "params", default: {}, null: false
+    t.json "args", default: {}, null: false
     t.datetime "running_at"
     t.index ["eventable_type", "eventable_id"], name: "index_server_events_on_eventable"
     t.index ["membership_id"], name: "index_server_events_on_membership_id"

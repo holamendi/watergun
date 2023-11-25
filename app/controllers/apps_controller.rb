@@ -2,23 +2,24 @@ class AppsController < ApplicationController
   before_action :set_app, only: [:show, :edit, :update, :destroy, :metrics, :logs]
 
   def index
-    @apps = Current.server.apps
+    @apps = current_server.apps
   end
 
   def new
-    @app = Current.server.apps.new
+    @app = current_server.apps.new
   end
 
   def create
-    @app = Current.server.apps.new(app_params)
+    @app = current_server.apps.new(app_params)
+
     if @app.save
       @app.server_events.create!(
-        event_type: "app_create",
+        event_type: "apps.create",
         source: "web",
-        params: {
-          dokku_app_name: @app.dokku_name
+        args: {
+          dokku_app: @app.dokku_name
         }
-      ).enqueue!
+      )
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new
@@ -41,6 +42,14 @@ class AppsController < ApplicationController
 
   def destroy
     @app.destroy
+    current_server.server_events.create!(
+      event_type: "apps.destroy",
+      source: "web",
+      args: {
+        dokku_app: @app.dokku_name
+      }
+    )
+
     redirect_to apps_path, notice: "App deleted successfully."
   end
 
@@ -57,6 +66,6 @@ class AppsController < ApplicationController
   end
 
   def set_app
-    @app = Current.server.apps.find(params[:id])
+    @app = current_server.apps.find(params[:id])
   end
 end
