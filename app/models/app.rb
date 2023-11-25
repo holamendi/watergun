@@ -3,7 +3,7 @@ class App < ApplicationRecord
   include BelongsToServer
   include ServerEventable
 
-  store_attribute :data, :git_repository, :string
+  store_attribute :data, :git_repo, :string
   store_attribute :data, :git_branch, :string
 
   validates :name, presence: true, uniqueness: {scope: :server_id}

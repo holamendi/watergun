@@ -15,10 +15,7 @@ class AppsController < ApplicationController
     if @app.save
       @app.server_events.create!(
         event_type: "apps.create",
-        source: "web",
-        args: {
-          dokku_app: @app.dokku_name
-        }
+        source: "web"
       )
       redirect_to app_path(@app), notice: "App created successfully."
     else
@@ -62,7 +59,7 @@ class AppsController < ApplicationController
   private
 
   def app_params
-    params.require(:app).permit(:name)
+    params.require(:app).permit(:name, :git_repo)
   end
 
   def set_app
