@@ -1,5 +1,5 @@
+<h2 class="text-xl font-extrabold">General</h2>
 <%= form_with model: app, class: "space-y-6" do |form| %>
-  <h1 class="font-bold">General</h1>
   <div class="form-control">
     <%= form.label :name, class: "label" %>
     <%= form.text_field :name, class: "input input-bordered" %>
@@ -8,5 +8,5 @@
     <%= form.label :git_repo, "Github Repo", class: "label" %>
     <%= form.text_field :git_repo, class: "input input-bordered" %>
   </div>
-  <%= form.submit "Save", class: "btn btn-primary" %>
+  <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

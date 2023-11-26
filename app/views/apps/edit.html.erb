@@ -1,4 +1,4 @@
 <%= render "header", app: @app %>
 <%= render "form", app: @app %>
-<h1 class="mt-10 mb-8 font-bold">Danger zone</h1>
-<%= button_to "Destroy", app_path(@app), class: "btn btn-error", method: :delete %>
+<h2 class="mt-10 mb-6 text-xl font-extrabold text-error">Danger zone</h1>
+<%= button_to "Destroy App", app_path(@app), class: "btn btn-error text-white", method: :delete, data: { "turbo-confirm": "Are you sure?" } %>

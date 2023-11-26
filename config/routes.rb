@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :apps do
     member do
-      get :logs
+      get :activity
       get :metrics
     end
   end

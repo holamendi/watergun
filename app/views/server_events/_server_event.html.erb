@@ -1,0 +1,19 @@
+<tr id="<%= dom_id(server_event) %>">
+  <td><%= server_event.event_type %></td>
+  <td>
+    <% if server_event.status_running? %>
+      <span class="text-success">Running</span>
+    <% elsif server_event.status_success? %>
+      <span class="text-success">Success</span>
+    <% elsif server_event.status_failure? %>
+      <span class="text-error">Failed</span>
+    <% end %>
+  </td>
+  <td>
+    <% if server_event.completed_at? %>
+      <div class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.completed_at %>">
+        <%= time_ago_in_words server_event.completed_at %> ago
+      </div>
+    <% end %>
+  </td>
+</tr>

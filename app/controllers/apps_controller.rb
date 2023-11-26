@@ -1,5 +1,5 @@
 class AppsController < ApplicationController
-  before_action :set_app, only: [:show, :edit, :update, :destroy, :metrics, :logs]
+  before_action :set_app, only: [:show, :edit, :update, :destroy, :activity]
 
   def index
     @apps = current_server.apps
@@ -50,10 +50,8 @@ class AppsController < ApplicationController
     redirect_to apps_path, notice: "App deleted successfully."
   end
 
-  def metrics
-  end
-
-  def logs
+  def activity
+    @server_events = @app.server_events.order(created_at: :desc).limit(50)
   end
 
   private
