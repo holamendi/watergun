@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :git_credentials
   resources :apps do
     member do
       get :activity

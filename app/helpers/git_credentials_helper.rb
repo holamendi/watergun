@@ -1,0 +1,2 @@
+module GitCredentialsHelper
+end

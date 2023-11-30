@@ -6,7 +6,7 @@
   </div>
     <div class="form-control">
     <%= form.label :git_repo, "Github Repo", class: "label" %>
-    <%= form.text_field :git_repo, class: "input input-bordered" %>
+    <%= form.select :git_repo, Current.org.git_credential.repos.pluck(:full_name), {}, class: "select select-bordered" %>
   </div>
   <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

@@ -57,6 +57,7 @@ end
 gem "httpx"
 gem "litestack"
 gem "net-ssh"
+gem "octokit"
 gem "turbo-rails"
 gem "sshkey"
 gem "store_attribute"

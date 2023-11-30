@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_24_183852) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_30_174249) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -32,6 +32,16 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_24_183852) do
     t.index ["id", "server_id"], name: "index_dokku_users_on_id_and_server_id", unique: true
     t.index ["org_id"], name: "index_dokku_users_on_org_id"
     t.index ["server_id"], name: "index_dokku_users_on_server_id"
+  end
+
+  create_table "git_credentials", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "provider", null: false
+    t.string "description"
+    t.string "personal_access_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["org_id"], name: "index_git_credentials_on_org_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -118,6 +128,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_24_183852) do
   add_foreign_key "apps", "servers"
   add_foreign_key "dokku_users", "orgs"
   add_foreign_key "dokku_users", "servers"
+  add_foreign_key "git_credentials", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
   add_foreign_key "server_event_logs", "orgs"
