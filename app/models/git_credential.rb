@@ -6,12 +6,12 @@ class GitCredential < ApplicationRecord
   }, _prefix: true, _default: "github"
 
   def repos
-    client.repos
+    client.repo
   end
 
   private
 
   def client
-    Octokit::Client.new(access_token: personal_access_token)
+    Octokit::Client.new(access_token: personal_access_token, per_page: 100)
   end
 end
