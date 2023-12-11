@@ -6,7 +6,7 @@ class GitCredential < ApplicationRecord
   }, _prefix: true, _default: "github"
 
   def repos
-    client.repo
+    client.repos
   end
 
   private
