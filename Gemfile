@@ -54,6 +54,7 @@ group :development do
   gem "annotate"
 end
 
+gem "honeybadger"
 gem "httpx"
 gem "litestack"
 gem "net-ssh"
