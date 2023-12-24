@@ -54,6 +54,9 @@ class AppsController < ApplicationController
     @server_events = @app.server_events.order(created_at: :desc).limit(50)
   end
 
+  def select_git_repo
+  end
+
   private
 
   def app_params

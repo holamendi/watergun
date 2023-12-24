@@ -10,7 +10,12 @@ module ServerEvents
       def call
         server_event.update!(status: "running", running_at: Time.current)
 
-        status, output = server_event.server.ssh_command!("dokku apps:create #{app.dokku_name}")
+        commands = [
+          "dokku apps:create #{app.dokku_name}",
+          "dokku builder:set #{app.dokku_name} selected #{app.dokku_builder}"
+        ]
+
+        status, output = server_event.server.ssh_command!(commands.join(" && "))
 
         server_event.update!(status: status.zero? ? "success" : "failure", completed_at: Time.current)
         server_event.create_server_event_log!(content: output, org: server_event.org)

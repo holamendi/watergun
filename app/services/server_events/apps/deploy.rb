@@ -10,10 +10,10 @@ module ServerEvents
       def call
         server_event.update!(status: "running", running_at: Time.current)
 
-        commands = []
-
-        commands << "dokku git:auth github.com u #{app.org.git_credential.personal_access_token}" if app.org.git_credential.present?
-        commands << "dokku git:sync --build #{app.dokku_name} http://github.com/#{app.git_repo}.git main"
+        commands = [
+          "dokku git:auth github.com u #{app.org.git_credential.personal_access_token}",
+          "dokku git:sync --build #{app.dokku_name} http://github.com/#{app.git_repo}.git #{app.git_branch}}"
+        ]
 
         status, output = server_event.server.ssh_command!(commands.join(" && "))
 

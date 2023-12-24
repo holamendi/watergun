@@ -5,8 +5,10 @@ Rails.application.routes.draw do
       get :activity
       get :metrics
     end
+    collection do
+      get :select_git_repo
+    end
   end
-  resources :git_repositories
   resources :databases
   resources :memberships
   resources :orgs
