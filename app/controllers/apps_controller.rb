@@ -60,7 +60,7 @@ class AppsController < ApplicationController
   private
 
   def app_params
-    params.require(:app).permit(:name, :git_repo)
+    params.require(:app).permit(:name, :git_repo, :git_branch, :dokku_builder)
   end
 
   def set_app

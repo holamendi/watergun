@@ -13,7 +13,8 @@ class App < ApplicationRecord
   store_attribute :data, :git_branch, :string, default: "main"
   store_attribute :data, :dokku_builder, :string, default: "buildpack"
 
-  validates :name, :git_repo, :git_branch, presence: true, uniqueness: {scope: :server_id}
+  validates :name, presence: true, uniqueness: {scope: :server_id}
+  validates :git_repo, :git_brach, presence: true
   validates :dokku_builder, inclusion: {in: DOKKU_BUILDERS.keys}
 
   before_validation :set_dokku_name, on: :create
