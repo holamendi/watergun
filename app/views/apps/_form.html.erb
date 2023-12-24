@@ -4,9 +4,11 @@
     <%= form.label :name, class: "label" %>
     <%= form.text_field :name, class: "input input-bordered" %>
   </div>
-    <div class="form-control">
+  <div class="form-control">
     <%= form.label :git_repo, "Github Repo", class: "label" %>
-    <%= form.select :git_repo, Current.org.git_credential.repos.pluck(:full_name), {}, class: "select select-bordered" %>
+    <%= turbo_frame_tag "git_repositories", src: git_repositories_path do %>
+      <span class="loading loading-spinner loading-xs"></span>
+    <% end %>
   </div>
   <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

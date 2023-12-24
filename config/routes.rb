@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       get :metrics
     end
   end
+  resources :git_repositories
   resources :databases
   resources :memberships
   resources :orgs

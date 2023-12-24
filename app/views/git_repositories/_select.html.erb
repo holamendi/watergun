@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "git_repositories" do %>
+  <%= select_tag :git_repo, options_for_select(Current.org.git_credential.repos.pluck(:full_name)), class: "select select-bordered" %>
+<% end %>
