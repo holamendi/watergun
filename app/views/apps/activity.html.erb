@@ -1,16 +1,5 @@
 <%= turbo_stream_from @app, :server_events %>
-
 <%= render "header", app: @app %>
-<table id="server_events" class="table">
-  <thead>
-    <tr>
-      <th>Event</th>
-      <th>Status</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= render @server_events %>
-  </tbody>
-</table>
+<div id="server_events">
+  <%= render @server_events %>
+</div>

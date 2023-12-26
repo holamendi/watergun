@@ -28,6 +28,10 @@ class ServerEvent < ApplicationRecord
   after_create_commit -> { broadcast_prepend_to eventable, :server_events }
   after_update_commit -> { broadcast_replace_to eventable, :server_events }
 
+  def completed?
+    completed_at.present?
+  end
+
   def enqueue
     ServerEvents::ProcessJob.perform_later(self)
   end

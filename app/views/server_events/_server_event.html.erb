@@ -1,24 +1,32 @@
-<tr id="<%= dom_id(server_event) %>">
-  <td><%= server_event.event_type %></td>
-  <td>
-    <% if server_event.status_running? %>
-      <span class="text-success">Running</span>
-    <% elsif server_event.status_success? %>
-      <span class="text-success">Success</span>
-    <% elsif server_event.status_failure? %>
-      <span class="text-error">Failed</span>
-    <% end %>
-  </td>
-  <td>
-    <% if server_event.completed_at? %>
-      <div class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.completed_at %>">
-        <%= time_ago_in_words server_event.completed_at %> ago
+<div id="<%= dom_id(server_event) %>">
+  <details class="mb-2 collapse bg-base-200 <%= 'collapse-arrow' if server_event.completed_at? %>">
+    <summary class="text-sm collapse-title <%= 'cursor-default' if server_event.completed_at? %>">
+      <div class="flex flex-row justify-between">
+        <div>
+          <%= server_event.event_type %>
+        </div>
+        <div>
+          <% if server_event.completed_at? %>
+            <span class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.completed_at %>">
+              <%= time_ago_in_words server_event.completed_at %> ago
+            </span>
+          <% end %>
+        </div>
+        <div>
+          <% if server_event.status_running? %>
+            <span class="text-success">Running</span>
+          <% elsif server_event.status_success? %>
+            <span class="text-success">Success</span>
+          <% elsif server_event.status_failure? %>
+            <span class="text-error">Failed</span>
+          <% end %>
+        </div>
+      </div>
+    </summary>
+    <% if server_event.completed? %>
+      <div class="max-h-screen overflow-scroll text-xs collapse-content">
+        <%= simple_format h(server_event.server_event_log.content.delete("[1G")) %>
       </div>
     <% end %>
-  </td>
-  <td>
-    <% if server_event.status.in?(%w[success failure]) %>
-      <%= link_to "Logs", logs_server_event_path(server_event) %>
-    <% end %>
-  </td>
-</tr>
+  </details>
+</div>
