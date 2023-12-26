@@ -4,9 +4,9 @@ class App < ApplicationRecord
   include ServerEventable
 
   DOKKU_BUILDERS = {
-    buildpack: "Heroku Buildpacks",
-    dockerfile: "Dockerfile",
-    nixpacks: "Nixpacks"
+    "buildpack" => "Heroku Buildpacks",
+    "dockerfile" => "Dockerfile",
+    "nixpacks" => "Nixpacks"
   }
 
   store_attribute :data, :git_repo, :string
