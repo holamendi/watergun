@@ -19,7 +19,7 @@
   </div>
   <div class="form-control">
     <%= form.label :dokku_builder, "Builder", class: "label" %>
-    <%= form.select :dokku_builder, App::DOKKU_BUILDERS.invert.to_a, {}, class: "select select-bordered w-full" %>
+    <%= form.select :dokku_builder, form.object.compatible_dokku_builders.invert.to_a, {}, class: "select select-bordered w-full" %>
   </div>
   <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

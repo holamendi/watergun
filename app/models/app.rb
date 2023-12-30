@@ -42,8 +42,9 @@ class App < ApplicationRecord
 
   before_validation :set_dokku_name, on: :create
 
-  def available_dokku_builders
-    DOKKU_BUILDERS if server.architecture.include?("x86")
+  def compatible_dokku_builders
+    return DOKKU_BUILDERS if server.nil?
+    return DOKKU_BUILDERS if server.architecture.include?("x86")
 
     DOKKU_BUILDERS.except("buildpack")
   end
