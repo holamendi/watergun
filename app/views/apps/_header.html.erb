@@ -1,10 +1,12 @@
 <div class="mb-6">
   <h1 class="text-3xl font-extrabold"><%= app.name %></h1>
 </div>
-<div class="flex pb-6">
+<% if false %>
+<div class="flex h-full pb-6">
   <div role="tablist" class="w-3xl tabs tabs-bordered">
     <%= link_to "overview", app_path(@app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
     <%= link_to "activity", activity_app_path(@app), class: class_names("tab", "tab-active" => action_name  == "activity"), role: "tab" %>
     <%= link_to "settings", edit_app_path(@app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
   </div>
 </div>
+<% end %>

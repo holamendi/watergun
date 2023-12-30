@@ -1,18 +1,18 @@
 <div id="<%= dom_id(server_event) %>">
-  <details class="mb-2 collapse bg-base-200 <%= 'collapse-arrow' if server_event.completed_at? %>">
-    <summary class="text-sm collapse-title <%= 'cursor-default' if server_event.completed_at? %>">
+  <details class="mb-2 overflow-visible rounded-md collapse bg-base-200 collapse-arrow">
+    <summary class="min-h-0 overflow-visible text-sm collapse-title">
       <div class="flex flex-row justify-between">
-        <div>
+        <div class="w-1/3">
           <%= server_event.event_type %>
         </div>
-        <div>
+        <div class="w-1/3">
           <% if server_event.completed_at? %>
             <span class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.completed_at %>">
               <%= time_ago_in_words server_event.completed_at %> ago
             </span>
           <% end %>
         </div>
-        <div>
+        <div class="w-1/3">
           <% if server_event.status_running? %>
             <span class="text-success">Running</span>
           <% elsif server_event.status_success? %>
@@ -23,10 +23,8 @@
         </div>
       </div>
     </summary>
-    <% if server_event.completed? %>
-      <div class="max-h-screen overflow-scroll text-xs collapse-content">
-        <%= simple_format h(server_event.server_event_log.content.delete("[1G")) %>
-      </div>
-    <% end %>
+    <div id="<%= dom_id(server_event, :logs) %>" class="overflow-scroll text-xs max-h-96 collapse-content">
+      <%= simple_format h(server_event.server_event_log.content.delete("[1G")) if server_event.completed? %>
+    </div>
   </details>
 </div>

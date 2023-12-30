@@ -1,5 +1,10 @@
 <%= turbo_stream_from @app, :server_events %>
 <%= render "header", app: @app %>
-<div id="server_events">
-  <%= render @server_events %>
+<div class="flex">
+  <div>
+    <%= render "menu", app: @app %>
+  </div>
+  <div id="server_events" class="flex-1 ">
+    <%= render @server_events %>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 class OrgsController < ApplicationController
-  before_action :set_org, only: %i[ show edit update destroy ]
+  before_action :set_org, only: %i[show edit update destroy]
 
   # GET /orgs
   def index
@@ -46,13 +46,14 @@ class OrgsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_org
-      @org = Org.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def org_params
-      params.require(:org).permit(:name)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_org
+    @org = Org.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def org_params
+    params.require(:org).permit(:name)
+  end
 end

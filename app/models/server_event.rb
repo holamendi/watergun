@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: server_events
+#
+#  id             :integer          not null, primary key
+#  args           :json             not null
+#  completed_at   :datetime
+#  event_type     :string           not null
+#  eventable_type :string
+#  running_at     :datetime
+#  source         :string           not null
+#  status         :string           not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  eventable_id   :integer
+#  job_id         :string
+#  membership_id  :integer
+#  org_id         :integer          not null
+#  server_id      :integer          not null
+#
+# Indexes
+#
+#  index_server_events_on_eventable      (eventable_type,eventable_id)
+#  index_server_events_on_membership_id  (membership_id)
+#  index_server_events_on_org_id         (org_id)
+#  index_server_events_on_server_id      (server_id)
+#
+# Foreign Keys
+#
+#  membership_id  (membership_id => memberships.id)
+#  org_id         (org_id => orgs.id)
+#  server_id      (server_id => servers.id)
+#
 class ServerEvent < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer

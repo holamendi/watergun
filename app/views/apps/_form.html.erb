@@ -5,8 +5,12 @@
   </div>
   <div class="form-control">
     <%= form.label :git_repo, "Repository", class: "label" %>
-    <%= turbo_frame_tag "select_git_repo", src: select_git_repo_apps_path do %>
-      <%= form.select :git_repo, [["Fetching data from Github...", nil]], {}, disabled: true, class: "select select-bordered w-full" %>
+    <% if form.object.new_record? %>
+      <%= turbo_frame_tag "select_git_repo", src: select_git_repo_apps_path do %>
+        <%= form.select :git_repo, [["Fetching data from Github...", nil]], {}, disabled: true, class: "select select-bordered w-full" %>
+      <% end %>
+    <% else %>
+      <%= form.text_field :git_repo, class: "input input-bordered", disabled: true %>
     <% end %>
   </div>
   <div class="form-control">
