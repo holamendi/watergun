@@ -69,20 +69,20 @@ class Server < ApplicationRecord
             Turbo::StreamsChannel.broadcast_append_to server_event.eventable, :server_events, target: "logs_server_event_#{server_event.id}", content: "<p>#{data}</p>"
           end
 
-        finished_at = Time.current
+          finished_at = Time.current
 
-        result << {
-          command: command,
-          exit_code: status[:exit_code],
-          started_at: started_at,
-          finished_at: finished_at
-        }
-
-        status = {}
+          result << {
+            command: command,
+            exit_code: status[:exit_code],
+            started_at: started_at,
+            finished_at: finished_at
+          }
+        end
       end
     end
 
     {
+      success: result.all? { |r| r[:exit_code].zero? },
       details: result,
       output: output
     }

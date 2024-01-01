@@ -15,10 +15,10 @@ module ServerEvents
           "dokku builder:set #{app.dokku_name} selected #{app.dokku_builder}"
         ]
 
-        status, output = server_event.server.ssh_command!(commands.join(" && "), server_event)
+        success, details, output = server_event.server.ssh_command!(commands, server_event).values_at(:success, :details, :output)
 
         server_event.create_server_event_log!(content: output, org: server_event.org)
-        server_event.update!(status: status.zero? ? "success" : "failure", completed_at: Time.current)
+        server_event.update!(status: success ? "success" : "failure", completed_at: Time.current)
 
         if app.git_repo.present?
           app.server_events.create!(
@@ -28,6 +28,8 @@ module ServerEvents
             source: server_event.source
           )
         end
+      rescue
+        server_event.update!(status: "failure", completed_at: Time.current)
       end
 
       private
