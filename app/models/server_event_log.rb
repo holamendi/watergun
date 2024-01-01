@@ -23,5 +23,7 @@
 class ServerEventLog < ApplicationRecord
   include BelongsToOrg
 
+  normalizes :content, with: -> { _1.encode!("UTF-8", invalid: :replace, undef: :replace).force_encoding("utf-8") }
+
   belongs_to :server_event
 end
