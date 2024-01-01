@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_30_174249) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_01_185931) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -86,6 +86,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_30_174249) do
     t.datetime "updated_at", null: false
     t.json "args", default: {}, null: false
     t.datetime "running_at"
+    t.json "data", default: {}, null: false
     t.index ["eventable_type", "eventable_id"], name: "index_server_events_on_eventable"
     t.index ["membership_id"], name: "index_server_events_on_membership_id"
     t.index ["org_id"], name: "index_server_events_on_org_id"

@@ -5,6 +5,7 @@
 #  id             :integer          not null, primary key
 #  args           :json             not null
 #  completed_at   :datetime
+#  data           :json             not null
 #  event_type     :string           not null
 #  eventable_type :string
 #  running_at     :datetime
@@ -53,6 +54,8 @@ class ServerEvent < ApplicationRecord
     success: "success",
     failure: "failure"
   }, _prefix: true, _default: "pending"
+
+  store_attribute :data, :commands, :json, default: []
 
   validates :event_type, inclusion: {in: EVENT_TYPES}
 

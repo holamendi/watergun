@@ -26,27 +26,21 @@ class App < ApplicationRecord
   include BelongsToServer
   include ServerEventable
 
-  DOKKU_BUILDERS = {
-    "herokuish" => "Heroku Buildpacks",
-    "dockerfile" => "Dockerfile",
-    "nixpacks" => "Nixpacks"
-  }
-
   store_attribute :data, :git_repo, :string
   store_attribute :data, :git_branch, :string, default: "main"
   store_attribute :data, :dokku_builder, :string, default: "buildpack"
 
   validates :name, presence: true, uniqueness: {scope: :server_id}
   validates :git_repo, :git_branch, presence: true
-  validates :dokku_builder, inclusion: {in: DOKKU_BUILDERS.keys}
+  validates :dokku_builder, inclusion: {in: Server::DOKKU_BUILDERS.keys}
 
   before_validation :set_dokku_name, on: :create
 
   def compatible_dokku_builders
-    return DOKKU_BUILDERS if server.nil?
-    return DOKKU_BUILDERS if server.architecture.include?("x86")
+    return Server::DOKKU_BUILDERS unless server&.architecture.present?
+    return Server::DOKKU_BUILDERS if server.architecture.include?("x86")
 
-    DOKKU_BUILDERS.except("buildpack")
+    Server::DOKKU_BUILDERS.except("buildpack")
   end
 
   private
