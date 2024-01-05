@@ -62,7 +62,9 @@ Rails.application.configure do
   config.cache_store = :litecache
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  config.active_job.queue_adapter = :litejob
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = {database: {writing: :solid_queue, reading: :solid_queue}}
+
   # config.active_job.queue_name_prefix = "watergun_production"
 
   config.action_mailer.perform_caching = false
@@ -81,7 +83,7 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
   config.active_record.sqlite3_production_warning = false
-
+  config.solid_queue.connects_to = {database: {writing: :solid_queue, reading: :solid_queue}}
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
