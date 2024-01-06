@@ -42,7 +42,7 @@ module ServerEvents
           if index.zero? || result.present? && result.last[:exit_code].zero?
             ssh.exec!(command, status:) do |channel, stream, data|
               output << data
-              server_event.server_event_log.update!(content: server_event.server_event_log.content + data)
+              server_event.server_event_log.update!(content: server_event.server_event_log.content + data.force_encoding("UTF-8"))
               Turbo::StreamsChannel.broadcast_append_to server_event.eventable, :server_events, target: "logs_server_event_#{server_event.id}", content: "<p>#{data}</p>"
             end
 
