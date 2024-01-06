@@ -10,7 +10,6 @@ class Current < ActiveSupport::CurrentAttributes
     super
     return unless session
 
-    self.server_event_source = "web"
     self.user = session.user
   end
 

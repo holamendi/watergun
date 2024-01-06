@@ -56,7 +56,7 @@ class ServerEvent < ApplicationRecord
     exception: "exception"
   }, _prefix: true, _default: "pending"
 
-  attribute :source, :string, default: Current.server_event_source
+  attribute :source, :string, default: "web"
 
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
