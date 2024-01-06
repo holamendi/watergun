@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_01_185931) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_06_162046) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -19,6 +19,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_185931) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "data", default: {}, null: false
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
   end

@@ -24,11 +24,12 @@
 class App < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer
+  include Discard::Model
   include ServerEventable
 
   store_attribute :data, :git_repo, :string
   store_attribute :data, :git_branch, :string, default: "main"
-  store_attribute :data, :dokku_builder, :string, default: "buildpack"
+  store_attribute :data, :dokku_builder, :string, default: "herokuish"
 
   validates :name, presence: true, uniqueness: {scope: :server_id}
   validates :git_repo, :git_branch, presence: true
@@ -36,11 +37,19 @@ class App < ApplicationRecord
 
   before_validation :set_dokku_name, on: :create
 
-  def compatible_dokku_builders
-    return Server::DOKKU_BUILDERS unless server&.architecture.present?
-    return Server::DOKKU_BUILDERS if server.architecture.include?("x86")
+  after_create_commit -> { server_events.create!(event_type: "apps.create") }
+  after_discard -> { server_events.create!(event_type: "apps.destroy") }
 
-    Server::DOKKU_BUILDERS.except("buildpack")
+  def compatible_dokku_builders
+    if server.architecture.include?("x86")
+      Server::DOKKU_BUILDERS
+    else
+      Server::DOKKU_BUILDERS.except("herokuish")
+    end
+  end
+
+  def deploy
+    server_events.create!(event_type: "apps.deploy", source: "web")
   end
 
   private

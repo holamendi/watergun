@@ -1,10 +1,16 @@
 class Current < ActiveSupport::CurrentAttributes
-  attribute :membership, :org, :server, :session, :user
+  attribute :membership,
+    :org,
+    :server,
+    :server_event_source,
+    :session,
+    :user
 
   def session=(session)
     super
     return unless session
 
+    self.server_event_source = "web"
     self.user = session.user
   end
 

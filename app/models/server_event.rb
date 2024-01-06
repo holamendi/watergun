@@ -52,15 +52,18 @@ class ServerEvent < ApplicationRecord
     pending: "pending",
     running: "running",
     success: "success",
-    failure: "failure"
+    failure: "failure",
+    exception: "exception"
   }, _prefix: true, _default: "pending"
 
-  store_attribute :data, :commands, :json, default: []
+  attribute :source, :string, default: Current.server_event_source
+
+  store_attribute :data, :details, :json, default: []
+  store_attribute :data, :exception, :json, default: {}
 
   validates :event_type, inclusion: {in: EVENT_TYPES}
 
-  after_create_commit :enqueue
-
+  after_create_commit :process_async
   after_create_commit -> { broadcast_prepend_to eventable, :server_events }
   after_update_commit -> { broadcast_replace_to eventable, :server_events }
 
@@ -68,8 +71,12 @@ class ServerEvent < ApplicationRecord
     completed_at.present?
   end
 
-  def enqueue
+  def process_async
     ServerEvents::ProcessJob.perform_later(self)
+  end
+
+  def process
+    event_processor.new(self).call
   end
 
   def event_processor

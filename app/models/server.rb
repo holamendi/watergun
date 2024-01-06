@@ -24,6 +24,8 @@
 class Server < ApplicationRecord
   include BelongsToOrg
 
+  USER = "watergun"
+
   DOKKU_BUILDERS = {
     "herokuish" => "Heroku Buildpacks",
     "dockerfile" => "Dockerfile",

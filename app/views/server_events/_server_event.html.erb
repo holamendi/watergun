@@ -24,7 +24,7 @@
       </div>
     </summary>
     <div id="<%= dom_id(server_event, :logs) %>" class="overflow-scroll text-xs max-h-96 collapse-content">
-      <%= simple_format h(server_event.server_event_log.content.delete("[1G")) if server_event.completed? %>
+      <%= simple_format h(server_event.server_event_log.content.delete("[1G")) if server_event.server_event_log %>
     </div>
   </details>
 </div>

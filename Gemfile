@@ -54,6 +54,7 @@ group :development do
   gem "annotate"
 end
 
+gem "discard"
 gem "faraday-retry"
 gem "honeybadger"
 gem "httpx"

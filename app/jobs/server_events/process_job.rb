@@ -6,7 +6,7 @@ module ServerEvents
       return unless server_event.status_pending?
 
       server_event.update!(job_id:)
-      server_event.event_processor.new(server_event).call
+      server_event.process
     end
   end
 end
