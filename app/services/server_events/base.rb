@@ -7,6 +7,7 @@ module ServerEvents
     end
 
     def call
+      app&.update!(status: app_status)
       server_event.update!(status: "running", running_at: Time.current)
       server_event.create_server_event_log!(org:, content: "")
 
@@ -26,6 +27,8 @@ module ServerEvents
           backtrace: e.backtrace
         }
       )
+    ensure
+      app&.update!(status: "idle")
     end
 
     private
@@ -71,6 +74,10 @@ module ServerEvents
 
     def app
       server_event.eventable if server_event.eventable_type == "App"
+    end
+
+    def app_status
+      raise NotImplementedError
     end
 
     def server

@@ -1,5 +1,5 @@
 class AppsController < ApplicationController
-  before_action :set_app, only: [:show, :edit, :update, :destroy, :activity]
+  before_action :set_app, except: [:index, :new, :create, :select_git_repo]
 
   def index
     @apps = current_server.apps.kept
@@ -36,6 +36,16 @@ class AppsController < ApplicationController
   def destroy
     @app.discard!
     redirect_to apps_path, notice: "App deleted successfully."
+  end
+
+  def deploy
+    @app.deploy!
+    redirect_to app_path(@app), notice: "App deploy started."
+  end
+
+  def restart
+    @app.restart!
+    redirect_to app_path(@app), notice: "App restart started."
   end
 
   def activity

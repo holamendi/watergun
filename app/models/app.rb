@@ -31,6 +31,14 @@ class App < ApplicationRecord
   store_attribute :data, :git_branch, :string, default: "main"
   store_attribute :data, :dokku_builder, :string, default: "herokuish"
 
+  enum status: {
+    creating: "creating",
+    deploying: "deploying",
+    idle: "idle",
+    restarting: "restarting",
+    updating: "updating"
+  }, _prefix: true, _default: "idle"
+
   validates :name, presence: true, uniqueness: {scope: :server_id}
   validates :git_repo, :git_branch, presence: true
   validates :dokku_builder, inclusion: {in: Server::DOKKU_BUILDERS.keys}
@@ -39,6 +47,7 @@ class App < ApplicationRecord
 
   after_create_commit -> { server_events.create!(event_type: "apps.create") }
   after_discard -> { server_events.create!(event_type: "apps.destroy") }
+  after_update_commit -> { broadcast_replace_to self, :header, target: "header_app_#{id}", partial: "apps/header", locals: {app: self} }
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -48,8 +57,12 @@ class App < ApplicationRecord
     end
   end
 
-  def deploy
-    server_events.create!(event_type: "apps.deploy", source: "web")
+  def deploy!
+    server_events.create!(event_type: "apps.deploy")
+  end
+
+  def restart!
+    server_events.create!(event_type: "apps.restart")
   end
 
   private

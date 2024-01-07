@@ -1,6 +1,10 @@
 module ServerEvents
   module Apps
     class Deploy < Base
+      def app_status
+        "deploying"
+      end
+
       def commands
         [
           "dokku git:auth github.com u #{app.org.git_credential.personal_access_token}",

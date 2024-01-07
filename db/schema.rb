@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_06_162046) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_07_150203) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -20,9 +20,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_06_162046) do
     t.datetime "updated_at", null: false
     t.json "data", default: {}, null: false
     t.datetime "discarded_at"
+    t.string "status"
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
+    t.index ["status"], name: "index_apps_on_status"
   end
 
   create_table "dokku_users", force: :cascade do |t|

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       get :activity
       get :metrics
       post :restart
+      post :deploy
     end
     collection do
       get :select_git_repo

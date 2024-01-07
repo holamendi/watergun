@@ -1,11 +1,20 @@
-<div class="mb-6">
-  <h1 class="text-3xl font-extrabold"><%= app.name %></h1>
-</div>
-<div class="flex">
-  <div role="tablist" class="w-3xl tabs tabs-bordered">
-    <%= link_to "overview", app_path(@app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
-    <%= link_to "metrics", metrics_app_path(@app), class: class_names("tab", "tab-active" => action_name  == "metrics"), role: "tab" %>
-    <%= link_to "logs", logs_app_path(@app), class: class_names("tab", "tab-active" => action_name  == "logs"), role: "tab" %>
-    <%= link_to "settings", edit_app_path(@app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
+<div id="<%= dom_id(app, :header) %>" %>
+  <div class="flex justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-extrabold"><%= app.name %>
+        <% unless app.status_idle? %>
+          <span class="font-normal badge badge-accent badge-lg"><%= app.status %> <span class="ml-4 loading loading-spinner loading-xs"></span></span>
+        <% end %>
+      </h1>
+    </div>
+    <div class="flex space-x-4 ">
+      <%= button_to "Deploy", deploy_app_path(app), class: "btn", disabled: !app.status_idle? %>
+      <%= button_to "Restart", restart_app_path(app), class: "btn", disabled: !app.status_idle? %>
+    </div>
+  </div>
+  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
+    <%= link_to "overview", app_path(app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
+    <%= link_to "activity", activity_app_path(app), class: class_names("tab", "tab-active" => action_name  == "activity"), role: "tab" %>
+    <%= link_to "settings", edit_app_path(app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
   </div>
 </div>
