@@ -1,15 +1,7 @@
 GIT
-  remote: https://github.com/basecamp/solid_queue.git
-  revision: 8606ec87d70ba72bcbf65e6367f9e2ef4f79cecf
-  branch: main
-  specs:
-    solid_queue (0.2.0)
-      rails (~> 7.1)
-
-GIT
-  remote: https://github.com/holamendi/litestack.git
-  revision: 6ed72fe5abe007268246cabe7d23876ea815f2f3
-  branch: disable-litejob
+  remote: https://github.com/oldmoe/litestack.git
+  revision: 92be782b681b3476e30b2fb216829728576bae33
+  branch: master
   specs:
     litestack (0.4.2)
       erubi
@@ -368,7 +360,6 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.1.2)
   rspec-rails
-  solid_queue!
   sshkey
   standard
   store_attribute
