@@ -1,16 +1,3 @@
-GIT
-  remote: https://github.com/oldmoe/litestack.git
-  revision: 92be782b681b3476e30b2fb216829728576bae33
-  branch: master
-  specs:
-    litestack (0.4.2)
-      erubi
-      hanami-router
-      oj
-      rack
-      sqlite3
-      tilt
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -149,6 +136,13 @@ GEM
     json (2.7.1)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
+    litestack (0.4.1)
+      erubi
+      hanami-router
+      oj
+      rack
+      sqlite3
+      tilt
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -353,7 +347,7 @@ DEPENDENCIES
   faraday-retry
   honeybadger
   httpx
-  litestack!
+  litestack (= 0.4.1)
   net-ssh
   octokit
   propshaft
