@@ -43,7 +43,7 @@ class ServerEvent < ApplicationRecord
     apps.restart
   ]
 
-  belongs_to :eventable, polymorphic: true, optional: true
+  belongs_to :eventable, polymorphic: true, optional: true, touch: true
   belongs_to :membership, optional: true
 
   has_one :server_event_log, dependent: :destroy

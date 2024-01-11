@@ -10,7 +10,7 @@ class AppsController < ApplicationController
   end
 
   def create
-    @app = current_server.apps.new(app_params)
+    @app = current_server.apps.new(app_params.merge(status: "creating"))
 
     if @app.save
       redirect_to app_path(@app), notice: "App created successfully."

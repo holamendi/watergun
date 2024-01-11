@@ -15,18 +15,10 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   idle_timeout: 0
 
-solid_queue: &solid_queue
-  <<: *default
-  migrations_paths: db/solid_queue_migrate
-
 development:
   primary:
     <<: *default
     database: <%= Litesupport.root.join("primary.sqlite3") %>
-
-  solid_queue:
-    <<: *solid_queue
-    database: <%= Litesupport.root.join("solid_queue.sqlite3") %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -35,10 +27,6 @@ test:
   primary:
     <<: *default
     database: <%= Litesupport.root.join("primary.sqlite3") %>
-
-  solid_queue:
-    <<: *solid_queue
-    database: <%= Litesupport.root.join("solid_queue.sqlite3") %>
 
 # Warning: Make sure your production database path is on a persistent
 # volume, otherwise your application data could be deleted between deploys.
@@ -50,8 +38,4 @@ production:
     <<: *default
     database: <%= Litesupport.root.join("primary.sqlite3") %>
 
-
-  solid_queue:
-    <<: *solid_queue
-    database: <%= Litesupport.root.join("solid_queue.sqlite3") %>
 

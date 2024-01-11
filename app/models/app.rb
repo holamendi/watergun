@@ -58,10 +58,12 @@ class App < ApplicationRecord
   end
 
   def deploy!
+    update!(status: "deploying")
     server_events.create!(event_type: "apps.deploy")
   end
 
   def restart!
+    update!(status: "restarting")
     server_events.create!(event_type: "apps.restart")
   end
 
