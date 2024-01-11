@@ -33,6 +33,7 @@ class App < ApplicationRecord
 
   enum status: {
     creating: "creating",
+    destroying: "destroying",
     deploying: "deploying",
     idle: "idle",
     restarting: "restarting",

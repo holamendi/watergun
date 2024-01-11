@@ -5,7 +5,7 @@
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
         <% unless app.status_idle? %>
-          <span class="font-normal badge badge-accent badge-lg"><%= app.status %> <span class="ml-4 loading loading-spinner loading-xs"></span></span>
+          <span class="font-normal badge badge-accent badge-lg"><%= app.status %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span></span>
         <% end %>
       </h1>
     </div>
