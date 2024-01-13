@@ -1,5 +1,4 @@
 <%= turbo_stream_from app, :header %>
-
 <div id="<%= dom_id(app, :header) %>">
   <div class="flex justify-between mb-6">
     <div>
@@ -9,9 +8,9 @@
         <% end %>
       </h1>
     </div>
-    <div class="flex space-x-4 ">
-      <%= button_to "Deploy", deploy_app_path(app), class: "btn", disabled: !app.status_idle? %>
-      <%= button_to "Restart", restart_app_path(app), class: "btn", disabled: !app.status_idle? %>
+    <div class="join">
+      <%= link_to "Deploy", deploy_app_path(app), class: "btn join-item", disabled: !app.status_idle?, data: { "turbo-method" => :post } %>
+      <%= link_to "Restart", restart_app_path(app), class: "btn join-item", disabled: !app.status_idle?, data: { "turbo-method" => :post } %>
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
