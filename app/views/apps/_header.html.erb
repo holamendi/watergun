@@ -3,14 +3,14 @@
   <div class="flex justify-between mb-6">
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
-        <% unless app.status_idle? %>
-          <span class="font-normal badge badge-accent badge-lg"><%= app.status %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span></span>
+        <% if app.running_server_event.present? %>
+          <span class="font-normal badge badge-accent badge-lg"><%= app.running_server_event.event_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span></span>
         <% end %>
       </h1>
     </div>
     <div class="join">
-      <%= link_to "Deploy", deploy_app_path(app), class: "btn join-item", disabled: !app.status_idle?, data: { "turbo-method" => :post } %>
-      <%= link_to "Restart", restart_app_path(app), class: "btn join-item", disabled: !app.status_idle?, data: { "turbo-method" => :post } %>
+      <%= link_to "Deploy", deploy_app_path(app), class: "btn join-item", disabled: app.running_server_event.present?, data: { "turbo-method" => :post } %>
+      <%= link_to "Restart", restart_app_path(app), class: "btn join-item", disabled: app.running_server_event.present?, data: { "turbo-method" => :post } %>
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">

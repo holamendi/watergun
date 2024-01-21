@@ -13,6 +13,7 @@ class Org < ApplicationRecord
   has_many :servers, dependent: :destroy
   has_many :server_events, dependent: :destroy
   has_many :server_event_logs, dependent: :destroy
+  has_many :services, dependent: :destroy
   has_many :users, through: :memberships
 
   has_one :git_credential, dependent: :destroy

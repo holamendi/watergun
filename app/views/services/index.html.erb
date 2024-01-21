@@ -1,0 +1,24 @@
+<div class="flex justify-between mb-6">
+  <h1 class="text-3xl font-extrabold">services</h1>
+  <%= link_to "new service", new_service_path, class: "link font-normal" %>
+</div>
+<div class="overflow-x-auto rounded-lg">
+  <table class="table">
+    <thead>
+      <tr class="pl-0 uppercase">
+        <th>Name</th>
+        <th>Last Deploy</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @services.each do |service| %>
+        <tr >
+          <td class="py-6"><%= link_to service.name, service, class: "link" %></td>
+          <td><%= l Time.current.to_date %></td>
+          <td><%= link_to "Delete", service, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

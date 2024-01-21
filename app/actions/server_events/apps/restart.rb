@@ -1,7 +1,7 @@
 module ServerEvents
   module Apps
     class Restart < Base
-      def app_status
+      def eventable_status
         "restarting"
       end
 

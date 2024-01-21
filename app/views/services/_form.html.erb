@@ -1,0 +1,12 @@
+<%= form_with model: service, class: "space-y-6" do |form| %>
+  <div class="form-control">
+    <%= form.label :name, class: "label" %>
+    <%= form.text_field :name, class: "input input-bordered input-md" %>
+  </div>
+  <div class="form-control">
+    <%= form.label :service_type, "Type", class: "label" %>
+    <%= form.select :service_type, Service.service_types.keys, {}, class: "select select-bordered w-full" %>
+  </div>
+  <%= form.submit "Save", class: "btn btn-primary text-white" %>
+<% end %>
+<%= debug service %>

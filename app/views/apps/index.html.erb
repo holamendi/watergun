@@ -7,8 +7,8 @@
     <thead>
       <tr class="pl-0 uppercase">
         <th>Name</th>
-        <th>Last Deployed</th>
-        <th>Running processes</th>
+        <th>Last Deploy</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -16,7 +16,7 @@
         <tr >
           <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
           <td><%= l Time.current.to_date %></td>
-          <td><%= 3 %></td>
+          <td><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
         </tr>
       <% end %>
     </table>

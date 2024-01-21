@@ -36,13 +36,6 @@ class ServerEvent < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer
 
-  EVENT_TYPES = %w[
-    apps.create
-    apps.deploy
-    apps.destroy
-    apps.restart
-  ]
-
   belongs_to :eventable, polymorphic: true, optional: true, touch: true
   belongs_to :membership, optional: true
 
@@ -61,7 +54,9 @@ class ServerEvent < ApplicationRecord
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
-  validates :event_type, inclusion: {in: EVENT_TYPES}
+  validates :event_type, inclusion: {in: -> { _1.event_types }}, if: -> { eventable.present? }
+
+  after_create_commit -> { server_event_log&.update!(server_event_id: id) }
 
   after_create_commit :process_async
   after_create_commit -> { broadcast_prepend_to eventable, :server_events }
@@ -80,6 +75,10 @@ class ServerEvent < ApplicationRecord
   end
 
   def event_processor
-    "ServerEvents::#{event_type.split(".").map(&:camelize).join("::")}".constantize
+    "ServerEvents::#{eventable.class.name.pluralize}::#{event_type.classify}".constantize
+  end
+
+  def event_types
+    eventable.class::SERVER_EVENT_TYPES
   end
 end

@@ -3,7 +3,7 @@
 # Table name: server_event_logs
 #
 #  id              :integer          not null, primary key
-#  content         :text
+#  data            :json             not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  org_id          :integer          not null
@@ -26,4 +26,8 @@ class ServerEventLog < ApplicationRecord
   normalizes :content, with: -> { _1.encode!("UTF-8", invalid: :replace, undef: :replace).force_encoding("utf-8") }
 
   belongs_to :server_event
+
+  def content
+    data.map { _1["output"] }.join
+  end
 end

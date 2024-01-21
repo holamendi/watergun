@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       get :select_git_repo
     end
   end
+  resources :services
   resources :databases
   resources :memberships
   resources :orgs

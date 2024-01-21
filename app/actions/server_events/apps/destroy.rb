@@ -1,7 +1,7 @@
 module ServerEvents
   module Apps
     class Destroy < Base
-      def app_status
+      def eventable_status
         "destroying"
       end
 
