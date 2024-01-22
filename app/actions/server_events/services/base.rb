@@ -1,5 +1,5 @@
 module ServerEvents
-  module Apps
+  module Services
     class Base < ServerEvents::Base
       delegate :org, :server, :service_type, to: :eventable
 
