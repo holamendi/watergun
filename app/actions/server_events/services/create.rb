@@ -1,5 +1,5 @@
 module ServerEvents
-  module Service
+  module Services
     class Create < Base
       def app_status
         "creating"
