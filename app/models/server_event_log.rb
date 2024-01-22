@@ -23,11 +23,11 @@
 class ServerEventLog < ApplicationRecord
   include BelongsToOrg
 
-  normalizes :content, with: -> { _1.encode!("UTF-8", invalid: :replace, undef: :replace).force_encoding("utf-8") }
+  attribute :data, ServerEventLogEntry.to_array_type
 
   belongs_to :server_event
 
-  def content
-    data.map { _1["output"] }.join
+  def output
+    data.map(&:output).join
   end
 end

@@ -11,7 +11,7 @@ module ServerEvents
     def call
       ServerEvent.transaction do
         server_event.update!(status: "running", running_at: Time.current)
-        server_event.create_server_event_log!(org:, content: "")
+        server_event.create_server_event_log!(org:)
       end
 
       result = execute_ssh_commands

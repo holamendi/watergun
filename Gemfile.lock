@@ -301,6 +301,8 @@ GEM
       rubocop-performance (~> 1.20.1)
     store_attribute (1.2.0)
       activerecord (>= 6.0)
+    store_model (2.2.0)
+      activerecord (>= 5.2)
     stringio (3.1.0)
     thor (1.3.0)
     tilt (2.3.0)
@@ -347,7 +349,7 @@ DEPENDENCIES
   faraday-retry
   honeybadger
   httpx
-  litestack (= 0.4.1)
+  litestack
   net-ssh
   octokit
   propshaft
@@ -357,6 +359,7 @@ DEPENDENCIES
   sshkey
   standard
   store_attribute
+  store_model
   turbo-rails
   tzinfo-data
   vite_rails

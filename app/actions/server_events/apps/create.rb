@@ -1,10 +1,6 @@
 module ServerEvents
   module Apps
     class Create < Base
-      def eventable_status
-        "creating"
-      end
-
       def commands
         [
           "dokku apps:create #{app.dokku_name}",

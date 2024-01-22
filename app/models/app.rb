@@ -36,6 +36,7 @@ class App < ApplicationRecord
     deploy
     destroy
     restart
+    update
   ].freeze
 
   store_attribute :data, :git_repo, :string
@@ -51,6 +52,7 @@ class App < ApplicationRecord
   after_create_commit -> { server_events.create!(event_type: "create") }
   after_discard -> { server_events.create!(event_type: "destroy") }
   after_update_commit -> { broadcast_replace_to self, :header, target: "header_app_#{id}", partial: "apps/header", locals: {app: self} }
+  after_update -> { server_events.create!(event_type: "update") }, if: :saved_change_to_dokku_builder?
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -61,13 +63,11 @@ class App < ApplicationRecord
   end
 
   def deploy!
-    update!(status: "deploying")
-    server_events.create!(event_type: "apps.deploy")
+    server_events.create!(event_type: "deploy")
   end
 
   def restart!
-    update!(status: "restarting")
-    server_events.create!(event_type: "apps.restart")
+    server_events.create!(event_type: "restart")
   end
 
   private
