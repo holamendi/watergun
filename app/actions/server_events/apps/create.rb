@@ -1,5 +1,5 @@
 module ServerEvents
-  module Services
+  module Apps
     class Create < Base
       def commands
         [
