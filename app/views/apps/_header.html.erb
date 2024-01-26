@@ -3,8 +3,10 @@
   <div class="flex justify-between mb-6">
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
-        <% if app.current_server_event.present? %>
-          <span class="font-normal badge badge-accent badge-lg"><%= app.current_server_event.event_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span></span>
+        <% if app.reload_current_server_event.present? %>
+          <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
+            <%= app.current_server_event.event_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
+          </span>
         <% end %>
       </h1>
     </div>

@@ -3,7 +3,7 @@
 # Table name: server_event_logs
 #
 #  id              :integer          not null, primary key
-#  data            :json             not null
+#  ssh_commands    :json             not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  org_id          :integer          not null
@@ -23,11 +23,11 @@
 class ServerEventLog < ApplicationRecord
   include BelongsToOrg
 
-  attribute :data, ServerEventLogEntry.to_array_type
+  attribute :ssh_commands, SshCommand.to_array_type
 
   belongs_to :server_event
 
   def output
-    data.map(&:output).join
+    ssh_commands.map(&:output).join
   end
 end

@@ -53,6 +53,9 @@ class AppsController < ApplicationController
   end
 
   def select_git_repo
+    if params[:id].present? && (app = current_server.apps.kept.find_by(id: params[:id]))
+      @git_repo = app.git_repo
+    end
   end
 
   private

@@ -42,6 +42,7 @@ class App < ApplicationRecord
   store_attribute :data, :git_repo, :string
   store_attribute :data, :git_branch, :string, default: "main"
   store_attribute :data, :dokku_builder, :string, default: "herokuish"
+  store_attribute :data, :urls, :json, default: []
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
   validates :git_repo, :git_branch, presence: true
@@ -49,10 +50,10 @@ class App < ApplicationRecord
 
   before_validation :set_dokku_name, on: :create
 
-  after_create_commit -> { server_events.create!(event_type: "create") }
-  after_discard -> { server_events.create!(event_type: "destroy") }
+  after_create_commit -> { create_server_event!("create") }
+  after_discard -> { create_server_event!("destroy") }
   after_update_commit -> { broadcast_replace_to self, :header, target: "header_app_#{id}", partial: "apps/header", locals: {app: self} }
-  after_update -> { server_events.create!(event_type: "update") }, if: :saved_change_to_dokku_builder?
+  after_update_commit :evaluate_server_event
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -63,14 +64,22 @@ class App < ApplicationRecord
   end
 
   def deploy!
-    server_events.create!(event_type: "deploy")
+    create_server_event!("deploy")
   end
 
   def restart!
-    server_events.create!(event_type: "restart")
+    create_server_event!("restart")
+  end
+
+  def create_server_event!(event_type)
+    server_events.create!(event_type:)
   end
 
   private
+
+  def evaluate_server_event
+    ServerEvents::Apps::Update.evaluate(app: self)
+  end
 
   def set_dokku_name
     self.dokku_name = "wgn-#{name.parameterize}-#{SecureRandom.hex(2)}"

@@ -15,10 +15,11 @@ module ServerEvents
       end
 
       result = execute_ssh_commands
+      ::Apps::Sync.new(app: eventable).call if eventable.is_a?(App)
 
       ServerEvent.transaction do
         server_event.update!(status: result.success? ? "success" : "failure", completed_at: result.completed_at)
-        server_event.server_event_log.update!(data: result.logs.as_json)
+        server_event.server_event_log.update!(ssh_commands: result.ssh_commands)
       end
     rescue => e
       server_event.update!(
@@ -35,6 +36,10 @@ module ServerEvents
 
     def commands
       raise NotImplementedError
+    end
+
+    def after_execute
+      nil
     end
 
     def execute_ssh_commands

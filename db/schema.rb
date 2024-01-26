@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_21_163009) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -37,6 +37,26 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_21_163009) do
     t.index ["org_id"], name: "index_dokku_users_on_org_id"
     t.index ["server_id"], name: "index_dokku_users_on_server_id"
   end
+
+# Could not dump table "events" because of following StandardError
+#   Unknown type 'REAL' for column 'value'
+
+# Could not dump table "events_search" because of following StandardError
+#   Unknown type '' for column 'topic'
+
+# Could not dump table "events_search_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "events_search_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "events_search_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "events_search_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
 
   create_table "git_credentials", force: :cascade do |t|
     t.integer "org_id", null: false
@@ -69,7 +89,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_21_163009) do
     t.integer "server_event_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.json "data", default: {}, null: false
+    t.json "ssh_commands", default: [], null: false
     t.index ["id", "server_event_id"], name: "index_server_event_logs_on_id_and_server_event_id", unique: true
     t.index ["org_id"], name: "index_server_event_logs_on_org_id"
     t.index ["server_event_id"], name: "index_server_event_logs_on_server_event_id"
@@ -136,6 +156,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_21_163009) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "topics", primary_key: "name", id: :text, force: :cascade do |t|
+    t.text "state"
+    t.integer "updated_at"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -148,6 +173,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_21_163009) do
   add_foreign_key "apps", "servers"
   add_foreign_key "dokku_users", "orgs"
   add_foreign_key "dokku_users", "servers"
+  add_foreign_key "events", "topics", column: "topic", primary_key: "name", on_delete: :cascade
   add_foreign_key "git_credentials", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"

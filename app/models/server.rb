@@ -34,6 +34,9 @@ class Server < ApplicationRecord
 
   has_secure_token :dokku_token, length: 32
 
+  store_attribute :data, :public_ip, :string
+  store_attribute :data, :architecture, :string
+
   enum provider: {
     digitalocean: "digitalocean",
     hetzner: "hetzner"
@@ -52,10 +55,9 @@ class Server < ApplicationRecord
   has_many :server_events, dependent: :destroy
   has_many :services, dependent: :destroy
 
-  store_attribute :data, :public_ip, :string
-  store_attribute :data, :architecture, :string
+  delegate :ssh_private_key, to: :dokku_user
 
   def execute_ssh_commands(commands, &block)
-    Servers::SshCommand.new(self).call(commands, &block)
+    Servers::ExecuteSshCommands.new(server: self, commands:).call(&block)
   end
 end
