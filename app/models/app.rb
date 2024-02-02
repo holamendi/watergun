@@ -52,8 +52,8 @@ class App < ApplicationRecord
 
   after_create_commit -> { create_server_event!("create") }
   after_discard -> { create_server_event!("destroy") }
-  after_update_commit -> { broadcast_replace_to self, :header, target: "header_app_#{id}", partial: "apps/header", locals: {app: self} }
-  after_update_commit :evaluate_server_event
+  after_update -> { create_server_event!("update") }
+  after_update -> { broadcast_replace_to self, :header, target: [self, :header], partial: "apps/header", locals: {app: self} }
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -76,10 +76,6 @@ class App < ApplicationRecord
   end
 
   private
-
-  def evaluate_server_event
-    ServerEvents::Apps::Update.evaluate(app: self)
-  end
 
   def set_dokku_name
     self.dokku_name = "wgn-#{name.parameterize}-#{SecureRandom.hex(2)}"

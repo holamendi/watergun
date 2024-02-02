@@ -3,7 +3,7 @@ module ServerEvents
     class Update < Base
       def self.evaluate(app:)
         return unless app.saved_change_to_dokku_builder?
-
+        debugger
         app.create_server_event!("update")
       end
 
