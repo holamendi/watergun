@@ -21,15 +21,15 @@ module ServerEvents
         server_event.update!(status: result.success? ? "success" : "failure", completed_at: result.completed_at)
         server_event.server_event_log.update!(ssh_commands: result.ssh_commands)
       end
-      # rescue => e
-      # server_event.update!(
-      #   status: "exception",
-      #   completed_at: Time.current,
-      #   exception: {
-      #     message: e.message,
-      #     backtrace: e.backtrace
-      #   }
-      # )
+    rescue => e
+      server_event.update!(
+        status: "exception",
+        completed_at: Time.current,
+        exception: {
+          message: e.message,
+          backtrace: e.backtrace
+        }
+      )
     end
 
     private

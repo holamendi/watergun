@@ -51,9 +51,9 @@ class App < ApplicationRecord
   before_validation :set_dokku_name, on: :create
 
   after_create_commit -> { create_server_event!("create") }
+  after_update -> { create_server_event!("update") }, if: -> { saved_change_to_git_repo? || saved_change_to_git_branch? || saved_change_to_dokku_builder? }
+  after_update_commit -> { broadcast_replace_to self, :header, target: [self, :header], partial: "apps/header", locals: {app: self} }
   after_discard -> { create_server_event!("destroy") }
-  after_update -> { create_server_event!("update") }
-  after_update -> { broadcast_replace_to self, :header, target: [self, :header], partial: "apps/header", locals: {app: self} }
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -72,7 +72,7 @@ class App < ApplicationRecord
   end
 
   def create_server_event!(event_type)
-    server_events.create!(event_type:)
+    server_events.create!(event_type:, org:, server:)
   end
 
   private

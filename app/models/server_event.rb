@@ -66,6 +66,12 @@ class ServerEvent < ApplicationRecord
     completed_at.present?
   end
 
+  def duration
+    return if running_at.blank? || completed_at.blank?
+
+    completed_at - running_at
+  end
+
   def process_async
     ServerEvents::ProcessJob.perform_later(self)
   end
