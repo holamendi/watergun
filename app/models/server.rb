@@ -49,13 +49,13 @@ class Server < ApplicationRecord
     provisioning: "provisioning"
   }, _prefix: true, _default: "provisioning"
 
-  has_one :dokku_user, class_name: "Dokku::User", dependent: :destroy
+  has_one :server_identity, dependent: :destroy
 
   has_many :apps
   has_many :server_events, dependent: :destroy
   has_many :services, dependent: :destroy
 
-  delegate :ssh_private_key, to: :dokku_user
+  delegate :ssh_private_key, to: :server_identity
 
   def execute_ssh_commands(commands, &block)
     Servers::ExecuteSshCommands.new(server: self, commands:).call(&block)

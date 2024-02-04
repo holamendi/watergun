@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_04_171307) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -25,17 +25,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
     t.index ["status"], name: "index_apps_on_status"
-  end
-
-  create_table "dokku_users", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "server_id", null: false
-    t.text "ssh_private_key", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["id", "server_id"], name: "index_dokku_users_on_id_and_server_id", unique: true
-    t.index ["org_id"], name: "index_dokku_users_on_org_id"
-    t.index ["server_id"], name: "index_dokku_users_on_server_id"
   end
 
   create_table "git_credentials", force: :cascade do |t|
@@ -97,6 +86,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
     t.index ["server_id"], name: "index_server_events_on_server_id"
   end
 
+  create_table "server_identities", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.text "ssh_private_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "server_id"], name: "index_server_identities_on_id_and_server_id", unique: true
+    t.index ["org_id"], name: "index_server_identities_on_org_id"
+    t.index ["server_id"], name: "index_server_identities_on_server_id"
+  end
+
   create_table "servers", force: :cascade do |t|
     t.string "provider", null: false
     t.string "name", null: false
@@ -146,8 +146,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
 
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
-  add_foreign_key "dokku_users", "orgs"
-  add_foreign_key "dokku_users", "servers"
   add_foreign_key "git_credentials", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
@@ -156,6 +154,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_26_093009) do
   add_foreign_key "server_events", "memberships"
   add_foreign_key "server_events", "orgs"
   add_foreign_key "server_events", "servers"
+  add_foreign_key "server_identities", "orgs"
+  add_foreign_key "server_identities", "servers"
   add_foreign_key "servers", "orgs"
   add_foreign_key "services", "orgs"
   add_foreign_key "services", "servers"
