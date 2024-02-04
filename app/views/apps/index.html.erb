@@ -1,22 +1,22 @@
 <div class="flex justify-between mb-6">
-  <h1 class="text-3xl font-extrabold">apps</h1>
-  <%= link_to "new app", new_app_path, class: "link font-normal"  %>
+  <h1 class="text-3xl font-extrabold">Apps</h1>
+  <%= link_to "Add new app", new_app_path, class: "link font-normal" %>
 </div>
 <div class="overflow-x-auto rounded-lg">
   <table class="table">
     <thead>
       <tr class="pl-0 uppercase">
         <th>Name</th>
-        <th>Last Deploy</th>
+        <th>URL</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <% @apps.each do |app| %>
-        <tr >
+        <tr>
           <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
-          <td><%= l Time.current.to_date %></td>
-          <td><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
+          <td><%= link_to app.urls.first, app.urls.first, class: "link", target: :blank if app.urls.present? %></td>
+          <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
         </tr>
       <% end %>
     </table>

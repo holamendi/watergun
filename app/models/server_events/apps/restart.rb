@@ -6,7 +6,7 @@ module ServerEvents
       end
 
       def commands
-        "dokku ps:restart #{app.dokku_name}"
+        "dokku ps:restart #{app.dokku_id}"
       end
     end
   end

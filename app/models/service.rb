@@ -5,12 +5,12 @@
 #  id           :integer          not null, primary key
 #  data         :json             not null
 #  discarded_at :datetime
-#  dokku_name   :string           not null
 #  name         :string           not null
 #  service_type :string           not null
 #  status       :string           not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  dokku_id     :string
 #  org_id       :integer          not null
 #  server_id    :integer          not null
 #
@@ -28,18 +28,25 @@ class Service < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer
   include Discard::Model
+  include DokkuEntity
   include ServerEventable
+
+  SERVER_EVENT_TYPES = %w[
+    create
+    destroy
+    restart
+  ].freeze
 
   enum service_type: {
     postgres: "postgres",
     redis: "redis"
   }, _prefix: true
 
-  before_validation :set_dokku_name, on: :create
+  after_create_commit -> { create_server_event!("create") }
+  after_discard -> { create_server_event!("destroy") }
+  after_update_commit -> { broadcast_replace_to self, :header, target: [self, :header], partial: "services/header", locals: {service: self} }
 
-  private
-
-  def set_dokku_name
-    self.dokku_name = "wgn-#{name.parameterize}-#{SecureRandom.hex(2)}"
+  def restart!
+    create_server_event!("restart")
   end
 end

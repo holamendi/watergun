@@ -11,17 +11,18 @@ Rails.application.routes.draw do
       get :select_git_repo
     end
   end
-  resources :services
-  resources :databases
-  resources :memberships
-  resources :orgs
+  resources :services do
+    member do
+      get :activity
+      post :restart
+    end
+  end
   resources :sessions, only: %i[new create destroy]
   resources :server_events, path: "events", only: [] do
     member do
       get :logs
     end
   end
-  resources :users
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

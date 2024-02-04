@@ -38,11 +38,6 @@ class ServicesController < ApplicationController
     redirect_to services_path, notice: "Service deleted successfully."
   end
 
-  def deploy
-    @service.deploy!
-    redirect_to service_path(@service), notice: "Service deploy started."
-  end
-
   def restart
     @service.restart!
     redirect_to service_path(@service), notice: "Service restart started."

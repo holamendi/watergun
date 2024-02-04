@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_04_171307) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_04_201020) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
     t.string "name", null: false
-    t.string "dokku_name", null: false
+    t.string "dokku_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "data", default: {}, null: false
@@ -115,12 +115,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_04_171307) do
     t.integer "server_id", null: false
     t.string "service_type", null: false
     t.string "name", null: false
-    t.string "dokku_name", null: false
     t.string "status", null: false
     t.json "data", default: {}, null: false
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "dokku_id"
     t.index ["org_id"], name: "index_services_on_org_id"
     t.index ["server_id"], name: "index_services_on_server_id"
   end

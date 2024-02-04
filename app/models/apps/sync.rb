@@ -7,7 +7,7 @@ module Apps
     end
 
     def call
-      @urls = app.server.execute_ssh_commands("dokku urls #{app.dokku_name}").ssh_commands.first.output
+      @urls = app.server.execute_ssh_commands("dokku urls #{app.dokku_id}").ssh_commands.first.output
 
       app.update!(urls: parse_urls(@urls))
 

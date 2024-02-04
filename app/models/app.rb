@@ -5,11 +5,11 @@
 #  id           :integer          not null, primary key
 #  data         :json             not null
 #  discarded_at :datetime
-#  dokku_name   :string           not null
 #  name         :string           not null
 #  status       :string
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  dokku_id     :string           not null
 #  org_id       :integer          not null
 #  server_id    :integer          not null
 #
@@ -29,6 +29,7 @@ class App < ApplicationRecord
   include BelongsToOrg
   include BelongsToServer
   include Discard::Model
+  include DokkuEntity
   include ServerEventable
 
   SERVER_EVENT_TYPES = %w[
@@ -47,8 +48,6 @@ class App < ApplicationRecord
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
   validates :git_repo, :git_branch, presence: true
   validates :dokku_builder, inclusion: {in: Server::DOKKU_BUILDERS.keys}
-
-  before_validation :set_dokku_name, on: :create
 
   after_create_commit -> { create_server_event!("create") }
   after_update -> { create_server_event!("update") }, if: -> { saved_change_to_git_repo? || saved_change_to_git_branch? || saved_change_to_dokku_builder? }
@@ -69,15 +68,5 @@ class App < ApplicationRecord
 
   def restart!
     create_server_event!("restart")
-  end
-
-  def create_server_event!(event_type)
-    server_events.create!(event_type:, org:, server:)
-  end
-
-  private
-
-  def set_dokku_name
-    self.dokku_name = "wgn-#{name.parameterize}-#{SecureRandom.hex(2)}"
   end
 end
