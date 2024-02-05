@@ -13,6 +13,11 @@
     <div class="join">
       <%= link_to "Deploy", deploy_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
       <%= link_to "Restart", restart_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
+      <% if app.ssl_enabled? %>
+        <%= link_to "Disable SSL", disable_ssl_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
+      <% else %>
+        <%= link_to "Enable SSL", enable_ssl_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
+      <% end %>
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">

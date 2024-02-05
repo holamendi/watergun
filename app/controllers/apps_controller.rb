@@ -48,6 +48,16 @@ class AppsController < ApplicationController
     redirect_to app_path(@app), notice: "App restart started."
   end
 
+  def enable_ssl
+    @app.enable_ssl!
+    redirect_to app_path(@app), notice: "SSL certificate request started."
+  end
+
+  def disable_ssl
+    @app.disable_ssl!
+    redirect_to app_path(@app), notice: "SSL certificate removal started."
+  end
+
   def activity
     @server_events = @app.server_events.order(created_at: :desc).limit(50)
   end

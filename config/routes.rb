@@ -4,8 +4,10 @@ Rails.application.routes.draw do
     member do
       get :activity
       get :metrics
-      post :restart
       post :deploy
+      post :disable_ssl
+      post :enable_ssl
+      post :restart
     end
     collection do
       get :select_git_repo

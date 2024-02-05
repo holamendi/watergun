@@ -36,6 +36,8 @@ class App < ApplicationRecord
     create
     deploy
     destroy
+    disable_ssl
+    enable_ssl
     restart
     update
   ].freeze
@@ -68,5 +70,25 @@ class App < ApplicationRecord
 
   def restart!
     create_server_event!("restart")
+  end
+
+  def enable_ssl!
+    create_server_event!("enable_ssl")
+  end
+
+  def disable_ssl!
+    create_server_event!("disable_ssl")
+  end
+
+  def ssl_enabled?
+    urls.any? { _1.start_with?("https://") }
+  end
+
+  def https_urls
+    urls.select { _1.start_with?("https://") }
+  end
+
+  def url
+    https_urls.first || urls.first
   end
 end
