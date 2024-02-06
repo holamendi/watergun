@@ -10,14 +10,18 @@
         <% end %>
       </h1>
     </div>
-    <div class="join">
-      <%= link_to "Deploy", deploy_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
-      <%= link_to "Restart", restart_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
-      <% if app.ssl_enabled? %>
-        <%= link_to "Disable SSL", disable_ssl_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
-      <% else %>
-        <%= link_to "Enable SSL", enable_ssl_app_path(app), class: "btn join-item", disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %>
-      <% end %>
+    <div>
+      <ul class="menu menu-horizontal">
+        <li tabindex="0">
+          <details>
+            <summary class="text-lg">Actions</summary>
+            <ul class="p-2">
+              <li><%= link_to "Deploy", deploy_app_path(app), disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %></li>
+              <li><%= link_to "Restart", restart_app_path(app), disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
@@ -26,3 +30,4 @@
     <%= link_to "settings", edit_app_path(app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
   </div>
 </div>
+
