@@ -1,3 +1,4 @@
+<%= turbo_stream_from @app, :header %>
 <%= turbo_stream_from @app, :server_events %>
 <%= render "header", app: @app %>
 <div id="server_events" class="flex-1">

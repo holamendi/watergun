@@ -34,10 +34,10 @@
 #
 class ServerEvent < ApplicationRecord
   include BelongsToOrg
+  include BelongsToMembership
   include BelongsToServer
 
   belongs_to :eventable, polymorphic: true, optional: true, touch: true
-  belongs_to :membership, optional: true
 
   has_one :server_event_log, dependent: :destroy
 
