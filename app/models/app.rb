@@ -53,7 +53,7 @@ class App < ApplicationRecord
 
   after_create_commit -> { create_server_event!("create") }
   after_update -> { create_server_event!("update") }, if: -> { saved_change_to_git_repo? || saved_change_to_git_branch? || saved_change_to_dokku_builder? }
-  after_update_commit -> { broadcast_replace_to self, :header, target: [self, :header], partial: "apps/header", locals: {app: self} }
+  after_update_commit -> { broadcast_refresh_to self, :header }
   after_discard -> { create_server_event!("destroy") }
 
   def compatible_dokku_builders

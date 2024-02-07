@@ -44,7 +44,7 @@ class Service < ApplicationRecord
 
   after_create_commit -> { create_server_event!("create") }
   after_discard -> { create_server_event!("destroy") }
-  after_update_commit -> { broadcast_replace_to self, :header, target: [self, :header], partial: "services/header", locals: {service: self} }
+  after_update_commit -> { broadcast_refresh_to self, :header }
 
   def restart!
     create_server_event!("restart")
