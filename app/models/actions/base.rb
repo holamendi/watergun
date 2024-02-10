@@ -1,4 +1,4 @@
-module ServerEvents
+module Actions
   class Base
     attr_reader :server_event
 

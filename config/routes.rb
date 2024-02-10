@@ -20,11 +20,6 @@ Rails.application.routes.draw do
     end
   end
   resources :sessions, only: %i[new create destroy]
-  resources :server_events, path: "events", only: [] do
-    member do
-      get :logs
-    end
-  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -1,30 +1,30 @@
 # == Schema Information
 #
-# Table name: server_events
+# Table name: actions
 #
-#  id             :integer          not null, primary key
-#  args           :json             not null
-#  completed_at   :datetime
-#  data           :json             not null
-#  event_type     :string           not null
-#  eventable_type :string
-#  running_at     :datetime
-#  source         :string           not null
-#  status         :string           not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  eventable_id   :integer
-#  job_id         :string
-#  membership_id  :integer
-#  org_id         :integer          not null
-#  server_id      :integer          not null
+#  id              :integer          not null, primary key
+#  actionable_type :string
+#  args            :json             not null
+#  completed_at    :datetime
+#  data            :json             not null
+#  event_type      :string           not null
+#  running_at      :datetime
+#  source          :string           not null
+#  status          :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  actionable_id   :integer
+#  job_id          :string
+#  membership_id   :integer
+#  org_id          :integer          not null
+#  server_id       :integer          not null
 #
 # Indexes
 #
-#  index_server_events_on_eventable      (eventable_type,eventable_id)
-#  index_server_events_on_membership_id  (membership_id)
-#  index_server_events_on_org_id         (org_id)
-#  index_server_events_on_server_id      (server_id)
+#  index_actions_on_membership_id     (membership_id)
+#  index_actions_on_org_id            (org_id)
+#  index_actions_on_server_id         (server_id)
+#  index_server_events_on_actionable  (actionable_type,actionable_id)
 #
 # Foreign Keys
 #
@@ -32,14 +32,14 @@
 #  org_id         (org_id => orgs.id)
 #  server_id      (server_id => servers.id)
 #
-class ServerEvent < ApplicationRecord
+class Action < ApplicationRecord
   include BelongsToOrg
   include BelongsToMembership
   include BelongsToServer
 
-  belongs_to :eventable, polymorphic: true, optional: true, touch: true
+  belongs_to :actionable, polymorphic: true, optional: true, touch: true
 
-  has_one :server_event_log, dependent: :destroy
+  has_one :action_log, dependent: :destroy
 
   enum status: {
     pending: "pending",
@@ -73,7 +73,7 @@ class ServerEvent < ApplicationRecord
   end
 
   def process_async
-    ServerEvents::ProcessJob.perform_later(self)
+    Actions::ProcessJob.perform_later(self)
   end
 
   def process
@@ -81,7 +81,7 @@ class ServerEvent < ApplicationRecord
   end
 
   def event_processor
-    "ServerEvents::#{eventable.class.name.pluralize}::#{event_type.classify}".constantize
+    "Actions::#{eventable.class.name.pluralize}::#{event_type.classify}".constantize
   end
 
   def event_types

@@ -25,11 +25,11 @@
 #  server_id  (server_id => servers.id)
 #
 class Service < ApplicationRecord
+  include Actionable
   include BelongsToOrg
   include BelongsToServer
   include Discard::Model
   include DokkuEntity
-  include ServerEventable
 
   SERVER_EVENT_TYPES = %w[
     create

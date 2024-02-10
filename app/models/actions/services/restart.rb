@@ -1,4 +1,4 @@
-module ServerEvents
+module Actions
   module Services
     class Restart < Base
       def commands

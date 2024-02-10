@@ -1,4 +1,4 @@
-module ServerEvents
+module Actions
   class ProcessJob < ApplicationJob
     queue_as :default
 

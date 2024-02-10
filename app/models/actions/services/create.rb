@@ -1,4 +1,4 @@
-module ServerEvents
+module Actions
   module Services
     class Create < Base
       def commands

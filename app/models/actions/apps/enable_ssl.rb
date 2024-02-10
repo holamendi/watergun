@@ -1,4 +1,4 @@
-module ServerEvents
+module Actions
   module Apps
     class EnableSsl < Base
       def commands
