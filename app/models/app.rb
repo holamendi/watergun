@@ -32,7 +32,7 @@ class App < ApplicationRecord
   include Discard::Model
   include DokkuEntity
 
-  SERVER_EVENT_TYPES = %w[
+  ACTION_TYPES = %w[
     create
     deploy
     destroy
@@ -42,19 +42,20 @@ class App < ApplicationRecord
     update
   ].freeze
 
-  store_attribute :data, :git_repo, :string
-  store_attribute :data, :git_branch, :string, default: "main"
-  store_attribute :data, :dokku_builder, :string, default: "herokuish"
   store_attribute :data, :urls, :json, default: []
 
-  validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
-  validates :git_repo, :git_branch, presence: true
-  validates :dokku_builder, inclusion: {in: Server::DOKKU_BUILDERS.keys}
+  enum status: {
+    initializing: "initializing",
+    idle: "idle"
+  }, _prefix: true, _default: :initializing
 
-  after_create_commit -> { create_server_event!("create") }
-  after_update -> { create_server_event!("update") }, if: -> { saved_change_to_git_repo? || saved_change_to_git_branch? || saved_change_to_dokku_builder? }
-  after_update_commit -> { broadcast_refresh_to self, :header }
-  after_discard -> { create_server_event!("destroy") }
+  has_many :sources, class_name: "AppSource", dependent: :destroy
+
+  validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
+
+  after_create_commit -> { enqueue_action!(:create) }
+  after_update_commit -> { broadcast_refresh_to self }
+  after_discard -> { enqueue_action!(:destroy) }
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")
@@ -64,28 +65,12 @@ class App < ApplicationRecord
     end
   end
 
-  def deploy!
-    create_server_event!("deploy")
-  end
-
-  def restart!
-    create_server_event!("restart")
-  end
-
-  def enable_ssl!
-    create_server_event!("enable_ssl")
-  end
-
-  def disable_ssl!
-    create_server_event!("disable_ssl")
-  end
-
   def ssl_enabled?
-    urls.any? { _1.start_with?("https://") }
+    urls.any? { |url| url.start_with?("https://") }
   end
 
   def https_urls
-    urls.select { _1.start_with?("https://") }
+    urls.select { |url| url.start_with?("https://") }
   end
 
   def url

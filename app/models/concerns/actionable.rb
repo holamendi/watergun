@@ -6,7 +6,7 @@ module Actionable
     has_one :current_action, -> { where(status: [:pending, :running]) }, class_name: "Action", as: :actionable, dependent: :destroy
   end
 
-  def create_server_event!(event_type)
-    server_events.create!(event_type:, org:, server:)
+  def enqueue_action!(action_type)
+    actions.create!(action_type:, org:, server:).perform_later
   end
 end

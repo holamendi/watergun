@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_10_190324) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_11_172541) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -28,7 +28,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_10_190324) do
     t.string "actionable_type"
     t.integer "actionable_id"
     t.integer "membership_id"
-    t.string "event_type", null: false
+    t.string "action_type", null: false
     t.string "source", null: false
     t.string "status", null: false
     t.string "job_id"
@@ -42,6 +42,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_10_190324) do
     t.index ["membership_id"], name: "index_actions_on_membership_id"
     t.index ["org_id"], name: "index_actions_on_org_id"
     t.index ["server_id"], name: "index_actions_on_server_id"
+  end
+
+  create_table "app_sources", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "type", null: false
+    t.json "data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_app_sources_on_app_id"
+    t.index ["org_id"], name: "index_app_sources_on_org_id"
   end
 
   create_table "apps", force: :cascade do |t|
@@ -162,6 +173,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_10_190324) do
   add_foreign_key "actions", "memberships"
   add_foreign_key "actions", "orgs"
   add_foreign_key "actions", "servers"
+  add_foreign_key "app_sources", "apps"
+  add_foreign_key "app_sources", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
   add_foreign_key "git_credentials", "orgs"

@@ -10,7 +10,7 @@ class AppsController < ApplicationController
   end
 
   def create
-    @app = current_server.apps.new(app_params.merge(status: "creating"))
+    @app = current_server.apps.new(app_params)
 
     if @app.save
       redirect_to app_path(@app), notice: "App created successfully."
@@ -20,6 +20,7 @@ class AppsController < ApplicationController
   end
 
   def show
+    @latest_actions = @app.actions.order(created_at: :desc).limit(5)
   end
 
   def edit
@@ -33,45 +34,10 @@ class AppsController < ApplicationController
     end
   end
 
-  def destroy
-    @app.discard!
-    redirect_to apps_path, notice: "App deleted successfully."
-  end
-
-  def deploy
-    @app.deploy!
-    redirect_to app_path(@app), notice: "App deploy started."
-  end
-
-  def restart
-    @app.restart!
-    redirect_to app_path(@app), notice: "App restart started."
-  end
-
-  def enable_ssl
-    @app.enable_ssl!
-    redirect_to app_path(@app), notice: "SSL certificate request started."
-  end
-
-  def disable_ssl
-    @app.disable_ssl!
-    redirect_to app_path(@app), notice: "SSL certificate removal started."
-  end
-
-  def activity
-    @server_events = @app.server_events.order(created_at: :desc).limit(50)
-  end
-
-  def select_git_repo
-    if params[:id].present? && (app = current_server.apps.kept.find_by(id: params[:id]))
-      @git_repo = app.git_repo
-    end
-  end
-
   private
 
   def app_params
-    params.require(:app).permit(:name, :git_repo, :git_branch, :dokku_builder)
+    params.require(:app).permit(:name)
   end
 
   def set_app

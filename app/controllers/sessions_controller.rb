@@ -1,6 +1,8 @@
 class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
+  layout "sessions"
+
   def new
     redirect_to root_path if Session.find_by_active_token(cookies.encrypted[:session_token])
 

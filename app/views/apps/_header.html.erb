@@ -1,12 +1,12 @@
-<%= turbo_stream_from @app, :header %>
+<%= turbo_stream_from @app %>
 
-<div id="<%= dom_id(app, :header) %>">
+<div>
   <div class="flex justify-between mb-6">
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
-        <% if app.reload_current_server_event.present? %>
+        <% if app.reload_current_action.present? %>
           <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
-            <%= app.current_server_event.event_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
+            <%= app.current_action.action_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
           </span>
         <% end %>
       </h1>
@@ -17,8 +17,8 @@
           <details>
             <summary class="text-lg">Actions</summary>
             <ul class="p-2">
-              <li><%= link_to "Deploy", deploy_app_path(app), disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %></li>
-              <li><%= link_to "Restart", restart_app_path(app), disabled: app.current_server_event.present?, data: { "turbo-method" => :post } %></li>
+              <li><%= link_to "Deploy", app_actions_path(app, params: {action_type: :deploy}), disabled: app.current_action.present?, data: { "turbo-method" => :post } %></li>
+              <li><%= link_to "Restart", app_actions_path(app, params: {action_type: :restart}), disabled: app.current_action.present?, data: { "turbo-method" => :post } %></li>
             </ul>
           </details>
         </li>
@@ -27,7 +27,6 @@
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
     <%= link_to "overview", app_path(app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
-    <%= link_to "activity", activity_app_path(app), class: class_names("tab", "tab-active" => action_name  == "activity"), role: "tab" %>
     <%= link_to "settings", edit_app_path(app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
   </div>
 </div>

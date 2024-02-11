@@ -1,21 +1,7 @@
 <%= form_with model: app, class: "space-y-6" do |form| %>
-  <div class="form-control">
-    <%= form.label :name, class: "label" %>
-    <%= form.text_field :name, class: "input input-bordered input-md" %>
-  </div>
-  <div class="form-control">
-    <%= form.label :git_repo, "Repository", class: "label" %>
-      <%= turbo_frame_tag "select_git_repo", src: select_git_repo_apps_path(id: form.object.id) do %>
-        <%= form.select :git_repo, [["Fetching data from Github...", nil]], {}, disabled: true, class: "select select-bordered w-full" %>
-      <% end %>
-  </div>
-  <div class="form-control">
-    <%= form.label :git_branch, "Branch", class: "label" %>
-    <%= form.text_field :git_branch, class: "input input-bordered" %>
-  </div>
-  <div class="form-control">
-    <%= form.label :dokku_builder, "Builder", class: "label" %>
-    <%= form.select :dokku_builder, form.object.compatible_dokku_builders.invert.to_a, {}, class: "select select-bordered w-full" %>
-  </div>
+  <%= form.label :name, class: "form-control" do %>
+    <div class="label"><span class="label-text">Name</span></div>
+    <%= form.text_field :name, class: "input input-bordered" %>
+  <% end %>
   <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

@@ -31,7 +31,7 @@ class Service < ApplicationRecord
   include Discard::Model
   include DokkuEntity
 
-  SERVER_EVENT_TYPES = %w[
+  ACTION_TYPES = %w[
     create
     destroy
     restart
@@ -42,9 +42,9 @@ class Service < ApplicationRecord
     redis: "redis"
   }, _prefix: true
 
-  after_create_commit -> { create_server_event!("create") }
-  after_discard -> { create_server_event!("destroy") }
-  after_update_commit -> { broadcast_refresh_to self, :header }
+  after_create_commit -> { enqueue_action!(:create) }
+  after_discard -> { enqueue_action!(:destroy) }
+  after_update_commit -> { broadcast_refresh_to(self, :header) }
 
   def restart!
     create_server_event!("restart")

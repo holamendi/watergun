@@ -1,9 +1,9 @@
 module Actions
   module Services
     class Base < Actions::Base
-      delegate :org, :server, :service_type, to: :eventable
+      delegate :org, :server, :service_type, to: :actionable
 
-      alias_method :service, :eventable
+      alias_method :service, :actionable
     end
   end
 end

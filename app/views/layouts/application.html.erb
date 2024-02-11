@@ -13,19 +13,14 @@
     </script>
   </head>
   <body class="h-full font-mono bg-base-200">
-    <% if controller_name == "sessions" %>
-      <%= yield %>
-    <% else %>
-      <%= render "shared/navbar" %>
-      <div class="px-4 mx-auto max-w-8xl sm:px-6 lg:px-8">
-              <%= render "shared/flash_messages" %>
-
-        <div class="flex max-w-5xl mx-auto space-x-5">
-          <div class="w-full p-8 mt-6 rounded-lg bg-base-100">
-            <%= yield %>
-          </div>
+    <%= render "shared/navbar" %>
+    <div class="px-4 mx-auto max-w-8xl sm:px-6 lg:px-8">
+      <%= render "shared/flash_messages" %>
+      <div class="flex max-w-5xl mx-auto space-x-5">
+        <div class="w-full p-8 mt-6 rounded-lg bg-base-100">
+          <%= yield %>
         </div>
       </div>
-    <% end %>
+    </div>
   </body>
 </html>

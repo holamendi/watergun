@@ -1,2 +1,18 @@
 
 <%= render "header", app: @app %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Action</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @latest_actions.each do |action| %>
+      <tr>
+        <td><%= action.action_type %> <% if action.status_running? %>(running)<% end %></td>
+        <td><%= action.created_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -25,7 +25,7 @@ class ActionLog < ApplicationRecord
 
   attribute :ssh_commands, SshCommand.to_array_type
 
-  belongs_to :server_event
+  belongs_to :action
 
   def output
     ssh_commands.map(&:output).join

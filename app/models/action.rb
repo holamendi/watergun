@@ -3,11 +3,11 @@
 # Table name: actions
 #
 #  id              :integer          not null, primary key
+#  action_type     :string           not null
 #  actionable_type :string
 #  args            :json             not null
 #  completed_at    :datetime
 #  data            :json             not null
-#  event_type      :string           not null
 #  running_at      :datetime
 #  source          :string           not null
 #  status          :string           not null
@@ -54,13 +54,12 @@ class Action < ApplicationRecord
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
-  validates :event_type, inclusion: {in: -> { _1.event_types }}, if: -> { eventable.present? }
+  validates :action_type, inclusion: {in: ->(action) { action.actionable.class::ACTION_TYPES }}, if: -> { actionable.present? }
 
-  after_create_commit -> { server_event_log&.update!(server_event_id: id) }
+  # after_create_commit -> { action_log&.update!(server_event_id: id) }
 
-  after_create_commit :process_async
-  after_create_commit -> { broadcast_prepend_to eventable, :server_events }
-  after_update_commit -> { broadcast_replace_to eventable, :server_events }
+  # after_create_commit -> { broadcast_refresh_to actionable, :server_events }
+  # after_update_commit -> { broadcast_refresh_to actionable, :server_events }
 
   def completed?
     completed_at.present?
@@ -72,7 +71,7 @@ class Action < ApplicationRecord
     completed_at - running_at
   end
 
-  def process_async
+  def perform_later
     Actions::ProcessJob.perform_later(self)
   end
 
@@ -81,10 +80,6 @@ class Action < ApplicationRecord
   end
 
   def event_processor
-    "Actions::#{eventable.class.name.pluralize}::#{event_type.classify}".constantize
-  end
-
-  def event_types
-    eventable.class::SERVER_EVENT_TYPES
+    "Actions::#{actionable.class.name.pluralize}::#{action_type.classify}".constantize
   end
 end

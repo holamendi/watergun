@@ -1,15 +1,15 @@
-<div class="flex flex-col justify-center min-h-full px-6 lg:px-8" data-controller="hello">
+<div class="flex flex-col justify-center min-h-full px-4 lg:px-8" data-controller="hello">
   <div class="px-10 pt-2 pb-10 shadow-lg rounded-xl sm:mx-auto sm:w-full sm:max-w-sm bg-base-100">
     <%= form_with(scope: :session, url: sessions_path, class: "space-y-6") do |form| %>
-      <div class="w-full form-control">
-        <%= form.label :email, class: "label" %>
+      <%= form.label :email, class: "form-control" do %>
+        <div class="label"><span class="label-text">Email</span></div>
         <%= form.text_field :email, class: "input input-bordered" %>
-      </div>
-      <div class="w-full form-control">
-        <%= form.label :password, class: "label" %>
+      <% end %>
+      <%= form.label :password, class: "form-control" do %>
+        <div class="label"><span class="label-text">Password</span></div>
         <%= form.password_field :password, class: "input input-bordered" %>
-      </div>
-      <div>
+      <% end %>
+      <div class="pt-2">
         <%= form.submit "Sign in", class: "btn btn-primary w-full no-animation" %>
       </div>
     <% end %>
