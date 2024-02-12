@@ -34,6 +34,11 @@ class AppsController < ApplicationController
     end
   end
 
+  def destroy
+    @app.discard!
+    redirect_to apps_path, notice: "App deleted successfully."
+  end
+
   private
 
   def app_params

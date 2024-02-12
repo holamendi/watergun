@@ -7,6 +7,6 @@ module Actionable
   end
 
   def enqueue_action!(action_type)
-    actions.create!(action_type:, org:, server:).perform_later
+    actions.create!(action_type:, org:, server:).process_later
   end
 end
