@@ -57,7 +57,7 @@ class Server < ApplicationRecord
 
   delegate :ssh_private_key, to: :server_identity
 
-  def execute_ssh_commands(commands, &block)
-    Servers::ExecuteSshCommands.new(server: self, commands:).call(&block)
+  def ssh_connection(&block)
+    Servers::Ssh.new(server: self).connection(&block)
   end
 end

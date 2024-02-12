@@ -1,4 +1,4 @@
-module Actions
+module ActionProcessors
   module Services
     class Destroy < Base
       def commands

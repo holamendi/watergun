@@ -54,13 +54,6 @@ class Action < ApplicationRecord
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
-  validates :action_type, inclusion: {in: ->(action) { action.actionable.class::ACTION_TYPES }}, if: -> { actionable.present? }
-
-  # after_create_commit -> { action_log&.update!(server_event_id: id) }
-
-  # after_create_commit -> { broadcast_refresh_to actionable, :server_events }
-  # after_update_commit -> { broadcast_refresh_to actionable, :server_events }
-
   def completed?
     completed_at.present?
   end
@@ -71,15 +64,15 @@ class Action < ApplicationRecord
     completed_at - running_at
   end
 
-  def perform_later
+  def process_later
     Actions::ProcessJob.perform_later(self)
   end
 
   def process
-    event_processor.new(self).call
+    processor_class.new(self).call
   end
 
-  def event_processor
-    "Actions::#{actionable.class.name.pluralize}::#{action_type.classify}".constantize
+  def processor_class
+    "ActionProcessors::#{actionable.class.name.pluralize}::#{action_type.classify}".safe_constantize
   end
 end

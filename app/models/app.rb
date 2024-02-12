@@ -32,16 +32,6 @@ class App < ApplicationRecord
   include Discard::Model
   include DokkuEntity
 
-  ACTION_TYPES = %w[
-    create
-    deploy
-    destroy
-    disable_ssl
-    enable_ssl
-    restart
-    update
-  ].freeze
-
   store_attribute :data, :urls, :json, default: []
 
   enum status: {

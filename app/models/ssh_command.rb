@@ -4,13 +4,13 @@ class SshCommand
   attribute :command, :string
   attribute :completed_at, :datetime
   attribute :exit_code, :integer
-  attribute :output, :string, default: ""
+  attribute :output, default: []
   attribute :started_at, :datetime
 
   validates :command, presence: true
 
-  def output_lines
-    output.split("\n")
+  def text_output
+    output.map(&:last).join
   end
 
   def success?
