@@ -2,11 +2,11 @@ module Actions
   class ProcessJob < ApplicationJob
     queue_as :default
 
-    def perform(server_event)
-      return unless server_event.status_pending?
+    def perform(action)
+      return unless action.status_enqueued?
 
-      server_event.update_columns(job_id:)
-      server_event.process
+      action.update_columns(job_id:)
+      action.process
     end
   end
 end

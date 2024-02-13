@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_11_172541) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_13_185357) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -38,6 +38,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_11_172541) do
     t.json "args", default: {}, null: false
     t.datetime "running_at"
     t.json "data", default: {}, null: false
+    t.json "payload", default: {}, null: false
     t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
     t.index ["membership_id"], name: "index_actions_on_membership_id"
     t.index ["org_id"], name: "index_actions_on_org_id"

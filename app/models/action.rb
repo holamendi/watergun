@@ -8,6 +8,7 @@
 #  args            :json             not null
 #  completed_at    :datetime
 #  data            :json             not null
+#  payload         :json             not null
 #  running_at      :datetime
 #  source          :string           not null
 #  status          :string           not null
@@ -43,6 +44,7 @@ class Action < ApplicationRecord
 
   enum status: {
     pending: "pending",
+    enqueued: "enqueued",
     running: "running",
     success: "success",
     failure: "failure",
@@ -54,6 +56,8 @@ class Action < ApplicationRecord
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
+  scope :enqueued_or_running, -> { where(status: %i[enqueued running]) }
+
   def completed?
     completed_at.present?
   end
@@ -64,7 +68,10 @@ class Action < ApplicationRecord
     completed_at - running_at
   end
 
-  def process_later
+  def enqueue!
+    return if actionable.actions.enqueued_or_running.excluding(self).exists?
+
+    status_enqueued!
     Actions::ProcessJob.perform_later(self)
   end
 

@@ -43,9 +43,9 @@ class App < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  after_create_commit -> { enqueue_action!(:create) }
+  after_create_commit -> { create_and_enqueue_action!(:create) }
   after_update_commit -> { broadcast_refresh_to self }
-  after_discard -> { enqueue_action!(:destroy) }
+  after_discard -> { create_and_enqueue_action!(:destroy) }
 
   def compatible_dokku_builders
     if server.architecture.include?("x86")

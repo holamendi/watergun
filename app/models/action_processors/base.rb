@@ -11,7 +11,8 @@ module ActionProcessors
 
     def call
       Action.transaction do
-        action.update!(status: :running, running_at: Time.current)
+        action.running_at = Time.current
+        action.status_running!
         action.create_action_log!(org:)
       end
 
@@ -22,19 +23,23 @@ module ActionProcessors
 
       @ssh = nil
 
-      Action.transaction do
-        action.update!(status: result.success? ? :success : :failure, completed_at: result.completed_at)
-        action.action_log.update!(ssh_commands: result.ssh_commands)
+      action.completed_at = result.completed_at
+      if result.success?
+        action.status_success!
+        actionable.enqueue_next_action!(action)
+      else
+        action.status_failure!
       end
-    rescue => e
-      action.update!(
-        status: "exception",
-        completed_at: Time.current,
-        exception: {
-          message: e.message,
-          backtrace: e.backtrace
-        }
-      )
+      action.action_log.update!(ssh_commands: result.ssh_commands)
+      # rescue => e
+      #   action.update!(
+      #     status: "exception",
+      #     completed_at: Time.current,
+      #     exception: {
+      #       message: e.message,
+      #       backtrace: e.backtrace
+      #     }
+      #   )
     end
 
     private
