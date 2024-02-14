@@ -18,13 +18,13 @@ module Servers
       end
 
       @completed_at = Time.current
-      @ssh_connection = nil
       self
     end
 
     def execute(command)
-      ssh_command = SshCommand.new(command:, started_at: Time.current)
+      ssh_command = SshCommand.new(command:, output: [], started_at: Time.current)
       @ssh_commands << ssh_command
+
       status = {}
 
       ssh_connection.exec!(command) do |_channel, stream, data|

@@ -133,6 +133,9 @@ GEM
     irb (1.11.2)
       rdoc
       reline (>= 0.4.2)
+    irb-theme-dracula (0.1.1)
+      irb
+      reline (>= 0.4.0)
     json (2.7.1)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
@@ -357,6 +360,7 @@ DEPENDENCIES
   faraday-retry
   honeybadger
   httpx
+  irb-theme-dracula
   litestack
   net-ssh
   octokit
