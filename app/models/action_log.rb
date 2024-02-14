@@ -23,7 +23,7 @@
 class ActionLog < ApplicationRecord
   include BelongsToOrg
 
-  attribute :ssh_commands, SshCommand.to_array_type
+  attribute :ssh_commands, Ssh::Command.to_array_type
 
   belongs_to :action
 

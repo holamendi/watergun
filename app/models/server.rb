@@ -57,7 +57,7 @@ class Server < ApplicationRecord
 
   delegate :ssh_private_key, to: :server_identity
 
-  def ssh_connection(&block)
-    Servers::Ssh.new(server: self).connection(&block)
+  def ssh_session(&block)
+    Ssh::Session.new(server: self).connect(&block)
   end
 end
