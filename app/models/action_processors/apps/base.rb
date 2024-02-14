@@ -6,7 +6,7 @@ module ActionProcessors
       private
 
       def sync_app
-        ssh_command = ssh.execute("dokku urls #{app.dokku_id}")
+        ssh_command = execute("dokku urls #{app.dokku_id}")
         return unless ssh_command.success?
 
         urls = ssh_command.text_output.split("\n")

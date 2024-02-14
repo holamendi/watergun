@@ -1,12 +1,11 @@
 module ActionProcessors
   class Base
-    attr_reader :action, :ssh
+    attr_reader :action, :ssh_session
 
     delegate :actionable, :org, :server, to: :action
 
     def initialize(action)
       @action = action
-      @ssh = nil
     end
 
     def call
@@ -16,21 +15,24 @@ module ActionProcessors
         action.create_action_log!(org:)
       end
 
-      result = server.ssh_connection do |ssh|
-        @ssh = ssh
+      result = server.ssh_session do |session|
+        @ssh_session = session
         process
       end
 
-      @ssh = nil
+      @ssh_session = nil
 
       action.completed_at = result.completed_at
-      if result.success?
-        action.status_success!
-        actionable.enqueue_next_action!(action)
-      else
-        action.status_failure!
+
+      Action.transaction do
+        if result.success?
+          action.status_success!
+          actionable.enqueue_next_action!(action)
+        else
+          action.status_failure!
+        end
+        action.action_log.update!(ssh_commands: result.commands)
       end
-      action.action_log.update!(ssh_commands: result.ssh_commands)
       # rescue => e
       #   action.update!(
       #     status: "exception",
@@ -46,6 +48,10 @@ module ActionProcessors
 
     def process
       raise "Implement in subclass"
+    end
+
+    def execute(command)
+      ssh_session.execute(command)
     end
   end
 end

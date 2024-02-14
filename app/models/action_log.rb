@@ -27,7 +27,7 @@ class ActionLog < ApplicationRecord
 
   belongs_to :action
 
-  def output
-    ssh_commands.map(&:output).join
+  def text_output
+    ssh_commands.map(&:text_output).join
   end
 end

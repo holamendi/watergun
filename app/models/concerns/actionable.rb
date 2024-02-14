@@ -6,6 +6,10 @@ module Actionable
     has_one :current_action, -> { enqueued_or_running }, class_name: "Action", as: :actionable, dependent: :destroy
   end
 
+  def create_and_enqueue_action!(action_type, payload = {})
+    actions.create!(org:, server:, action_type:, payload:).enqueue!
+  end
+
   def create_and_enqueue_actions!(actions)
     Action.transaction do
       actions.each do |action|
@@ -13,10 +17,6 @@ module Actionable
         create_and_enqueue_action!(action_type, payload)
       end
     end
-  end
-
-  def create_and_enqueue_action!(action_type, payload = {})
-    actions.create!(org:, server:, action_type:, payload:).enqueue!
   end
 
   def enqueue_next_action!(last_action)

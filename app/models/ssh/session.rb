@@ -26,7 +26,7 @@ module Ssh
 
       status = {}
 
-      @session.exec!(command) do |_channel, stream, data|
+      @session.exec!(command, status:) do |_channel, stream, data|
         ssh_command.append_output(stream, data)
         yield(stream.to_s, data) if block_given?
       end
@@ -34,6 +34,10 @@ module Ssh
       ssh_command.completed_at = Time.current
       ssh_command.exit_code = status[:exit_code]
       ssh_command
+    end
+
+    def success?
+      commands.all?(&:success?)
     end
   end
 end
