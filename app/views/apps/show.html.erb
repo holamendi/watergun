@@ -1,25 +1,26 @@
-
-<div id="app-turbo-stream" data-turbo-permanent="true" >
-  <%= turbo_stream_from @app %>
-</div>
+<%= turbo_stream_from @app %>
 <%= render "header", app: @app %>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Action</th>
-      <th>Completed</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @latest_actions.each do |action| %>
+<% if @app.source %>
+  <table class="table">
+    <thead>
       <tr>
-        <td><%= action.id %></td>
-        <td><%= action.action_type %> <% if action.status_running? %>(running)<% end %></td>
-        <td><%= action.completed_at %></td>
-        <td><%= action.status %></td>
+        <th>Id</th>
+        <th>Action</th>
+        <th>Completed</th>
+        <th>Status</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @latest_actions.each do |action| %>
+        <tr>
+          <td><%= action.id %></td>
+          <td><%= action.action_type %> <% if action.status_running? %>(running)<% end %></td>
+          <td><%= action.completed_at %></td>
+          <td><%= action.status %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <%= render "apps/app_sources/form", app_source: @app.build_source %>
+<% end %>

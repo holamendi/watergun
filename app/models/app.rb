@@ -39,11 +39,11 @@ class App < ApplicationRecord
     idle: "idle"
   }, _prefix: true, _default: :initializing
 
-  has_many :sources, class_name: "AppSource", dependent: :destroy
+  has_one :source, class_name: "AppSource", dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  # after_create_commit -> { create_and_enqueue_action!(:create) }
+  after_create_commit -> { create_and_enqueue_action!(:create) }
   after_update_commit -> { broadcast_refresh_to self }
   after_discard -> { create_and_enqueue_action!(:destroy) }
 

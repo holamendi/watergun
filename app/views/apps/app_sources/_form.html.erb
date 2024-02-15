@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "new_app_source" do %>
+  <%= app_source.errors.full_messages.to_sentence %>
+  <%= form_with model: app_source, url: app_app_sources_path(app_source.app), scope: :app_source, class: "space-y-6" do |form| %>
+    <%= form.label :repository, class: "form-control" do %>
+      <div class="label"><span class="label-text">Repository</span></div>
+      <%= form.text_field :repository, class: "input input-bordered" %>
+    <% end %>
+    <%= form.label :branch, class: "form-control" do %>
+      <div class="label"><span class="label-text">Branch</span></div>
+      <%= form.text_field :branch, class: "input input-bordered" %>
+    <% end %>
+    <%= form.submit "Save", class: "btn btn-primary text-white" %>
+  <% end %>
+<% end %>

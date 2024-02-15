@@ -20,7 +20,7 @@ Rails.application.routes.draw do
     end
 
     scope module: :apps do
-      resources :app_sources, path: :sources
+      resource :app_sources, path: :app_sources
       resources :actions, only: :create
     end
   end
