@@ -1,17 +1,24 @@
 
+<div id="app-turbo-stream" data-turbo-permanent="true" >
+  <%= turbo_stream_from @app %>
+</div>
 <%= render "header", app: @app %>
 <table class="table">
   <thead>
     <tr>
+      <th>Id</th>
       <th>Action</th>
-      <th>Date</th>
+      <th>Completed</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
     <% @latest_actions.each do |action| %>
       <tr>
+        <td><%= action.id %></td>
         <td><%= action.action_type %> <% if action.status_running? %>(running)<% end %></td>
-        <td><%= action.created_at %></td>
+        <td><%= action.completed_at %></td>
+        <td><%= action.status %></td>
       </tr>
     <% end %>
   </tbody>

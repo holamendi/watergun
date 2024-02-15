@@ -8,7 +8,7 @@ module Apps
     ].freeze
 
     def create
-      @app.enqueue_action!(params[:action_type])
+      @app.create_and_enqueue_action!(params[:action_type])
       redirect_to app_path(@app), notice: "Action enqueued successfully."
     end
 
