@@ -16,13 +16,13 @@ console.log('Visit the guide for more information: ', 'https://vite-ruby.netlify
 // Example: Load Rails libraries in Vite.
 //
 import * as Turbo from '@hotwired/turbo-rails'
-// Turbo.start()
+
 //
 // import ActiveStorage from '@rails/activestorage'
 // ActiveStorage.start()
 //
 // // Import all channels.
-const channels = import.meta.globEager('./**/*_channel.js')
+const channels = import.meta.glob('./**/*_channel.js')
 
 // Example: Import a stylesheet in app/frontend/index.css
 // import '~/index.css'
@@ -34,6 +34,6 @@ const application = Application.start()
 application.debug = true
 window.Stimulus   = application
 
-const controllers = import.meta.globEager('~/controllers/*_controller.js')
+const controllers = import.meta.glob('~/controllers/*_controller.js', { eager: true })
 registerControllers(application, controllers)
 

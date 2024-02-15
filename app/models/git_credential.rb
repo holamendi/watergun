@@ -22,7 +22,7 @@ class GitCredential < ApplicationRecord
   include BelongsToOrg
 
   enum provider: {
-    github: 0
+    github: "github"
   }, _prefix: true, _default: "github"
 
   def repos

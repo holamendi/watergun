@@ -43,7 +43,7 @@ class App < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  after_create_commit -> { create_and_enqueue_action!(:create) }
+  # after_create_commit -> { create_and_enqueue_action!(:create) }
   after_update_commit -> { broadcast_refresh_to self }
   after_discard -> { create_and_enqueue_action!(:destroy) }
 

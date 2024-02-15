@@ -23,5 +23,5 @@
 class AppSource < ApplicationRecord
   include BelongsToOrg
 
-  belongs_to :app, inverse_of: :source
+  belongs_to :app, inverse_of: :sources
 end
