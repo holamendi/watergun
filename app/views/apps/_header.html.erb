@@ -25,8 +25,10 @@
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
-    <%= link_to "overview", app_path(app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
-    <%= link_to "settings", edit_app_path(app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
+    <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
+    <%= link_to "Environment", edit_app_environment_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>
+    <%= link_to "Metrics", "#", class: class_names("tab", "tab-active" => false), role: "tab" %>
+    <%= link_to "Settings", edit_app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" %>
   </div>
 </div>
 

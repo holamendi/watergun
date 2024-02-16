@@ -1,6 +1,4 @@
-<%= turbo_frame_tag "modal_frame", target: "_top" do %>
-  <div class="flex justify-between mb-6">
-    <h1 class="text-3xl font-extrabold">new app</h1>
-  </div>
-  <%= render "form", app: @app %>
-<% end %>
+<div class="flex justify-between mb-6">
+  <h1 class="text-3xl font-extrabold">New App</h1>
+</div>
+<%= render "form", app: @app %>

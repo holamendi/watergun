@@ -15,12 +15,10 @@ Rails.application.routes.draw do
       post :enable_ssl
       post :restart
     end
-    collection do
-      get :select_git_repo
-    end
 
     scope module: :apps do
-      resource :app_sources, path: :app_sources
+      resource :app_sources, path: :sources
+      resource :environment_configuration, path: :environment, only: %i[edit update]
       resources :actions, only: :create
     end
   end

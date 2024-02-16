@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_13_185357) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_16_195403) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -72,25 +72,28 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_13_185357) do
     t.index ["status"], name: "index_apps_on_status"
   end
 
-# Could not dump table "events" because of following StandardError
-#   Unknown type 'REAL' for column 'value'
-
-# Could not dump table "events_search" because of following StandardError
-#   Unknown type '' for column 'topic'
-
-# Could not dump table "events_search_config" because of following StandardError
-#   Unknown type '' for column 'k'
-
-  create_table "events_search_data", force: :cascade do |t|
-    t.binary "block"
+  create_table "deploy_sources", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "type"
+    t.boolean "active"
+    t.json "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_deploy_sources_on_app_id"
+    t.index ["org_id"], name: "index_deploy_sources_on_org_id"
   end
 
-  create_table "events_search_docsize", force: :cascade do |t|
-    t.binary "sz"
+  create_table "environment_configurations", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.string "environment_configurable_type", null: false
+    t.integer "environment_configurable_id", null: false
+    t.json "variables", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["environment_configurable_type", "environment_configurable_id"], name: "index_environment_configurations_on_environment_configurable"
+    t.index ["org_id"], name: "index_environment_configurations_on_org_id"
   end
-
-# Could not dump table "events_search_idx" because of following StandardError
-#   Unknown type '' for column 'segid'
 
   create_table "git_credentials", force: :cascade do |t|
     t.integer "org_id", null: false
@@ -181,11 +184,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_13_185357) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "topics", primary_key: "name", id: :text, force: :cascade do |t|
-    t.text "state"
-    t.integer "updated_at"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -203,7 +201,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_13_185357) do
   add_foreign_key "app_sources", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
-  add_foreign_key "events", "topics", column: "topic", primary_key: "name", on_delete: :cascade
+  add_foreign_key "deploy_sources", "apps"
+  add_foreign_key "deploy_sources", "orgs"
+  add_foreign_key "environment_configurations", "orgs"
   add_foreign_key "git_credentials", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"

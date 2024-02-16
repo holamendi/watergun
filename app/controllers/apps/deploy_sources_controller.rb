@@ -1,9 +1,9 @@
 module Apps
-  class AppSourcesController < ApplicationController
+  class DeploySourcesController < ApplicationController
     before_action :set_app
 
     def create
-      @app_source = AppSources::Github.new(app_source_params.merge(app: @app))
+      @app_source = DeploySources::Github.new(app_source_params.merge(app: @app))
 
       if @app_source.save
         redirect_to @app, notice: "App source created successfully."

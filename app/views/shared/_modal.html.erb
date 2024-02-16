@@ -1,0 +1,8 @@
+<dialog data-controller="modal" id="modal" class="modal" data-action="turbo:frame-load->modal#showModal">
+  <div class="modal-box">
+    <%= turbo_frame_tag "modal_frame", target: "_top" %>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

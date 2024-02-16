@@ -1,6 +1,6 @@
 <%= turbo_stream_from @app %>
 <%= render "header", app: @app %>
-<% if @app.source %>
+<% if @app.deploy_source %>
   <table class="table">
     <thead>
       <tr>
@@ -22,5 +22,5 @@
     </tbody>
   </table>
 <% else %>
-  <%= render "apps/app_sources/form", app_source: @app.build_source %>
+
 <% end %>

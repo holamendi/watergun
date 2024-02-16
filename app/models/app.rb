@@ -31,6 +31,7 @@ class App < ApplicationRecord
   include BelongsToServer
   include Discard::Model
   include DokkuEntity
+  include EnvironmentConfigurable
 
   store_attribute :data, :urls, :json, default: []
 
@@ -39,7 +40,7 @@ class App < ApplicationRecord
     idle: "idle"
   }, _prefix: true, _default: :initializing
 
-  has_one :source, class_name: "AppSource", dependent: :destroy
+  has_one :deploy_source, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
