@@ -119,6 +119,7 @@ GEM
       reline (>= 0.3.8)
     discard (1.3.0)
       activerecord (>= 4.2, < 8)
+    dotenv (3.0.2)
     drb (2.2.0)
       ruby2_keywords
     dry-cli (1.0.0)
@@ -363,6 +364,7 @@ DEPENDENCIES
   capybara
   debug
   discard
+  dotenv
   faraday-retry
   honeybadger
   httpx

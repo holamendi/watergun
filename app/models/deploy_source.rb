@@ -25,4 +25,6 @@ class DeploySource < ApplicationRecord
   include BelongsToOrg
 
   belongs_to :app
+
+  after_create_commit -> { app.create_and_enqueue_action!(:set_deploy_source) }
 end

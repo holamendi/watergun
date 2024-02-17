@@ -42,8 +42,8 @@ class Service < ApplicationRecord
     redis: "redis"
   }, _prefix: true
 
-  after_create_commit -> { enqueue_action!(:create) }
-  after_discard -> { enqueue_action!(:destroy) }
+  after_create_commit -> { create_and_enqueue_action!(:create) }
+  after_discard -> { create_and_enqueue_action!(:destroy) }
   after_update_commit -> { broadcast_refresh_to(self, :header) }
 
   def restart!

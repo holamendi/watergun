@@ -1,6 +1,11 @@
+<div id="<%= "app_#{@app.id}_stream" %>" data-turbo-permanent="true">
 <%= turbo_stream_from @app %>
+</div>
 <%= render "header", app: @app %>
 <% if @app.deploy_source %>
+  <div class="flex py-2">
+    <%= button_to "Deploy", app_actions_path(@app), {params: { action_type: "deploy" }, class:"btn btn-primary btn-sm", disabled: @app.reload_current_action.present? } %>
+  </div>
   <table class="table">
     <thead>
       <tr>
@@ -22,5 +27,5 @@
     </tbody>
   </table>
 <% else %>
-
+  <%= link_to "Add a deploy source", new_app_deploy_source_path(@app), class: "btn btn-primary" %>
 <% end %>

@@ -38,7 +38,7 @@ class Action < ApplicationRecord
   include BelongsToMembership
   include BelongsToServer
 
-  belongs_to :actionable, polymorphic: true, optional: true, touch: true
+  belongs_to :actionable, polymorphic: true, optional: true
 
   has_one :action_log, dependent: :destroy
 
@@ -72,7 +72,7 @@ class Action < ApplicationRecord
     return if actionable.actions.enqueued_or_running.excluding(self).exists?
 
     status_enqueued!
-    Actions::ProcessJob.perform_later(self)
+    Actions::ProcessJob.set(wait: 1.second).perform_later(self)
   end
 
   def process

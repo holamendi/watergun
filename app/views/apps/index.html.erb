@@ -7,7 +7,7 @@
     <thead>
       <tr class="pl-0 uppercase">
         <th>Name</th>
-        <th>URL</th>
+        <th>Last deploy</th>
         <th></th>
       </tr>
     </thead>
@@ -15,7 +15,13 @@
       <% @apps.each do |app| %>
         <tr>
           <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
-          <td><%= link_to app.url, app.url, class: "link", target: :blank if app.url %></td>
+          <td >
+            <% if app.last_deployed_at.present? %>
+              <div class="tooltip" data-tip="<%= app.last_deployed_at.to_s %>">
+                <%= time_ago_in_words(app.last_deployed_at) %> ago
+              </div>
+            <% end %>
+          </td>
           <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
         </tr>
       <% end %>

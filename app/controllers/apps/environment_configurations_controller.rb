@@ -16,16 +16,7 @@ module Apps
     private
 
     def environment_configuration_params
-      params.require(:environment_configuration).permit(:variables).tap do |param|
-        param[:variables] = variables_string_to_hash(param[:variables])
-      end
-    end
-
-    def variables_string_to_hash(variables_string)
-      variables_string.split("\n").map do |line|
-        key, value = line.split("=")
-        [key, value&.strip || ""]
-      end.to_h
+      params.require(:environment_configuration).permit(:variables)
     end
 
     def set_app

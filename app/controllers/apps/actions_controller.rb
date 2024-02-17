@@ -9,7 +9,7 @@ module Apps
 
     def create
       @app.create_and_enqueue_action!(params[:action_type])
-      redirect_to app_path(@app), notice: "Action enqueued successfully."
+      redirect_to @app, notice: "Action enqueued successfully."
     end
 
     private

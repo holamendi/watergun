@@ -13,6 +13,7 @@ module ActionProcessors
         action.running_at = Time.current
         action.status_running!
         action.create_action_log!(org:)
+        actionable.touch
       end
 
       result = server.ssh_session do |session|
@@ -32,6 +33,7 @@ module ActionProcessors
           action.status_failure!
         end
         action.action_log.update!(ssh_commands: result.commands)
+        actionable.touch
       end
       # rescue => e
       #   action.update!(

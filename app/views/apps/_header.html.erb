@@ -1,6 +1,6 @@
 
 <div>
-  <div class="flex justify-between mb-6">
+  <div class="flex justify-between mb-10">
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
         <% if app.reload_current_action.present? %>
@@ -9,22 +9,12 @@
           </span>
         <% end %>
       </h1>
-    </div>
-    <div>
-      <ul class="menu menu-horizontal">
-        <li tabindex="0">
-          <details>
-            <summary class="text-lg">Actions</summary>
-            <ul class="p-2">
-              <li><%= link_to "Deploy", app_actions_path(app, params: {action_type: :deploy}), disabled: app.current_action.present?, data: { "turbo-method" => :post } %></li>
-              <li><%= link_to "Restart", app_actions_path(app, params: {action_type: :restart}), disabled: app.current_action.present?, data: { "turbo-method" => :post } %></li>
-            </ul>
-          </details>
-        </li>
-      </ul>
+      <% if app.last_deployed_at.present? && app.url.present? %>
+        <%= link_to app.url, app.url, class: "link text-neutral text-sm", target: :blank %>
+      <% end %>
     </div>
   </div>
-  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
+  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered tabs-md">
     <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
     <%= link_to "Environment", edit_app_environment_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>
     <%= link_to "Metrics", "#", class: class_names("tab", "tab-active" => false), role: "tab" %>

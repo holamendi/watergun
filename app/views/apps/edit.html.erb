@@ -1,2 +1,5 @@
+<div id="<%= "app_#{@app.id}_stream" %>" data-turbo-permanent="true">
+<%= turbo_stream_from @app %>
+</div>
 <%= render "header", app: @app %>
 <%= render "form", app: @app %>

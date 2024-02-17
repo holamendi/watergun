@@ -17,7 +17,7 @@ Rails.application.routes.draw do
     end
 
     scope module: :apps do
-      resource :app_sources, path: :sources
+      resource :deploy_source
       resource :environment_configuration, path: :environment, only: %i[edit update]
       resources :actions, only: :create
     end

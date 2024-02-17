@@ -3,15 +3,15 @@
   <div class="flex justify-between mb-6">
     <div>
       <h1 class="text-3xl font-extrabold"><%= service.name %>
-        <% if service.reload_current_server_event.present? %>
+        <% if service.reload_current_action.present? %>
           <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
-            <%= service.current_server_event.event_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
+            <%= service.current_action.action_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
           </span>
         <% end %>
       </h1>
     </div>
     <div class="join">
-      <%= link_to "Restart", restart_service_path(service), class: "btn join-item", disabled: service.current_server_event.present?, data: { "turbo-method" => :post } %>
+      <%= link_to "Restart", restart_service_path(service), class: "btn join-item", disabled: service.current_action.present?, data: { "turbo-method" => :post } %>
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">

@@ -2,16 +2,18 @@
 #
 # Table name: apps
 #
-#  id           :integer          not null, primary key
-#  data         :json             not null
-#  discarded_at :datetime
-#  name         :string           not null
-#  status       :string
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  dokku_id     :string           not null
-#  org_id       :integer          not null
-#  server_id    :integer          not null
+#  id               :integer          not null, primary key
+#  data             :json             not null
+#  discarded_at     :datetime
+#  last_deployed_at :datetime
+#  name             :string           not null
+#  status           :string
+#  urls             :json
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  dokku_id         :string           not null
+#  org_id           :integer          not null
+#  server_id        :integer          not null
 #
 # Indexes
 #
@@ -32,8 +34,6 @@ class App < ApplicationRecord
   include Discard::Model
   include DokkuEntity
   include EnvironmentConfigurable
-
-  store_attribute :data, :urls, :json, default: []
 
   enum status: {
     initializing: "initializing",

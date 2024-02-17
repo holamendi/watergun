@@ -59,6 +59,7 @@ group :test do
 end
 
 gem "discard"
+gem "dotenv"
 gem "faraday-retry"
 gem "honeybadger"
 gem "httpx"
