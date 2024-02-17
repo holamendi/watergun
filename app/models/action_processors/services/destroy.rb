@@ -1,8 +1,8 @@
 module ActionProcessors
   module Services
     class Destroy < Base
-      def commands
-        "dokku #{service.service_type}:destroy #{service.dokku_id} --force"
+      def process
+        execute("dokku #{service.service_type}:destroy #{service.dokku_id} --force")
       end
     end
   end
