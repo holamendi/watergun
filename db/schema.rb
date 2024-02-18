@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_17_115714) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -45,17 +45,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_17_115714) do
     t.index ["server_id"], name: "index_actions_on_server_id"
   end
 
-  create_table "app_sources", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "app_id", null: false
-    t.string "type", null: false
-    t.json "data", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["app_id"], name: "index_app_sources_on_app_id"
-    t.index ["org_id"], name: "index_app_sources_on_org_id"
-  end
-
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -72,6 +61,44 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_17_115714) do
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
     t.index ["status"], name: "index_apps_on_status"
+  end
+
+  create_table "container_metrics", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "container_id", null: false
+    t.datetime "timestamp", null: false
+    t.float "cpu_percentage", null: false
+    t.float "memory_percentage", null: false
+    t.string "memory_usage", null: false
+    t.string "block_io", null: false
+    t.string "network_io", null: false
+    t.index ["container_id"], name: "index_container_metrics_on_container_id"
+    t.index ["org_id"], name: "index_container_metrics_on_org_id"
+    t.index ["timestamp"], name: "index_container_metrics_on_timestamp"
+  end
+
+  create_table "containers", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "containerizable_type", null: false
+    t.integer "containerizable_id", null: false
+    t.string "status", null: false
+    t.string "cid", null: false
+    t.string "name", null: false
+    t.float "cpu_percentage", null: false
+    t.float "memory_percentage", null: false
+    t.string "memory_usage", null: false
+    t.string "block_io", null: false
+    t.string "network_io", null: false
+    t.datetime "last_synced_at", null: false
+    t.datetime "stopped_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cid"], name: "index_containers_on_cid"
+    t.index ["containerizable_type", "containerizable_id"], name: "index_containers_on_containerizable"
+    t.index ["org_id"], name: "index_containers_on_org_id"
+    t.index ["server_id"], name: "index_containers_on_server_id"
+    t.index ["status"], name: "index_containers_on_status"
   end
 
   create_table "deploy_sources", force: :cascade do |t|
@@ -143,7 +170,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_17_115714) do
     t.datetime "updated_at", null: false
     t.json "data", default: {}
     t.integer "org_id", null: false
+    t.datetime "last_synced_up"
     t.index ["dokku_token"], name: "index_servers_on_dokku_token", unique: true
+    t.index ["last_synced_up"], name: "index_servers_on_last_synced_up"
     t.index ["org_id"], name: "index_servers_on_org_id"
   end
 
@@ -199,10 +228,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_17_115714) do
   add_foreign_key "actions", "memberships"
   add_foreign_key "actions", "orgs"
   add_foreign_key "actions", "servers"
-  add_foreign_key "app_sources", "apps"
-  add_foreign_key "app_sources", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
+  add_foreign_key "container_metrics", "containers"
+  add_foreign_key "container_metrics", "orgs"
+  add_foreign_key "containers", "orgs"
+  add_foreign_key "containers", "servers"
   add_foreign_key "deploy_sources", "apps"
   add_foreign_key "deploy_sources", "orgs"
   add_foreign_key "environment_configurations", "orgs"

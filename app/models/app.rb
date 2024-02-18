@@ -31,6 +31,7 @@ class App < ApplicationRecord
   include Actionable
   include BelongsToOrg
   include BelongsToServer
+  include Containerizable
   include Discard::Model
   include DokkuEntity
   include EnvironmentConfigurable

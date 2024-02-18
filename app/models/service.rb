@@ -28,14 +28,9 @@ class Service < ApplicationRecord
   include Actionable
   include BelongsToOrg
   include BelongsToServer
+  include Containerizable
   include Discard::Model
   include DokkuEntity
-
-  ACTION_TYPES = %w[
-    create
-    destroy
-    restart
-  ].freeze
 
   enum service_type: {
     postgres: "postgres",

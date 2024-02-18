@@ -24,7 +24,7 @@
 class DeploySource < ApplicationRecord
   include BelongsToOrg
 
-  belongs_to :app
+  belongs_to :app, inverse_of: :deploy_source
 
   after_create_commit -> { app.create_and_enqueue_action!(:set_deploy_source) }
 end

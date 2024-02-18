@@ -1,2 +1,2 @@
 retries: 0
-workers: <%= ENV["LITEJOB_WORKERS"] || 5 %>
+workers: 5
