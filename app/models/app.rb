@@ -62,7 +62,7 @@ class App < ApplicationRecord
   end
 
   def https_urls
-    urls.select { |url| url.start_with?("https://") }
+    urls.to_a.select { |url| url.start_with?("https://") }
   end
 
   def url
