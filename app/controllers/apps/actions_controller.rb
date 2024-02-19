@@ -1,6 +1,6 @@
 module Apps
-  class ActionsController < ApplicationController
-    before_action :set_app, :authorize_action
+  class ActionsController < BaseController
+    before_action :authorize_action
 
     ALLOWED_ACTIONS = %w[
       deploy
@@ -13,10 +13,6 @@ module Apps
     end
 
     private
-
-    def set_app
-      @app = current_server.apps.kept.find(params[:app_id])
-    end
 
     def authorize_action
       return if ALLOWED_ACTIONS.include?(params[:action])

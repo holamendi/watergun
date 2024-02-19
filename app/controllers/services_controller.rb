@@ -20,6 +20,7 @@ class ServicesController < ApplicationController
   end
 
   def show
+    @latest_actions = @service.actions.order(created_at: :desc).limit(5)
   end
 
   def edit

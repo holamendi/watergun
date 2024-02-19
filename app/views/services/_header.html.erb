@@ -1,6 +1,5 @@
-
-<div id="<%= dom_id(service, :header) %>">
-  <div class="flex justify-between mb-6">
+<div>
+  <div class="flex justify-between mb-10">
     <div>
       <h1 class="text-3xl font-extrabold"><%= service.name %>
         <% if service.reload_current_action.present? %>
@@ -10,13 +9,12 @@
         <% end %>
       </h1>
     </div>
-    <div class="join">
-      <%= link_to "Restart", restart_service_path(service), class: "btn join-item", disabled: service.current_action.present?, data: { "turbo-method" => :post } %>
-    </div>
   </div>
-  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered">
-    <%= link_to "overview", service, class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
-    <%= link_to "activity", activity_service_path(service), class: class_names("tab", "tab-active" => action_name  == "activity"), role: "tab" %>
-    <%= link_to "settings", edit_service_path(service), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
+  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered tabs-md">
+    <%= link_to "Activity", service_path(service), class: class_names("tab", "tab-active" => (controller_name == "services" && action_name  == "show")), role: "tab" %>
+    <%= link_to "Metrics", service_metrics_path(service), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
+    <%= link_to "Environment", edit_app_environment_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" if false %>
+    <%= link_to "Settings", edit_service_path(service), class: class_names("tab", "tab-active" => (controller_name == "services" && action_name.in?(%w[edit update]))), role: "tab" %>
   </div>
 </div>
+

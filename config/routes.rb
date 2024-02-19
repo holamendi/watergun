@@ -17,16 +17,16 @@ Rails.application.routes.draw do
     end
 
     scope module: :apps do
+      resources :actions, only: :create
       resource :deploy_source
       resource :environment_configuration, path: :environment, only: %i[edit update]
-      resources :actions, only: :create
+      resource :metrics, only: :show
     end
   end
 
   resources :services do
-    member do
-      get :activity
-      post :restart
+    scope module: :services do
+      resource :metrics, only: :show
     end
   end
 
