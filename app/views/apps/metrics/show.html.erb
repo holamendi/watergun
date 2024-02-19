@@ -21,10 +21,10 @@
       <%= container.name %>
     </div>
     <div class="mb-6">
-      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:cpu_percentage).average(:cpu_percentage) %>
+      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage) %>
     </div>
     <div>
-      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:memory_percentage).average(:memory_percentage) %>
+      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage) %>
     </div>
   </div>
 <% end %>
