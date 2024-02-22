@@ -1,7 +1,5 @@
 module Apps
-  class EnvironmentConfigurationsController < ApplicationController
-    before_action :set_app
-
+  class EnvironmentConfigurationsController < BaseController
     def edit
     end
 
@@ -17,10 +15,6 @@ module Apps
 
     def environment_configuration_params
       params.require(:environment_configuration).permit(:variables)
-    end
-
-    def set_app
-      @app = current_server.apps.kept.find(params[:app_id])
     end
   end
 end

@@ -5,7 +5,7 @@
   </div>
   <div class="form-control">
     <%= form.label :service_type, "Type", class: "label" %>
-    <%= form.select :service_type, Service.service_types.keys, {}, class: "select select-bordered w-full" %>
+    <%= form.select :service_type, Service.service_types.keys, {}, class: "select select-bordered w-full", disabled: form.object.persisted? %>
   </div>
   <%= form.submit "Save", class: "btn btn-primary text-white" %>
 <% end %>

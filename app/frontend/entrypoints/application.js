@@ -36,3 +36,5 @@ window.Stimulus   = application
 const controllers = import.meta.glob('~/controllers/*_controller.js', { eager: true })
 registerControllers(application, controllers)
 
+import "chartkick/chart.js"
+

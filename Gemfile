@@ -58,10 +58,12 @@ group :test do
   gem "selenium-webdriver"
 end
 
+gem "chartkick"
 gem "discard"
 gem "dotenv"
 gem "faraday-retry"
 gem "honeybadger"
+gem "groupdate"
 gem "httpx"
 gem "litestack", github: "holamendi/litestack", branch: "erb-config-yml"
 gem "net-ssh"

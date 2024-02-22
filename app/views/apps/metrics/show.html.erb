@@ -1,0 +1,30 @@
+<%= turbo_stream_from @app %>
+<%= render "apps/header", app: @app %>
+<div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
+  <div class="stat">
+    <div class="stat-title">Running Processes</div>
+    <div class="stat-value"><%= @running_containers.count %></div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">CPU Usage</div>
+    <div class="stat-value"><%= @running_containers.sum(:cpu_percentage) %>%</div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">RAM Usage</div>
+    <div class="stat-value"><%= @running_containers.sum(:memory_percentage) %>%</div>
+  </div>
+</div>
+
+<% @running_containers.each do |container| %>
+  <div class="w-full p-4 mb-4 shadow rounded-xl">
+    <div class="mb-4">
+      <%= container.name %>
+    </div>
+    <div class="mb-6">
+      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage) %>
+    </div>
+    <div>
+      <%= line_chart container.container_metrics.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage) %>
+    </div>
+  </div>
+<% end %>

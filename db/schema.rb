@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_18_165516) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -43,6 +43,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
     t.index ["membership_id"], name: "index_actions_on_membership_id"
     t.index ["org_id"], name: "index_actions_on_org_id"
     t.index ["server_id"], name: "index_actions_on_server_id"
+  end
+
+  create_table "app_sources", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "type", null: false
+    t.json "data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_app_sources_on_app_id"
+    t.index ["org_id"], name: "index_app_sources_on_org_id"
   end
 
   create_table "apps", force: :cascade do |t|
@@ -123,6 +134,26 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
     t.index ["environment_configurable_type", "environment_configurable_id"], name: "index_environment_configurations_on_environment_configurable"
     t.index ["org_id"], name: "index_environment_configurations_on_org_id"
   end
+
+# Could not dump table "events" because of following StandardError
+#   Unknown type 'REAL' for column 'value'
+
+# Could not dump table "events_search" because of following StandardError
+#   Unknown type '' for column 'topic'
+
+# Could not dump table "events_search_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "events_search_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "events_search_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "events_search_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
 
   create_table "git_credentials", force: :cascade do |t|
     t.integer "org_id", null: false
@@ -215,6 +246,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "topics", primary_key: "name", id: :text, force: :cascade do |t|
+    t.text "state"
+    t.integer "updated_at"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -228,6 +264,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
   add_foreign_key "actions", "memberships"
   add_foreign_key "actions", "orgs"
   add_foreign_key "actions", "servers"
+  add_foreign_key "app_sources", "apps"
+  add_foreign_key "app_sources", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
   add_foreign_key "container_metrics", "containers"
@@ -237,6 +275,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_181116) do
   add_foreign_key "deploy_sources", "apps"
   add_foreign_key "deploy_sources", "orgs"
   add_foreign_key "environment_configurations", "orgs"
+  add_foreign_key "events", "topics", column: "topic", primary_key: "name", on_delete: :cascade
   add_foreign_key "git_credentials", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
