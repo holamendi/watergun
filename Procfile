@@ -1,2 +1,3 @@
 web: bin/rails s
-release: bundle exec rails db:create db:migrate
+solid_queue: bundle exec rake solid_queue:start
+release: bin/rails db:create db:migrate
