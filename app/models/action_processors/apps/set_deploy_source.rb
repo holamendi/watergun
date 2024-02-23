@@ -20,8 +20,8 @@ module ActionProcessors
         app.deploy_source.branch
       end
 
-      def github_personal_access_token
-        org.git_credential.personal_access_token
+      def github_access_token
+        org.github_access_token.token
       end
     end
   end

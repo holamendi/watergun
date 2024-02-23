@@ -1,2 +1,0 @@
-class GitCredentialsController < ApplicationController
-end

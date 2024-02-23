@@ -34,23 +34,6 @@ class ServicesController < ApplicationController
     end
   end
 
-  def destroy
-    @service.discard!
-    redirect_to services_path, notice: "Service deleted successfully."
-  end
-
-  def restart
-    @service.restart!
-    redirect_to service_path(@service), notice: "Service restart started."
-  end
-
-  def activity
-    @server_events = @service.server_events.order(created_at: :desc).limit(50)
-  end
-
-  def select_git_repo
-  end
-
   private
 
   def service_params

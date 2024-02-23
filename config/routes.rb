@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
+  mount MissionControl::Jobs::Engine, at: "/jobs"
+
   get "up" => "rails/health#show", :as => :rails_health_check
 
   get "login" => "sessions#new", :as => :login
   delete "logout" => "sessions#destroy", :as => :logout
 
   root "apps#index"
-
-  resources :git_credentials
 
   resources :apps do
     member do
