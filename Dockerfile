@@ -13,12 +13,15 @@ ENV RAILS_ENV=production \
 FROM base as build
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
-    build-essential curl git node-gyp pkg-config python-is-python3 && \
+    build-essential curl git node-gyp pkg-config python-is-python3 libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
 ARG NODE_VERSION=20.3.1
 ARG YARN_VERSION=1.22.19
 ENV PATH=/usr/local/node/bin:$PATH
+ENV LD_PRELOAD="libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true,stats_print:true" \
+    RUBY_YJIT_ENABLE="1"
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
     npm install -g yarn@$YARN_VERSION && \
