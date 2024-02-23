@@ -58,6 +58,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
+gem "activerecord-enhancedsqlite3-adapter"
 gem "chartkick"
 gem "discard"
 gem "dotenv"
@@ -69,6 +70,7 @@ gem "litestack", github: "holamendi/litestack", branch: "erb-config-yml"
 gem "net-ssh"
 gem "octokit"
 gem "turbo-rails"
+gem "solid_queue" # , github: "basecamp/solid_queue", branch: "main"
 gem "sshkey"
 gem "store_attribute"
 gem "store_model"
