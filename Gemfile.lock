@@ -1,4 +1,15 @@
 GIT
+  remote: https://github.com/basecamp/mission_control-jobs.git
+  revision: 609c8959a44b19f846df5759094e6fa90e403fe8
+  branch: main
+  specs:
+    mission_control-jobs (0.1.1)
+      importmap-rails
+      rails (~> 7.1)
+      stimulus-rails
+      turbo-rails
+
+GIT
   remote: https://github.com/holamendi/litestack.git
   revision: 68619f1eccbff49d9cc47372a755475b886dbb15
   branch: erb-config-yml
@@ -175,11 +186,6 @@ GEM
     matrix (0.4.2)
     mini_mime (1.1.5)
     minitest (5.22.2)
-    mission_control-jobs (0.1.1)
-      importmap-rails
-      rails (~> 7.1)
-      stimulus-rails
-      turbo-rails
     msgpack (1.7.2)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
@@ -392,7 +398,7 @@ DEPENDENCIES
   httpx
   irb-theme-dracula
   litestack!
-  mission_control-jobs
+  mission_control-jobs!
   net-ssh
   octokit
   propshaft
