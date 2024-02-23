@@ -20,7 +20,7 @@ module Servers
         timestamp = Time.current
         # sync apps
         server.apps.kept.each do |app|
-          app_stats = docker_stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }
+          app_stats = docker_stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }.uniq(&:id)
           app_stats.each do |stat|
             # find or create container
             container = app.containers.find_or_initialize_by(cid: stat.id)
