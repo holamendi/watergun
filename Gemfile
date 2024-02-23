@@ -71,7 +71,7 @@ gem "mission_control-jobs", github: "basecamp/mission_control-jobs", branch: "ma
 gem "net-ssh"
 gem "octokit"
 gem "turbo-rails"
-gem "solid_queue" # , github: "basecamp/solid_queue", branch: "main"
+gem "solid_queue", github: "basecamp/solid_queue", branch: "main"
 gem "sshkey"
 gem "store_attribute"
 gem "store_model"

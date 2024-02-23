@@ -17,7 +17,7 @@ class Org < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :users, through: :memberships
 
-  has_one :git_credential, dependent: :destroy
+  has_one :github_access_token, dependent: :destroy
 
   validates :name, presence: true
 end

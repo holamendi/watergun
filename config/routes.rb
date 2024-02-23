@@ -8,8 +8,6 @@ Rails.application.routes.draw do
 
   root "apps#index"
 
-  resources :git_credentials
-
   resources :apps do
     member do
       post :deploy

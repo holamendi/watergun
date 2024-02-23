@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_18_165516) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_23_174034) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -124,14 +124,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_165516) do
     t.index ["org_id"], name: "index_environment_configurations_on_org_id"
   end
 
-  create_table "git_credentials", force: :cascade do |t|
+  create_table "github_access_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
-    t.integer "provider", null: false
-    t.string "description"
-    t.string "personal_access_token", null: false
+    t.string "token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["org_id"], name: "index_git_credentials_on_org_id"
+    t.index ["org_id"], name: "index_github_access_tokens_on_org_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -237,7 +235,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_18_165516) do
   add_foreign_key "deploy_sources", "apps"
   add_foreign_key "deploy_sources", "orgs"
   add_foreign_key "environment_configurations", "orgs"
-  add_foreign_key "git_credentials", "orgs"
+  add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
   add_foreign_key "server_identities", "orgs"
