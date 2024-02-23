@@ -8,7 +8,7 @@ module ActionProcessors
       private
 
       def sync_github_repository
-        execute("dokku git:auth github.com u #{github_personal_access_token}")
+        execute("dokku git:auth github.com u #{github_access_token}")
         execute("dokku git:sync #{app.dokku_id} #{github_repository} #{github_branch}")
       end
 
