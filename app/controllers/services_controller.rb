@@ -34,6 +34,11 @@ class ServicesController < ApplicationController
     end
   end
 
+  def destroy
+    @service.discard!
+    redirect_to services_path, notice: "Service deleted successfully."
+  end
+
   private
 
   def service_params
