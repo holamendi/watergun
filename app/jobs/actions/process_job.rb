@@ -1,6 +1,6 @@
 module Actions
   class ProcessJob < ApplicationJob
-    limits_concurrency to: 1, key: ->(contact) { action.actionable }, duration: 20.minutes
+    limits_concurrency to: 1, key: ->(action) { action.actionable }, duration: 20.minutes
 
     def perform(action)
       return unless action.status_pending?
