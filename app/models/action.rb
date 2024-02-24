@@ -44,7 +44,6 @@ class Action < ApplicationRecord
 
   enum status: {
     pending: "pending",
-    enqueued: "enqueued",
     running: "running",
     success: "success",
     failure: "failure",
@@ -56,7 +55,7 @@ class Action < ApplicationRecord
   store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
-  scope :enqueued_or_running, -> { where(status: %i[enqueued running]) }
+  scope :pending_or_running, -> { where(status: %w[pending running]) }
 
   def completed?
     completed_at.present?
@@ -69,10 +68,7 @@ class Action < ApplicationRecord
   end
 
   def enqueue!
-    return if actionable.actions.enqueued_or_running.excluding(self).exists?
-
-    status_enqueued!
-    Actions::ProcessJob.set(wait: 1.second).perform_later(self)
+    Actions::ProcessJob.perform_later(self)
   end
 
   def process

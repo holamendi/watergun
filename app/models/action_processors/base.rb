@@ -28,22 +28,21 @@ module ActionProcessors
       Action.transaction do
         if result.success?
           action.status_success!
-          actionable.enqueue_next_action!(action)
         else
           action.status_failure!
         end
         action.action_log.update!(ssh_commands: result.commands)
         actionable.touch
       end
-      # rescue => e
-      #   action.update!(
-      #     status: "exception",
-      #     completed_at: Time.current,
-      #     exception: {
-      #       message: e.message,
-      #       backtrace: e.backtrace
-      #     }
-      #   )
+    rescue => e
+      action.update!(
+        status: "exception",
+        completed_at: Time.current,
+        exception: {
+          message: e.message,
+          backtrace: e.backtrace
+        }
+      )
     end
 
     private

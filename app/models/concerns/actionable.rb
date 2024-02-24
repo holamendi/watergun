@@ -3,7 +3,7 @@ module Actionable
 
   included do
     has_many :actions, as: :actionable, dependent: :destroy
-    has_one :current_action, -> { enqueued_or_running }, class_name: "Action", as: :actionable, dependent: :destroy
+    has_one :current_action, -> { pending_or_running }, class_name: "Action", as: :actionable, dependent: :destroy
   end
 
   def create_and_enqueue_action!(action_type, payload = {})
@@ -17,11 +17,5 @@ module Actionable
         create_and_enqueue_action!(action_type, payload)
       end
     end
-  end
-
-  def enqueue_next_action!(last_action)
-    return unless last_action.status_success?
-
-    actions.status_pending.order(:created_at).first&.enqueue!
   end
 end

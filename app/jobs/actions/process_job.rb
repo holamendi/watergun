@@ -1,9 +1,9 @@
 module Actions
   class ProcessJob < ApplicationJob
-    queue_as :default
+    limits_concurrency to: 1, key: ->(contact) { action.actionable }, duration: 20.minutes
 
     def perform(action)
-      return unless action.status_enqueued?
+      return unless action.status_pending?
 
       action.update_columns(job_id:)
       action.process
