@@ -49,14 +49,6 @@ class App < ApplicationRecord
   after_update_commit -> { broadcast_refresh_to self }
   after_discard -> { create_and_enqueue_action!(:destroy) }
 
-  def compatible_dokku_builders
-    if server.cpu_type.include?("x86")
-      Server::DOKKU_BUILDERS
-    else
-      Server::DOKKU_BUILDERS.except("herokuish")
-    end
-  end
-
   def ssl_enabled?
     urls.any? { |url| url.start_with?("https://") }
   end
