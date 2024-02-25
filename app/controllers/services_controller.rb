@@ -1,5 +1,5 @@
 class ServicesController < ApplicationController
-  before_action :set_service, except: [:index, :new, :create, :select_git_repo]
+  before_action :set_service, except: [:index, :new, :create]
 
   def index
     @services = current_server.services.kept

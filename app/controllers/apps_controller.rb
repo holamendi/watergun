@@ -1,5 +1,5 @@
 class AppsController < ApplicationController
-  before_action :set_app, except: [:index, :new, :create, :select_git_repo]
+  before_action :set_app, except: [:index, :new, :create]
 
   def index
     @apps = current_server.apps.kept

@@ -21,7 +21,7 @@ module Ssh
     end
 
     def execute(command)
-      ssh_command = Command.new(command:, output: [], started_at: Time.current)
+      ssh_command = Command.new(command:, started_at: Time.current)
       @commands << ssh_command
 
       status = {}

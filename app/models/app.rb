@@ -50,7 +50,7 @@ class App < ApplicationRecord
   after_discard -> { create_and_enqueue_action!(:destroy) }
 
   def compatible_dokku_builders
-    if server.architecture.include?("x86")
+    if server.cpu_type.include?("x86")
       Server::DOKKU_BUILDERS
     else
       Server::DOKKU_BUILDERS.except("herokuish")

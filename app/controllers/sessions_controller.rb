@@ -17,6 +17,7 @@ class SessionsController < ApplicationController
       cookies.encrypted[:session_token] = {value: Current.session.token, expires: Current.session.expires_at}
       redirect_to root_path
     else
+      flash.now[:error] = "Invalid email or password"
       render :new, status: :unprocessable_entity
     end
   end

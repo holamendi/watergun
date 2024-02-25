@@ -5,7 +5,7 @@ module Ssh
     attribute :command, :string
     attribute :completed_at, :datetime
     attribute :exit_code, :integer
-    attribute :output, OutputEntry.to_array_type
+    attribute :output, OutputEntry.to_array_type, default: -> { [] }
     attribute :started_at, :datetime
 
     validates :command, presence: true

@@ -1,4 +1,3 @@
-
 <div>
   <div class="flex justify-between mb-10">
     <div>
@@ -14,11 +13,10 @@
       <% end %>
     </div>
   </div>
-  <div role="tablist" class="w-full mb-4 lg:w-1/2 tabs tabs-bordered tabs-md">
+  <div role="tablist" class="w-full mb-4 overflow-scroll lg:w-1/2 tabs tabs-bordered tabs-md">
     <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
     <%= link_to "Metrics", app_metrics_path(app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
     <%= link_to "Environment", edit_app_environment_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>
     <%= link_to "Settings", edit_app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" %>
   </div>
 </div>
-
