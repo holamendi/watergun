@@ -8,7 +8,7 @@ module ActionProcessors
       @action = action
     end
 
-    def call
+    def execute
       Action.transaction do
         action.running_at = Time.current
         action.status_running!
@@ -43,16 +43,6 @@ module ActionProcessors
           backtrace: e.backtrace
         }
       )
-    end
-
-    private
-
-    def process
-      raise "Implement in subclass"
-    end
-
-    def execute(command)
-      ssh_session.execute(command)
     end
   end
 end

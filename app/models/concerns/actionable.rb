@@ -6,16 +6,11 @@ module Actionable
     has_one :current_action, -> { pending_or_running }, class_name: "Action", as: :actionable, dependent: :destroy
   end
 
-  def create_and_enqueue_action!(action_type, payload = {})
-    actions.create!(org:, server:, action_type:, payload:).enqueue!
+  def enqueue_action!(action_type, attributes = {})
+    action_class(action_type).create!(actionable: self, **attributes).enqueue
   end
 
-  def create_and_enqueue_actions!(actions)
-    Action.transaction do
-      actions.each do |action|
-        action_type, payload = action
-        create_and_enqueue_action!(action_type, payload)
-      end
-    end
+  def action_class(action_type)
+    "Actions::#{self.class.name.pluralize}::#{action_type.to_s.classify}".constantize
   end
 end

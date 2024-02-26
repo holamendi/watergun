@@ -3,7 +3,6 @@
 # Table name: actions
 #
 #  id              :integer          not null, primary key
-#  action_type     :string           not null
 #  actionable_type :string
 #  args            :json             not null
 #  completed_at    :datetime
@@ -12,6 +11,7 @@
 #  running_at      :datetime
 #  source          :string           not null
 #  status          :string           not null
+#  type            :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  actionable_id   :integer
@@ -34,6 +34,7 @@
 #  server_id      (server_id => servers.id)
 #
 class Action < ApplicationRecord
+  include Actions::Processable
   include BelongsToOrg
   include BelongsToMembership
   include BelongsToServer
@@ -52,7 +53,6 @@ class Action < ApplicationRecord
 
   attribute :source, :string, default: "web"
 
-  store_attribute :data, :details, :json, default: []
   store_attribute :data, :exception, :json, default: {}
 
   scope :pending_or_running, -> { where(status: %w[pending running]) }
@@ -67,15 +67,7 @@ class Action < ApplicationRecord
     completed_at - running_at
   end
 
-  def enqueue!
+  def enqueue
     Actions::ProcessJob.perform_later(self)
-  end
-
-  def process
-    processor_class.new(self).call
-  end
-
-  def processor_class
-    "ActionProcessors::#{actionable.class.name.pluralize}::#{action_type.classify}".safe_constantize
   end
 end
