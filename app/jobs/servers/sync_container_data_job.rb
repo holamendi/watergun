@@ -13,13 +13,13 @@ module Servers
     )
 
     def perform
-      Server.all.each { |server| sync_metrics(server) }
+      Server.all.each { |server| sync_containers(server) }
     end
 
     private
 
-    def sync_metrics(server)
-      Current.set(server:, org: server.org) do
+    def sync_containers(server)
+      Current.set(org: server.org, server:) do
         docker_container_stats = []
 
         server.ssh_session do |session|
@@ -38,28 +38,26 @@ module Servers
           end
         end
 
-        timestamp = Time.current
+        synced_at = Time.current
         docker_container_stats.uniq!
 
-        server.apps.kept.each do |app|
-          app_stats = docker_container_stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }
-          app_stats.each do |stats|
-            container = app.containers.find_or_initialize_by(cid: stats.id)
-            container.update!(stats.to_h.except(:id).merge(last_synced_at: timestamp))
-            container.container_metrics.create!(stats.to_h.except(:id, :name).merge(timestamp:))
+        (server.apps.kept + server.services.kept).each do |entity|
+          containers = docker_container_stats.select { |stat| stat.name.include?(entity.dokku_id) }
+
+          containers.each do |stats|
+            container = entity.containers.find_or_initialize_by(cid: stats.id)
+
+            ApplicationRecord.transaction do
+              container.update!(stats.to_h.except(:id).merge(last_synced_at: synced_at))
+              container.container_metrics.create!(stats.to_h.except(:id, :name).merge(timestamp: synced_at))
+            end
           end
         end
 
-        server.services.kept.each do |service|
-          service_stats = docker_container_stats.select { |stat| stat.name.include?("#{service.service_type}.#{service.dokku_id}") }
-          service_stats.each do |stats|
-            container = service.containers.find_or_initialize_by(cid: stats.id)
-            container.update!(stats.to_h.except(:id).merge(last_synced_at: timestamp))
-            container.container_metrics.create!(stats.to_h.except(:id, :name).merge(timestamp:))
-          end
-        end
-
-        server.containers.running.where.not(cid: docker_container_stats.map(&:id)).update_all(status: "stopped", stopped_at: timestamp)
+        server.containers
+          .running
+          .where.not(cid: docker_container_stats.map(&:id))
+          .update_all(status: "stopped", stopped_at: Time.current)
       end
     end
   end
