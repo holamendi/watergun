@@ -12,7 +12,7 @@ dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
 dokku plugin:install https://github.com/dokku/dokku-redis.git redis
 
 # Add user watergun with groups dokku, docker, and adm
-adduser watergun
+adduser --disabled-password watergun
 usermod -aG dokku,docker,adm watergun
 echo '%dokku ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/dokku' | sudo tee /etc/sudoers.d/dokku
 

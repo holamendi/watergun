@@ -38,7 +38,7 @@ class Container < ApplicationRecord
   include BelongsToServer
 
   belongs_to :containerizable, polymorphic: true
-  has_many :container_metrics, dependent: :destroy
+  has_many :container_metrics, dependent: :delete_all
 
   enum status: {
     running: "running",
