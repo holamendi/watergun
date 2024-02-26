@@ -1,0 +1,7 @@
+<%= form_with model: [:org, current_org.github_access_token || current_org.build_github_access_token], class: "space-y-4" do |form| %>
+  <%= form.label :token, class: "form-control" do %>
+    <div class="label"><span class="label-text">Personal access token</span></div>
+    <%= form.text_field :token, class: "input input-bordered w-full" %>
+  <% end %>
+  <%= form.submit "Save", class: "btn btn-primary" %>
+<% end %>

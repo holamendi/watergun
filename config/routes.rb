@@ -9,18 +9,18 @@ Rails.application.routes.draw do
   root "apps#index"
 
   resources :apps do
-    member do
-      post :deploy
-      post :disable_ssl
-      post :enable_ssl
-      post :restart
-    end
-
     scope module: :apps do
       resources :actions, only: :create
       resource :deploy_source
       resource :environment_configuration, path: :environment, only: %i[edit update]
       resource :metrics, only: :show
+    end
+  end
+
+  resource :org, only: :show do
+    scope module: :orgs do
+      resource :settings, only: :show
+      resource :github_access_token, only: :update
     end
   end
 

@@ -27,8 +27,9 @@
     <ul class="menu menu-horizontal">
       <li tabindex="0">
         <details>
-          <summary><%= Current.user.email %></summary>
+          <summary>Account</summary>
           <ul class="p-2">
+            <li><%= link_to "Settings", org_settings_path %></li>
             <li><%= link_to "Log out", logout_path, data: { turbo_method: :delete } %></li>
           </ul>
         </details>
