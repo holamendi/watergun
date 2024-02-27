@@ -1,6 +1,6 @@
 module ActionProcessors
   class Base
-    attr_reader :action, :ssh_session
+    attr_reader :action, :ssh
 
     delegate :actionable, :org, :server, to: :action
 
@@ -16,21 +16,16 @@ module ActionProcessors
         actionable.touch
       end
 
-      result = server.ssh_session do |session|
-        @ssh_session = session
+      result = server.ssh_session do |ssh|
+        @ssh = ssh
         process
+        @ssh = nil
       end
-
-      @ssh_session = nil
 
       action.completed_at = result.completed_at
 
       Action.transaction do
-        if result.success?
-          action.status_success!
-        else
-          action.status_failure!
-        end
+        result.success? ? action.status_success! : action.status_failure!
         action.action_log.update!(ssh_commands: result.commands)
         actionable.touch
       end

@@ -6,27 +6,26 @@ module ActionProcessors
       private
 
       def sync_app
-        ssh_command = execute("dokku urls #{app.dokku_id}")
-        return unless ssh_command.success?
-
-        urls = parse_app_urls(ssh_command.text_output)
-        app.update_columns(urls:)
+        app.update_columns(urls: dokku_app_urls)
       end
 
-      def attempt_ssl_cerficate_request
+      def dokku_app_urls
+        ssh.execute("dokku urls #{action.dokku_id}").text_output.split("\n")
+      end
+
+      def enable_ssl
         return if letsencrypt_enabled?
-        return unless app.urls.all? { |url| Resolv.getaddress(URI.parse(url).host) == server.public_ip }
+        return unless app_domains_resolve_to_server?
 
-        execute("dokku letsencrypt:enable #{app.dokku_id}")
-        sync_app
+        ssh.execute("dokku letsencrypt:enable #{app.dokku_id}")
       end
 
-      def letsencrypt_enabled?
-        execute("dokku letsencrypt:active #{app.dokku_id}").text_output.strip == "true"
+      def ssl_enabled?
+        ssh.execute("dokku letsencrypt:active #{app.dokku_id}").text_output.strip == "true"
       end
 
-      def parse_app_urls(text_output)
-        text_output.split("\n")
+      def app_domains_resolve_to_server?
+        app.urls.all? { |url| Resolv.getaddress(URI.parse(url).host) == server.public_ip }
       end
     end
   end

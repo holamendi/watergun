@@ -57,6 +57,18 @@ class Action < ApplicationRecord
 
   scope :pending_or_running, -> { where(status: %w[pending running]) }
 
+  def enqueue
+    Actions::ProcessJob.perform_later(self)
+  end
+
+  def process
+    processor_class.new(self).call
+  end
+
+  def processor_class
+    "ActionProcessors::#{actionable.class.name.pluralize}::#{action_type.classify}"
+  end
+
   def completed?
     completed_at.present?
   end
@@ -65,9 +77,5 @@ class Action < ApplicationRecord
     return if running_at.blank? || completed_at.blank?
 
     completed_at - running_at
-  end
-
-  def enqueue
-    Actions::ProcessJob.perform_later(self)
   end
 end

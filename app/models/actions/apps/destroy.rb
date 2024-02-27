@@ -1,11 +1,9 @@
 module Actions
   module Apps
     class Destroy < Action
-      include DokkuAppAction
+      store_attribute :payload, :dokku_id, :string
 
-      def process_action
-        destroy_dokku_app
-      end
+      validates :dokku_id, presence: true
     end
   end
 end

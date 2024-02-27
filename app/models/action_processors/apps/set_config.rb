@@ -2,7 +2,7 @@ module ActionProcessors
   module Apps
     class SetConfig < Base
       def process
-        execute("dokku config:set --encoded --no-restart #{app.dokku_id} #{encoded_variables_as_string}")
+        execute("dokku config:set --encoded --no-restart #{action.dokku_id} #{encoded_variables_as_string}")
       end
 
       private

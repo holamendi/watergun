@@ -1,8 +1,8 @@
 module ActionProcessors
   module Apps
     class Create < Base
-      def process
-        execute("dokku apps:create #{app.dokku_id}")
+      def process(ssh)
+        ssh.execute("dokku apps:create #{action.dokku_id}")
       end
     end
   end
