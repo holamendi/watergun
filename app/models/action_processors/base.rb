@@ -30,6 +30,7 @@ module ActionProcessors
         actionable.touch
       end
     rescue => e
+      raise e
       action.update!(
         status: "exception",
         completed_at: Time.current,
@@ -38,6 +39,7 @@ module ActionProcessors
           backtrace: e.backtrace
         }
       )
+      actionable.touch
     end
   end
 end

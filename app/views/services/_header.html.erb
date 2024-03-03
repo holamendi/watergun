@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-extrabold"><%= service.name %>
         <% if service.reload_current_action.present? %>
           <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
-            <%= service.current_action.action_type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
+            <%= service.current_action.type %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
           </span>
         <% end %>
       </h1>

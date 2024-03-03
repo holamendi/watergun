@@ -17,7 +17,7 @@
       <% @latest_actions.each do |action| %>
         <tr>
           <td><%= action.id %></td>
-          <td><%= action.action_type %> <% if action.status_running? %>(running)<% end %></td>
+          <td><%= action.type %> <% if action.status_running? %>(running)<% end %></td>
           <td><%= action.completed_at %></td>
           <td><%= action.status %></td>
         </tr>
