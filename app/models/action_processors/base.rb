@@ -3,12 +3,13 @@ module ActionProcessors
     attr_reader :action, :ssh
 
     delegate :actionable, :org, :server, to: :action
+    delegate :execute, to: :ssh
 
     def initialize(action)
       @action = action
     end
 
-    def execute
+    def call
       Action.transaction do
         action.running_at = Time.current
         action.status_running!

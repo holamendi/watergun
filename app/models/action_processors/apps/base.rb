@@ -10,18 +10,18 @@ module ActionProcessors
       end
 
       def dokku_app_urls
-        ssh.execute("dokku urls #{action.dokku_id}").text_output.split("\n")
+        execute("dokku urls #{action.dokku_id}").text_output.split("\n")
       end
 
       def enable_ssl
         return if letsencrypt_enabled?
         return unless app_domains_resolve_to_server?
 
-        ssh.execute("dokku letsencrypt:enable #{app.dokku_id}")
+        execute("dokku letsencrypt:enable #{app.dokku_id}")
       end
 
       def ssl_enabled?
-        ssh.execute("dokku letsencrypt:active #{app.dokku_id}").text_output.strip == "true"
+        execute("dokku letsencrypt:active #{app.dokku_id}").text_output.strip == "true"
       end
 
       def app_domains_resolve_to_server?

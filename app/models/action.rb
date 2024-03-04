@@ -62,11 +62,11 @@ class Action < ApplicationRecord
   end
 
   def process
-    processor_class.new(self).call
+    processor.call
   end
 
-  def processor_class
-    "ActionProcessors::#{actionable.class.name.pluralize}::#{action_type.classify}"
+  def processor
+    "ActionProcessors#{type.delete_prefix("Actions")}".constantize.new(self)
   end
 
   def completed?

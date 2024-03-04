@@ -2,7 +2,7 @@ module ActionProcessors
   module Apps
     class Destroy < Base
       def process
-        ssh.execute("dokku apps:destroy --force #{action.dokku_id}")
+        execute("dokku apps:destroy --force #{action.dokku_id}")
       end
     end
   end
