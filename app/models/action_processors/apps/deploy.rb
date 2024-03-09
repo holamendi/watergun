@@ -5,7 +5,7 @@ module ActionProcessors
         return unless rebuild_dokku_app.success?
 
         enable_ssl
-        update_app_urls
+        sync_app
       end
 
       private

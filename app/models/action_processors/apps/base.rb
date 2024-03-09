@@ -14,7 +14,7 @@ module ActionProcessors
       end
 
       def enable_ssl
-        return if letsencrypt_enabled?
+        return if ssl_enabled?
         return unless app_domains_resolve_to_server?
 
         execute("dokku letsencrypt:enable #{app.dokku_id}")

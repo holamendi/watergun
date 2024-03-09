@@ -2,7 +2,7 @@
 <%= render "header", app: @app %>
 <% if @app.deploy_source %>
   <div class="flex py-2">
-    <%= button_to "Deploy", app_actions_path(@app), {params: { action_type: "deploy" }, class:"btn btn-primary btn-sm", disabled: @app.reload_current_action.present? } %>
+    <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.reload_current_action.present?  %>
   </div>
   <table class="table">
     <thead>
@@ -17,7 +17,7 @@
       <% @latest_actions.each do |action| %>
         <tr>
           <td><%= action.id %></td>
-          <td><%= action.type %> <% if action.status_running? %>(running)<% end %></td>
+          <td><%= action.action_code %> <% if action.status_running? %>(running)<% end %></td>
           <td><%= action.completed_at %></td>
           <td><%= action.status %></td>
         </tr>

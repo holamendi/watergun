@@ -1,7 +1,7 @@
 <%= turbo_stream_from @app %>
 <%= render "apps/header", app: @app %>
 
-<%= form_with model: [@app, @app.environment_configuration], class: "space-y-6" do |form| %>
+<%= form_with model: @app.environment_configuration, url: app_environment_configuration_path(@app), class: "space-y-6" do |form| %>
   <%= form.text_area :variables, value: form.object.variables_as_string, class: "textarea textarea-bordered w-full h-96" %>
-  <%= form.submit "Save", class: "btn btn-primary text-white" %>
+  <%= form.submit "Save", class: "btn btn-primary" %>
 <% end %>

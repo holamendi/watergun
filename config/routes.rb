@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     scope module: :apps do
       resources :actions, only: :create
       resource :deploy_source
+      resources :deployments, only: :create
       resource :environment_configuration, path: :environment, only: %i[edit update]
       resource :metrics, only: :show
     end

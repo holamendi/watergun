@@ -57,6 +57,10 @@ class Action < ApplicationRecord
 
   scope :pending_or_running, -> { where(status: %w[pending running]) }
 
+  def action_code
+    type.delete_prefix("Actions::").underscore.tr("/", ".")
+  end
+
   def enqueue
     Actions::ProcessJob.perform_later(self)
   end
