@@ -1,4 +1,4 @@
-module ActionProcessors
+module Processors
   module ServiceLinks
     class Create < Base
       def commands

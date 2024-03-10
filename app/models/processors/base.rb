@@ -1,4 +1,4 @@
-module ActionProcessors
+module Processors
   class Base
     attr_reader :action, :ssh
 
@@ -31,7 +31,6 @@ module ActionProcessors
         actionable.touch
       end
     rescue => e
-      raise e
       action.update!(
         status: "exception",
         completed_at: Time.current,

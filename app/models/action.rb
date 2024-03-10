@@ -34,7 +34,6 @@
 #  server_id      (server_id => servers.id)
 #
 class Action < ApplicationRecord
-  include Actions::Processable
   include BelongsToOrg
   include BelongsToMembership
   include BelongsToServer
@@ -70,7 +69,7 @@ class Action < ApplicationRecord
   end
 
   def processor
-    "ActionProcessors#{type.delete_prefix("Actions")}".constantize.new(self)
+    "Processors#{type.delete_prefix("Actions")}".constantize.new(self)
   end
 
   def completed?

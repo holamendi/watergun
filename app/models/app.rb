@@ -60,4 +60,8 @@ class App < ApplicationRecord
   def url
     https_urls.first || urls.first
   end
+
+  def urls_resolve_to_server?
+    urls.all? { |url| Resolv.getaddress(URI.parse(url).host) == server.public_ip }
+  end
 end

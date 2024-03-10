@@ -1,6 +1,6 @@
-module ActionProcessors
+module Processors
   module Services
-    class Base < ActionProcessors::Base
+    class Base < Processors::Base
       alias_method :service, :actionable
     end
   end

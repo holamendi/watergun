@@ -37,13 +37,9 @@ class Service < ApplicationRecord
     redis: "redis"
   }, _prefix: true
 
-  after_create_commit -> { enqueue_action!(:create) }
-  after_discard -> { enqueue_action!(:destroy) }
+  after_create_commit -> { enqueue_action!(:create, dokku_id:, service_type:) }
+  after_discard -> { enqueue_action!(:destroy, dokku_id:, service_type:) }
   after_update_commit -> { broadcast_refresh_to(self) }
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
-
-  def restart!
-    create_server_event!("restart")
-  end
 end

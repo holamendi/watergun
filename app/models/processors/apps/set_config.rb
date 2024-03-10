@@ -1,4 +1,4 @@
-module ActionProcessors
+module Processors
   module Apps
     class SetConfig < Base
       def process

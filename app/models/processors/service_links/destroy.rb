@@ -1,4 +1,4 @@
-module ActionProcessors
+module Processors
   module ServiceLinks
     class Destroy < Base
       def process
