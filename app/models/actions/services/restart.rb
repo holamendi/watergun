@@ -1,6 +1,6 @@
 module Actions
   module Services
-    class Destroy < Action
+    class Restart < Action
       store_attribute :payload, :dokku_id, :string
       store_attribute :payload, :service_type, :string
 
