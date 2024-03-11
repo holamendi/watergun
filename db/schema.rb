@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_26_153820) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_11_173022) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -183,7 +183,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_26_153820) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "discarded_at"
     t.index ["app_id"], name: "index_service_links_on_app_id"
+    t.index ["discarded_at"], name: "index_service_links_on_discarded_at"
     t.index ["org_id"], name: "index_service_links_on_org_id"
     t.index ["service_id", "app_id"], name: "index_service_links_on_service_id_and_app_id", unique: true
     t.index ["service_id"], name: "index_service_links_on_service_id"

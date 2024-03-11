@@ -32,6 +32,9 @@ class Service < ApplicationRecord
   include Discard::Model
   include DokkuEntity
 
+  has_many :service_links, dependent: :destroy
+  has_many :linked_apps, through: :service_links, source: :app
+
   enum service_type: {
     postgres: "postgres",
     redis: "redis"

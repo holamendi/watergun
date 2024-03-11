@@ -31,6 +31,7 @@ module Processors
         actionable.touch
       end
     rescue => e
+      raise e if Rails.env.development?
       action.update!(
         status: "exception",
         completed_at: Time.current,

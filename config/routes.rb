@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :services do
     scope module: :services do
       resource :metrics, only: :show
+      resources :service_links, only: %i[index new create destroy], path: :links
     end
   end
 
