@@ -8,9 +8,12 @@ Rails.application.routes.draw do
 
   root "apps#index"
 
+  resources :actions, only: [] do
+    get :logs, on: :member
+  end
+
   resources :apps do
     scope module: :apps do
-      resources :actions, only: :create
       resource :deploy_source
       resources :deployments, only: :create
       resource :environment_configuration, path: :environment, only: %i[edit update]
