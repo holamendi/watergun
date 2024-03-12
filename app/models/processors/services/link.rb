@@ -9,11 +9,11 @@ module Processors
       private
 
       def link_service
-        execute("dokku #{action.service_type}:link #{action.service_dokku_id} #{action.app_dokku_id}")
+        execute("dokku #{action.service_type}:link #{action.service_dokku_id} #{action.app_dokku_id} --no-restart")
       end
 
       def update_service_link_status
-        service.service_links.find(action.service_link_id).update_columns(status: "linked")
+        service.service_links.find(action.service_link_id).update(status: "linked")
       end
     end
   end

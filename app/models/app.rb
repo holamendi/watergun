@@ -42,6 +42,8 @@ class App < ApplicationRecord
   }, _prefix: true, _default: :initializing
 
   has_one :deploy_source, dependent: :destroy
+  has_many :service_links, dependent: :destroy
+  has_many :services, through: :service_links
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 

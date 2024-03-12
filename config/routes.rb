@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       resources :deployments, only: :create
       resource :environment_configuration, path: :environment, only: %i[edit update]
       resource :metrics, only: :show
+      resources :services
     end
   end
 

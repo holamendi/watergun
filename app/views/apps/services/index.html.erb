@@ -1,0 +1,26 @@
+<%= turbo_stream_from @app %>
+<%= render "apps/header", app: @app %>
+
+<div class="flex py-2">
+  <%= link_to "New Service", new_app_service_path(@app), class: "btn" %>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @service_links.each do |service_link| %>
+      <tr>
+        <td><%= service_link.service.name %></td>
+        <td><%= service_link.service.service_type %></td>
+        <td><%= service_link.status %></td>
+        <td class="text-right"><%= link_to "Delete", app_service_path(@app, service_link.service), class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

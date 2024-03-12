@@ -17,7 +17,7 @@
         <td><%= action.type %> <% if action.status_running? %>(running)<% end %></td>
         <td><%= action.completed_at %></td>
         <td><%= action.status %></td>
-        <td class="text-right"><% if action.completed? %> <%= link_to "View logs", logs_action_path(action), target: :blank, class: "link" %> <% end %></td>
+        <td class="text-right"><% if action.completed? %> <%= link_to "View logs", logs_action_path(action), target: :_blank, class: "link" %> <% end %></td>
       </tr>
     <% end %>
   </tbody>

@@ -40,6 +40,11 @@ class Service < ApplicationRecord
     redis: "redis"
   }, _prefix: true
 
+  enum status: {
+    pending: "pending",
+    created: "created"
+  }, _prefix: true, _default: "pending"
+
   after_create_commit -> { enqueue_action!(:create, dokku_id:, service_type:) }
   after_discard -> { enqueue_action!(:destroy, dokku_id:, service_type:) }
   after_update_commit -> { broadcast_refresh_to(self) }

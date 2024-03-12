@@ -35,6 +35,8 @@ class AppsController < ApplicationController
   end
 
   def destroy
+    @app.service_links.discard_all
+    @app.services.discard_all
     @app.discard!
     redirect_to apps_path, notice: "App deleted successfully."
   end

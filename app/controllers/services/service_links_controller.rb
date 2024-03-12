@@ -19,7 +19,7 @@ module Services
     end
 
     def destroy
-      @service_link = @service.service_links.find(params[:id])
+      @service_link = @service.service_links.kept.find(params[:id])
       @service_link.discard!
       redirect_to service_service_links_path(@service), notice: "Service link deleted successfully."
     end
