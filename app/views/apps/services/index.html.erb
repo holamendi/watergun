@@ -18,7 +18,13 @@
       <tr>
         <td><%= service_link.service.name %></td>
         <td><%= service_link.service.service_type %></td>
-        <td><%= service_link.status %></td>
+        <td>
+           <% if service_link.status_pending? %>
+              <div class="text-white badge badge-info">Provisioning</div>
+            <% elsif service_link.status_linked? %>
+              <div class="text-white badge badge-success">Active</div>
+            <% end  %>
+        </td>
         <td class="text-right"><%= link_to "Delete", app_service_path(@app, service_link.service), class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
       </tr>
     <% end %>
