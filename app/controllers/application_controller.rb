@@ -28,6 +28,6 @@ class ApplicationController < ActionController::Base
   def authenticate!
     return if (Current.session = Session.find_by_active_token(cookies.encrypted[:session_token]))
 
-    redirect_to login_path, notice: "Please sign in"
+    redirect_to "/login", notice: "Please sign in"
   end
 end

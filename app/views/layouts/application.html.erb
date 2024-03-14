@@ -13,10 +13,14 @@
     </script>
   </head>
   <body class="h-full font-mono bg-base-200">
-    <%= render "shared/navbar" %>
-    <div class="px-4 mx-auto max-w-8xl sm:px-6 lg:px-8">
+    <div class="w-full bg-base-100">
+      <div class="max-w-6xl px-4 mx-auto">
+        <%= render "shared/navbar" %>
+      </div>
+    </div>
+    <div class="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
       <%= render "shared/flash_messages" %>
-      <div class="flex max-w-5xl mx-auto space-x-5">
+      <div class="flex max-w-6xl mx-auto space-x-5">
         <div class="w-full px-4 py-6 mt-6 rounded-lg bg-base-100">
           <%= yield %>
         </div>

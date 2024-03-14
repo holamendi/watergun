@@ -7,7 +7,6 @@
   <table class="table">
     <thead>
       <tr>
-        <th>Id</th>
         <th>Action</th>
         <th>Completed</th>
         <th>Status</th>
@@ -17,10 +16,25 @@
     <tbody>
       <% @latest_actions.each do |action| %>
         <tr>
-          <td><%= action.id %></td>
-          <td><%= action.action_code %> <% if action.status_running? %>(running)<% end %></td>
-          <td><%= action.completed_at %></td>
-          <td><%= action.status %></td>
+          <td><%= action.action_code %></td>
+          <td>
+            <% if action.completed? %>
+              <div class="tooltip" data-tip="<%= action.completed_at.to_s %>">
+                <%= time_ago_in_words(action.completed_at) %> ago
+              </div>
+            <% end %>
+          </td>
+          <td>
+            <% if action.status_pending? %>
+              <div class="badge badge-ghost">Queued</div>
+            <% elsif action.status_running? %>
+              <div class="text-white badge badge-info">Running</div>
+            <% elsif action.status_success? %>
+              <div class="text-white badge badge-success">Success</div>
+            <% elsif action.status_failure? %>
+              <div class="text-white badge badge-error">Failed</div>
+            <% end %>
+          </td>
           <td class="text-right"><% if action.completed? %> <%= link_to "View logs", logs_action_path(action), target: :_blank, class: "link" %> <% end %></td>
         </tr>
       <% end %>

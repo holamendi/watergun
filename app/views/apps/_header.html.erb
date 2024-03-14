@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-extrabold"><%= app.name %>
         <% if app.reload_current_action.present? %>
           <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
-            <%= app.current_action.action_code %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
+            <%= app.current_action.action_code.split(".").last %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
           </span>
         <% end %>
       </h1>
@@ -13,8 +13,8 @@
       <% end %>
     </div>
   </div>
-  <div role="tablist" class="w-full mb-4 overflow-scroll lg:w-2/3 tabs tabs-bordered tabs-md">
-    <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
+  <div role="tablist" class="w-full mb-4 lg:w-2/3 tabs tabs-bordered tabs-md">
+    <%= link_to "Overview", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
     <%= link_to "Services", app_services_path(app), class: class_names("tab", "tab-active" => (controller_name == "services")), role: "tab" %>
     <%= link_to "Metrics", app_metrics_path(app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
     <%= link_to "Environment", edit_app_environment_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>

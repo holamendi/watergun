@@ -1,7 +1,11 @@
 <%= form_with model: @github_access_token, url: org_github_access_token_path, method: :put, class: "space-y-4" do |form| %>
   <%= form.label :token, class: "form-control" do %>
-    <div class="label"><span class="label-text">Personal access token</span></div>
-    <%= form.text_field :token, class: "input input-bordered w-full" %>
+    <div class="label"><span class="label-text">Github personal access token</span></div>
+    <% if form.object.persisted? %>
+      <%= text_field_tag :token, "*" * 28 + form.object.token.last(4), class: "input input-bordered w-full", disabled: true %>
+    <% else %>
+      <%= form.password_field :token, class: "input input-bordered w-full" %>
+    <% end %>
   <% end %>
   <%= form.submit "Save", class: "btn btn-primary" %>
 <% end %>

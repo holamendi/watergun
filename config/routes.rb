@@ -29,12 +29,12 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :services do
-    scope module: :services do
-      resource :metrics, only: :show
-      resources :service_links, only: %i[index new create destroy], path: :links
-    end
-  end
+  # resources :services do
+  #   scope module: :services do
+  #     resource :metrics, only: :show
+  #     resources :service_links, only: %i[index new create destroy], path: :links
+  #   end
+  # end
 
   resources :sessions, only: %i[new create destroy]
 end
