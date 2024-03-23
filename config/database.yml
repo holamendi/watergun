@@ -23,6 +23,7 @@ development:
   solid_queue:
     <<: *default
     database: storage/solid_queue_development.sqlite3
+    migrations_paths: db/solid_queue_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

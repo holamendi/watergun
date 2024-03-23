@@ -1,12 +1,3 @@
-# == Schema Information
-#
-# Table name: orgs
-#
-#  id         :integer          not null, primary key
-#  name       :string           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
 class Org < ApplicationRecord
   has_many :apps, dependent: :destroy
   has_many :actions, dependent: :destroy

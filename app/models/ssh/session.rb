@@ -10,13 +10,13 @@ module Ssh
     def connect
       @started_at = Time.current
 
-      Net::SSH.start(server.public_ip, Server::USER, key_data: [server.ssh_private_key], keys_only: true, non_interactive: true) do |session|
+      Net::SSH.start(server.public_ip, ServerIdentity::USER, key_data: [server.ssh_private_key], keys_only: true, non_interactive: true) do |session|
         @session = session
         yield(self)
       end
 
       @completed_at = Time.current
-      remove_instance_variable(:@session)
+      @session = nil
       self
     end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_11_173022) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_23_164254) do
   create_table "action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "action_id", null: false
@@ -160,9 +160,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_11_173022) do
   end
 
   create_table "servers", force: :cascade do |t|
-    t.string "provider", null: false
     t.string "name", null: false
-    t.string "dokku_token", null: false
     t.string "status", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -171,7 +169,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_11_173022) do
     t.datetime "last_synced_at"
     t.string "public_ip"
     t.string "cpu_type"
-    t.index ["dokku_token"], name: "index_servers_on_dokku_token", unique: true
     t.index ["last_synced_at"], name: "index_servers_on_last_synced_at"
     t.index ["org_id"], name: "index_servers_on_org_id"
   end

@@ -1,46 +1,11 @@
-# == Schema Information
-#
-# Table name: servers
-#
-#  id             :integer          not null, primary key
-#  cpu_type       :string
-#  data           :json
-#  dokku_token    :string           not null
-#  last_synced_at :datetime
-#  name           :string           not null
-#  provider       :string           not null
-#  public_ip      :string
-#  status         :string           not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  org_id         :integer          not null
-#
-# Indexes
-#
-#  index_servers_on_dokku_token     (dokku_token) UNIQUE
-#  index_servers_on_last_synced_at  (last_synced_at)
-#  index_servers_on_org_id          (org_id)
-#
-# Foreign Keys
-#
-#  org_id  (org_id => orgs.id)
-#
 class Server < ApplicationRecord
   include BelongsToOrg
-  has_secure_token :dokku_token, length: 32
-
-  USER = "watergun"
 
   DOKKU_BUILDERS = {
     "herokuish" => "Heroku Buildpacks",
     "dockerfile" => "Dockerfile",
     "nixpacks" => "Nixpacks"
   }
-
-  enum provider: {
-    digitalocean: "digitalocean",
-    hetzner: "hetzner"
-  }, _prefix: true
 
   enum status: {
     active: "active"
@@ -57,8 +22,18 @@ class Server < ApplicationRecord
 
   delegate :ssh_private_key, to: :server_identity
 
-  def ssh_session(&block)
-    Ssh::Session.new(server: self).connect(&block)
+  def ssh_session(&)
+    Ssh::Session.new(server: self).connect(&)
+  end
+
+  def execute_ssh_commands(commands)
+    return if commands.blank?
+
+    ssh_session do |ssh|
+      Array.wrap(commands).each do |command|
+        ssh.execute(command)
+      end
+    end
   end
 
   def available_dokku_builders
