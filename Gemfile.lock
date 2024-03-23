@@ -1,11 +1,11 @@
 GIT
   remote: https://github.com/holamendi/litestack.git
-  revision: 68619f1eccbff49d9cc47372a755475b886dbb15
-  branch: erb-config-yml
+  revision: 5d27b86285ddbd7e1e5fd3ed21b037c4a7b1727f
+  branch: fix-litecable-closed-statements
   specs:
     litestack (0.4.3)
       erubi
-      hanami-router
+      hanami-router (~> 2.0)
       oj
       rack
       sqlite3
