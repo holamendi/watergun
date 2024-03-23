@@ -8,11 +8,5 @@
         "attempts": 3
       }
     ]
-  },
-  "cron": [
-    {
-      "command": "bundle exec rails runner 'Servers::SyncContainerDataJob.perform_later'",
-      "schedule": "* * * * *"
-    }
-  ]
+  }
 }
