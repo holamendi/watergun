@@ -47,8 +47,6 @@ group :development do
 
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
-  gem "annotate"
-  gem "irb-theme-dracula"
   gem "ruby-lsp-rails"
 end
 
@@ -62,7 +60,6 @@ gem "activerecord-enhancedsqlite3-adapter"
 gem "chartkick"
 gem "discard"
 gem "dotenv"
-gem "faraday-retry"
 gem "honeybadger"
 gem "groupdate"
 gem "httpx"

@@ -37,4 +37,12 @@ Rails.application.routes.draw do
   # end
 
   resources :sessions, only: %i[new create destroy]
+
+  namespace :api do
+    namespace :v1 do
+      resources :apps do
+        resources :deployments, only: :create
+      end
+    end
+  end
 end

@@ -1,19 +1,21 @@
 module Processors
   module Services
     class Link < Base
+      delegate :service_type, :service_dokku_id, :app_dokku_id, :service_link_id, to: :action
+
       def process
-        link_service
-        update_service_link_status
+        link_dokku_service
+        service_link.status_linked!
       end
 
       private
 
-      def link_service
-        execute("dokku #{action.service_type}:link #{action.service_dokku_id} #{action.app_dokku_id} --no-restart")
+      def link_dokku_service
+        ssh.execute("dokku #{service_type}:link #{service_dokku_id} #{app_dokku_id} --no-restart")
       end
 
-      def update_service_link_status
-        service.service_links.find(action.service_link_id).update(status: "linked")
+      def service_link
+        service.service_links.find(service_link_id)
       end
     end
   end

@@ -31,16 +31,10 @@ module Processors
         actionable.touch
       end
     rescue => e
-      raise e if Rails.env.development?
-      action.update!(
-        status: "exception",
-        completed_at: Time.current,
-        exception: {
-          message: e.message,
-          backtrace: e.backtrace
-        }
-      )
+      action.update!(status: "failure", completed_at: Time.current)
       actionable.touch
+
+      raise e if Rails.env.development?
     end
   end
 end

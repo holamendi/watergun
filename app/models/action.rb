@@ -11,13 +11,10 @@ class Action < ApplicationRecord
     pending: "pending",
     running: "running",
     success: "success",
-    failure: "failure",
-    exception: "exception"
+    failure: "failure"
   }, _prefix: true, _default: "pending"
 
   attribute :source, :string, default: "web"
-
-  store_attribute :data, :exception, :json, default: {}
 
   scope :pending_or_running, -> { where(status: %w[pending running]) }
 
@@ -30,11 +27,11 @@ class Action < ApplicationRecord
   end
 
   def process
-    processor.call
+    self.class.processor.new(self).call
   end
 
-  def processor
-    "Processors#{type.delete_prefix("Actions")}".constantize.new(self)
+  def self.processor
+    raise "processor not implemented for #{self.class.name}"
   end
 
   def completed?

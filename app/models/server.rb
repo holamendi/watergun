@@ -37,10 +37,8 @@ class Server < ApplicationRecord
   end
 
   def available_dokku_builders
-    if cpu_type.include?("x86")
-      DOKKU_BUILDERS
-    else
-      DOKKU_BUILDERS.except("herokuish")
-    end
+    return DOKKU_BUILDERS if cpu_type.include?("x86")
+
+    DOKKU_BUILDERS.except("herokuish")
   end
 end

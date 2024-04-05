@@ -1,6 +1,6 @@
 module Actions
   module Apps
-    class SetDeploySource < Action
+    class UpdateDeploySource < Action
       SOURCE_TYPES = %w[github].freeze
 
       store_attribute :payload, :dokku_id, :string
@@ -18,6 +18,10 @@ module Actions
 
       def github_source?
         source_type == "github"
+      end
+
+      def self.processor
+        Processors::Apps::UpdateDeploySource
       end
     end
   end

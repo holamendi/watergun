@@ -20,7 +20,8 @@ class AppsController < ApplicationController
   end
 
   def show
-    @latest_actions = @app.actions.order(created_at: :desc).limit(5)
+    service_actions = Action.where(actionable_type: "Service", actionable_id: @app.services.ids)
+    @recent_actions = @app.actions.or(service_actions).order(created_at: :desc).limit(10)
   end
 
   def edit
