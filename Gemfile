@@ -53,6 +53,7 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+  gem "mocha"
   gem "selenium-webdriver"
 end
 
@@ -60,6 +61,7 @@ gem "activerecord-enhancedsqlite3-adapter"
 gem "chartkick"
 gem "discard"
 gem "dotenv"
+gem "faraday-retry"
 gem "honeybadger"
 gem "groupdate"
 gem "httpx"

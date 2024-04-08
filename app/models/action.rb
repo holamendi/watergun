@@ -30,14 +30,11 @@ class Action < ApplicationRecord
     self.class.processor.new(self).call
   end
 
-  def self.processor
-    raise "processor not implemented for #{self.class.name}"
-  end
-
   def completed?
     completed_at.present?
   end
 
+  # duration in seconds
   def duration
     return if running_at.blank? || completed_at.blank?
 

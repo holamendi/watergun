@@ -13,6 +13,7 @@ class AppsController < ApplicationController
     @app = current_server.apps.new(app_params)
 
     if @app.save
+      Actions::Apps::Create.enqueue!(app: @app)
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new
@@ -20,8 +21,7 @@ class AppsController < ApplicationController
   end
 
   def show
-    service_actions = Action.where(actionable_type: "Service", actionable_id: @app.services.ids)
-    @recent_actions = @app.actions.or(service_actions).order(created_at: :desc).limit(10)
+    @recent_actions = @app.related_actions.order(created_at: :desc).limit(10)
   end
 
   def edit
