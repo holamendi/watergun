@@ -7,7 +7,6 @@ class Action < ApplicationRecord
   belongs_to :actionable, polymorphic: true, optional: true
 
   has_one :action_log, dependent: :destroy
-  attr_reader :ssh_session
 
   enum status: {
     pending: "pending",
@@ -24,8 +23,8 @@ class Action < ApplicationRecord
     type.delete_prefix("Actions::").underscore.tr("/", ".")
   end
 
-  def enqueue
-    Actions::ProcessJob.perform_later(self)
+  def schedule(at: Time.current)
+    Actions::ProcessJob.set(wait_until: at).perform_later(self)
   end
 
   def completed?
