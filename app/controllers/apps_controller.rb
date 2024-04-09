@@ -13,7 +13,7 @@ class AppsController < ApplicationController
     @app = current_server.apps.new(app_params)
 
     if @app.save
-      Actions::Apps::Create.enqueue!(app: @app)
+      @app.schedule_action!(Actions::Apps::Create, app_dokku_id: @app.dokku_id)
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new

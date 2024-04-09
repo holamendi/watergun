@@ -10,8 +10,8 @@ module Processors
 
       private
 
-      def authenticate_dokku_git_account
-        ssh.execute("dokku git:auth github.com u #{github_access_token}")
+      def authenticate_github_access_token
+        ssh.execute(Dokku::Git.auth)
       end
 
       def sync_dokku_git_repository

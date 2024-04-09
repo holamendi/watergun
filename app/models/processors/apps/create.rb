@@ -4,7 +4,7 @@ module Processors
       delegate :app_dokku_id, to: :action
 
       def process
-        ssh.execute("dokku apps:create #{app_dokku_id}")
+        ssh.execute(Dokku::App.create(app: app_dokku_id))
       end
     end
   end

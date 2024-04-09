@@ -2,10 +2,12 @@ class Action < ApplicationRecord
   include BelongsToOrg
   include BelongsToMembership
   include BelongsToServer
+  include Actions::Processor
 
   belongs_to :actionable, polymorphic: true, optional: true
 
   has_one :action_log, dependent: :destroy
+  attr_reader :ssh_session
 
   enum status: {
     pending: "pending",
@@ -24,10 +26,6 @@ class Action < ApplicationRecord
 
   def enqueue
     Actions::ProcessJob.perform_later(self)
-  end
-
-  def process
-    self.class.processor.new(self).call
   end
 
   def completed?

@@ -1,18 +1,18 @@
 module Actions
   module Apps
     class Create < Action
-      store_attribute :payload, :app_dokku_id, :string
+      store_attribute :payload, :dokku_app_id, :string
 
-      validates :app_dokku_id, presence: true
+      validates :dokku_app_id, presence: true
 
-      class << self
-        def processor
-          Processors::Apps::Create
-        end
+      def process_action
+        create_dokku_app
+      end
 
-        def enqueue!(app:)
-          create!(actionable: app, app_dokku_id: app.dokku_id).enqueue
-        end
+      private
+
+      def create_dokku_app
+        ssh.execute(Dokku::App.create(dokku_app_id))
       end
     end
   end

@@ -3,7 +3,7 @@ module Actions
     class UpdateDeploySource < Action
       SOURCE_TYPES = %w[github].freeze
 
-      store_attribute :payload, :dokku_id, :string
+      store_attribute :payload, :dokku_app_id, :string
       store_attribute :payload, :source_type, :string
       store_attribute :payload, :github_repository, :string
       store_attribute :payload, :github_branch, :string
@@ -20,8 +20,14 @@ module Actions
         source_type == "github"
       end
 
-      def self.processor
-        Processors::Apps::UpdateDeploySource
+      def process_action
+        update_deploy_source
+      end
+
+      private
+
+      def update_deploy_source
+        ssh.execute(Dokku::Git.auth(dokku_id, git_source))
       end
     end
   end

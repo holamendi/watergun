@@ -6,7 +6,7 @@ module Actionable
     has_one :current_action, -> { pending_or_running }, class_name: "Action", as: :actionable, dependent: :destroy
   end
 
-  def enqueue_action!(action_class, attributes = {})
-    action_class.create!(actionable: self, **attributes).enqueue
+  def schedule_action!(action_class, payload = {})
+    action_class.create!(actionable: self, **payload).schedule
   end
 end
