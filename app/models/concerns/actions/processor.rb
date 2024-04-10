@@ -2,9 +2,7 @@ module Actions
   module Processor
     extend ActiveSupport::Concern
 
-    included do
-      attr_reader :ssh
-    end
+    included { attr_reader :ssh }
 
     def process
       raise "Action must implement #process_action" unless respond_to?(:process_action)
