@@ -18,8 +18,10 @@ module Actions
 
       result = server.ssh_session do |ssh|
         @ssh = ssh
-        self.completed_at = result.completed_at
+        process_action
       end
+
+      self.completed_at = result.completed_at
 
       Action.transaction do
         result.success? ? status_success! : status_failure!
