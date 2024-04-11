@@ -19,7 +19,7 @@ module Processors
 
       result = server.ssh_session do |ssh|
         @ssh = ssh
-        process
+        perform
         @ssh = nil
       end
 

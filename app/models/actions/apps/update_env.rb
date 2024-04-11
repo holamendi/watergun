@@ -7,7 +7,7 @@ module Actions
       validates :dokku_app_id, presence: true
       validates :environment_variables, presence: true
 
-      def process_action
+      def perform
         set_dokku_app_env
       end
 

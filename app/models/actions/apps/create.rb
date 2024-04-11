@@ -5,7 +5,7 @@ module Actions
 
       validates :dokku_app_id, presence: true
 
-      def process_action
+      def perform
         create_dokku_app
       end
 

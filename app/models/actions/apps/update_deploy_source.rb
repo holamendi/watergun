@@ -20,7 +20,7 @@ module Actions
         source_type == "github"
       end
 
-      def process_action
+      def perform
         update_deploy_source
       end
 

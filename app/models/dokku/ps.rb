@@ -8,6 +8,10 @@ module Dokku
       def restart(app)
         command_prefix("restart #{app}")
       end
+
+      def rebuild(app)
+        command_prefix("rebuild #{app}")
+      end
     end
   end
 end

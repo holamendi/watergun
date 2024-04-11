@@ -16,7 +16,7 @@ module Actions
 
       result = server.ssh_session do |ssh|
         @ssh = ssh
-        process_action
+        perform
       end
 
       self.completed_at = result.completed_at
