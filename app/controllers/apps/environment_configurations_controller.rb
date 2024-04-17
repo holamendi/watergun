@@ -28,7 +28,7 @@ module Apps
       return unless @environment_configuration.saved_change_to_variables?
 
       @app.schedule_action!(
-        Actions::Apps::UpdateEnv,
+        Apps::UpdateEnv,
         app_dokku_id: @app.dokku_id,
         environment_variables: @environment_configuration.variables
       )

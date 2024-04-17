@@ -5,7 +5,7 @@ module Actions
 
       store_attribute :payload, :dokku_app_id, :string
       store_attribute :payload, :source_type, :string
-      store_attribute :payload, :github_repository, :string
+      store_attribute :payload, :github_repo, :string
       store_attribute :payload, :github_branch, :string
 
       validates :dokku_id, presence: true

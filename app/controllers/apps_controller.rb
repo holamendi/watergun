@@ -13,7 +13,7 @@ class AppsController < ApplicationController
     @app = current_server.apps.new(app_params)
 
     if @app.save
-      @app.schedule_action!(Actions::Apps::Create, app_dokku_id: @app.dokku_id)
+      @app.schedule_action!(Apps::Create, app_dokku_id: @app.dokku_id)
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new

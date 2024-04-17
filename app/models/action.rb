@@ -23,8 +23,8 @@ class Action < ApplicationRecord
     type.delete_prefix("Actions::").underscore.tr("/", ".")
   end
 
-  def schedule(at: Time.current)
-    Actions::ProcessJob.set(wait_until: at).perform_later(self)
+  def schedule
+    Actions::ProcessJob.perform_later(self)
   end
 
   def completed?

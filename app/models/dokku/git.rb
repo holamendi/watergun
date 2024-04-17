@@ -8,6 +8,10 @@ module Dokku
       def auth(url, password)
         command_prefix("auth #{url} u #{password}")
       end
+
+      def sync(app, repo:, branch: "main")
+        command_prefix("sync #{app} #{repo} #{branch}")
+      end
     end
   end
 end

@@ -1,0 +1,29 @@
+<div class="overflow-x-auto rounded-lg">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>id</th>
+        <th>code</th>
+        <th>actionable</th>
+        <th>payload</th>
+        <th>status</th>
+        <th>created_at</th>
+        <th>completed_at</th>
+        <th>duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @actions.each do |action| %>
+        <tr>
+          <td><%= action.id %></td>
+          <td><%= action.action_code %></td>
+          <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
+          <td><pre><%= JSON.pretty_generate(action.payload) %></pre></td>
+          <td><%= action.status %></td>
+          <td><%= action.completed_at %></td>
+          <td><%= action.duration %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

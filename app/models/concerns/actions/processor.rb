@@ -5,7 +5,7 @@ module Actions
     included { attr_reader :ssh }
 
     def process
-      raise "Action must implement #process_action" unless respond_to?(:process_action)
+      raise "Action must implement #perform" unless respond_to?(:perform)
 
       Action.transaction do
         self.running_at = Time.current

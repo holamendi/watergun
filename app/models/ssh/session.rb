@@ -29,6 +29,7 @@ module Ssh
       @session.exec!(command, status:) do |_channel, stream, data|
         ssh_command.append_output(stream, data)
         yield(stream.to_s, data) if block_given?
+        Rails.logger.debug(data&.strip) if Rails.env.development?
       end
 
       ssh_command.completed_at = Time.current

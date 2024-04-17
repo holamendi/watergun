@@ -6,7 +6,7 @@ module Dokku
       end
 
       def set(app, env_variables, restart: false)
-        command = command_prefix("set --encoded #{app} #{base_64_encoded_env_variables_as_string(env_variables)}")
+        command = command_prefix("set #{app} #{base_64_encoded_env_variables_as_string(env_variables)} --encoded ")
         command += " --no-restart" unless restart
         command
       end
