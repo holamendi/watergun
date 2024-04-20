@@ -12,7 +12,10 @@ module Apps
       @service = current_server.services.new(service_params)
 
       if @service.save
-        @app.service_links.create!(service: @service)
+        service_link = @app.service_links.create!(service: @service)
+
+        ServerActions::CreateDokkuService.perform_later!(@service)
+        ServerActions::LinkDokkuService.perform_later!(service_link)
 
         redirect_to app_services_path(@app), notice: "Service created successfully."
       else

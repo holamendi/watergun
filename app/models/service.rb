@@ -1,5 +1,5 @@
 class Service < ApplicationRecord
-  include Actionable
+  include ServerActionable
   include BelongsToOrg
   include BelongsToServer
   include Containerizable
@@ -12,16 +12,14 @@ class Service < ApplicationRecord
   enum service_type: {
     postgres: "postgres",
     redis: "redis"
-  }, _prefix: true
+  }
 
   enum status: {
     pending: "pending",
     created: "created"
-  }, _prefix: true, _default: "pending"
-
-  after_create_commit -> { enqueue_action!(:create, dokku_id:, service_type:) }
-  after_discard -> { enqueue_action!(:destroy, dokku_id:, service_type:) }
-  after_update_commit -> { broadcast_refresh_to(self) }
+  }, _default: "pending"
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
+
+  after_update_commit -> { broadcast_refresh_to(self) }
 end

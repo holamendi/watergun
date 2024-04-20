@@ -10,41 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_07_141523) do
-  create_table "action_logs", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "action_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.json "ssh_commands", default: [], null: false
-    t.index ["action_id"], name: "index_action_logs_on_action_id"
-    t.index ["id", "action_id"], name: "index_action_logs_on_id_and_action_id", unique: true
-    t.index ["org_id"], name: "index_action_logs_on_org_id"
-  end
-
-  create_table "actions", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "server_id", null: false
-    t.string "actionable_type"
-    t.integer "actionable_id"
-    t.integer "membership_id"
-    t.string "source", null: false
-    t.string "status", null: false
-    t.string "job_id"
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.json "args", default: {}, null: false
-    t.datetime "running_at"
-    t.json "data", default: {}, null: false
-    t.json "payload", default: {}, null: false
-    t.string "type"
-    t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
-    t.index ["membership_id"], name: "index_actions_on_membership_id"
-    t.index ["org_id"], name: "index_actions_on_org_id"
-    t.index ["server_id"], name: "index_actions_on_server_id"
-  end
-
+ActiveRecord::Schema[7.1].define(version: 2024_04_20_115423) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -56,6 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_07_141523) do
     t.datetime "discarded_at"
     t.datetime "last_deployed_at"
     t.json "urls", default: []
+    t.string "status"
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
@@ -146,6 +113,38 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_07_141523) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "server_action_logs", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_action_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.json "ssh_commands", default: [], null: false
+    t.index ["id", "server_action_id"], name: "index_server_action_logs_on_id_and_server_action_id", unique: true
+    t.index ["org_id"], name: "index_server_action_logs_on_org_id"
+    t.index ["server_action_id"], name: "index_server_action_logs_on_server_action_id"
+  end
+
+  create_table "server_actions", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "actionable_type"
+    t.integer "actionable_id"
+    t.integer "membership_id"
+    t.string "source", null: false
+    t.string "status", null: false
+    t.string "job_id"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "running_at"
+    t.json "payload", default: {}, null: false
+    t.string "type"
+    t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
+    t.index ["membership_id"], name: "index_server_actions_on_membership_id"
+    t.index ["org_id"], name: "index_server_actions_on_org_id"
+    t.index ["server_id"], name: "index_server_actions_on_server_id"
+  end
+
   create_table "server_identities", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -220,11 +219,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_07_141523) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  add_foreign_key "action_logs", "actions"
-  add_foreign_key "action_logs", "orgs"
-  add_foreign_key "actions", "memberships"
-  add_foreign_key "actions", "orgs"
-  add_foreign_key "actions", "servers"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
   add_foreign_key "container_metrics", "containers"
@@ -237,6 +231,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_07_141523) do
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
+  add_foreign_key "server_action_logs", "orgs"
+  add_foreign_key "server_action_logs", "server_actions"
+  add_foreign_key "server_actions", "memberships"
+  add_foreign_key "server_actions", "orgs"
+  add_foreign_key "server_actions", "servers"
   add_foreign_key "server_identities", "orgs"
   add_foreign_key "server_identities", "servers"
   add_foreign_key "servers", "orgs"

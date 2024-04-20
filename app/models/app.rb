@@ -1,5 +1,5 @@
 class App < ApplicationRecord
-  include Actionable
+  include ServerActionable
   include BelongsToOrg
   include BelongsToServer
   include Containerizable
@@ -13,7 +13,6 @@ class App < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
   after_update_commit -> { broadcast_refresh_to(self) }
-  after_discard -> { enqueue_action!(:destroy, dokku_id:) }
 
   def ssl_enabled?
     urls.any? { |url| url.start_with?("https://") }
@@ -31,9 +30,9 @@ class App < ApplicationRecord
     urls.all? { |url| Resolv.getaddress(URI.parse(url).host) == server.public_ip }
   end
 
-  def related_actions
-    actions.or(
-      Action.where(actionable_type: "Service", actionable_id: services.ids)
+  def related_server_actions
+    server_actions.or(
+      ServerAction.where(actionable_type: "Service", actionable_id: services.ids)
     )
   end
 end

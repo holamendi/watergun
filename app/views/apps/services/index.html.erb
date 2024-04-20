@@ -19,9 +19,9 @@
         <td><%= service_link.service.name %></td>
         <td><%= service_link.service.service_type %></td>
         <td>
-           <% if service_link.status_pending? %>
+           <% if service_link.pending? %>
               <div class="text-white badge badge-info">Provisioning</div>
-            <% elsif service_link.status_linked? %>
+            <% elsif service_link.linked? %>
               <div class="text-white badge badge-success">Active</div>
             <% end  %>
         </td>

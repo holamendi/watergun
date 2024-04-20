@@ -4,12 +4,11 @@
       <label tabindex="0" class="btn btn-ghost lg:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="bg" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
       </label>
-
       <% if false %>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-        <li><%= link_to "Apps", apps_path %></li>
-        <li><%= link_to "Services", services_path %></li>
-      </ul>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li><%= link_to "Apps", apps_path %></li>
+          <li><%= link_to "Services", services_path %></li>
+        </ul>
       <% end %>
     </div>
     <div class="h-6 px-4 ">
@@ -19,16 +18,8 @@
         </svg>
       <% end %>
     </div>
-    <div>
-      <div class="text-sm breadcrumbs">
-  <ul>
-    <li><a>Apps</a></li>
-    <li><a>My App</a></li>
-  </ul>
-</div>
-    </div>
-  </div>
 
+  </div>
   <div class="navbar-end">
     <ul class="menu menu-horizontal">
       <li tabindex="0">

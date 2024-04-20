@@ -20,11 +20,7 @@ module Actions
       private
 
       def sync_github_repo
-        ssh.execute(
-          Dokku::Git.sync(
-            dokku_app_id, repo: repo_url, branch:
-          )
-        )
+        ssh.execute(Dokku::Git.sync(dokku_app_id, repo: repo_url, branch: branch))
       end
 
       def repo_url

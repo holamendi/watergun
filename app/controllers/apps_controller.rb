@@ -13,7 +13,7 @@ class AppsController < ApplicationController
     @app = current_server.apps.new(app_params)
 
     if @app.save
-      @app.schedule_action!(Apps::Create, app_dokku_id: @app.dokku_id)
+      ServerActions::CreateDokkuApp.perform_later!(@app)
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new
@@ -21,7 +21,7 @@ class AppsController < ApplicationController
   end
 
   def show
-    @recent_actions = @app.related_actions.order(created_at: :desc).limit(10)
+    @recent_server_actions = @app.related_server_actions.order(created_at: :desc).limit(10)
   end
 
   def edit
@@ -36,9 +36,8 @@ class AppsController < ApplicationController
   end
 
   def destroy
-    @app.service_links.discard_all
-    @app.services.discard_all
     @app.discard!
+    ServerActions::DestroyDokkuApp.perform_later!(@app)
     redirect_to apps_path, notice: "App deleted successfully."
   end
 

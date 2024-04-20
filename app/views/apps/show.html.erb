@@ -2,7 +2,7 @@
 <%= render "header", app: @app %>
 <% if @app.deploy_source %>
   <div class="flex py-2">
-    <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.reload_current_action.present?  %>
+    <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.current_server_action.present?  %>
   </div>
   <table class="table">
     <thead>
@@ -14,7 +14,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @recent_actions.each do |action| %>
+      <% @recent_server_actions.each do |action| %>
         <tr>
           <td><%= action.action_code %></td>
           <td>
@@ -25,13 +25,13 @@
             <% end %>
           </td>
           <td>
-            <% if action.status_pending? %>
+            <% if action.pending? %>
               <div class="badge badge-ghost">Queued</div>
-            <% elsif action.status_running? %>
+            <% elsif action.running? %>
               <div class="text-white badge badge-info">Running</div>
-            <% elsif action.status_success? %>
+            <% elsif action.success? %>
               <div class="text-white badge badge-success">Success</div>
-            <% elsif action.status_failure? %>
+            <% elsif action.failure? %>
               <div class="text-white badge badge-error">Failed</div>
             <% end %>
           </td>
