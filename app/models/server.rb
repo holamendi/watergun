@@ -11,16 +11,14 @@ class Server < ApplicationRecord
     active: "active"
   }, _prefix: true, _default: "active"
 
-  has_one :server_identity, dependent: :destroy
+  has_one :ssh_key, dependent: :destroy
 
   has_many :apps
   has_many :containers, dependent: :destroy
   has_many :actions, dependent: :destroy
   has_many :services, dependent: :destroy
 
-  after_create :create_server_identity
-
-  delegate :ssh_private_key, to: :server_identity
+  after_create :create_ssh_key
 
   def ssh_session(&)
     Ssh::Session.new(server: self).connect(&)

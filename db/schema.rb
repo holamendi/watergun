@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_22_095051) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -64,18 +64,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
     t.index ["org_id"], name: "index_containers_on_org_id"
     t.index ["server_id"], name: "index_containers_on_server_id"
     t.index ["status"], name: "index_containers_on_status"
-  end
-
-  create_table "deploy_sources", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "app_id", null: false
-    t.string "type"
-    t.boolean "active"
-    t.json "data"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["app_id"], name: "index_deploy_sources_on_app_id"
-    t.index ["org_id"], name: "index_deploy_sources_on_org_id"
   end
 
   create_table "environment_configurations", force: :cascade do |t|
@@ -158,17 +146,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
     t.index ["server_id"], name: "index_server_actions_on_server_id"
   end
 
-  create_table "server_identities", force: :cascade do |t|
-    t.integer "org_id", null: false
-    t.integer "server_id", null: false
-    t.text "ssh_private_key", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["id", "server_id"], name: "index_server_identities_on_id_and_server_id", unique: true
-    t.index ["org_id"], name: "index_server_identities_on_org_id"
-    t.index ["server_id"], name: "index_server_identities_on_server_id"
-  end
-
   create_table "servers", force: :cascade do |t|
     t.string "name", null: false
     t.string "status", null: false
@@ -224,6 +201,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "ssh_keys", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.text "private_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "server_id"], name: "index_ssh_keys_on_id_and_server_id", unique: true
+    t.index ["org_id"], name: "index_ssh_keys_on_org_id"
+    t.index ["server_id"], name: "index_ssh_keys_on_server_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -238,8 +226,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
   add_foreign_key "container_metrics", "orgs"
   add_foreign_key "containers", "orgs"
   add_foreign_key "containers", "servers"
-  add_foreign_key "deploy_sources", "apps"
-  add_foreign_key "deploy_sources", "orgs"
   add_foreign_key "environment_configurations", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "github_repos", "apps"
@@ -251,8 +237,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
   add_foreign_key "server_actions", "memberships"
   add_foreign_key "server_actions", "orgs"
   add_foreign_key "server_actions", "servers"
-  add_foreign_key "server_identities", "orgs"
-  add_foreign_key "server_identities", "servers"
   add_foreign_key "servers", "orgs"
   add_foreign_key "service_links", "apps"
   add_foreign_key "service_links", "orgs"
@@ -260,4 +244,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
   add_foreign_key "services", "orgs"
   add_foreign_key "services", "servers"
   add_foreign_key "sessions", "users"
+  add_foreign_key "ssh_keys", "orgs"
+  add_foreign_key "ssh_keys", "servers"
 end

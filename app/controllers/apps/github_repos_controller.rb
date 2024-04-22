@@ -5,9 +5,10 @@ module Apps
     end
 
     def create
-      @github_repo = @app.build_github_repo(github_repo_params)
+      @github_repo = @app.build_github_repo(create_github_repo_params)
 
       if @github_repo.save
+        ServerActions::SyncDokkuGitRepo.perform_later!(@github_repo)
         redirect_to @app, notice: "App source created successfully."
       else
         flash.now[:alert] = @github_repo.errors.full_messages.to_sentence
@@ -15,10 +16,30 @@ module Apps
       end
     end
 
+    def edit
+      @github_repo = @app.github_repo
+    end
+
+    def update
+      @github_repo = @app.github_repo
+
+      if @github_repo.update(update_github_repo_params)
+        ServerActions::SyncDokkuGitRepo.perform_later!(@github_repo) if @github_repo.saved_change_to_branch?
+        redirect_to @app, notice: "App source updated successfully."
+      else
+        flash.now[:alert] = @github_repo.errors.full_messages.to_sentence
+        render :edit, status: :unprocessable_entity
+      end
+    end
+
     private
 
-    def github_repo_params
+    def create_github_repo_params
       params.require(:github_repo).permit(:repo, :branch)
+    end
+
+    def update_github_repo_params
+      params.require(:github_repo).permit(:branch)
     end
   end
 end

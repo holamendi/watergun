@@ -7,11 +7,14 @@ module Dokku
         @ssh_session = ssh_session
         @app = app
         @service = service
-        @command = nil
+      end
+
+      def command
+        "dokku postgres:unlink #{service} #{app}"
       end
 
       def call
-        @command = ssh_session.execute("dokku service:unlink #{service} #{app}")
+        ssh_session.execute(command)
         self
       end
     end

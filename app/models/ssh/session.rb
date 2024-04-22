@@ -10,7 +10,7 @@ module Ssh
     def connect
       @started_at = Time.current
 
-      Net::SSH.start(server.public_ip, ServerIdentity::USER, key_data: [server.ssh_private_key], keys_only: true, non_interactive: true) do |session|
+      Net::SSH.start(server.public_ip, SshKey::USER, key_data: [ssh_private_key], keys_only: true, non_interactive: true) do |session|
         @session = session
         yield(self)
       end
@@ -39,6 +39,12 @@ module Ssh
 
     def success?
       commands.all?(&:success?)
+    end
+
+    private
+
+    def ssh_private_key
+      server.ssh_key.private_key
     end
   end
 end
