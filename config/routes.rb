@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   root "apps#index"
 
-  resources :actions, only: :index do
+  resources :server_actions, only: :index do
     get :logs, on: :member
   end
 

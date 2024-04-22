@@ -13,10 +13,10 @@
       </tr>
     </thead>
     <tbody>
-      <% @actions.each do |action| %>
+      <% @server_actions.each do |action| %>
         <tr>
           <td><%= action.id %></td>
-          <td><%= action.action_code %></td>
+          <td><%= action.type %></td>
           <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
           <td><pre><%= JSON.pretty_generate(action.payload) %></pre></td>
           <td><%= action.status %></td>

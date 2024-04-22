@@ -15,7 +15,7 @@ class Server < ApplicationRecord
 
   has_many :apps
   has_many :containers, dependent: :destroy
-  has_many :actions, dependent: :destroy
+  has_many :actions, class_name: "ServerAction", dependent: :destroy
   has_many :services, dependent: :destroy
 
   after_create :create_ssh_key
