@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_20_115423) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_22_070939) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -95,6 +95,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_20_115423) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["org_id"], name: "index_github_access_tokens_on_org_id"
+  end
+
+  create_table "github_repos", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "repo", null: false
+    t.string "branch", null: false
+    t.boolean "private", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id", "repo"], name: "index_github_repos_on_app_id_and_repo", unique: true
+    t.index ["app_id"], name: "index_github_repos_on_app_id"
+    t.index ["org_id"], name: "index_github_repos_on_org_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -229,6 +242,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_20_115423) do
   add_foreign_key "deploy_sources", "orgs"
   add_foreign_key "environment_configurations", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
+  add_foreign_key "github_repos", "apps"
+  add_foreign_key "github_repos", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
   add_foreign_key "server_action_logs", "orgs"

@@ -12,10 +12,16 @@ module ServerActions
       self.dokku_service_id ||= service.dokku_id
     end
 
+    delegate :app, :service, to: :service_link
+
+    def concurrency_key
+      service
+    end
+
+    private
+
     def perform
-      ssh_session do |ssh|
-        Dokku::Apps::UnlinkService.call(ssh, service: dokku_service_id, app: dokku_app_id)
-      end
+      Dokku::Apps::UnlinkService.call(ssh, service: dokku_service_id, app: dokku_app_id)
     end
   end
 end

@@ -8,13 +8,13 @@ Rails.application.routes.draw do
 
   root "apps#index"
 
-  resources :server_actions, only: :index do
+  resources :actions, only: :index do
     get :logs, on: :member
   end
 
   resources :apps do
     scope module: :apps do
-      resource :deploy_source
+      resource :github_repo
       resources :deployments, only: :create
       resource :environment_configuration, path: :environment, only: %i[edit update]
       resource :metrics, only: :show

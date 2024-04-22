@@ -12,11 +12,11 @@ module ServerActions
       self.dokku_service_id ||= service.dokku_id
     end
 
-    def perform
-      ssh_session { |ssh| dokku_command_class.call(ssh, service: dokku_service_id) }
-    end
-
     private
+
+    def perform
+      dokku_command_class.call(ssh, service: dokku_service_id)
+    end
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Create".constantize

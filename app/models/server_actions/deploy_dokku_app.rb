@@ -6,6 +6,8 @@ module ServerActions
 
     validates :dokku_app_id, presence: true
 
+    private
+
     def perform
       return unless sync_github_repo.success?
 
@@ -15,8 +17,6 @@ module ServerActions
       update_app_last_deployed_at(rebuild_result.completed_at)
       enable_ssl
     end
-
-    private
 
     def sync_github_repo
       ssh.execute(Dokku::Git.sync(dokku_app_id, repo: repo_url, branch: branch))

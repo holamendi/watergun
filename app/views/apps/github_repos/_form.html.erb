@@ -1,7 +1,7 @@
-  <%= form_with model: deploy_source, url: app_deploy_source_path(deploy_source.app), class: "space-y-6" do |form| %>
+  <%= form_with model: github_repo, url: app_github_repo_path(github_repo.app), class: "space-y-6" do |form| %>
     <%= form.label :repository, class: "form-control" do %>
       <div class="label"><span class="label-text">Repository</span></div>
-      <%= form.text_field :repository, class: "input input-bordered" %>
+      <%= form.text_field :repo, class: "input input-bordered" %>
     <% end %>
     <%= form.label :branch, class: "form-control" do %>
       <div class="label"><span class="label-text">Branch</span></div>
@@ -9,3 +9,5 @@
     <% end %>
     <%= form.submit "Save", class: "btn btn-primary text-white" %>
   <% end %>
+
+

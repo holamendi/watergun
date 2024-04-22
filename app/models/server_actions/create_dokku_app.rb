@@ -10,8 +10,10 @@ module ServerActions
       self.dokku_app_id ||= app.dokku_id
     end
 
+    private
+
     def perform
-      ssh_session { |ssh| Dokku::Apps::Create.call(ssh, app: dokku_app_id) }
+      Dokku::Apps::Create.call(ssh, app: dokku_app_id)
     end
   end
 end

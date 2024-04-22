@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  org: one
+  app: one
+  repo: MyString
+  branch: MyString
+  private: false
+
+two:
+  org: two
+  app: two
+  repo: MyString
+  branch: MyString
+  private: false

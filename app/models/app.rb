@@ -7,7 +7,7 @@ class App < ApplicationRecord
   include DokkuEntity
   include EnvironmentConfigurable
 
-  has_one :deploy_source, dependent: :destroy
+  has_one :github_repo, dependent: :destroy
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 

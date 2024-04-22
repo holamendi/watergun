@@ -18,20 +18,18 @@ module ServerActions
       self.service_type ||= service.service_type
     end
 
-    def perform
-      ssh_session do |ssh|
-        link_result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
-        return unless link_result.success?
-
-        service_link.linked!
-      end
-    end
-
     def concurrency_key
       service
     end
 
     private
+
+    def perform
+      link_result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
+      return unless link_result.success?
+
+      service_link.linked!
+    end
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Link".constantize

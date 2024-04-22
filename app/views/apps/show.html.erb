@@ -1,6 +1,6 @@
 <%= turbo_stream_from @app %>
 <%= render "header", app: @app %>
-<% if @app.deploy_source %>
+<% if @app.github_repo.present? %>
   <div class="flex py-2">
     <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.current_server_action.present?  %>
   </div>
@@ -14,32 +14,9 @@
       </tr>
     </thead>
     <tbody>
-      <% @recent_server_actions.each do |action| %>
-        <tr>
-          <td><%= action.action_code %></td>
-          <td>
-            <% if action.completed? %>
-              <div class="tooltip" data-tip="<%= action.completed_at.to_s %>">
-                <%= time_ago_in_words(action.completed_at) %> ago
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <% if action.pending? %>
-              <div class="badge badge-ghost">Queued</div>
-            <% elsif action.running? %>
-              <div class="text-white badge badge-info">Running</div>
-            <% elsif action.success? %>
-              <div class="text-white badge badge-success">Success</div>
-            <% elsif action.failure? %>
-              <div class="text-white badge badge-error">Failed</div>
-            <% end %>
-          </td>
-          <td class="text-right"><% if action.completed? %> <%= link_to "View logs", logs_action_path(action), target: :_blank, class: "link" %> <% end %></td>
-        </tr>
-      <% end %>
+
     </tbody>
   </table>
 <% else %>
-  <%= link_to "Add a deploy source", new_app_deploy_source_path(@app), class: "btn btn-primary text-white" %>
+  <%= link_to "Add a Deploy source", new_app_github_repo_path(@app), class: "btn btn-primary text-white" %>
 <% end %>
