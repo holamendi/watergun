@@ -1,14 +1,6 @@
 module Dokku
   module Apps
     class Report < Base
-      Parsed = Data.define(
-        :created_at,
-        :deploy_source,
-        :deploy_source_metadata,
-        :dir,
-        :locked
-      )
-
       attr_reader :app
 
       def initialize(ssh_session, app:)
@@ -16,18 +8,24 @@ module Dokku
         @app = app
       end
 
-      def call
-        @command = ssh_session.execute("dokku apps:report #{app} --format json")
-        json_report = JSON.parse(command.text_output)
+      def command
+        "dokku apps:report #{app} --format json"
+      end
 
-        Parsed.new(
-          created_at: Time.zone.at(json_report["app-created-at"].to_i),
-          deploy_source: json_report["app-deploy-source"],
-          deploy_source_metadata: json_report["app-deploy-source-metadata"],
-          dir: json_report["app-dir"],
-          locked: (json_report["app-locked"] == "true")
-        )
+      def report
+        return unless success?
+
+        JSON.parse(result.text_output).then do |json|
+          {
+            created_at: Time.zone.at(json["app-created-at"].to_i),
+            deploy_source: json["app-deploy-source"],
+            deploy_source_metadata: json["app-deploy-source-metadata"],
+            dir: json["app-dir"],
+            locked: (json["app-locked"] == "true")
+          }
+        end
       end
     end
   end
 end
+ß

@@ -1,6 +1,6 @@
 module ServerActions
   class SyncDokkuGitRepo < ServerAction
-    alias_method :github_repo, :actionable
+    alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :repo, :string
@@ -8,7 +8,7 @@ module ServerActions
 
     validates :dokku_app_id, :repo, :branch, presence: true
 
-    delegate :app, to: :github_repo
+    delegate :github_repo, to: :app
 
     before_validation on: :create do
       self.dokku_app_id ||= app.dokku_id

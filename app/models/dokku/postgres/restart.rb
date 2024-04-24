@@ -11,11 +11,6 @@ module Dokku
       def command
         "dokku postgres:restart #{service}"
       end
-
-      def call
-        ssh_session.execute(command)
-        self
-      end
     end
   end
 end

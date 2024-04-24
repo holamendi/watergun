@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_22_095051) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -64,6 +64,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_095051) do
     t.index ["org_id"], name: "index_containers_on_org_id"
     t.index ["server_id"], name: "index_containers_on_server_id"
     t.index ["status"], name: "index_containers_on_status"
+  end
+
+  create_table "deployments", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "source", null: false
+    t.string "status", null: false
+    t.string "repo", null: false
+    t.string "branch", null: false
+    t.string "rev"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_deployments_on_app_id"
+    t.index ["org_id"], name: "index_deployments_on_org_id"
   end
 
   create_table "environment_configurations", force: :cascade do |t|
@@ -226,6 +241,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_22_095051) do
   add_foreign_key "container_metrics", "orgs"
   add_foreign_key "containers", "orgs"
   add_foreign_key "containers", "servers"
+  add_foreign_key "deployments", "apps"
+  add_foreign_key "deployments", "orgs"
   add_foreign_key "environment_configurations", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "github_repos", "apps"

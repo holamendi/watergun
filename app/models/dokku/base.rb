@@ -1,13 +1,22 @@
 module Dokku
   class Base
-    attr_reader :ssh_session, :command
+    attr_reader :ssh_session, :result
 
-    def self.call(*, **)
-      new(*, **).call
+    def self.call(ssh_session, **)
+      new(ssh_session, **).call
+    end
+
+    def call
+      @result = ssh_session.execute(command)
+      self
+    end
+
+    def command
+      raise "implement in subclass"
     end
 
     def success?
-      command&.success?
+      result&.success?
     end
   end
 end

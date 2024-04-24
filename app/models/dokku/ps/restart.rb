@@ -6,12 +6,10 @@ module Dokku
       def initialize(ssh_session, app:)
         @ssh_session = ssh_session
         @app = app
-        @command = nil
       end
 
-      def call
-        @command = ssh_session.execute("dokku ps:restart #{app}")
-        self
+      def command
+        "dokku ps:restart #{app}"
       end
     end
   end

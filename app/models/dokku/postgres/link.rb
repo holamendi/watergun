@@ -3,16 +3,14 @@ module Dokku
     class Link < Base
       attr_reader :app, :service
 
-      def initialize(ssh_session, app:, service:)
+      def initialize(ssh_session, service:, app:)
         @ssh_session = ssh_session
-        @app = app
         @service = service
-        @command = nil
+        @app = app
       end
 
-      def call
-        @command = ssh_session.execute("dokku postgres:link #{service} #{app}")
-        self
+      def command
+        "dokku postgres:link #{service} #{app}"
       end
     end
   end

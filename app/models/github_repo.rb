@@ -21,8 +21,7 @@ class GithubRepo < ApplicationRecord
   end
 
   def validate_branch_exists
-    return if errors.where(:repo).any?
-    return if errors.where(:branch).any?
+    return if errors.where(:repo).any? || errors.where(:branch).any?
     return unless branch_changed?
 
     Octokit.branch(repo, branch)

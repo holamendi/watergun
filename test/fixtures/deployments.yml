@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  org: one
+  app: one
+  status: MyString
+  repo: MyString
+  branch: MyString
+  rev: MyString
+  completed_at: 2024-04-24 10:15:32
+
+two:
+  org: two
+  app: two
+  status: MyString
+  repo: MyString
+  branch: MyString
+  rev: MyString
+  completed_at: 2024-04-24 10:15:32

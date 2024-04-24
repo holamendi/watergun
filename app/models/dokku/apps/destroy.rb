@@ -9,12 +9,8 @@ module Dokku
         @command = nil
       end
 
-      def call
-        @command = ssh_session.execute("dokku apps:destroy --force #{app}")
-      end
-
-      def success?
-        command.success?
+      def command
+        "dokku apps:destroy --force #{app}"
       end
     end
   end

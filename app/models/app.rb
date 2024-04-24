@@ -7,8 +7,9 @@ class App < ApplicationRecord
   include DokkuEntity
   include EnvironmentConfigurable
 
+  has_many :deployments, dependent: :delete_all
   has_one :github_repo, dependent: :destroy
-  has_many :service_links, dependent: :destroy
+  has_many :service_links, dependent: :delete_all
   has_many :services, through: :service_links
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}

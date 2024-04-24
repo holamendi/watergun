@@ -6,12 +6,10 @@ module Dokku
       def initialize(ssh_session, service:)
         @ssh_session = ssh_session
         @service = service
-        @command = nil
       end
 
-      def call
-        @command = ssh_session.execute("dokku postgres:create #{service}")
-        self
+      def command
+        "dokku postgres:create #{service}"
       end
     end
   end
