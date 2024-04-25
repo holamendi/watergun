@@ -5,7 +5,7 @@ class App < ApplicationRecord
   include Containerizable
   include Discard::Model
   include DokkuEntity
-  include EnvironmentConfigurable
+  include EnvConfigurable
 
   has_many :deployments, dependent: :delete_all
   has_one :github_repo, dependent: :destroy

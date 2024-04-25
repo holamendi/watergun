@@ -8,7 +8,7 @@ module Apps
       @github_repo = @app.build_github_repo(create_github_repo_params)
 
       if @github_repo.save
-        ServerActions::SyncDokkuGitRepo.perform_later!(@github_repo)
+        ServerActions::SyncGitRepo.perform_later!(@app)
         redirect_to @app, notice: "App source created successfully."
       else
         flash.now[:alert] = @github_repo.errors.full_messages.to_sentence

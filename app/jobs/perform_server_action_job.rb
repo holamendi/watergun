@@ -5,6 +5,6 @@ class PerformServerActionJob < ApplicationJob
     return unless server_action.pending?
 
     server_action.update_columns(job_id:)
-    server_action.perform_and_log
+    server_action.perform_action
   end
 end

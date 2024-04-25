@@ -1,5 +1,5 @@
 module ServerActions
-  class SyncDokkuGitRepo < ServerAction
+  class SyncGitRepo < ServerAction
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

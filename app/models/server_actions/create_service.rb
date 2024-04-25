@@ -1,5 +1,5 @@
 module ServerActions
-  class RestartDokkuService < ServerAction
+  class CreateService < ServerAction
     alias_method :service, :actionable
 
     store_attribute :payload, :dokku_service_id, :string
@@ -19,7 +19,7 @@ module ServerActions
     end
 
     def dokku_command_class
-      "Dokku::#{service_type.camelcase}::Restart".constantize
+      "Dokku::#{service_type.camelcase}::Create".constantize
     end
   end
 end

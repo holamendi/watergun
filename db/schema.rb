@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -72,8 +72,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
     t.string "source", null: false
     t.string "status", null: false
     t.string "repo", null: false
-    t.string "branch", null: false
-    t.string "rev"
+    t.string "sha"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -81,15 +80,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
     t.index ["org_id"], name: "index_deployments_on_org_id"
   end
 
-  create_table "environment_configurations", force: :cascade do |t|
+  create_table "env_configurations", force: :cascade do |t|
     t.integer "org_id", null: false
-    t.string "environment_configurable_type", null: false
-    t.integer "environment_configurable_id", null: false
+    t.string "env_configurable_type", null: false
+    t.integer "env_configurable_id", null: false
     t.json "variables", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["environment_configurable_type", "environment_configurable_id"], name: "index_environment_configurations_on_environment_configurable"
-    t.index ["org_id"], name: "index_environment_configurations_on_org_id"
+    t.index ["env_configurable_type", "env_configurable_id"], name: "index_environment_configurations_on_environment_configurable"
+    t.index ["org_id"], name: "index_env_configurations_on_org_id"
   end
 
   create_table "github_access_tokens", force: :cascade do |t|
@@ -155,6 +154,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
     t.datetime "running_at"
     t.json "payload", default: {}, null: false
     t.string "type"
+    t.string "failure_message"
     t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
     t.index ["membership_id"], name: "index_server_actions_on_membership_id"
     t.index ["org_id"], name: "index_server_actions_on_org_id"
@@ -243,7 +243,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_081532) do
   add_foreign_key "containers", "servers"
   add_foreign_key "deployments", "apps"
   add_foreign_key "deployments", "orgs"
-  add_foreign_key "environment_configurations", "orgs"
+  add_foreign_key "env_configurations", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "github_repos", "apps"
   add_foreign_key "github_repos", "orgs"

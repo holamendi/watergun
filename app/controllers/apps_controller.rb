@@ -13,7 +13,7 @@ class AppsController < ApplicationController
     @app = current_server.apps.new(app_params)
 
     if @app.save
-      ServerActions::CreateDokkuApp.perform_later!(@app)
+      ServerActions::CreateApp.perform_later!(@app)
       redirect_to app_path(@app), notice: "App created successfully."
     else
       render :new
@@ -37,7 +37,7 @@ class AppsController < ApplicationController
 
   def destroy
     @app.discard!
-    ServerActions::DestroyDokkuApp.perform_later!(@app)
+    ServerActions::DestroyApp.perform_later!(@app)
     redirect_to apps_path, notice: "App deleted successfully."
   end
 

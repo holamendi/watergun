@@ -1,7 +1,7 @@
 module Dokku
   module Config
     class Set < Base
-      attr_reader :app, :config
+      attr_reader :app, :env, :restart
 
       def initialize(ssh_session, app:, env:, restart: false)
         @ssh_session = ssh_session

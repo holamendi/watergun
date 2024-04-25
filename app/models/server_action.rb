@@ -1,4 +1,6 @@
 class ServerAction < ApplicationRecord
+  class ServerActionFailure < StandardError; end
+
   include BelongsToOrg
   include BelongsToMembership
   include BelongsToServer
@@ -19,13 +21,21 @@ class ServerAction < ApplicationRecord
 
   attribute :source, :string, default: "web"
 
-  scope :pending_or_running, -> { where(status: %w[pending running]) }
+  scope :pending_or_running, -> { where(status: %i[pending running]) }
 
   def self.perform_later!(actionable, **)
     create!(actionable:, **).perform_later
   end
 
-  def perform_and_log
+  def perform_later
+    PerformServerActionJob.perform_later(self)
+  end
+
+  def fail!(message = nil)
+    raise(ServerActionFailure, message)
+  end
+
+  def perform_action
     raise "server action must implement #perform" unless respond_to?(:perform, true)
 
     self.running_at = Time.current
@@ -37,21 +47,25 @@ class ServerAction < ApplicationRecord
 
     create_log!(org:, ssh_commands: result.commands)
 
-    self.completed_at = result.completed_at
-    result.success? ? success! : failure!
+    self.status = if result.success?
+      :success
+    else
+      :failure
+    end
+  rescue ServerActionFailure => e
+    self.status = :failure
+    self.failure_message = e.message
   rescue => e
-    self.completed_at = Time.current
-    failure!
-
+    self.status = :failure
+    self.failure_message = e.detailed_message
     raise e if Rails.env.local?
+  ensure
+    self.completed_at = Time.current
+    save!
   end
 
   def concurrency_key
     actionable
-  end
-
-  def perform_later
-    PerformServerActionJob.perform_later(self)
   end
 
   def completed?
@@ -59,7 +73,7 @@ class ServerAction < ApplicationRecord
   end
 
   def duration
-    return if running_at.blank? || completed_at.blank?
+    return unless completed?
 
     completed_at - running_at
   end

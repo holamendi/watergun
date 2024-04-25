@@ -58,6 +58,7 @@ group :test do
 end
 
 gem "activerecord-enhancedsqlite3-adapter"
+gem "alba"
 gem "chartkick"
 gem "discard"
 gem "dotenv"

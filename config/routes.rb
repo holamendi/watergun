@@ -16,7 +16,7 @@ Rails.application.routes.draw do
     scope module: :apps do
       resource :github_repo
       resources :deployments, only: :create
-      resource :environment_configuration, path: :environment, only: %i[edit update]
+      resource :env_configuration, path: :enironment, only: %i[edit update]
       resource :metrics, only: :show
       resources :services
     end

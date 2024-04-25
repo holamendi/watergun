@@ -1,5 +1,5 @@
 module ServerActions
-  class RestartDokkuApp < ServerAction
+  class DestroyApp < ServerAction
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string
@@ -13,7 +13,7 @@ module ServerActions
     private
 
     def perform
-      Dokku::Apps::Restart.call(ssh, app: dokku_app_id)
+      Dokku::Apps::Destroy.call(ssh, app: dokku_app_id)
     end
   end
 end

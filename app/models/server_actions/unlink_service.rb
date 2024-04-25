@@ -1,5 +1,5 @@
 module ServerActions
-  class UnlinkDokkuService < ServerAction
+  class UnlinkService < ServerAction
     alias_method :service_link, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

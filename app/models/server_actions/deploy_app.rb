@@ -1,11 +1,10 @@
 module ServerActions
-  class DeployDokkuApp < ServerAction
+  class DeployApp < ServerAction
     alias_method :deployment, :actionable
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :repo, :string
-    store_attribute :payload, :branch, :string
-    store_attribute :payload, :rev, :string
+    store_attribute :payload, :sha, :string
 
     validates :dokku_app_id, presence: true
 
@@ -14,8 +13,7 @@ module ServerActions
     before_validation on: :create do
       self.dokku_app_id ||= deployment.app.dokku_id
       self.repo ||= deployment.repo
-      self.branch ||= deployment.branch
-      self.rev ||= deployment.rev
+      self.sha ||= deployment.sha
     end
 
     def concurrency_key
@@ -25,15 +23,26 @@ module ServerActions
     private
 
     def perform
-      return unless sync_git_repo.success?
+      deployment.in_progress!
 
-      rebuild_dokku_app.then do |command|
-        app.update_columns(last_deployed_at: command.result.completed_at) if command.success?
+      unless sync_git_repo.success?
+        deployment.failure!
+        fail!("failed to sync git repo")
+      end
+
+      result = rebuild_dokku_app
+
+      if result.success?
+        deployment.success!
+        app.update!(last_deployed_at: result.completed_at)
+      else
+        deployment.failure!
+        fail!("failed to rebuild dokku app")
       end
     end
 
     def sync_git_repo
-      Dokku::Git::Sync.call(ssh, app: dokku_app_id, repo:, branch:)
+      Dokku::Git::Sync.call(ssh, app: dokku_app_id, repo:, sha:)
     end
 
     def rebuild_dokku_app

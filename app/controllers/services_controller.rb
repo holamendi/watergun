@@ -13,7 +13,7 @@ class ServicesController < ApplicationController
     @service = current_server.services.new(service_params.merge(status: "creating"))
 
     if @service.save
-      ServerActions::CreateDokkuService.perform_later!(@service)
+      ServerActions::CreateService.perform_later!(@service)
       redirect_to service_path(@service), notice: "Service creation scheduled"
     else
       render :new

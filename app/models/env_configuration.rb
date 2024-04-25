@@ -1,9 +1,9 @@
-class EnvironmentConfiguration < ApplicationRecord
+class EnvConfiguration < ApplicationRecord
   include BelongsToOrg
 
   attr_writer :variables_as_string
 
-  belongs_to :environment_configurable, polymorphic: true
+  belongs_to :env_configurable, polymorphic: true
 
   delegate :dokku_id, to: :environment_configurable
 

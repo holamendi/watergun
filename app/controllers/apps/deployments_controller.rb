@@ -1,20 +1,30 @@
 module Apps
   class DeploymentsController < BaseController
     def create
-      @deployment = @app.deployments.new(deployment_params)
+      deployment = @app.deployments.new(source: "web")
 
-      if @deployment.save
-        ServerActions::DeployDokkuApp.perform_later!(@deployment)
+      commit = if params[:sha].present?
+        github_repo.remote_commit(params[:sha])
       else
-        flash.now[:alert] = @deployment.errors.full_messages.to_sentence
+        github_repo.remote_branch.commit
+      end
+
+      if commit.present?
+        deployment.sha = commit.sha
+        deployment.save!
+        ServerActions::DeployApp.perform_later!(deployment)
+        flash[:notice] = "Deployment scheduled"
+        redirect_to @app
+      else
+        flash.now[:alert] = deployment.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end
     end
 
     private
 
-    def deployment_params
-      params.require(:deployment).permit(:branch, :ref)
+    def github_repo
+      @app.github_repo
     end
   end
 end
