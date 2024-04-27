@@ -14,9 +14,9 @@ production:
       batch_size: 500
       concurrency_maintenance_interval: 300
       recurring_tasks:
-        my_periodic_job:
-          class: Servers::SyncContainerDataJob
-          schedule: every minute
+        #my_periodic_job:
+          #class: Servers::SyncContainerDataJob
+          #schedule: every minute
   workers:
     - queues: "*"
       threads: 3
