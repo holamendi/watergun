@@ -34,7 +34,6 @@ module ServerActions
 
       if result.success?
         deployment.success!
-        app.update!(last_deployed_at: result.completed_at)
       else
         deployment.failure!
         fail!("failed to rebuild dokku app")

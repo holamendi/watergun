@@ -7,7 +7,7 @@ one:
   repo: MyString
   branch: MyString
   rev: MyString
-  completed_at: 2024-04-24 10:15:32
+  finished_at: 2024-04-24 10:15:32
 
 two:
   org: two
@@ -16,4 +16,4 @@ two:
   repo: MyString
   branch: MyString
   rev: MyString
-  completed_at: 2024-04-24 10:15:32
+  finished_at: 2024-04-24 10:15:32

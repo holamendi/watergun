@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_27_104241) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
-    t.integer "user_id", null: false
     t.string "token", null: false
     t.boolean "read_only", default: false, null: false
     t.datetime "expires_at", null: false
@@ -21,7 +20,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
     t.datetime "updated_at", null: false
     t.index ["org_id"], name: "index_api_tokens_on_org_id"
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
-    t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
   create_table "apps", force: :cascade do |t|
@@ -86,9 +84,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
     t.string "status", null: false
     t.string "repo", null: false
     t.string "sha"
-    t.datetime "completed_at"
+    t.datetime "finished_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "started_at"
     t.index ["app_id"], name: "index_deployments_on_app_id"
     t.index ["org_id"], name: "index_deployments_on_org_id"
   end
@@ -160,7 +159,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
     t.string "source", null: false
     t.string "status", null: false
     t.string "job_id"
-    t.datetime "completed_at"
+    t.datetime "finished_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "running_at"
@@ -258,7 +257,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
   end
 
   add_foreign_key "api_tokens", "orgs"
-  add_foreign_key "api_tokens", "users"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
   add_foreign_key "container_metrics", "containers"

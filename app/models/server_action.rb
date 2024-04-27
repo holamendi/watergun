@@ -57,7 +57,7 @@ class ServerAction < ApplicationRecord
     self.failure_message = e.detailed_message
     raise e if Rails.env.local?
   ensure
-    self.completed_at = Time.current
+    self.finished_at = Time.current
     save!
   end
 
@@ -65,14 +65,14 @@ class ServerAction < ApplicationRecord
     actionable
   end
 
-  def completed?
-    completed_at.present?
+  def finished?
+    finished_at.present?
   end
 
   def duration
-    return unless completed?
+    return unless finished?
 
-    completed_at - running_at
+    finished_at - running_at
   end
 
   class ServerActionFailure < StandardError; end

@@ -9,7 +9,7 @@ class CreateServerEvents < ActiveRecord::Migration[7.1]
       t.string :source, null: false
       t.string :status, null: false
       t.string :job_id, null: false
-      t.datetime :completed_at
+      t.datetime :finished_at
 
       t.timestamps
     end

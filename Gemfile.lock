@@ -403,6 +403,7 @@ DEPENDENCIES
   mocha
   net-ssh
   octokit
+  oj
   paper_trail
   propshaft
   puma (>= 5.0)

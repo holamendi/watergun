@@ -9,6 +9,8 @@ Rails.application.routes.draw do
       resources :apps, only: %i[index show] do
         resources :deployments, only: %i[index show create]
       end
+
+      resources :deployments, only: %i[index show]
     end
   end
 

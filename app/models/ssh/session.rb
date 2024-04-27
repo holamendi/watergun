@@ -1,6 +1,6 @@
 module Ssh
   class Session
-    attr_reader :server, :commands, :started_at, :completed_at
+    attr_reader :server, :commands, :started_at, :finished_at
 
     def initialize(server:)
       @server = server
@@ -15,7 +15,7 @@ module Ssh
         yield(self)
       end
 
-      @completed_at = Time.current
+      @finished_at = Time.current
       @session = nil
       self
     end
@@ -32,7 +32,7 @@ module Ssh
         Rails.logger.debug(data&.strip) if Rails.env.development?
       end
 
-      ssh_command.completed_at = Time.current
+      ssh_command.finished_at = Time.current
       ssh_command.exit_code = status[:exit_code]
       ssh_command
     end

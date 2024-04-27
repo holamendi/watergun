@@ -3,7 +3,7 @@ module Ssh
     include StoreModel::Model
 
     attribute :command, :string
-    attribute :completed_at, :datetime
+    attribute :finished_at, :datetime
     attribute :exit_code, :integer
     attribute :output, OutputEntry.to_array_type, default: -> { [] }
     attribute :started_at, :datetime
@@ -27,7 +27,7 @@ module Ssh
     end
 
     def duration
-      completed_at - started_at
+      finished_at - started_at
     end
   end
 end

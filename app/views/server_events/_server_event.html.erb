@@ -6,9 +6,9 @@
           <%= server_event.event_type %>
         </div>
         <div class="w-1/3">
-          <% if server_event.completed_at? %>
-            <span class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.completed_at %>">
-              <%= time_ago_in_words server_event.completed_at %> ago
+          <% if server_event.finished_at? %>
+            <span class="tooltip tooltip-hover tooltip-top" data-tip="<%= server_event.finished_at %>">
+              <%= time_ago_in_words server_event.finished_at %> ago
             </span>
           <% end %>
         </div>

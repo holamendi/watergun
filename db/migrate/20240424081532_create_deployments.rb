@@ -8,7 +8,7 @@ class CreateDeployments < ActiveRecord::Migration[7.1]
       t.string :repo, null: false
       t.string :branch, null: false
       t.string :rev
-      t.timestamp :completed_at
+      t.timestamp :finished_at
 
       t.timestamps
     end

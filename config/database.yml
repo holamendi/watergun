@@ -25,7 +25,6 @@ development:
     database: storage/solid_queue_development.sqlite3
     migrations_paths: db/solid_queue_migrate
 
-
 test:
   primary:
     <<: *default
@@ -35,8 +34,6 @@ test:
     <<: *default
     database: storage/solid_queue_test.sqlite3
     migrations_paths: db/solid_queue_migrate
-
-
 
 production:
   primary:
