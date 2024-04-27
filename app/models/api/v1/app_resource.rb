@@ -9,9 +9,8 @@ module Api
         :created_at,
         :updated_at
 
-      one :github_repo, resource: GithubResource
-
-      many :deployments, resource: DeploymentResource
+      one :github_repo, resource: GithubRepoResource
+      one :last_deployment, resource: DeploymentResource
     end
   end
 end

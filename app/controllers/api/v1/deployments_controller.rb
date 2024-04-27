@@ -35,7 +35,7 @@ module Api
           ServerActions::DeployApp.perform_later!(deployment)
           render json: DeploymentResource.new(deployment), status: :created
         else
-          render json: {errors: deployment.errors.full_messages}, status: :unprocessable_entity
+          render json: {errors: "invalid commit"}, status: :unprocessable_entity
         end
       end
 

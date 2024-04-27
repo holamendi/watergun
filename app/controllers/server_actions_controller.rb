@@ -5,7 +5,6 @@ class ServerActionsController < ApplicationController
 
   def logs
     @server_action = current_server.actions.find(params[:id])
-
     render plain: @server_action.log.text_output
   end
 end

@@ -18,6 +18,7 @@ class Current < ActiveSupport::CurrentAttributes
     super
     return unless user
 
+    PaperTrail.request.whodunnit = user.to_global_id
     self.membership = user.memberships.first
     self.org = membership.org
     self.server = org.servers.first

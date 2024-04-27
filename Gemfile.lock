@@ -213,6 +213,7 @@ GEM
       sawyer (~> 0.9)
     oj (3.16.3)
       bigdecimal (>= 3.0)
+    pagy (8.3.0)
     paper_trail (15.1.0)
       activerecord (>= 6.1)
       request_store (~> 1.4)
@@ -404,6 +405,7 @@ DEPENDENCIES
   net-ssh
   octokit
   oj
+  pagy (~> 8.3)
   paper_trail
   propshaft
   puma (>= 5.0)
