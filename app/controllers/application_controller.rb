@@ -35,6 +35,6 @@ class ApplicationController < ActionController::Base
   end
 
   def user_for_paper_trail
-    current_user.to_global_id
+    current_user&.to_global_id
   end
 end
