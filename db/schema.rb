@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_27_071417) do
+  create_table "api_tokens", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "user_id", null: false
+    t.string "token", null: false
+    t.boolean "read_only", default: false, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["org_id"], name: "index_api_tokens_on_org_id"
+    t.index ["token"], name: "index_api_tokens_on_token", unique: true
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
   create_table "apps", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
@@ -144,7 +157,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
     t.integer "server_id", null: false
     t.string "actionable_type"
     t.integer "actionable_id"
-    t.integer "membership_id"
     t.string "source", null: false
     t.string "status", null: false
     t.string "job_id"
@@ -156,7 +168,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
     t.string "type"
     t.string "failure_message"
     t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
-    t.index ["membership_id"], name: "index_server_actions_on_membership_id"
     t.index ["org_id"], name: "index_server_actions_on_org_id"
     t.index ["server_id"], name: "index_server_actions_on_server_id"
   end
@@ -235,6 +246,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  create_table "versions", force: :cascade do |t|
+    t.string "item_type", null: false
+    t.bigint "item_id", null: false
+    t.string "event", null: false
+    t.string "whodunnit"
+    t.text "object", limit: 1073741823
+    t.datetime "created_at"
+    t.text "object_changes", limit: 1073741823
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+  end
+
+  add_foreign_key "api_tokens", "orgs"
+  add_foreign_key "api_tokens", "users"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
   add_foreign_key "container_metrics", "containers"
@@ -251,7 +275,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_171205) do
   add_foreign_key "memberships", "users"
   add_foreign_key "server_action_logs", "orgs"
   add_foreign_key "server_action_logs", "server_actions"
-  add_foreign_key "server_actions", "memberships"
   add_foreign_key "server_actions", "orgs"
   add_foreign_key "server_actions", "servers"
   add_foreign_key "servers", "orgs"

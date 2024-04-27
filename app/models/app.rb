@@ -1,4 +1,6 @@
 class App < ApplicationRecord
+  has_paper_trail
+
   include ServerActionable
   include BelongsToOrg
   include BelongsToServer

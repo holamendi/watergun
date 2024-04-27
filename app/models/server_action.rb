@@ -1,8 +1,5 @@
 class ServerAction < ApplicationRecord
-  class ServerActionFailure < StandardError; end
-
   include BelongsToOrg
-  include BelongsToMembership
   include BelongsToServer
 
   attr_accessor :ssh_session
@@ -77,4 +74,6 @@ class ServerAction < ApplicationRecord
 
     completed_at - running_at
   end
+
+  class ServerActionFailure < StandardError; end
 end

@@ -70,6 +70,7 @@ gem "litestack", github: "holamendi/litestack", branch: "fix-litecable-closed-st
 gem "mission_control-jobs"
 gem "net-ssh"
 gem "octokit"
+gem "paper_trail"
 gem "turbo-rails"
 gem "solid_queue"
 gem "sshkey"
