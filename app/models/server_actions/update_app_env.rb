@@ -1,5 +1,7 @@
 module ServerActions
   class UpdateAppEnv < ServerAction
+    ACTION_CODE = "apps.update_env"
+
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

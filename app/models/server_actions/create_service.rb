@@ -1,5 +1,7 @@
 module ServerActions
   class CreateService < ServerAction
+    ACTION_CODE = "services.create"
+
     alias_method :service, :actionable
 
     store_attribute :payload, :dokku_service_id, :string
@@ -15,7 +17,8 @@ module ServerActions
     private
 
     def perform
-      dokku_command_class.call(ssh, service: dokku_service_id)
+      result = dokku_command_class.call(ssh, service: dokku_service_id)
+      service.status_created! if result.success?
     end
 
     def dokku_command_class

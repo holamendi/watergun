@@ -25,8 +25,12 @@ module Apps
 
     def destroy
       @service = @app.services.kept.find(params[:id])
-      @service.service_links.kept.find_by(app: @app).discard!
+      service_link = @service.service_links.kept.find_by(app: @app)
+
+      service_link.discard!
+      ServerActions::UnlinkService.perform_later!(service_link)
       @service.discard!
+      ServerActions::DestroyService.perform_later!(@service)
 
       redirect_to app_services_path(@app), notice: "Service scheduled for deletion"
     end

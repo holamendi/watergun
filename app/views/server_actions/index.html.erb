@@ -1,3 +1,4 @@
+<%= turbo_stream_from current_org, :server_actions %>
 <div class="overflow-x-auto rounded-lg">
   <table class="table table-xs">
     <thead>
@@ -15,12 +16,12 @@
       <% @server_actions.each do |action| %>
         <tr>
           <td><%= action.id %></td>
-          <td><%= action.type.demodulize %></td>
+          <td><%= action.class::ACTION_CODE %></td>
           <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
           <td><pre><%= JSON.pretty_generate(action.payload) %></pre></td>
-          <td><%= action.status %></td>
+          <td><span class="badge <%= status_badge_class(action.status) %>"><%= action.status %></span></td>
           <td><%= action.finished_at %></td>
-          <td><%= action.duration %></td>
+          <td><% if action.finished? %><%= action.duration.round(1) %><% end %></td>
         </tr>
       <% end %>
     </tbody>

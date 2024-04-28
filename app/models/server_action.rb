@@ -10,15 +10,17 @@ class ServerAction < ApplicationRecord
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
   enum status: {
-    pending: "pending",
+    queued: "queued",
     running: "running",
     success: "success",
     failure: "failure"
-  }, _default: "pending"
+  }, _default: "queued"
 
   attribute :source, :string, default: "web"
 
-  scope :pending_or_running, -> { where(status: %i[pending running]) }
+  scope :queued_or_running, -> { where(status: %i[queued running]) }
+
+  after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
 
   def self.perform_later!(actionable, **)
     create!(actionable:, **).perform_later
@@ -42,7 +44,7 @@ class ServerAction < ApplicationRecord
       with(ssh_session:) { perform }
     end
 
-    create_log!(org:, ssh_commands: result.commands)
+    create_log!(ssh_commands: result.commands)
 
     self.status = if result.success?
       :success

@@ -1,5 +1,7 @@
 module ServerActions
   class SyncGitRepo < ServerAction
+    ACTION_CODE = "apps.git_sync"
+
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

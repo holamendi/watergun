@@ -1,5 +1,7 @@
 module ServerActions
   class LinkService < ServerAction
+    ACTION_CODE = "services.link"
+
     alias_method :service_link, :actionable
 
     store_attribute :payload, :dokku_app_id, :string
@@ -25,10 +27,8 @@ module ServerActions
     private
 
     def perform
-      link_result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
-      return unless link_result.success?
-
-      service_link.linked!
+      result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
+      service_link.linked! if result.success?
     end
 
     def dokku_command_class

@@ -1,5 +1,7 @@
 module ServerActions
   class RestartService < ServerAction
+    ACTION_CODE = "services.restart"
+
     alias_method :service, :actionable
 
     store_attribute :payload, :dokku_service_id, :string

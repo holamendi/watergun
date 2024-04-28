@@ -5,6 +5,10 @@ class ServerActionLog < ApplicationRecord
 
   belongs_to :server_action
 
+  before_validation on: :create do
+    self.org = server_action.org
+  end
+
   def text_output
     ssh_commands.map(&:text_output).join
   end

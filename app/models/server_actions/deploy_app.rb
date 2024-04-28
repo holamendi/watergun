@@ -1,5 +1,7 @@
 module ServerActions
   class DeployApp < ServerAction
+    ACTION_CODE = "apps.deploy"
+
     alias_method :deployment, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

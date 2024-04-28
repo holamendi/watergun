@@ -1,5 +1,7 @@
 module ServerActions
   class CreateApp < ServerAction
+    ACTION_CODE = "apps.create"
+
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

@@ -16,8 +16,9 @@ class Service < ApplicationRecord
 
   enum status: {
     pending: "pending",
-    created: "created"
-  }, _default: "pending"
+    created: "created",
+    destroyed: "destroyed"
+  }, _default: "pending", _prefix: true
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 

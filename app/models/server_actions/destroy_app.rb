@@ -1,5 +1,7 @@
 module ServerActions
   class DestroyApp < ServerAction
+    ACTION_CODE = "apps.destroy"
+
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string
@@ -13,7 +15,8 @@ module ServerActions
     private
 
     def perform
-      Dokku::Apps::Destroy.call(ssh, app: dokku_app_id)
+      result = Dokku::Apps::Destroy.call(ssh, app: dokku_app_id)
+      app.service_links.update_all(status: :unlinked, discarded_at: Time.current) if result.success?
     end
   end
 end

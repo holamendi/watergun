@@ -1,5 +1,7 @@
 module ServerActions
   class RestartApp < ServerAction
+    ACTION_CODE = "apps.restart"
+
     alias_method :app, :actionable
 
     store_attribute :payload, :dokku_app_id, :string

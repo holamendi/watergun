@@ -7,8 +7,17 @@ class ServiceLink < ApplicationRecord
 
   enum status: {
     pending: "pending",
-    linked: "linked"
+    linked: "linked",
+    unlinked: "unlinked"
   }, _default: "pending"
 
   validates :app, uniqueness: {scope: :service, conditions: -> { undiscarded }}
+
+  def linked!(at = Time.current)
+    update!(status: :linked, linked_at: at)
+  end
+
+  def unlinked!(at = Time.current)
+    update!(status: :unlinked, unlinked_at: at)
+  end
 end

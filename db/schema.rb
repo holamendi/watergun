@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_27_104241) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_28_084633) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -193,6 +193,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_27_104241) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
+    t.datetime "linked_at"
+    t.datetime "unlinked_at"
     t.index ["app_id"], name: "index_service_links_on_app_id"
     t.index ["discarded_at"], name: "index_service_links_on_discarded_at"
     t.index ["org_id"], name: "index_service_links_on_org_id"
