@@ -94,6 +94,8 @@ GEM
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
     alba (3.1.0)
+    anyway_config (2.6.3)
+      ruby-next-core (~> 1.0)
     ast (2.4.2)
     base64 (0.2.0)
     bcrypt (3.1.20)
@@ -124,6 +126,7 @@ GEM
     dotenv (3.1.0)
     drb (2.2.1)
     dry-cli (1.0.0)
+    dry-initializer (3.1.1)
     erubi (1.12.0)
     et-orbi (1.2.11)
       tzinfo
@@ -307,6 +310,7 @@ GEM
     ruby-lsp-rails (0.3.5)
       ruby-lsp (>= 0.16.0, < 0.17.0)
       sorbet-runtime (>= 0.5.9897)
+    ruby-next-core (1.0.3)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
@@ -378,6 +382,13 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yabeda (0.12.0)
+      anyway_config (>= 1.0, < 3)
+      concurrent-ruby
+      dry-initializer
+    yabeda-honeybadger_insights (0.1.0)
+      honeybadger (>= 5.5)
+      yabeda (~> 0.12)
     zeitwerk (2.6.13)
 
 PLATFORMS
@@ -423,6 +434,7 @@ DEPENDENCIES
   tzinfo-data
   vite_rails
   web-console
+  yabeda-honeybadger_insights
 
 RUBY VERSION
    ruby 3.3.1p55
