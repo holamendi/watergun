@@ -16,14 +16,14 @@
         <tr>
           <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
           <td >
-            <% if app.last_deployment.present? %>
-              <div class="tooltip" data-tip="<%= app.last_deployment.finished_at.to_s %>">
-                <%= time_ago_in_words(app.last_deployment.finished_at) %> ago
+            <% if app.deployment.present? %>
+              <div class="tooltip" data-tip="<%= app.deployment.finished_at.to_s %>">
+                <%= time_ago_in_words(app.deployment.finished_at) %> ago
               </div>
             <% end %>
           </td>
           <td>
-            <%= app.last_deployment.sha.first(7) %>
+            <%= app.deployment.sha.first(7) %>
           </td>
           <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
         </tr>

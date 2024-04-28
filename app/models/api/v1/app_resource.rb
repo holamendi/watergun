@@ -10,7 +10,7 @@ module Api
         :updated_at
 
       one :github_repo, resource: GithubRepoResource
-      one :last_deployment, resource: DeploymentResource
+      one :deployment, resource: DeploymentResource
     end
   end
 end

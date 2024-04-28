@@ -8,7 +8,6 @@ module Apps
       @github_repo = @app.build_github_repo(create_github_repo_params)
 
       if @github_repo.save
-        ServerActions::SyncGitRepo.perform_later!(@app)
         redirect_to @app, notice: "App source created successfully."
       else
         flash.now[:alert] = @github_repo.errors.full_messages.to_sentence
@@ -24,7 +23,6 @@ module Apps
       @github_repo = @app.github_repo
 
       if @github_repo.update(update_github_repo_params)
-        ServerActions::SyncDokkuGitRepo.perform_later!(@github_repo) if @github_repo.saved_change_to_branch?
         redirect_to @app, notice: "App source updated successfully."
       else
         flash.now[:alert] = @github_repo.errors.full_messages.to_sentence
