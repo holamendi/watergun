@@ -15,7 +15,7 @@ class Deployment < ApplicationRecord
 
   enum source: {
     web: "web",
-    api: "api"
+    api_v1: "api_v1"
   }
 
   scope :kept, -> { joins(:app).merge(App.kept) }
