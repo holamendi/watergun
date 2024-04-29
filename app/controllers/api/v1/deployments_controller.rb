@@ -21,7 +21,7 @@ module Api
       end
 
       def create
-        deployment = @app.deployments.kept.new(source: "api")
+        deployment = @app.deployments.kept.new(source: "api_v1")
 
         commit = if params[:sha].present?
           @github_repo.remote_commit(params[:sha])
