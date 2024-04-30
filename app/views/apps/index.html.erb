@@ -15,7 +15,7 @@
       <% @apps.each do |app| %>
         <tr>
           <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
-          <td >
+          <td>
             <% if app.deployment.present? %>
               <div class="tooltip" data-tip="<%= app.deployment.finished_at.to_s %>">
                 <%= time_ago_in_words(app.deployment.finished_at) %> ago
@@ -23,7 +23,9 @@
             <% end %>
           </td>
           <td>
-            <%= app.deployment.sha.first(7) %>
+            <% if app.deployment.present? %>
+              <%= app.deployment.sha.first(7) %>
+            <% end %>
           </td>
           <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
         </tr>

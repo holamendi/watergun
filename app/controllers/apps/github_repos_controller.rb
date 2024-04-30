@@ -7,6 +7,15 @@ module Apps
     def create
       @github_repo = @app.build_github_repo(create_github_repo_params)
 
+      if params[:github_access_token].present?
+        @github_access_token = current_org.build_github_access_token(token: params[:github_access_token])
+
+        unless @github_access_token.save
+          flash.now[:alert] = @github_access_token.errors.full_messages.to_sentence
+          return render :new, status: :unprocessable_entity
+        end
+      end
+
       if @github_repo.save
         redirect_to @app, notice: "App source created successfully."
       else

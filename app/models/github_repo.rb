@@ -11,24 +11,32 @@ class GithubRepo < ApplicationRecord
   before_create { self.private = remote_repo.private? }
 
   def remote_repo
-    @remote_repo ||= Octokit.repo(repo)
+    oktokit_client.repo(repo)
   rescue Octokit::NotFound
     nil
   end
 
   def remote_branch
-    Octokit.branch(repo, branch)
+    oktokit_client.branch(repo, branch)
   rescue Octokit::NotFound
     nil
   end
 
   def remote_commit(sha)
-    Octokit.commit(repo, sha)
+    oktokit_client.commit(repo, sha)
   rescue Octokit::UnprocessableEntity
     nil
   end
 
   private
+
+  def oktokit_client
+    @oktokit_client ||= if org.github_access_token
+      Octokit::Client.new(access_token: org.github_access_token.token)
+    else
+      Octokit::Client.new
+    end
+  end
 
   def validate_repo_exists
     return if errors.where(:repo).any?

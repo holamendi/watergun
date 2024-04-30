@@ -26,6 +26,7 @@ module ServerActions
 
     def perform
       deployment.in_progress!
+      authenticate_github_account
 
       unless sync_git_repo.success?
         deployment.failure!
@@ -48,6 +49,16 @@ module ServerActions
 
     def rebuild_dokku_app
       Dokku::Ps::Rebuild.call(ssh, app: dokku_app_id)
+    end
+
+    def authenticate_github_account
+      return unless github_access_token
+
+      Dokku::Git::Auth.call(ssh, access_token: github_access_token.token)
+    end
+
+    def github_access_token
+      @github_access_token ||= deployment.org.github_access_token
     end
   end
 end
