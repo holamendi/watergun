@@ -1,17 +1,17 @@
   <%= form_with model: github_repo, url: app_github_repo_path(github_repo.app), class: "space-y-6" do |form| %>
-  <%= form.label :github_access_token, class: "form-control" do %>
-      <div class="label"><span class="label-text">Personal access token</span></div>
+  <% unless current_org.github_access_token.present? %>
+    <%= form.label :github_access_token, class: "form-control" do %>
+      <div class="label"><span class="label-text">Github access token</span></div>
       <%= text_field_tag :github_access_token, params[:github_access_token], class: "input input-bordered" %>
     <% end %>
-    <%= form.label :repository, class: "form-control" do %>
-      <div class="label"><span class="label-text">Repository</span></div>
-      <%= form.text_field :repo, class: "input input-bordered" %>
-    <% end %>
-    <%= form.label :branch, class: "form-control" do %>
-      <div class="label"><span class="label-text">Branch</span></div>
-      <%= form.text_field :branch, class: "input input-bordered" %>
-    <% end %>
-    <%= form.submit "Save", class: "btn btn-primary text-white" %>
   <% end %>
-
-
+  <%= form.label :repository, class: "form-control" do %>
+    <div class="label"><span class="label-text">Repository</span></div>
+    <%= form.text_field :repo, class: "input input-bordered" %>
+  <% end %>
+  <%= form.label :branch, class: "form-control" do %>
+    <div class="label"><span class="label-text">Branch</span></div>
+    <%= form.text_field :branch, class: "input input-bordered" %>
+  <% end %>
+  <%= form.submit "Save", class: "btn btn-primary text-white" %>
+<% end %>
