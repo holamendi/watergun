@@ -19,5 +19,5 @@ production:
           schedule: every 30 seconds
   workers:
     - queues: "*"
-      threads: 3
+      threads: 5
       polling_interval: 0.1
