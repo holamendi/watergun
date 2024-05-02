@@ -31,7 +31,7 @@ class AppsController < ApplicationController
     if @app.update(app_params)
       redirect_to edit_app_path(@app), notice: "App updated successfully."
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 

@@ -38,6 +38,9 @@ module Watergun
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
     config.mission_control.jobs.base_controller_class = "ApplicationController"
+    config.solid_queue.connects_to = {database: {writing: :solid_queue, reading: :solid_queue}}
+    # config.solid_queue.logger = Rails.application.logger
   end
 end

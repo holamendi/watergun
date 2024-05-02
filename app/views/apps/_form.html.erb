@@ -1,7 +1,8 @@
 <%= form_with model: @app, class: "space-y-6" do |form| %>
   <%= form.label :name, class: "form-control" do %>
     <div class="label"><span class="label-text">Name</span></div>
-    <%= form.text_field :name, class: "input input-bordered" %>
+    <%= form.text_field :name, class: "input input-bordered w-1/2" %>
+    <%= error_messages_for(form.object, :name) %>
   <% end %>
   <%= form.submit "Save", class: "btn btn-primary" %>
 <% end %>

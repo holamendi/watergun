@@ -3,11 +3,11 @@
     <%= form_with(scope: :session, url: sessions_path, class: "space-y-4") do |form| %>
       <%= form.label :email, class: "form-control" do %>
         <div class="label"><span class="label-text">Email</span></div>
-        <%= form.text_field :email, class: "input input-bordered" %>
+        <%= form.email_field :email, class: "input input-bordered", value: params.dig(:session, :email), required: true %>
       <% end %>
       <%= form.label :password, class: "form-control" do %>
         <div class="label"><span class="label-text">Password</span></div>
-        <%= form.password_field :password, class: "input input-bordered" %>
+        <%= form.password_field :password, class: "input input-bordered", required: true %>
       <% end %>
       <div class="pt-2">
         <%= form.submit "Sign in", class: "btn btn-primary w-full no-animation" %>
