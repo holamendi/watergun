@@ -17,12 +17,19 @@ module ServerActions
     private
 
     def perform
-      result = dokku_command_class.call(ssh, service: dokku_service_id)
-      service.status_created! if result.success?
+      result = dokku_service_create_command_class.call(ssh, service: dokku_service_id)
+      return unless result.success?
+
+      service.data = dokku_service_info_command_class.call(ssh, service: dokku_service_id).parse
+      service.status_created!
     end
 
-    def dokku_command_class
+    def dokku_service_create_command_class
       "Dokku::#{service_type.camelcase}::Create".constantize
+    end
+
+    def dokku_service_info_command_class
+      "Dokku::#{service_type.camelcase}::Info".constantize
     end
   end
 end

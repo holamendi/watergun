@@ -41,6 +41,10 @@ module Ssh
       commands.all?(&:success?)
     end
 
+    def text_output
+      commands.map(&:output).join("\n")
+    end
+
     private
 
     def ssh_private_key
