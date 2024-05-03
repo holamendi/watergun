@@ -37,6 +37,7 @@ module ServerActions
 
       if result.success?
         deployment.success!
+        update_app_urls!
       else
         deployment.failure!
         fail!("failed to rebuild dokku app")
@@ -49,6 +50,11 @@ module ServerActions
 
     def rebuild_dokku_app
       Dokku::Ps::Rebuild.call(ssh, app: dokku_app_id)
+    end
+
+    def update_app_urls!
+      urls = Dokku::Urls.call(ssh, app: dokku_app_id).parse
+      app.update!(urls:) if urls.present?
     end
 
     def authenticate_github_account

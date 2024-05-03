@@ -2,13 +2,13 @@
   <div class="flex justify-between mb-10">
     <div>
       <h1 class="text-3xl font-extrabold"><%= app.name %>
-        <% if app.reload_current_server_action.present? %>
+        <% if app.current_server_action.present? %>
           <span class="font-normal badge badge-accent badge-lg" data-turbo-temporary>
             <%= app.current_server_action.type.split(".").last %> <span class="ml-4 loading loading-spinner loading-xs" data-turbo-temporary></span>
           </span>
         <% end %>
       </h1>
-      <% if app.last_deployed_at.present? && app.url.present? %>
+      <% if app.urls.present? %>
         <%= link_to app.url, app.url, class: "link text-neutral text-sm", target: :blank %>
       <% end %>
     </div>

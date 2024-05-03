@@ -2,7 +2,13 @@ module Dokku
   class Base
     attr_reader :ssh_session, :result
 
-    delegate :success?, :failure?, :duration, :started_at, :finished_at, :output, to: :result
+    delegate :success?,
+      :failure?,
+      :duration,
+      :started_at,
+      :finished_at,
+      :output,
+      :text_output, to: :result
 
     def self.call(ssh_session, **)
       new(ssh_session, **).call
