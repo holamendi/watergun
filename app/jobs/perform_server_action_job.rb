@@ -4,7 +4,6 @@ class PerformServerActionJob < ApplicationJob
   def perform(server_action)
     return unless server_action.queued?
 
-    server_action.update_columns(job_id:)
     server_action.perform_action
   end
 end

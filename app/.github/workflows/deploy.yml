@@ -1,0 +1,15 @@
+name: Deploy to Watergun
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  curl_post_request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send POST request
+      run: |
+        curl -X POST https://helsinki.watergun.dev/api/v1/apps/9/deployments -H "Authorization: Bearer ${{ secrets.WATERGUN_API_KEY }}"
