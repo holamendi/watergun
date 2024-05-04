@@ -21,7 +21,7 @@ class AppsController < ApplicationController
   end
 
   def show
-    @recent_server_actions = @app.related_server_actions.order(created_at: :desc).limit(10)
+    @deployments = @app.deployments.kept.order(created_at: :desc)
   end
 
   def edit

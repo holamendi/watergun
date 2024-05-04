@@ -7,14 +7,39 @@
   <table class="table">
     <thead>
       <tr>
-        <th>Action</th>
+        <th>sha</th>
         <th>finished</th>
+        <th>duration</th>
         <th>Status</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-
+      <% @deployments.each do |deployment| %>
+        <tr>
+          <td><%= deployment.short_sha %></td>
+          <td>
+            <% if deployment.finished? %>
+              <div class="tooltip" data-tip="<%= deployment.finished_at.to_s %>">
+                <%= time_ago_in_words(deployment.finished_at) %> ago
+              </div>
+            <% end %>
+          </td>
+          <td>
+            <% if deployment.finished?%>
+              <%= deployment.duration.round %> seconds
+            <% end %>
+          </td>
+          <td>
+            <span class="badge <%= status_badge_class(deployment.status) %>"><%= deployment.status %></span>
+          </td>
+          <td>
+            <% if deployment.finished? %>
+              <%= link_to "logs", logs_app_deployment_path(@app, deployment), class: "link", target: :_blank %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 <% else %>

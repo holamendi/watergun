@@ -21,6 +21,11 @@ module Apps
       end
     end
 
+    def logs
+      @deployment = @app.deployments.kept.finished.find(params[:id])
+      render plain: @deployment.server_action.log.text_output
+    end
+
     private
 
     def github_repo

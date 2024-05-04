@@ -24,7 +24,7 @@
           </td>
           <td>
             <% if app.deployment.present? %>
-              <%= app.deployment.sha.first(7) %>
+              <%= app.deployment.short_sha %>
             <% end %>
           </td>
           <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>

@@ -2,16 +2,16 @@
 <%= render "apps/header", app: @app %>
 <div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
   <div class="stat">
-    <div class="stat-title">Running Processes</div>
+    <div class="stat-title">Running Containers</div>
     <div class="stat-value"><%= @running_containers.count %></div>
   </div>
   <div class="stat">
     <div class="stat-title">CPU Usage</div>
-    <div class="stat-value"><%= @running_containers.sum(:cpu_percentage) %>%</div>
+    <div class="stat-value"><%= @running_containers.sum(:cpu_percentage).round(2) %>%</div>
   </div>
   <div class="stat">
     <div class="stat-title">RAM Usage</div>
-    <div class="stat-value"><%= @running_containers.sum(:memory_percentage) %>%</div>
+    <div class="stat-value"><%= @running_containers.sum(:memory_percentage).round(2) %>%</div>
   </div>
 </div>
 

@@ -19,11 +19,24 @@ class Deployment < ApplicationRecord
   }
 
   scope :kept, -> { joins(:app).merge(App.kept) }
+  scope :finished, -> { where.not(finished_at: nil) }
 
   delegate :github_repo, to: :app
 
   before_validation on: :create do
     self.repo ||= github_repo.repo
+  end
+
+  def server_action
+    server_actions.last
+  end
+
+  def short_sha
+    sha&.first(7)
+  end
+
+  def finished?
+    finished_at.present?
   end
 
   def in_progress!(at = Time.current)
@@ -36,5 +49,11 @@ class Deployment < ApplicationRecord
 
   def failure!(at = Time.current)
     update!(status: :failure, finished_at: at)
+  end
+
+  def duration
+    return unless started_at && finished_at
+
+    finished_at - started_at
   end
 end

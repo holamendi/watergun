@@ -14,7 +14,7 @@
     </div>
   </div>
   <div role="tablist" class="w-full mb-4 lg:w-2/3 tabs tabs-bordered tabs-md">
-    <%= link_to "Overview", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
+    <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
     <%= link_to "Services", app_services_path(app), class: class_names("tab", "tab-active" => (controller_name == "services")), role: "tab" %>
     <%= link_to "Metrics", app_metrics_path(app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
     <%= link_to "Environment", edit_app_env_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>
