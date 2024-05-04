@@ -4,7 +4,7 @@ class GithubRepo < ApplicationRecord
   belongs_to :app, inverse_of: :github_repo
 
   validates :repo, :branch, presence: true
-  validates :repo, format: {with: %r{\A[a-zA-Z0-9-]+/[a-zA-Z0-9-]+\z}}, allow_blank: true
+  # validates :repo, format: {with: %r{\A[a-zA-Z0-9-]+/[a-zA-Z0-9-]+\z}}, allow_blank: true
   validate :validate_repo_exists, on: :create
   validate :validate_branch_exists, if: :branch_changed?
 
