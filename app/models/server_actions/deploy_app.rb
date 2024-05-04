@@ -29,8 +29,7 @@ module ServerActions
       authenticate_github_account
 
       unless sync_git_repo.success?
-        deployment.failure!
-        fail!("failed to sync git repo")
+        deployment.failure! and return
       end
 
       result = rebuild_dokku_app
@@ -40,7 +39,6 @@ module ServerActions
         update_app_urls!
       else
         deployment.failure!
-        fail!("failed to rebuild dokku app")
       end
     end
 
