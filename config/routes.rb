@@ -28,6 +28,7 @@ Rails.application.routes.draw do
 
   resources :apps do
     scope module: :apps do
+      resource :command_runs, only: %i[new create show]
       resource :github_repo
       resources :deployments, only: :create do
         get :logs, on: :member

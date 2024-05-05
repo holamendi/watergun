@@ -6,12 +6,12 @@ class Deployment < ApplicationRecord
 
   belongs_to :app
 
-  enum status: {
-    queued: "queued",
-    in_progress: "in_progress",
-    success: "success",
-    failure: "failure"
-  }, _default: "queued"
+  enum status: enum_keys(
+    :queued,
+    :in_progress,
+    :success,
+    :failure
+  ), _default: :queued
 
   enum source: {
     web: "web",

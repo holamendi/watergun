@@ -5,11 +5,11 @@ class ServiceLink < ApplicationRecord
   belongs_to :app, touch: true
   belongs_to :service
 
-  enum status: {
-    pending: "pending",
-    linked: "linked",
-    unlinked: "unlinked"
-  }, _default: "pending"
+  enum status: enum_keys(
+    :pending,
+    :linked,
+    :unlinked
+  ), _default: :pending
 
   validates :app, uniqueness: {scope: :service, conditions: -> { undiscarded }}
 

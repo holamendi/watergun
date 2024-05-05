@@ -9,10 +9,10 @@ class Service < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :linked_apps, through: :service_links, source: :app
 
-  enum service_type: {
-    postgres: "postgres",
-    redis: "redis"
-  }
+  enum service_type: enum_keys(
+    :postgres,
+    :redis
+  )
 
   enum status: {
     pending: "pending",

@@ -5,8 +5,8 @@ class Container < ApplicationRecord
   belongs_to :containerizable, polymorphic: true
   has_many :container_metrics, dependent: :delete_all
 
-  enum status: {
-    running: "running",
-    stopped: "stopped"
-  }, _default: "running"
+  enum status: enum_keys(
+    :running,
+    :stopped
+  )
 end

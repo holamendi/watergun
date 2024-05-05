@@ -7,9 +7,9 @@ class Server < ApplicationRecord
     "nixpacks" => "Nixpacks"
   }
 
-  enum status: {
-    active: "active"
-  }, _prefix: true, _default: "active"
+  enum :status, enum_keys(
+    :active
+  ), _default: :active
 
   has_one :ssh_key, dependent: :destroy
 
