@@ -5,6 +5,6 @@ module ApplicationHelper
       running: "badge-primary",
       success: "badge-success",
       failure: "badge-error"
-    }[status.to_sym] || "badge-default"
+    }[status&.to_sym] || "badge-default"
   end
 end

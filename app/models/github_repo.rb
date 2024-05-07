@@ -12,7 +12,7 @@ class GithubRepo < ApplicationRecord
 
   def remote_repo
     oktokit_client.repo(repo)
-  rescue Octokit::NotFound
+  rescue Octokit::NotFound, Octokit::InvalidRepository
     nil
   end
 
