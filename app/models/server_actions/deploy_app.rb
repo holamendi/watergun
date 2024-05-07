@@ -37,6 +37,7 @@ module ServerActions
       if result.success?
         deployment.success!
         update_app_urls!
+        schedule_enable_ssl!
       else
         deployment.failure!
       end
@@ -63,6 +64,12 @@ module ServerActions
 
     def github_access_token
       @github_access_token ||= deployment.org.github_access_token
+    end
+
+    def schedule_enable_ssl!
+      return if app.https_urls.any?
+
+      ServerActions::EnableAppSsl.perform_later!(app)
     end
   end
 end

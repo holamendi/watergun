@@ -4,6 +4,9 @@ class PerformServerActionJob < ApplicationJob
   def perform(server_action)
     return unless server_action.queued?
 
+    Current.org = server_action.org
+    Current.server = server_action.server
+
     server_action.perform_action
   end
 end
