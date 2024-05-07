@@ -8,5 +8,5 @@ class Container < ApplicationRecord
   enum status: enum_keys(
     :running,
     :stopped
-  )
+  ), _default: :running
 end
