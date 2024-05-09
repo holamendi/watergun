@@ -1,5 +1,5 @@
 <%= turbo_stream_from current_org, :server_actions %>
-<div class="overflow-x-auto rounded-lg">
+<div class="overflow-x-auto">
   <table class="table table-xs">
     <thead>
       <tr>
@@ -7,9 +7,10 @@
         <th>code</th>
         <th>actionable</th>
         <th>payload</th>
-        <th>status</th>
         <th>finished_at</th>
         <th>duration</th>
+        <th>status</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -18,10 +19,19 @@
           <td><%= action.id %></td>
           <td><%= action.class::ACTION_CODE %></td>
           <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
-          <td><pre><%= JSON.pretty_generate(action.payload) %></pre></td>
-          <td><span class="badge <%= status_badge_class(action.status) %>"><%= action.status %></span></td>
-          <td><%= action.finished_at %></td>
+          <td class="overflow-scroll overflow-ellipsis max-w-48 whitespace-nowrap">
+            <span>
+            <%= action.payload.map{|k,v| "#{k}: #{v}"}.join("<br>").html_safe %>
+            </span>
+          </td>
+          <td><%= action.finished_at.to_s %></td>
           <td><% if action.finished? %><%= action.duration.round(1) %><% end %></td>
+          <td><span class="badge <%= status_badge_class(action.status) %> badge-xs text-white"><%= action.status %></span></td>
+          <td>
+            <% if action.log.present? %>
+              <%= link_to "logs", logs_server_action_path(action), class: "link", target: :_blank %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
