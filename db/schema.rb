@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_03_181116) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_05_094702) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -37,6 +37,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_03_181116) do
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
+  end
+
+  create_table "command_runs", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "command"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_command_runs_on_app_id"
+    t.index ["org_id"], name: "index_command_runs_on_org_id"
   end
 
   create_table "container_metrics", force: :cascade do |t|
@@ -260,6 +270,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_03_181116) do
   add_foreign_key "api_tokens", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "servers"
+  add_foreign_key "command_runs", "apps"
+  add_foreign_key "command_runs", "orgs"
   add_foreign_key "container_metrics", "containers"
   add_foreign_key "container_metrics", "orgs"
   add_foreign_key "containers", "orgs"
