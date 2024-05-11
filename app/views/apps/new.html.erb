@@ -1,4 +1,8 @@
-<div class="flex justify-between mb-6">
-  <h1 class="text-3xl font-extrabold">New App</h1>
+<div class="flex justify-center w-full">
+  <div class="w-full p-4 bg-white rounded-md md:w-1/3">
+    <div class="flex justify-between">
+      <h1 class="text-xl">New App</h1>
+    </div>
+    <%= render "form", app: @app %>
+  </div>
 </div>
-<%= render "form", app: @app %>

@@ -1,10 +1,11 @@
 class Service < ApplicationRecord
-  include ServerActionable
-  include BelongsToOrg
-  include BelongsToServer
   include Containerizable
   include Discard::Model
   include DokkuEntity
+  include ServerActionable
+
+  belongs_to :org, default: -> { Current.org }
+  belongs_to :server, default: -> { Current.server }
 
   has_many :service_links, dependent: :destroy
   has_many :linked_apps, through: :service_links, source: :app
@@ -14,11 +15,11 @@ class Service < ApplicationRecord
     :redis
   )
 
-  enum status: {
-    pending: "pending",
-    created: "created",
-    destroyed: "destroyed"
-  }, _default: "pending", _prefix: true
+  enum status: enum_keys(
+    :pending,
+    :created,
+    :destroyed
+  ), _default: :pending, _prefix: true
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 

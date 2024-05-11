@@ -4,7 +4,7 @@
   <div class="flex py-2">
     <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.current_server_action.present?  %>
   </div>
-  <table class="table">
+  <table class="table table-xs">
     <thead>
       <tr>
         <th>sha</th>

@@ -1,5 +1,6 @@
 <%= turbo_stream_from current_org, :server_actions %>
-<div class="overflow-x-auto">
+
+<div class="p-4 overflow-x-auto bg-white rounded-md">
   <table class="table table-xs">
     <thead>
       <tr>
@@ -24,9 +25,15 @@
             <%= action.payload.map{|k,v| "#{k}: #{v}"}.join("<br>").html_safe %>
             </span>
           </td>
-          <td><%= action.finished_at.to_s %></td>
-          <td><% if action.finished? %><%= action.duration.round(1) %><% end %></td>
-          <td><span class="badge <%= status_badge_class(action.status) %> badge-xs text-white"><%= action.status %></span></td>
+          <td>
+            <% if action.finished? %>
+              <div class="tooltip" data-tip="<%= action.finished_at.to_s %>">
+                <%= time_ago_in_words(action.finished_at) %> ago
+              </div>
+            <% end %>
+          </td>
+          <td><% if action.finished? %><%= action.duration.round(1) %>s<% end %></td>
+          <td><span class="badge <%= status_badge_class(action.status) %> badge-sm text-white"><%= action.status %></span></td>
           <td>
             <% if action.log.present? %>
               <%= link_to "logs", logs_server_action_path(action), class: "link", target: :_blank %>

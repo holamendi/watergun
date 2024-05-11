@@ -1,36 +1,26 @@
-<div class="navbar bg-base-100">
+<div class="px-4 py-0 min-h-11 navbar bg-base-200">
   <div class="navbar-start">
-    <div class="dropdown">
-      <label tabindex="0" class="btn btn-ghost lg:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="bg" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-      </label>
-      <% if false %>
-        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-          <li><%= link_to "Apps", apps_path %></li>
-          <li><%= link_to "Services", services_path %></li>
-        </ul>
-      <% end %>
-    </div>
-    <div class="h-6 px-4 ">
+    <div class="h-4">
       <%= link_to root_path do %>
         <svg class="w-full h-full fill-base-content" viewBox="132.84 235.85 667.16 328.29" width="667.16" height="328.29" xmlns="http://www.w3.org/2000/svg">
           <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
         </svg>
       <% end %>
     </div>
-
+    <% if @app&.persisted? %>
+      <div class="text-sm">
+        <span class="pl-2 select-none">/</span>
+        <span><%= @app.name %></span>
+      </div>
+    <% end %>
   </div>
   <div class="navbar-end">
-    <ul class="menu menu-horizontal">
-      <li tabindex="0">
-        <details>
-          <summary><%= current_user.email %></summary>
-          <ul class="p-2">
-            <li><%= link_to "Settings", org_settings_path %></li>
-            <li><%= link_to "Log out", logout_path, data: { turbo_method: :delete } %></li>
-          </ul>
-        </details>
-      </li>
-    </ul>
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="font-normal btn btn-sm btn-ghost"><%= current_user.email %></div>
+      <ul tabindex="0" class="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52 mt-4">
+        <li><a>Item 1</a></li>
+        <li><a>Item 2</a></li>
+      </ul>
+    </div>
   </div>
 </div>

@@ -1,35 +1,19 @@
-<div class="flex justify-between mb-6">
-  <h1 class="text-3xl font-extrabold">Apps</h1>
-  <%= link_to "New App", new_app_path, class: "btn btn-primary", data: { turbo_frame: "modal_frame" } %>
+<div class="w-full">
+  <div class="flex justify-end">
+    <%= link_to "New App", new_app_path, class: "btn btn-neutral btn-sm rounded-md font-normal text-sm" %>
+  </div>
 </div>
-<div class="overflow-x-auto rounded-lg">
-  <table class="table">
-    <thead>
-      <tr class="pl-0 uppercase">
-        <th>Name</th>
-        <th>Last deploy</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @apps.each do |app| %>
-        <tr>
-          <td class="py-6"><%= link_to app.name, app, class: "link" %></td>
-          <td>
-            <% if app.deployment.present? %>
-              <div class="tooltip" data-tip="<%= app.deployment.finished_at.to_s %>">
-                <%= time_ago_in_words(app.deployment.finished_at) %> ago
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <% if app.deployment.present? %>
-              <%= app.deployment.short_sha %>
-            <% end %>
-          </td>
-          <td class="text-right"><%= link_to "Delete", app, class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+  <% @apps.each do |app| %>
+    <%= link_to app do %>
+      <div class="flex h-full rounded-md shadow-lg hover:shadow-xl card bg-base-100">
+        <div class="flex-grow card-body">
+          <h2 class="text-lg font-bold card-title"><%= app.name %></h2>
+          <% if app.github_repo.present? %>
+            <span class="text-xs text-neutral-500"><%= app.github_repo.repo %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 </div>

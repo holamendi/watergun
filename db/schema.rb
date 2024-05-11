@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_05_094702) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_11_075243) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -150,6 +150,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_05_094702) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "projects", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "name"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_projects_on_discarded_at"
+    t.index ["org_id"], name: "index_projects_on_org_id"
+    t.index ["server_id"], name: "index_projects_on_server_id"
+  end
+
   create_table "server_action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_action_id", null: false
@@ -284,6 +296,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_05_094702) do
   add_foreign_key "github_repos", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
+  add_foreign_key "projects", "orgs"
+  add_foreign_key "projects", "servers"
   add_foreign_key "server_action_logs", "orgs"
   add_foreign_key "server_action_logs", "server_actions"
   add_foreign_key "server_actions", "orgs"

@@ -11,6 +11,18 @@ GIT
       sqlite3
       tilt
 
+GIT
+  remote: https://github.com/rails/solid_queue.git
+  revision: d24a16132e7f112dd4b7d9322bffb7825469db7c
+  branch: reload-dev-fix
+  specs:
+    solid_queue (0.3.0)
+      activejob (>= 7.1)
+      activerecord (>= 7.1)
+      concurrent-ruby (~> 1.2.2)
+      fugit (~> 1.10.1)
+      railties (>= 7.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -136,7 +148,7 @@ GEM
       net-http
     faraday-retry (2.2.1)
       faraday (~> 2.0)
-    fugit (1.9.0)
+    fugit (1.10.1)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     globalid (1.2.1)
@@ -327,12 +339,6 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    solid_queue (0.3.0)
-      activejob (>= 7.1)
-      activerecord (>= 7.1)
-      concurrent-ruby (~> 1.2.2)
-      fugit (~> 1.9.0)
-      railties (>= 7.1)
     sorbet-runtime (0.5.11361)
     sqlite3 (1.7.3-aarch64-linux)
     sqlite3 (1.7.3-arm64-darwin)
@@ -431,7 +437,7 @@ DEPENDENCIES
   rails (~> 7.1.3.2)
   ruby-lsp-rails
   selenium-webdriver
-  solid_queue
+  solid_queue!
   sshkey
   standard
   store_attribute
