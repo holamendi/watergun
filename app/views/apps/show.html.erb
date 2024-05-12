@@ -1,47 +1,49 @@
 <%= turbo_stream_from @app %>
-<%= render "header", app: @app %>
-<% if @app.github_repo.present? %>
-  <div class="flex py-2">
-    <%= button_to "Deploy", app_deployments_path(@app), class:"btn btn-primary", disabled: @app.current_server_action.present?  %>
-  </div>
-  <table class="table table-xs">
-    <thead>
-      <tr>
-        <th>sha</th>
-        <th>finished</th>
-        <th>duration</th>
-        <th>Status</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @deployments.each do |deployment| %>
-        <tr>
-          <td><%= deployment.short_sha %></td>
-          <td>
-            <% if deployment.finished? %>
-              <div class="tooltip" data-tip="<%= deployment.finished_at.to_s %>">
-                <%= time_ago_in_words(deployment.finished_at) %> ago
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <% if deployment.finished?%>
-              <%= deployment.duration.round %> seconds
-            <% end %>
-          </td>
-          <td>
-            <span class="badge <%= status_badge_class(deployment.status) %>"><%= deployment.status %></span>
-          </td>
-          <td>
-            <% if deployment.finished? %>
-              <%= link_to "logs", logs_app_deployment_path(@app, deployment), class: "link", target: :_blank %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <%= link_to "Add a Deploy source", new_app_github_repo_path(@app), class: "btn btn-primary text-white" %>
+<% content_for :breadcrumb do %>
+  <span class="pl-2 select-none">/</span>
+  <span><%= @app.name %></span>
 <% end %>
+<%= render "header", app: @app %>
+<%= render "tabs", app: @app %>
+  <% if @app.github_repo.present? %>
+    <table class="table pt-4">
+      <thead>
+        <tr>
+          <th>sha</th>
+          <th>finished</th>
+          <th>duration</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @deployments.each do |deployment| %>
+          <tr>
+            <td><%= deployment.short_sha %></td>
+            <td>
+              <% if deployment.finished? %>
+                <div class="tooltip" data-tip="<%= deployment.finished_at.to_s %>">
+                  <%= time_ago_in_words(deployment.finished_at) %> ago
+                </div>
+              <% end %>
+            </td>
+            <td>
+              <% if deployment.finished?%>
+                <%= deployment.duration.round %> seconds
+              <% end %>
+            </td>
+            <td>
+              <span class="badge <%= status_badge_class(deployment.status) %>"><%= deployment.status %></span>
+            </td>
+            <td>
+              <% if deployment.finished? %>
+                <%= link_to "logs", logs_app_deployment_path(@app, deployment), class: "link", target: :_blank %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <%= link_to "Add a Deploy source", new_app_github_repo_path(@app), class: "btn btn-primary" %>
+  <% end %>

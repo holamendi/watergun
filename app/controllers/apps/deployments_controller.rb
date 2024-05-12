@@ -12,7 +12,8 @@ module Apps
       if commit.present?
         deployment.sha = commit.sha
         deployment.save!
-        ServerActions::DeployApp.perform_later!(deployment)
+        deploy_action = ServerActions::DeployApp.perform_later!(deployment)
+        ServerActions::EnableAppSsl.perform_later!(@app, depends_on: deploy_action)
         flash[:notice] = "Deployment scheduled"
         redirect_to @app
       else

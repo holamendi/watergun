@@ -1,10 +1,7 @@
-<div class="flex">
-  <div role="tablist" class="w-3xl tabs tabs-lifted tabs-md">
-    <%= link_to "overview", app_path(@app), class: class_names("tab", "tab-active" => action_name  == "show"), role: "tab" %>
-    <a role="tab" class="tab">metrics</a>
-    <a role="tab" class="tab">logs</a>
-    <%= link_to "settings", edit_app_path(@app), class: class_names("tab", "tab-active" => action_name.in?(%w[edit update])), role: "tab" %>
-  </div>
-  <div class="w-full border-b border-base-300">
-  </div>
+<div role="tablist" class="w-full pb-4 overflow-scroll lg:w-1/2 tabs tabs-bordered">
+  <%= link_to "Deployments", app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
+  <%= link_to "Services", app_services_path(app), class: class_names("tab", "tab-active" => (controller_name == "services")), role: "tab" %>
+  <%= link_to "Metrics", app_metrics_path(app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
+  <%= link_to "Environment", edit_app_env_configuration_path(app), class: class_names("tab", "tab-active" => (controller_name == "environment_configurations")), role: "tab" %>
+  <%= link_to "Settings", edit_app_path(app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" %>
 </div>

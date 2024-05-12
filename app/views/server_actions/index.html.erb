@@ -1,6 +1,6 @@
 <%= turbo_stream_from current_org, :server_actions %>
 
-<div class="p-4 overflow-x-auto bg-white rounded-md">
+<div class="p-4 overflow-x-auto rounded-md bg-base-100">
   <table class="table table-xs">
     <thead>
       <tr>
@@ -33,7 +33,7 @@
             <% end %>
           </td>
           <td><% if action.finished? %><%= action.duration.round(1) %>s<% end %></td>
-          <td><span class="badge <%= status_badge_class(action.status) %> badge-sm text-white"><%= action.status %></span></td>
+          <td><span class="badge <%= status_badge_class(action.status) %> badge-sm"><%= action.status %></span></td>
           <td>
             <% if action.log.present? %>
               <%= link_to "logs", logs_server_action_path(action), class: "link", target: :_blank %>

@@ -37,7 +37,6 @@ module ServerActions
       if result.success?
         deployment.success!
         update_app_urls!
-        schedule_enable_ssl!
       else
         deployment.failure!
       end

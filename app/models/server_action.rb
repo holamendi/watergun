@@ -6,6 +6,7 @@ class ServerAction < ApplicationRecord
   alias_method :ssh, :ssh_session
 
   belongs_to :actionable, polymorphic: true, optional: true
+  belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
@@ -13,7 +14,8 @@ class ServerAction < ApplicationRecord
     :queued,
     :running,
     :success,
-    :failure
+    :failure,
+    :cancelled
   ), _default: :queued
 
   attribute :source, :string, default: "web"
@@ -22,8 +24,10 @@ class ServerAction < ApplicationRecord
 
   after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
 
-  def self.perform_later!(actionable, **)
-    create!(actionable:, **).perform_later
+  def self.perform_later!(actionable, depends_on: nil, **)
+    action = create!(actionable:, preceding_action: depends_on, **)
+    action.perform_later
+    action
   end
 
   def perform_later

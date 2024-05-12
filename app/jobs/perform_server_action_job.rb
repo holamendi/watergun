@@ -4,6 +4,10 @@ class PerformServerActionJob < ApplicationJob
   def perform(server_action)
     return unless server_action.queued?
 
+    if server_action.preceding_action&.failure?
+      return server_action.cancelled!
+    end
+
     Current.org = server_action.org
     Current.server = server_action.server
 
