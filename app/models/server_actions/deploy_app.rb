@@ -26,6 +26,7 @@ module ServerActions
 
     def perform
       deployment.in_progress!
+
       authenticate_github_account
 
       unless sync_git_repo.success?

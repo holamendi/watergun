@@ -4,7 +4,7 @@ class Deployment < ApplicationRecord
   include BelongsToOrg
   include ServerActionable
 
-  belongs_to :app
+  belongs_to :app, touch: true
 
   enum status: enum_keys(
     :queued,

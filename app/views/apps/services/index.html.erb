@@ -6,11 +6,8 @@
   <span>Services</span>
 <% end %>
 <%= render "apps/header", app: @app %>
-
-
-
-<div class="flex py-2">
-  <%= link_to "Attach Service", new_app_service_path(@app), class: "btn btn-primary float-right" %>
+<div class="flex justify-start w-full pb-6">
+  <%= link_to "Attach Service", new_app_service_path(@app), class: "btn link btn-ghost btn-sm rounded-md font-normal text-sm" %>
 </div>
 <table class="table">
   <thead>
@@ -27,11 +24,11 @@
         <td><%= service_link.service.name %></td>
         <td><%= service_link.service.service_type %></td>
         <td>
-           <% if service_link.pending? %>
-              <div class="badge badge-info">Provisioning</div>
-            <% elsif service_link.linked? %>
-              <div class="badge badge-success">Active</div>
-            <% end  %>
+          <% if service_link.pending? %>
+            <div class="badge badge-info">Provisioning</div>
+          <% elsif service_link.linked? %>
+            <div class="badge badge-success">Active</div>
+          <% end  %>
         </td>
         <td class="text-right"><%= link_to "Delete", app_service_path(@app, service_link.service), class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
       </tr>
