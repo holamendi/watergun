@@ -26,7 +26,7 @@ class Current < ActiveSupport::CurrentAttributes
 
   def api_token=(api_token)
     super
-    return unless api_tokenp
+    return unless api_token
 
     self.org = api_token.org
     self.server = org.servers.first
