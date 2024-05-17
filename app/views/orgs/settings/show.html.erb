@@ -1,4 +1,28 @@
-<h1 class="text-3xl font-extrabold">Account settings</h1>
-<div class="mt-10">
-  <%= render "orgs/github_access_tokens/form" %>
+<h1 class="pb-6 text-xl font-bold">Account settings</h1>
+
+<h2 class="pb-4 text-lg font-bold">API Tokens</h2>
+<div class="flex justify-start w-full pb-6">
+  <%= button_to "Create API Token", org_api_tokens_path, class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
 </div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Expiration</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @api_tokens.each do |api_token| %>
+      <tr>
+        <td><%= api_token.token %></td>
+        <td class="tooltip" data-tip="<%= api_token.expires_at.to_s %>">
+          In <%= distance_of_time_in_words_to_now(api_token.expires_at) %>
+        </td>
+        <td>
+          <%= button_to "Delete", org_api_token_path(api_token), method: :delete, class: "text-error", form: { data: { turbo_confirm: "Do you really…" } } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

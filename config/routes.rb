@@ -20,12 +20,6 @@ Rails.application.routes.draw do
   get "login" => "sessions#new", :as => :login
   delete "logout" => "sessions#destroy", :as => :logout
 
-  resources :sessions, only: %i[new create destroy]
-
-  resources :server_actions, only: :index do
-    get :logs, on: :member
-  end
-
   resources :apps do
     scope module: :apps do
       resource :command_runs, only: %i[new create show]
@@ -41,8 +35,15 @@ Rails.application.routes.draw do
 
   resource :org, only: :show do
     scope module: :orgs do
+      resources :api_tokens
       resource :settings, only: :show
       resource :github_access_token, only: :update
     end
+  end
+
+  resources :sessions, only: %i[new create destroy]
+
+  resources :server_actions, only: :index do
+    get :logs, on: :member
   end
 end
