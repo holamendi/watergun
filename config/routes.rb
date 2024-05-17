@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       end
 
       resources :deployments, only: %i[index show]
+      resource :ping, only: :show
     end
   end
 
