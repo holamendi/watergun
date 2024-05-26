@@ -1,15 +1,11 @@
 class Server < ApplicationRecord
-  include BelongsToOrg
-
   DOKKU_BUILDERS = {
     "herokuish" => "Heroku Buildpacks",
     "dockerfile" => "Dockerfile",
     "nixpacks" => "Nixpacks"
   }
 
-  enum :status, enum_keys(
-    :active
-  ), _default: :active
+  belongs_to :org, default: -> { Current.org }
 
   has_one :ssh_key, dependent: :destroy
 
@@ -17,6 +13,10 @@ class Server < ApplicationRecord
   has_many :containers, dependent: :destroy
   has_many :actions, class_name: "ServerAction", dependent: :destroy
   has_many :services, dependent: :destroy
+
+  enum :status, enum_keys(
+    :active
+  ), _default: :active
 
   after_create :create_ssh_key
 

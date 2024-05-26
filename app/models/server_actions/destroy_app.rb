@@ -12,8 +12,6 @@ module ServerActions
       self.dokku_app_id ||= app.dokku_id
     end
 
-    private
-
     def perform
       result = Dokku::Apps::Destroy.call(ssh, app: dokku_app_id)
       app.service_links.update_all(status: :unlinked, discarded_at: Time.current) if result.success?

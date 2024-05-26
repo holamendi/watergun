@@ -17,8 +17,6 @@ module ServerActions
       self.env ||= env_configuration.variables
     end
 
-    private
-
     def perform
       Dokku::Config::Set.call(ssh, app: dokku_app_id, env:)
     end

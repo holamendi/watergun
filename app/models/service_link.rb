@@ -1,7 +1,7 @@
 class ServiceLink < ApplicationRecord
-  include BelongsToOrg
   include Discard::Model
 
+  belongs_to :org, default: -> { Current.org }
   belongs_to :app, touch: true
   belongs_to :service
 

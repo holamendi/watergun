@@ -8,9 +8,12 @@
       <span class="block text-sm text-content link text-accent-content"><%= link_to app.url, app.url, target: :_blank %></span>
     <% end %>
   </div>
-  <div>
+  <div class="flex gap-x-2">
     <% if app.github_repo.present? && controller_name == "apps" && action_name == "show" %>
       <%= button_to "Deploy", app_deployments_path(@app), class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
+    <% end %>
+    <% if app.deployed? %>
+      <%= button_to "Restart", app_restarts_path(@app), class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
     <% end %>
   </div>
 </div>

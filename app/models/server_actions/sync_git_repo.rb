@@ -22,8 +22,6 @@ module ServerActions
       app
     end
 
-    private
-
     def perform
       Dokku::Git::Sync.call(ssh, app: dokku_app_id, repo:, branch:)
     end

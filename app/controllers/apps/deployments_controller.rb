@@ -1,5 +1,7 @@
 module Apps
-  class DeploymentsController < BaseController
+  class DeploymentsController < ApplicationController
+    before_action :set_app
+
     def create
       deployment = @app.deployments.new(source: "web")
 
@@ -12,8 +14,7 @@ module Apps
       if commit.present?
         deployment.sha = commit.sha
         deployment.save!
-        deploy_action = ServerActions::DeployApp.perform_later!(deployment)
-        ServerActions::EnableAppSsl.perform_later!(@app, depends_on: deploy_action)
+        ServerActions::DeployApp.perform_later!(deployment)
         flash[:notice] = "Deployment scheduled"
         redirect_to @app
       else
@@ -28,6 +29,10 @@ module Apps
     end
 
     private
+
+    def set_app
+      @app = current_server.apps.kept.find(params[:app_id])
+    end
 
     def github_repo
       @app.github_repo

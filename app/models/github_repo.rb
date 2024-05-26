@@ -1,5 +1,5 @@
 class GithubRepo < ApplicationRecord
-  include BelongsToOrg
+  belongs_to :org, default: -> { Current.org }
 
   belongs_to :app, inverse_of: :github_repo
 

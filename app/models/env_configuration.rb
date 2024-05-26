@@ -1,5 +1,5 @@
 class EnvConfiguration < ApplicationRecord
-  include BelongsToOrg
+  belongs_to :org, default: -> { Current.org }
 
   attr_writer :variables_as_string
 

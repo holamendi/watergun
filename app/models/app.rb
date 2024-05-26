@@ -19,6 +19,10 @@ class App < ApplicationRecord
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
   after_update_commit -> { broadcast_refresh_to(self) }
 
+  def deployed?
+    deployments.success.any?
+  end
+
   def ssl_enabled?
     https_urls.any?
   end

@@ -14,7 +14,6 @@ module Ssh
         @session = session
         yield(self)
       end
-
       @finished_at = Time.current
       @session = nil
       self
@@ -39,6 +38,10 @@ module Ssh
 
     def success?
       commands.all?(&:success?)
+    end
+
+    def status
+      success? ? :success : :failure
     end
 
     def text_output

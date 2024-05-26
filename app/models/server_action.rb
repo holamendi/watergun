@@ -1,10 +1,8 @@
 class ServerAction < ApplicationRecord
-  include BelongsToOrg
-  include BelongsToServer
+  include ServerActions::Performer
 
-  attr_accessor :ssh_session
-  alias_method :ssh, :ssh_session
-
+  belongs_to :org, default: -> { Current.org }
+  belongs_to :server, default: -> { Current.server }
   belongs_to :actionable, polymorphic: true, optional: true
   belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
 
@@ -24,49 +22,6 @@ class ServerAction < ApplicationRecord
 
   after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
 
-  def self.perform_later!(actionable, depends_on: nil, **)
-    action = create!(actionable:, preceding_action: depends_on, **)
-    action.perform_later
-    action
-  end
-
-  def perform_later
-    PerformServerActionJob.perform_later(self)
-  end
-
-  def fail!(message = nil)
-    raise(ServerActionFailure, message)
-  end
-
-  def perform_action
-    raise "server action must implement #perform" unless respond_to?(:perform, true)
-
-    self.running_at = Time.current
-    running!
-
-    result = server.ssh_session do |ssh_session|
-      with(ssh_session:) { perform }
-    end
-
-    create_log!(ssh_commands: result.commands)
-
-    self.status = if result.success?
-      :success
-    else
-      :failure
-    end
-  rescue ServerActionFailure => e
-    self.status = :failure
-    self.failure_message = e.message
-  rescue => e
-    self.status = :failure
-    self.failure_message = e.detailed_message
-    raise e if Rails.env.local?
-  ensure
-    self.finished_at = Time.current
-    save!
-  end
-
   def concurrency_key
     actionable
   end
@@ -80,6 +35,6 @@ class ServerAction < ApplicationRecord
 
     finished_at - running_at
   end
-
-  class ServerActionFailure < StandardError; end
 end
+
+class ServerActionFailure < StandardError; end

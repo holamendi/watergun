@@ -1,9 +1,8 @@
 class Deployment < ApplicationRecord
+  include ServerActionable
   has_paper_trail on: %i[create]
 
-  include BelongsToOrg
-  include ServerActionable
-
+  belongs_to :org, default: -> { Current.org }
   belongs_to :app, touch: true
 
   enum status: enum_keys(

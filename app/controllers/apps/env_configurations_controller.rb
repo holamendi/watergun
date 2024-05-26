@@ -1,6 +1,6 @@
 module Apps
-  class EnvConfigurationsController < BaseController
-    before_action :set_env_configuration
+  class EnvConfigurationsController < ApplicationController
+    before_action :set_app, :set_env_configuration
 
     def edit
     end
@@ -15,6 +15,10 @@ module Apps
     end
 
     private
+
+    def set_app
+      @app = current_server.apps.kept.find(params[:app_id])
+    end
 
     def set_env_configuration
       @env_configuration = @app.env_configuration

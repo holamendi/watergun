@@ -10,6 +10,8 @@ class Service < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :linked_apps, through: :service_links, source: :app
 
+  store_attribute :data, :version, :string
+
   enum service_type: enum_keys(
     :postgres,
     :redis

@@ -22,12 +22,12 @@ module ServerActions
       service
     end
 
-    private
-
     def perform
       result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
       service_link.unlinked! if result.success?
     end
+
+    private
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Unlink".constantize

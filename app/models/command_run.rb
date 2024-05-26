@@ -1,7 +1,7 @@
 class CommandRun < ApplicationRecord
   has_paper_trail on: %i[create]
 
-  include BelongsToOrg
+  belongs_to :org, default: -> { Current.org }
 
   validates :command, presence: true
 

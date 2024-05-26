@@ -14,12 +14,12 @@ module ServerActions
       self.dokku_service_id ||= service.dokku_id
     end
 
-    private
-
     def perform
       result = dokku_command_class.call(ssh, service: dokku_service_id)
       service.status_destroyed! if result.success?
     end
+
+    private
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Destroy".constantize

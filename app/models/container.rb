@@ -1,6 +1,6 @@
 class Container < ApplicationRecord
-  include BelongsToOrg
-  include BelongsToServer
+  belongs_to :org, default: -> { Current.org }
+  belongs_to :server, default: -> { Current.server }
 
   belongs_to :containerizable, polymorphic: true
   has_many :container_metrics, dependent: :delete_all

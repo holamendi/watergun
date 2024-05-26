@@ -12,14 +12,14 @@ module ServerActions
       self.dokku_app_id ||= app.dokku_id
     end
 
-    private
-
     def perform
       return if ssl_enabled?
 
       result = Dokku::Letsencrypt::Enable.call(ssh, app: dokku_app_id)
       update_app_urls! if result.success?
     end
+
+    private
 
     def update_app_urls!
       urls = Dokku::Urls.call(ssh, app: dokku_app_id).parse

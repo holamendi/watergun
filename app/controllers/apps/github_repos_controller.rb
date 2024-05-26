@@ -1,5 +1,7 @@
 module Apps
-  class GithubReposController < BaseController
+  class GithubReposController < ApplicationController
+    before_action :set_app
+
     def new
       @github_repo = @app.build_github_repo
     end
@@ -40,6 +42,10 @@ module Apps
     end
 
     private
+
+    def set_app
+      @app = current_server.apps.kept.find(params[:app_id])
+    end
 
     def create_github_repo_params
       params.require(:github_repo).permit(:repo, :branch)

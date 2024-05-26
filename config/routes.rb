@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       end
       resource :env_configuration, path: :environment, only: %i[edit update]
       resource :metrics, only: :show
+      resources :restarts, only: :create
       resources :services
     end
   end

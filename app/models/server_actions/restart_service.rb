@@ -14,8 +14,6 @@ module ServerActions
       self.dokku_service_id ||= service.dokku_id
     end
 
-    private
-
     def perform
       dokku_command_class.call(ssh, service: dokku_service_id)
     end

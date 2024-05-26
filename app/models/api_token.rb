@@ -1,8 +1,8 @@
 class ApiToken < ApplicationRecord
-  include BelongsToOrg
-
   has_secure_token
   has_paper_trail
+
+  belongs_to :org, default: -> { Current.org }
 
   attribute :read_only, :boolean, default: false
   attribute :expires_at, :datetime, default: -> { 1.year.from_now }

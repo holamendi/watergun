@@ -1,5 +1,5 @@
 class ContainerMetric < ApplicationRecord
-  include BelongsToOrg
+  belongs_to :org, default: -> { Current.org }
 
   belongs_to :container
 end
