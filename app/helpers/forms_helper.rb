@@ -1,4 +1,4 @@
-module FormHelper
+module FormsHelper
   def error_messages_for(object, attribute)
     error_messages(object.errors.messages_for(attribute))
   end

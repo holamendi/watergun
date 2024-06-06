@@ -1,11 +1,14 @@
 <%= turbo_stream_from @app %>
+
 <% content_for :breadcrumb do %>
   <span class="pl-2 select-none">/</span>
   <span><%= @app.name %></span>
   <span class="select-none">/</span>
   <span>Metrics</span>
 <% end %>
+
 <%= render "apps/header", app: @app %>
+
 <div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
   <div class="stat">
     <div class="stat-title">Running Containers</div>

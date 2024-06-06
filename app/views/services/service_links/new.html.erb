@@ -1,9 +1,0 @@
-<%= turbo_stream_from @service %>
-<%= render "services/header", service: @service %>
-<%= form_with model: [@service, @service_link], class: "space-y-4" do |form| %>
-  <%= form.label :app_id, class: "form-control" do %>
-    <div class="label"><span class="label-text">App</span></div>
-    <%= form.select :app_id, current_server.apps.kept.excluding(@service.linked_apps).pluck(:name, :id), {}, class: "select select-bordered w-full" %>
-  <% end %>
-  <%= form.submit "Save", class: "btn btn-primary text-white" %>
-<% end %>

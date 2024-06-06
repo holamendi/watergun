@@ -1,11 +1,14 @@
 <%= turbo_stream_from @app %>
+
 <% content_for :breadcrumb do %>
   <span class="pl-2 select-none">/</span>
   <span><%= @app.name %></span>
   <span class="select-none">/</span>
   <span>Services</span>
 <% end %>
+
 <%= render "apps/header", app: @app %>
+
 <div class="flex justify-start w-full pb-6">
   <%= link_to "Attach Service", new_app_service_path(@app), class: "btn link btn-ghost btn-sm rounded-md font-normal text-sm" %>
 </div>

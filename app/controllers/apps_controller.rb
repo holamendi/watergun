@@ -35,8 +35,18 @@ class AppsController < ApplicationController
     end
   end
 
+  # TODO: move this logic to something more reusable
   def destroy
-    Apps::Destroy.call(app: @app)
+    @app.discard!
+    ServerActions::DestroyApp.perform_later!(@app)
+
+    @app.service_links.kept.includes(:service).each do |service_link|
+      service_link.discard!
+      unlink_action = ServerActions::UnlinkService.perform_later!(service_link)
+      service_link.service.discard!
+      ServerActions::DestroyService.perform_later!(service_link.service, depends_on: unlink_action)
+    end
+
     redirect_to apps_path, notice: "App deleted successfully."
   end
 

@@ -1,20 +1,19 @@
-  <%= form_with model: github_repo, url: app_github_repo_path(github_repo.app), class: "space-y-4" do |form| %>
+<%= form_with model: github_repo, url: app_github_repo_path(github_repo.app), class: "space-y-4" do |form| %>
   <div class="w-full md:w-1/3">
-
-  <% unless current_org.github_access_token.present? %>
-    <%= form.label :github_access_token, class: "form-control" do %>
-      <div class="label"><span class="label-text">Github access token</span></div>
-      <%= text_field_tag :github_access_token, params[:github_access_token], class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
+    <% unless current_org.github_access_token.present? %>
+      <%= form.label :github_access_token, class: "form-control" do %>
+        <div class="label"><span class="label-text">Github access token</span></div>
+        <%= text_field_tag :github_access_token, params[:github_access_token], class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
+      <% end %>
     <% end %>
-  <% end %>
-  <%= form.label :repository, class: "form-control" do %>
-    <div class="label"><span class="label-text">Repository</span></div>
-    <%= form.text_field :repo, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
-  <% end %>
-  <%= form.label :branch, class: "form-control" do %>
-    <div class="label"><span class="label-text">Branch</span></div>
-    <%= form.text_field :branch, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
-  <% end %>
+    <%= form.label :repository, class: "form-control" do %>
+      <div class="label"><span class="label-text">Repository</span></div>
+      <%= form.text_field :repo, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
+    <% end %>
+    <%= form.label :branch, class: "form-control" do %>
+      <div class="label"><span class="label-text">Branch</span></div>
+      <%= form.text_field :branch, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
+    <% end %>
   </div>
   <%= form.submit "Save", class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
 <% end %>

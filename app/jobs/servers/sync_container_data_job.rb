@@ -2,7 +2,7 @@ module Servers
   class SyncContainerDataJob < ApplicationJob
     queue_as :default
 
-    ContainerStats = Data.define(
+    ContainerStat = Data.define(
       :block_io,
       :cpu_percentage,
       :id,
@@ -20,13 +20,13 @@ module Servers
 
     def sync_containers(server)
       Current.set(org: server.org, server:) do
-        docker_container_stats = []
+        stats = []
 
         server.ssh_session do |session|
           session.execute("docker stats --no-stream --format=json").text_output.each_line do |line|
             stats = JSON.parse(line)
 
-            docker_container_stats << ContainerStats.new(
+            stats << ContainerStat.new(
               block_io: stats["BlockIO"],
               cpu_percentage: stats["CPUPerc"].to_f.round(2),
               id: stats["ID"],
@@ -39,15 +39,17 @@ module Servers
         end
 
         synced_at = Time.current
-        docker_container_stats.uniq!
+
+        # TODO: I forgot why I added this line 🙈
+        stats.uniq!
 
         (server.apps.kept + server.services.kept).each do |entity|
-          containers = docker_container_stats.select { |stat| stat.name.include?(entity.dokku_id) }
+          containers = stats.select { |stat| stat.name.include?(entity.dokku_id) }
 
           containers.each do |stats|
             container = entity.containers.find_or_initialize_by(cid: stats.id)
 
-            ApplicationRecord.transaction do
+            Container.transaction do
               container.update!(stats.to_h.except(:id).merge(last_synced_at: synced_at))
               container.checks.create!(stats.to_h.except(:id, :name).merge(timestamp: synced_at))
             end
@@ -56,7 +58,7 @@ module Servers
 
         server.containers
           .running
-          .where.not(cid: docker_container_stats.map(&:id))
+          .where.not(cid: stats.map(&:id))
           .update_all(status: "stopped", stopped_at: Time.current)
       end
     end
