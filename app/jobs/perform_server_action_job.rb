@@ -3,14 +3,10 @@ class PerformServerActionJob < ApplicationJob
 
   def perform(server_action)
     return unless server_action.queued?
+    return server_action.cancelled! if server_action.preceding_action&.failure?
 
-    if server_action.preceding_action&.failure?
-      return server_action.cancelled!
+    Current.set(org: server_action.org, server: server_action.server) do
+      server_action.perform_action
     end
-
-    Current.org = server_action.org
-    Current.server = server_action.server
-
-    server_action.perform_action
   end
 end

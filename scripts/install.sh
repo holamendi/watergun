@@ -2,7 +2,7 @@
 
 # Check if running with sudo
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run with sudo"
+  echo "Please run as root"
   exit
 fi
 

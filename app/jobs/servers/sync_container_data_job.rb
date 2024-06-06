@@ -2,7 +2,7 @@ module Servers
   class SyncContainerDataJob < ApplicationJob
     queue_as :default
 
-    ContainerStat = Data.define(
+    ContainerStats = Data.define(
       :block_io,
       :cpu_percentage,
       :id,
@@ -26,7 +26,7 @@ module Servers
           session.execute("docker stats --no-stream --format=json").text_output.each_line do |line|
             stats = JSON.parse(line)
 
-            docker_container_stats << ContainerStat.new(
+            docker_container_stats << ContainerStats.new(
               block_io: stats["BlockIO"],
               cpu_percentage: stats["CPUPerc"].to_f.round(2),
               id: stats["ID"],
@@ -49,7 +49,7 @@ module Servers
 
             ApplicationRecord.transaction do
               container.update!(stats.to_h.except(:id).merge(last_synced_at: synced_at))
-              container.container_metrics.create!(stats.to_h.except(:id, :name).merge(timestamp: synced_at))
+              container.checks.create!(stats.to_h.except(:id, :name).merge(timestamp: synced_at))
             end
           end
         end

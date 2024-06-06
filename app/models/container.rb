@@ -3,7 +3,7 @@ class Container < ApplicationRecord
   belongs_to :server, default: -> { Current.server }
 
   belongs_to :containerizable, polymorphic: true
-  has_many :container_metrics, dependent: :delete_all
+  has_many :checks, class_name: "ContainerCheck", dependent: :delete_all
 
   enum status: enum_keys(
     :running,

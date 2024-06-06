@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_12_120956) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -49,7 +49,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_120956) do
     t.index ["org_id"], name: "index_command_runs_on_org_id"
   end
 
-  create_table "container_metrics", force: :cascade do |t|
+  create_table "container_checks", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "container_id", null: false
     t.datetime "timestamp", null: false
@@ -58,9 +58,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_120956) do
     t.string "memory_usage", null: false
     t.string "block_io", null: false
     t.string "network_io", null: false
-    t.index ["container_id"], name: "index_container_metrics_on_container_id"
-    t.index ["org_id"], name: "index_container_metrics_on_org_id"
-    t.index ["timestamp"], name: "index_container_metrics_on_timestamp"
+    t.index ["container_id"], name: "index_container_checks_on_container_id"
+    t.index ["org_id"], name: "index_container_checks_on_org_id"
+    t.index ["timestamp"], name: "index_container_checks_on_timestamp"
   end
 
   create_table "containers", force: :cascade do |t|
@@ -274,8 +274,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_120956) do
   add_foreign_key "apps", "servers"
   add_foreign_key "command_runs", "apps"
   add_foreign_key "command_runs", "orgs"
-  add_foreign_key "container_metrics", "containers"
-  add_foreign_key "container_metrics", "orgs"
+  add_foreign_key "container_checks", "containers"
+  add_foreign_key "container_checks", "orgs"
   add_foreign_key "containers", "orgs"
   add_foreign_key "containers", "servers"
   add_foreign_key "deployments", "apps"
