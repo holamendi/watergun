@@ -12,7 +12,7 @@ module Dokku
         "dokku postgres:info #{service}"
       end
 
-      def parse
+      def parsed_output
         return unless success?
 
         text_output.lines.each_with_object({}) do |line, hash|

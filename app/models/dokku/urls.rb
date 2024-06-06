@@ -11,7 +11,7 @@ module Dokku
       "dokku urls #{app}"
     end
 
-    def parse
+    def parsed_output
       return unless success?
 
       text_output.split("\n").map(&:strip)

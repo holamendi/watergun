@@ -12,7 +12,7 @@ module Dokku
         "dokku apps:report #{app} --format json"
       end
 
-      def parse
+      def parsed_output
         return unless success?
 
         JSON.parse(result.text_output).then do |json|

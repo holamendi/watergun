@@ -22,12 +22,12 @@ module ServerActions
     private
 
     def update_app_urls!
-      urls = Dokku::Urls.call(ssh, app: dokku_app_id).parse
+      urls = Dokku::Urls.call(ssh, app: dokku_app_id).parsed_output
       app.update!(urls:) if urls.present?
     end
 
     def ssl_enabled?
-      Dokku::Letsencrypt::Active.call(ssh, app: dokku_app_id).parse
+      Dokku::Letsencrypt::Active.call(ssh, app: dokku_app_id).parsed_output
     end
   end
 end

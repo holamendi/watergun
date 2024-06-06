@@ -13,6 +13,7 @@ class Service < ApplicationRecord
   store_attribute :data, :version, :string
 
   enum service_type: enum_keys(
+    :mongo,
     :postgres,
     :redis
   )

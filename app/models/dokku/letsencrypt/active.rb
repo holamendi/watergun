@@ -12,7 +12,7 @@ module Dokku
         "dokku letsencrypt:active #{app}"
       end
 
-      def parse
+      def parsed_output
         result.text_output.strip == "true"
       end
     end

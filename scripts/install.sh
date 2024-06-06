@@ -13,8 +13,8 @@ dokku plugin:install https://github.com/dokku/dokku-redis.git redis
 
 # Add user watergun with groups dokku, docker, and adm
 adduser --disabled-password watergun
-usermod -aG dokku,docker,adm watergun
-echo '%dokku ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/dokku' | sudo tee /etc/sudoers.d/dokku
+# grant sudo rights to watergun user
+echo 'watergun ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/watergun
 
 # Add watergun public key to authorized_keys
 sudo -u watergun mkdir -p /home/watergun/.ssh
