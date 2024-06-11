@@ -8,13 +8,13 @@ class ServerAction < ApplicationRecord
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
-  enum status: enum_keys(
-    :queued,
-    :running,
-    :success,
-    :failure,
-    :cancelled
-  ), _default: :queued
+  enum status: {
+    queued: 0,
+    running: 1,
+    success: 2,
+    failure: 3,
+    cancelled: 4
+  }, _default: :queued
 
   attribute :source, :string, default: "web"
 

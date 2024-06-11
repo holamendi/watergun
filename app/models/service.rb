@@ -12,17 +12,17 @@ class Service < ApplicationRecord
 
   store_attribute :data, :version, :string
 
-  enum service_type: enum_keys(
-    :mongo,
-    :postgres,
-    :redis
-  )
+  enum service_type: {
+    postgres: 0,
+    redis: 1,
+    mongo: 2
+  }
 
-  enum status: enum_keys(
-    :pending,
-    :created,
-    :destroyed
-  ), _default: :pending, _prefix: true
+  enum status: {
+    pending: 0,
+    created: 1,
+    destroyed: 2
+  }, _default: :pending, _prefix: true
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 

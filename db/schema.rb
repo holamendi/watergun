@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_11_151411) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -68,7 +68,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.integer "server_id", null: false
     t.string "containerizable_type", null: false
     t.integer "containerizable_id", null: false
-    t.string "status", null: false
+    t.integer "status"
     t.string "cid", null: false
     t.string "name", null: false
     t.float "cpu_percentage", null: false
@@ -90,8 +90,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
   create_table "deployments", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "app_id", null: false
-    t.string "source", null: false
-    t.string "status", null: false
+    t.integer "source"
+    t.integer "status"
     t.string "repo", null: false
     t.string "sha"
     t.datetime "finished_at"
@@ -100,6 +100,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.datetime "started_at"
     t.index ["app_id"], name: "index_deployments_on_app_id"
     t.index ["org_id"], name: "index_deployments_on_org_id"
+    t.index ["source"], name: "index_deployments_on_source"
+    t.index ["status"], name: "index_deployments_on_status"
   end
 
   create_table "env_configurations", force: :cascade do |t|
@@ -167,7 +169,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.string "actionable_type"
     t.integer "actionable_id"
     t.string "source", null: false
-    t.string "status", null: false
+    t.integer "status"
     t.datetime "finished_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -180,11 +182,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.index ["org_id"], name: "index_server_actions_on_org_id"
     t.index ["preceding_server_action_id"], name: "index_server_actions_on_preceding_server_action_id"
     t.index ["server_id"], name: "index_server_actions_on_server_id"
+    t.index ["status"], name: "index_server_actions_on_status"
   end
 
   create_table "servers", force: :cascade do |t|
     t.string "name", null: false
-    t.string "status", null: false
+    t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "data", default: {}
@@ -194,13 +197,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.string "cpu_type"
     t.index ["last_synced_at"], name: "index_servers_on_last_synced_at"
     t.index ["org_id"], name: "index_servers_on_org_id"
+    t.index ["status"], name: "index_servers_on_status"
   end
 
   create_table "service_links", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "service_id", null: false
     t.integer "app_id", null: false
-    t.string "status"
+    t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
@@ -211,14 +215,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.index ["org_id"], name: "index_service_links_on_org_id"
     t.index ["service_id", "app_id"], name: "index_service_links_on_service_id_and_app_id", unique: true
     t.index ["service_id"], name: "index_service_links_on_service_id"
+    t.index ["status"], name: "index_service_links_on_status"
   end
 
   create_table "services", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
-    t.string "service_type", null: false
+    t.integer "service_type"
     t.string "name", null: false
-    t.string "status", null: false
+    t.integer "status"
     t.json "data", default: {}, null: false
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
@@ -226,6 +231,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_06_082957) do
     t.string "dokku_id"
     t.index ["org_id"], name: "index_services_on_org_id"
     t.index ["server_id"], name: "index_services_on_server_id"
+    t.index ["service_type"], name: "index_services_on_service_type"
+    t.index ["status"], name: "index_services_on_status"
   end
 
   create_table "sessions", force: :cascade do |t|

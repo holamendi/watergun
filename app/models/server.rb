@@ -14,9 +14,9 @@ class Server < ApplicationRecord
   has_many :actions, class_name: "ServerAction", dependent: :destroy
   has_many :services, dependent: :destroy
 
-  enum :status, enum_keys(
-    :active
-  ), _default: :active
+  enum status: {
+    active: 0
+  }, _default: :active
 
   after_create :create_ssh_key
 

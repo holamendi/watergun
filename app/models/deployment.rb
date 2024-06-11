@@ -5,16 +5,16 @@ class Deployment < ApplicationRecord
   belongs_to :org, default: -> { Current.org }
   belongs_to :app, touch: true
 
-  enum status: enum_keys(
-    :queued,
-    :in_progress,
-    :success,
-    :failure
-  ), _default: :queued
+  enum status: {
+    queued: 0,
+    in_progress: 1,
+    success: 2,
+    failure: 3
+  }, _default: :queued
 
   enum source: {
-    web: "web",
-    api_v1: "api_v1"
+    web: 0,
+    api_v1: 1
   }
 
   scope :kept, -> { joins(:app).merge(App.kept) }
