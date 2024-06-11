@@ -1,6 +1,6 @@
 module ServerActions
   class EnableAppSsl < ServerAction
-    ACTION_CODE = "apps.enable_ssl"
+    SLUG = "apps.enable_ssl"
 
     alias_method :app, :actionable
 

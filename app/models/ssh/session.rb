@@ -37,6 +37,12 @@ module Ssh
       ssh_command
     end
 
+    def execute!(command)
+      result = execute(command)
+
+      raise CommandExecutionError, "Command exited with status #{command.exit_code}: #{command}" unless result.success?
+    end
+
     def success?
       commands.all?(&:success?)
     end
@@ -55,4 +61,6 @@ module Ssh
       server.ssh_key.private_key
     end
   end
+
+  class NonZero < StandardError; end
 end

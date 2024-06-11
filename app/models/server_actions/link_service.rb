@@ -1,6 +1,6 @@
 module ServerActions
   class LinkService < ServerAction
-    ACTION_CODE = "services.link"
+    SLUG = "services.link"
 
     alias_method :service_link, :actionable
 

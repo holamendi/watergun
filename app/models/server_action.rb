@@ -22,6 +22,10 @@ class ServerAction < ApplicationRecord
 
   after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
 
+  def slug
+    self.class::SLUG
+  end
+
   def concurrency_key
     actionable
   end

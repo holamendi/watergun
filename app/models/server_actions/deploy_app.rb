@@ -1,6 +1,6 @@
 module ServerActions
   class DeployApp < ServerAction
-    ACTION_CODE = "apps.deploy"
+    SLUG = "apps.deploy"
 
     alias_method :deployment, :actionable
 

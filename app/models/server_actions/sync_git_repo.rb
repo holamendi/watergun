@@ -1,6 +1,6 @@
 module ServerActions
   class SyncGitRepo < ServerAction
-    ACTION_CODE = "apps.git_sync"
+    SLUG = "apps.git_sync"
 
     alias_method :app, :actionable
 

@@ -1,6 +1,6 @@
 module ServerActions
   class RestartApp < ServerAction
-    ACTION_CODE = "apps.restart"
+    SLUG = "apps.restart"
 
     alias_method :app, :actionable
 

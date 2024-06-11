@@ -1,6 +1,6 @@
 module ServerActions
   class UpdateAppEnv < ServerAction
-    ACTION_CODE = "apps.update_env"
+    SLUG = "apps.update_env"
 
     alias_method :app, :actionable
 

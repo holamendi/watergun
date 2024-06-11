@@ -1,6 +1,6 @@
 module ServerActions
   class UnlinkService < ServerAction
-    ACTION_CODE = "services.unlink"
+    SLUG = "services.unlink"
 
     alias_method :service_link, :actionable
 

@@ -1,6 +1,6 @@
 module ServerActions
   class CreateService < ServerAction
-    ACTION_CODE = "services.create"
+    SLUG = "services.create"
 
     alias_method :service, :actionable
 
@@ -42,7 +42,7 @@ module ServerActions
       plugins.installed?(service_type)
     end
 
-    def install_plugin
+    def install_plugin!
       Dokku::Plugin::Install.call(ssh, plugin: service_type)
     end
   end

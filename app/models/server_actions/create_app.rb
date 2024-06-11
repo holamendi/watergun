@@ -1,6 +1,6 @@
 module ServerActions
   class CreateApp < ServerAction
-    ACTION_CODE = "apps.create"
+    SLUG = "apps.create"
 
     alias_method :app, :actionable
 

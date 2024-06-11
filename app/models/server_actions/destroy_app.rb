@@ -1,6 +1,6 @@
 module ServerActions
   class DestroyApp < ServerAction
-    ACTION_CODE = "apps.destroy"
+    SLUG = "apps.destroy"
 
     alias_method :app, :actionable
 
