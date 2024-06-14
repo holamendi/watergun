@@ -1,6 +1,6 @@
 module ServerActions
   class DestroyDomain < ServerAction
-    SLUG = "apps.add_domain"
+    SLUG = "apps.remove_domain"
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :domain, :string
