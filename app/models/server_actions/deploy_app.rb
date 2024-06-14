@@ -26,30 +26,23 @@ module ServerActions
 
     def perform
       deployment.in_progress!
-
-      authenticate_github_account
-
-      unless sync_git_repo.success?
-        deployment.failure! and return
-      end
-
-      result = rebuild_dokku_app
-
-      if result.success?
-        deployment.success!
-        update_app_urls!
-        schedule_enable_ssl!
-      else
-        deployment.failure!
-      end
+      authenticate_github_account!
+      sync_git_repo!
+      rebuild_dokku_app!
+      deployment.success!
+      update_app_urls!
+      schedule_enable_ssl!
+    rescue Dokku::CommandExecutionError => e
+      deployment.failure!
+      raise e
     end
 
-    def sync_git_repo
-      Dokku::Git::Sync.call(ssh, app: dokku_app_id, repo:, sha:)
+    def sync_git_repo!
+      Dokku::Git::Sync.call!(ssh, app: dokku_app_id, repo:, sha:)
     end
 
-    def rebuild_dokku_app
-      Dokku::Ps::Rebuild.call(ssh, app: dokku_app_id)
+    def rebuild_dokku_app!
+      Dokku::Ps::Rebuild.call!(ssh, app: dokku_app_id)
     end
 
     def update_app_urls!
@@ -57,10 +50,10 @@ module ServerActions
       app.update!(urls:) if urls.present?
     end
 
-    def authenticate_github_account
+    def authenticate_github_account!
       return unless github_access_token
 
-      Dokku::Git::Auth.call(ssh, access_token: github_access_token.token)
+      Dokku::Git::Auth.call!(ssh, access_token: github_access_token.token)
     end
 
     def github_access_token

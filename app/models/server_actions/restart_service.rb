@@ -15,7 +15,13 @@ module ServerActions
     end
 
     def perform
-      dokku_command_class.call(ssh, service: dokku_service_id)
+      restart_dokku_service!
+    end
+
+    private
+
+    def restart_dokku_service!
+      dokku_command_class.call!(ssh, service: dokku_service_id)
     end
 
     def dokku_command_class

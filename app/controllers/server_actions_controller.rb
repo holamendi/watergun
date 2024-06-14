@@ -1,6 +1,6 @@
 class ServerActionsController < ApplicationController
   def index
-    @server_actions = current_server.actions.order(created_at: :desc)
+    @server_actions = current_server.actions.order(created_at: :desc).limit(20)
   end
 
   def logs

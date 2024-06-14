@@ -13,7 +13,13 @@ module ServerActions
     end
 
     def perform
-      Dokku::Ps::Restart.call(ssh, app: dokku_app_id)
+      restart_dokku_app!
+    end
+
+    private
+
+    def restart_dokku_app!
+      Dokku::Ps::Restart.call!(ssh, app: dokku_app_id)
     end
   end
 end

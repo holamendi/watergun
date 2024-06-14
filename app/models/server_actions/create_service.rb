@@ -17,14 +17,20 @@ module ServerActions
     def perform
       return unless plugin_installed? || install_plugin.success?
 
-      result = dokku_service_create_command_class.call(ssh, service: dokku_service_id)
-      return unless result.success?
-
-      service.data = dokku_service_info_command_class.call(ssh, service: dokku_service_id).parsed_output
+      create_dokku_service!
+      service.data = dokku_service_info
       service.status_created!
     end
 
     private
+
+    def create_dokku_service!
+      dokku_service_create_command_class.call!(ssh, service: dokku_service_id)
+    end
+
+    def dokku_service_info
+      dokku_service_info_command_class.call!(ssh, service: dokku_service_id).parsed_output
+    end
 
     def dokku_service_create_command_class
       "Dokku::#{service_type.camelcase}::Create".constantize
@@ -43,7 +49,7 @@ module ServerActions
     end
 
     def install_plugin!
-      Dokku::Plugin::Install.call(ssh, plugin: service_type)
+      Dokku::Plugin::Install.call!(ssh, plugin: service_type)
     end
   end
 end

@@ -20,7 +20,7 @@ module Ssh
     end
 
     def execute(command)
-      ssh_command = Command.new(command:, started_at: Time.current)
+      ssh_command = Ssh::Command.new(command:, started_at: Time.current)
       @commands << ssh_command
 
       status = {}
@@ -35,12 +35,6 @@ module Ssh
       ssh_command.finished_at = Time.current
       ssh_command.exit_code = status[:exit_code]
       ssh_command
-    end
-
-    def execute!(command)
-      result = execute(command)
-
-      raise CommandExecutionError, "Command exited with status #{command.exit_code}: #{command}" unless result.success?
     end
 
     def success?
@@ -61,6 +55,4 @@ module Ssh
       server.ssh_key.private_key
     end
   end
-
-  class NonZero < StandardError; end
 end

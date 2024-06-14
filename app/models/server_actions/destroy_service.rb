@@ -15,11 +15,15 @@ module ServerActions
     end
 
     def perform
-      result = dokku_command_class.call(ssh, service: dokku_service_id)
-      service.status_destroyed! if result.success?
+      destroy_dokku_service!
+      service.status_destroyed!
     end
 
     private
+
+    def destroy_dokku_service!
+      dokku_command_class.call!(ssh, service: dokku_service_id)
+    end
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Destroy".constantize

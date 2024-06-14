@@ -25,11 +25,15 @@ module ServerActions
     end
 
     def perform
-      result = dokku_command_class.call(ssh, service: dokku_service_id, app: dokku_app_id)
-      service_link.linked! if result.success?
+      link_dokku_service!
+      service_link.linked!
     end
 
     private
+
+    def link_dokku_service!
+      dokku_command_class.call!(ssh, service: dokku_service_id, app: dokku_app_id)
+    end
 
     def dokku_command_class
       "Dokku::#{service_type.camelcase}::Link".constantize

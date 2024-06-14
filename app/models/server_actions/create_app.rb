@@ -13,7 +13,13 @@ module ServerActions
     end
 
     def perform
-      Dokku::Apps::Create.call(ssh, app: dokku_app_id)
+      create_dokku_app!
+    end
+
+    private
+
+    def create_dokku_app!
+      Dokku::Apps::Create.call!(ssh, app: dokku_app_id)
     end
   end
 end

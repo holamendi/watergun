@@ -15,19 +15,23 @@ module ServerActions
     def perform
       return if ssl_enabled?
 
-      result = Dokku::Letsencrypt::Enable.call(ssh, app: dokku_app_id)
-      update_app_urls! if result.success?
+      enable_ssl!
+      update_app_urls!
     end
 
     private
 
+    def ssl_enabled?
+      Dokku::Letsencrypt::Active.call!(ssh, app: dokku_app_id).parsed_output
+    end
+
+    def enable_ssl!
+      Dokku::Letsencrypt::Enable.call!(ssh, app: dokku_app_id)
+    end
+
     def update_app_urls!
       urls = Dokku::Urls.call(ssh, app: dokku_app_id).parsed_output
       app.update!(urls:) if urls.present?
-    end
-
-    def ssl_enabled?
-      Dokku::Letsencrypt::Active.call(ssh, app: dokku_app_id).parsed_output
     end
   end
 end

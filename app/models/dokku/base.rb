@@ -14,8 +14,19 @@ module Dokku
       new(ssh_session, **).call
     end
 
+    def self.call!(ssh_session, **)
+      new(ssh_session, **).call!
+    end
+
     def call
       @result = ssh_session.execute(command)
+      self
+    end
+
+    def call!
+      if call.failure?
+        raise Dokku::CommandExecutionError.new("dokku command failed: #{command}", result)
+      end
       self
     end
 

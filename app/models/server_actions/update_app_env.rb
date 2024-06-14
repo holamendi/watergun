@@ -18,7 +18,13 @@ module ServerActions
     end
 
     def perform
-      Dokku::Config::Set.call(ssh, app: dokku_app_id, env:)
+      set_dokku_app_config!
+    end
+
+    private
+
+    def set_dokku_app_config
+      Dokku::Config::Set.cal!(ssh, app: dokku_app_id, env:)
     end
   end
 end

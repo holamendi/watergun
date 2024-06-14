@@ -22,10 +22,6 @@ class ServerAction < ApplicationRecord
 
   after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
 
-  def slug
-    self.class::SLUG
-  end
-
   def concurrency_key
     actionable
   end
@@ -39,6 +35,12 @@ class ServerAction < ApplicationRecord
 
     finished_at - running_at
   end
-end
 
-class ServerActionFailure < StandardError; end
+  def self.slug
+    self::SLUG
+  end
+
+  def slug
+    self.class.slug
+  end
+end

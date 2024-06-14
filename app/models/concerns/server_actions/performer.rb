@@ -21,13 +21,17 @@ module ServerActions
       self.running_at = Time.current
       running!
 
-      result = server.ssh_session do |ssh_session|
-        with(ssh_session:) { perform }
+      session = server.ssh_session do |ssh_session|
+        with(ssh_session:) do
+          perform
+        rescue Dokku::CommandExecutionError
+        end
       end
 
-      create_log!(ssh_commands: result.commands)
+      create_log!(ssh_commands: session.commands)
 
-      self.status = result.status
+      self.status = session.status
+      self
     rescue => e
       self.status = :failure
       self.failure_message = e.detailed_message
