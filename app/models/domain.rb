@@ -17,5 +17,7 @@ class Domain < ApplicationRecord
 
   def resolves_to_server?
     Resolv.getaddress(hostname) == app.server.public_ip
+  rescue Resolv::ResolvError
+    false
   end
 end
