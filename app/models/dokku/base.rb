@@ -24,9 +24,7 @@ module Dokku
     end
 
     def call!
-      if call.failure?
-        raise Dokku::CommandExecutionError.new("dokku command failed: #{command}", result)
-      end
+      raise Dokku::CommandExecutionError.new("dokku command failed: #{command}", result) if call.failure?
       self
     end
 
