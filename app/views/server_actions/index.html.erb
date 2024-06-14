@@ -18,6 +18,7 @@
     <tbody>
       <% @server_actions.each do |action| %>
         <tr>
+          <td><%= action.id %></td>
           <td><%= action.slug %></td>
           <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
           <td class="overflow-scroll overflow-ellipsis max-w-48 whitespace-nowrap">
