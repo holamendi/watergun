@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_11_151411) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_14_130645) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -102,6 +102,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_11_151411) do
     t.index ["org_id"], name: "index_deployments_on_org_id"
     t.index ["source"], name: "index_deployments_on_source"
     t.index ["status"], name: "index_deployments_on_status"
+  end
+
+  create_table "domains", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "hostname", null: false
+    t.integer "status", null: false
+    t.boolean "ssl_enabled", default: false, null: false
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id"], name: "index_domains_on_app_id"
+    t.index ["discarded_at"], name: "index_domains_on_discarded_at"
+    t.index ["org_id"], name: "index_domains_on_org_id"
+    t.index ["status"], name: "index_domains_on_status"
   end
 
   create_table "env_configurations", force: :cascade do |t|
@@ -287,6 +302,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_11_151411) do
   add_foreign_key "containers", "servers"
   add_foreign_key "deployments", "apps"
   add_foreign_key "deployments", "orgs"
+  add_foreign_key "domains", "apps"
+  add_foreign_key "domains", "orgs"
   add_foreign_key "env_configurations", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "github_repos", "apps"

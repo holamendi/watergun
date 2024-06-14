@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  org: one
+  app: one
+  domain: MyString
+  status: 1
+  ssl_enabled: false
+  discarded_at: 2024-06-14 15:06:45
+
+two:
+  org: two
+  app: two
+  domain: MyString
+  status: 1
+  ssl_enabled: false
+  discarded_at: 2024-06-14 15:06:45

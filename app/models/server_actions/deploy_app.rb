@@ -13,7 +13,7 @@ module ServerActions
     delegate :app, to: :deployment
 
     before_validation on: :create do
-      self.dokku_app_id ||= deployment.app.dokku_id
+      self.dokku_app_id ||= app.dokku_id
       self.repo ||= deployment.repo
       self.sha ||= deployment.sha
     end
@@ -21,8 +21,6 @@ module ServerActions
     def concurrency_key
       app
     end
-
-    private
 
     def perform
       deployment.in_progress!
@@ -36,6 +34,8 @@ module ServerActions
       deployment.failure!
       raise e
     end
+
+    private
 
     def sync_git_repo!
       Dokku::Git::Sync.call!(ssh, app: dokku_app_id, repo:, sha:)

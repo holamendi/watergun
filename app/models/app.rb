@@ -10,6 +10,7 @@ class App < ApplicationRecord
   belongs_to :org, default: -> { Current.org }
   belongs_to :server, default: -> { Current.server }
 
+  has_many :domains, dependent: :delete_all
   has_many :deployments, dependent: :delete_all
   has_one :deployment, -> { success.order(created_at: :desc) }, class_name: "Deployment"
   has_one :github_repo, dependent: :destroy

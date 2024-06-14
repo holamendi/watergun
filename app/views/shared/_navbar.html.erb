@@ -15,12 +15,14 @@
       </div>
       <div class="navbar-end">
         <div class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="font-normal btn btn-sm btn-ghost"><%= current_user.email %></div>
+          <div tabindex="0" role="button" class="font-normal btn btn-sm btn-ghost">
+            <%= current_user.email %>
+          </div>
           <ul tabindex="0" class="menu dropdown-content z-[1] p-2 bg-base-100 rounded-box w-52 mt-4 shadow-xl text-sm">
             <li>
               <%= link_to "Settings", org_settings_path %>
             </li>
-             <li>
+            <li>
               <%= link_to "Activity", server_actions_path %>
             </li>
             <li>

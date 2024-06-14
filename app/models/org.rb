@@ -2,6 +2,7 @@ class Org < ApplicationRecord
   has_many :api_tokens, dependent: :destroy
   has_many :apps, dependent: :destroy
   has_many :deployments, dependent: :destroy
+  has_many :domains, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :servers, dependent: :destroy
   has_many :server_identities, dependent: :destroy
