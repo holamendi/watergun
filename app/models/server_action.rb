@@ -1,6 +1,4 @@
 class ServerAction < ApplicationRecord
-  include ServerActions::Performer
-
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
