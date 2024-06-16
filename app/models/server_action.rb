@@ -1,6 +1,8 @@
 class ServerAction < ApplicationRecord
-  include Memery
   include ServerActions::Performer
+
+  attr_accessor :ssh_session
+  alias_method :ssh, :ssh_session
 
   belongs_to :org, default: -> { Current.org }
   belongs_to :server, default: -> { Current.server }
@@ -27,6 +29,32 @@ class ServerAction < ApplicationRecord
     actionable
   end
 
+  def perform_action
+    raise "server action must implement #perform" unless respond_to?(:perform, true)
+
+    self.running_at = Time.current
+    running!
+
+    session = server.ssh_session do |ssh_session|
+      with(ssh_session:) do
+        perform
+      rescue Dokku::CommandExecutionError
+      end
+    end
+
+    create_log!(ssh_commands: session.commands)
+    self
+  rescue => e
+    self.status = :failure
+    self.failure_message = e.detailed_message
+    Honbeybadger.notify(e)
+  else
+    self.status = :success
+  ensure
+    self.finished_at = Time.current
+    save!
+  end
+
   def finished?
     finished_at.present?
   end
@@ -43,5 +71,11 @@ class ServerAction < ApplicationRecord
 
   def slug
     self.class.slug
+  end
+
+  def self.perform_later!(actionable, depends_on: nil, **)
+    action = create!(actionable:, preceding_action: depends_on, **)
+    PerformServerActionJob.perform_later(action)
+    action
   end
 end

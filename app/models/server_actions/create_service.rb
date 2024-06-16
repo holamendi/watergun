@@ -40,11 +40,11 @@ module ServerActions
       "Dokku::#{service_type.camelcase}::Info".constantize
     end
 
-    def plugins
-      @plugins ||= Dokku::Plugin::List.call(ssh)
+    memoize def plugins
+      Dokku::Plugin::List.call(ssh)
     end
 
-    def plugin_installed?
+    memoize def plugin_installed?
       plugins.installed?(service_type)
     end
 
