@@ -35,7 +35,7 @@ module ServerActions
     rescue => e
       self.status = :failure
       self.failure_message = e.detailed_message
-      Bugsnag.notify(e)
+      Honbeybadger.notify(e)
     ensure
       self.finished_at = Time.current
       save!

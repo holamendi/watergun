@@ -12,7 +12,7 @@ class App < ApplicationRecord
 
   has_many :domains, dependent: :delete_all
   has_many :deployments, dependent: :delete_all
-  has_one :deployment, -> { success.order(created_at: :desc) }, class_name: "Deployment"
+  has_one :deployment, -> { success.recent }, class_name: "Deployment"
   has_one :github_repo, dependent: :destroy
   has_many :service_links, dependent: :delete_all
   has_many :services, through: :service_links

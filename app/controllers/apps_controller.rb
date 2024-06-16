@@ -21,7 +21,7 @@ class AppsController < ApplicationController
   end
 
   def show
-    @deployments = @app.deployments.kept.order(created_at: :desc)
+    @deployments = @app.deployments.kept.recent.limit(5)
   end
 
   def edit
