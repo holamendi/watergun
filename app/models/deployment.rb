@@ -43,7 +43,10 @@ class Deployment < ApplicationRecord
   end
 
   def success!(at = Time.current)
-    update!(status: :success, finished_at: at)
+    transaction do
+      update!(status: :success, finished_at: at)
+      app.touch(:deployed_at)
+    end
   end
 
   def failure!(at = Time.current)

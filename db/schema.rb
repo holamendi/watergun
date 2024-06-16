@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_16_172334) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_16_183758) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -31,8 +31,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_16_172334) do
     t.datetime "updated_at", null: false
     t.json "data", default: {}, null: false
     t.datetime "discarded_at"
-    t.datetime "last_deployed_at"
-    t.json "urls", default: []
+    t.datetime "deployed_at"
     t.string "status"
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"

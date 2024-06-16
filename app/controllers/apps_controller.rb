@@ -2,7 +2,7 @@ class AppsController < ApplicationController
   before_action :set_app, except: [:index, :new, :create]
 
   def index
-    @pagy, @apps = pagy(current_server.apps.kept)
+    @pagy, @apps = pagy(current_server.apps.kept.includes(:github_repo))
   end
 
   def new
