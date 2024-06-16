@@ -180,6 +180,8 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
+    memery (1.5.0)
+      ruby2_keywords (~> 0.0.2)
     mini_mime (1.1.5)
     minitest (5.22.3)
     mission_control-jobs (0.2.1)
@@ -418,6 +420,7 @@ DEPENDENCIES
   httpx
   litestack!
   lograge
+  memery
   mission_control-jobs
   mocha
   net-ssh

@@ -3,7 +3,7 @@ module Dokku
     class Install < Base
       attr_reader :plugin, :repo
 
-      PLUGINS = {
+      PLUGIN_GITHUB_REPOS = {
         "clickhouse" => "dokku/dokku-clickhouse",
         "elasticsearch" => "dokku/dokku-elasticsearch",
         "letsencrypt" => "dokku/dokku-letsencrypt",
@@ -20,7 +20,7 @@ module Dokku
       def initialize(ssh_session, plugin:)
         @ssh_session = ssh_session
         @plugin = plugin
-        @repo = PLUGINS.fetch(plugin)
+        @repo = PLUGIN_GITHUB_REPOS.fetch(plugin)
       end
 
       def command

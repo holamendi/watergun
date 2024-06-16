@@ -4,7 +4,7 @@
     <% if app.github_repo.present? %>
       <span class="text-sm text-conten"><%= app.github_repo.repo %></span>
     <% end %>
-    <% if app.https_urls.present? %>
+    <% if app.url.present? %>
       <span class="block text-sm text-content link text-accent-content"><%= link_to app.url, app.url, target: :_blank %></span>
     <% end %>
   </div>

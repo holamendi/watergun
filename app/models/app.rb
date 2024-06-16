@@ -24,19 +24,7 @@ class App < ApplicationRecord
     deployments.success.any?
   end
 
-  def ssl_enabled?
-    https_urls.any?
-  end
-
-  def https_urls
-    urls.to_a.select { |url| url.start_with?("https://") }
-  end
-
-  def url
-    https_urls.first || urls.first
-  end
-
-  def urls_resolve_to_server?
-    urls.all? { |url| Resolv.getaddress(URI.parse(url).host) == server.public_ip }
+  memoize def url
+    domains.ssl_enabled.first&.url || domains.first&.url
   end
 end

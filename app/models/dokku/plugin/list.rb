@@ -9,7 +9,7 @@ module Dokku
         "dokku plugin:list"
       end
 
-      def parsed_output
+      memoize def parsed_output
         return unless success?
 
         text_output.split("\n").map(&:strip).map do |line|

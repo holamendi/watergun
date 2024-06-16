@@ -1,5 +1,7 @@
 module Dokku
   class Base
+    include Memery
+
     attr_reader :ssh_session, :result
 
     delegate :success?,

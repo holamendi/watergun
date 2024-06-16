@@ -12,6 +12,9 @@ class Domain < ApplicationRecord
     destroyed: 2
   }, _default: :pending, _prefix: true
 
+  scope :ssl_enabled, -> { where(ssl_enabled: true) }
+  scope :ssl_disabled, -> { where(ssl_enabled: false) }
+
   validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
@@ -19,5 +22,13 @@ class Domain < ApplicationRecord
     Resolv.getaddress(hostname) == app.server.public_ip
   rescue Resolv::ResolvError
     false
+  end
+
+  def url
+    "#{scheme}://#{hostname}"
+  end
+
+  def scheme
+    ssl_enabled ? "https" : "http"
   end
 end

@@ -14,12 +14,21 @@ module ServerActions
 
     def perform
       create_dokku_app!
+      create_domains!
     end
 
     private
 
     def create_dokku_app!
       Dokku::Apps::Create.call!(ssh, app: dokku_app_id)
+    end
+
+    def create_domains!
+      dokku_app_hostnames.each { |hostname| app.domains.create!(hostname:) }
+    end
+
+    def dokku_app_hostnames
+      Dokku::Domains::Report.call!(ssh, app: dokku_app_id).domains_app_vhosts
     end
   end
 end

@@ -12,7 +12,27 @@ module Dokku
         "dokku apps:report #{app} --format json"
       end
 
-      def parsed_output
+      def created_at
+        parsed_output[:created_at]
+      end
+
+      def deploy_source
+        parsed_output[:deploy_source]
+      end
+
+      def deploy_source_metadata
+        parsed_output[:deploy_source_metadata]
+      end
+
+      def dir
+        parsed_output[:dir]
+      end
+
+      def locked
+        parsed_output[:locked]
+      end
+
+      memoize def parsed_output
         return unless success?
 
         JSON.parse(result.text_output).then do |json|

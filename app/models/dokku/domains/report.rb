@@ -8,11 +8,23 @@ module Dokku
         @app = app
       end
 
-      def command
-        "dokku domains:report #{app}"
+      def domains_app_enabled
+        parsed_output[:domains_app_enabled]
       end
 
-      def parsed_output
+      def domains_app_vhosts
+        parsed_output[:domains_app_vhosts]
+      end
+
+      def domains_global_enabled
+        parsed_output[:domains_global_enabled]
+      end
+
+      def domains_global_vhosts
+        parsed_output[:domaisn_global_vhosts]
+      end
+
+      memoize def parsed_output
         return unless success?
 
         text_output.lines.each_with_object({}) do |line, hash|
@@ -21,8 +33,24 @@ module Dokku
           key, value = line.split(":", 2).map(&:strip)
           next if key.nil? || value.nil?
 
-          hash[key.downcase.tr(" ", "_").to_sym] = value
+          key = key.downcase.tr(" ", "_")
+
+          hash[key.to_sym] = if key.include?("_vhosts")
+            value.split(" ")
+          elsif value == "true"
+            true
+          elsif value == "false"
+            false
+          else
+            value
+          end
         end
+      end
+
+      private
+
+      def command
+        "dokku domains:report #{app}"
       end
     end
   end

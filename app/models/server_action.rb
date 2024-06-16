@@ -1,4 +1,5 @@
 class ServerAction < ApplicationRecord
+  include Memery
   include ServerActions::Performer
 
   belongs_to :org, default: -> { Current.org }
