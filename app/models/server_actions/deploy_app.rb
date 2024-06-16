@@ -27,11 +27,12 @@ module ServerActions
       authenticate_github_account!
       sync_git_repo!
       rebuild_dokku_app!
-      deployment.success!
       schedule_enable_ssl!
     rescue Dokku::CommandExecutionError => e
       deployment.failure!
       raise e
+    else
+      deployment.success!
     end
 
     private
