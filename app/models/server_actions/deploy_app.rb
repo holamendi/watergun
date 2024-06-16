@@ -28,7 +28,6 @@ module ServerActions
       sync_git_repo!
       rebuild_dokku_app!
       deployment.success!
-      update_app_urls!
       schedule_enable_ssl!
     rescue Dokku::CommandExecutionError => e
       deployment.failure!
@@ -51,8 +50,8 @@ module ServerActions
       Dokku::Git::Auth.call!(ssh, access_token: github_access_token.token)
     end
 
-    def github_access_token
-      @github_access_token ||= deployment.org.github_access_token
+    memoize def github_access_token
+      deployment.org.github_access_token
     end
 
     def schedule_enable_ssl!
