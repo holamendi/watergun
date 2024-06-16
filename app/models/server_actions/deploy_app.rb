@@ -45,11 +45,6 @@ module ServerActions
       Dokku::Ps::Rebuild.call!(ssh, app: dokku_app_id)
     end
 
-    def update_app_urls!
-      urls = Dokku::Urls.call(ssh, app: dokku_app_id).parsed_output
-      app.update!(urls:) if urls.present?
-    end
-
     def authenticate_github_account!
       return unless github_access_token
 
@@ -61,7 +56,7 @@ module ServerActions
     end
 
     def schedule_enable_ssl!
-      return if app.https_urls.any?
+      return unless app.domains.ssl_disabled.any?
 
       ServerActions::EnableAppSsl.perform_later!(app)
     end
