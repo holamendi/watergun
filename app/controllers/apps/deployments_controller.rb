@@ -3,8 +3,6 @@ module Apps
     before_action :set_app
 
     def create
-      deployment = @app.deployments.new(source: "web")
-
       commit = if params[:sha].present?
         github_repo.remote_commit(params[:sha])
       else
@@ -12,7 +10,7 @@ module Apps
       end
 
       if commit.present?
-        deployment.assign_attributes(
+        deployment = @app.deployments.create!(
           sha: commit.sha,
           author_url: commit.author.html_url,
           author_avatar_url: commit.author.avatar_url,
@@ -20,7 +18,6 @@ module Apps
           commit_message: commit.commit.message,
           commit_html_url: commit.html_url
         )
-        deployment.save!
         ServerActions::DeployApp.perform_later!(deployment)
         flash[:notice] = "Deployment scheduled"
         redirect_to @app

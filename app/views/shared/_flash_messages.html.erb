@@ -7,7 +7,7 @@
     "info" => "alert-info"
   }
 %>
-<div class="toast">
+<div class="toast" data-turbo-permanent>
   <% flash.each do |type, message| %>
     <div role="alert" class="alert <%= class_mapping[type.to_s] %> mb-6" data-turbo-temporary>
       <span><%= message %></span>

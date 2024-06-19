@@ -21,8 +21,6 @@ module Api
       end
 
       def create
-        deployment = @app.deployments.kept.new(source: "api_v1")
-
         commit = if params[:sha].present?
           @github_repo.remote_commit(params[:sha])
         else
@@ -30,7 +28,7 @@ module Api
         end
 
         if commit.present?
-          deployment.assign_attributes(
+          deployment = @app.deployments.create!(
             sha: commit.sha,
             author_url: commit.author.html_url,
             author_avatar_url: commit.author.avatar_url,
@@ -38,7 +36,6 @@ module Api
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
-          deployment.save!
           ServerActions::DeployApp.perform_later!(deployment)
           render json: DeploymentResource.new(deployment), status: :created
         else
