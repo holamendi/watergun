@@ -12,7 +12,14 @@ module Apps
       end
 
       if commit.present?
-        deployment.sha = commit.sha
+        deployment.assign_attributes(
+          sha: commit.sha,
+          author_url: commit.author.html_url,
+          author_avatar_url: commit.author.avatar_url,
+          author_date: commit.commit.author.date,
+          commit_message: commit.commit.message,
+          commit_html_url: commit.html_url
+        )
         deployment.save!
         ServerActions::DeployApp.perform_later!(deployment)
         flash[:notice] = "Deployment scheduled"
