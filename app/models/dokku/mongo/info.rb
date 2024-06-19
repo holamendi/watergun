@@ -12,7 +12,7 @@ module Dokku
         "dokku mongo:info #{service}"
       end
 
-      def parsed_output
+      memoize def parsed_output
         return unless success?
 
         text_output.lines.each_with_object({}) do |line, hash|
