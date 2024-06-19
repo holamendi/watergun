@@ -8,7 +8,7 @@ class Deployment < ApplicationRecord
   store_attribute :data, :author_login, :string
   store_attribute :data, :author_url, :string
   store_attribute :data, :author_avatar_url, :string
-  store_attribute :data, :commit_date, :datetime
+  store_attribute :data, :author_date, :datetime
   store_attribute :data, :commit_message, :string
   store_attribute :data, :commit_html_url, :string
 

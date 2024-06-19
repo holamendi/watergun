@@ -12,6 +12,7 @@ module Apps
       if commit.present?
         deployment = @app.deployments.create!(
           sha: commit.sha,
+          author_login: commit.author.login,
           author_url: commit.author.html_url,
           author_avatar_url: commit.author.avatar_url,
           author_date: commit.commit.author.date,
