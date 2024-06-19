@@ -2,7 +2,7 @@ module ServerActions
   class UpdateAppEnv < ServerAction
     SLUG = "apps.update_env"
 
-    alias_method :app, :actionable
+    actionable App
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :env, :json
@@ -17,14 +17,14 @@ module ServerActions
       self.env ||= env_configuration.variables
     end
 
+    private
+
     def perform
       set_dokku_app_config!
     end
 
-    private
-
-    def set_dokku_app_config
-      Dokku::Config::Set.cal!(ssh, app: dokku_app_id, env:)
+    def set_dokku_app_config!
+      Dokku::Config::Set.call!(ssh, app: dokku_app_id, env:)
     end
   end
 end

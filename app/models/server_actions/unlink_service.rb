@@ -2,7 +2,7 @@ module ServerActions
   class UnlinkService < ServerAction
     SLUG = "services.unlink"
 
-    alias_method :service_link, :actionable
+    actionable ServiceLink
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :dokku_service_id, :string
@@ -22,12 +22,12 @@ module ServerActions
       service
     end
 
+    private
+
     def perform
       unlink_dokku_service!
       service_link.unlinked!
     end
-
-    private
 
     def unlink_dokku_service!
       dokku_command_class.call!(ssh, service: dokku_service_id, app: dokku_app_id)

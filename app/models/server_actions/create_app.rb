@@ -2,7 +2,7 @@ module ServerActions
   class CreateApp < ServerAction
     SLUG = "apps.create"
 
-    alias_method :app, :actionable
+    actionable App
 
     store_attribute :payload, :dokku_app_id, :string
 
@@ -12,12 +12,12 @@ module ServerActions
       self.dokku_app_id ||= app.dokku_id
     end
 
+    private
+
     def perform
       create_dokku_app!
       create_domains!
     end
-
-    private
 
     def create_dokku_app!
       Dokku::Apps::Create.call!(ssh, app: dokku_app_id)

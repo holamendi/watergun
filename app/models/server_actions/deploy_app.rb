@@ -2,7 +2,7 @@ module ServerActions
   class DeployApp < ServerAction
     SLUG = "apps.deploy"
 
-    alias_method :deployment, :actionable
+    actionable Deployment
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :repo, :string
@@ -10,7 +10,7 @@ module ServerActions
 
     validates :dokku_app_id, presence: true
 
-    delegate :app, to: :deployment
+    delegate :app, :org, to: :deployment
 
     before_validation on: :create do
       self.dokku_app_id ||= app.dokku_id
@@ -21,6 +21,8 @@ module ServerActions
     def concurrency_key
       app
     end
+
+    private
 
     def perform
       deployment.in_progress!
@@ -34,8 +36,6 @@ module ServerActions
     else
       deployment.success!
     end
-
-    private
 
     def sync_git_repo!
       Dokku::Git::Sync.call!(ssh, app: dokku_app_id, repo:, sha:)
@@ -52,7 +52,7 @@ module ServerActions
     end
 
     memoize def github_access_token
-      deployment.org.github_access_token
+      org.github_access_token
     end
 
     def schedule_enable_ssl!

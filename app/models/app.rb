@@ -21,7 +21,7 @@ class App < ApplicationRecord
   after_update_commit -> { broadcast_refresh_to(self) }
 
   def deployed?
-    deployments.success.any?
+    deployed_at.present?
   end
 
   memoize def url

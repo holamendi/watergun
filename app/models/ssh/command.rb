@@ -14,7 +14,13 @@ module Ssh
       output << OutputEntry.new(timestamp: Time.current, stream: stream.to_s, data:)
     end
 
-    def text_output
+    def to_s
+      str = "[#{started_at}][command.execute] #{command}\n"
+      str << output.map { |entry| "[#{entry.timestamp}][command.#{entry.stream}] #{entry.data}" }.join
+      str << "[#{finished_at}][command.finish] #{command} (exit code: #{exit_code})"
+    end
+
+    def text_output(timestamp: true, stream: true)
       output.map(&:data).join
     end
 

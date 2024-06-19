@@ -4,12 +4,12 @@
     <% if app.github_repo.present? %>
       <span class="text-sm text-conten"><%= app.github_repo.repo %></span>
     <% end %>
-    <% if app.url.present? %>
+    <% if app.deployed? && app.url.present? %>
       <span class="block text-sm text-content link text-accent-content"><%= link_to app.url, app.url, target: :_blank %></span>
     <% end %>
   </div>
   <div class="flex gap-x-2">
-    <% if app.github_repo.present? && controller_name == "apps" && action_name == "show" %>
+    <% if app.github_repo.present?%>
       <%= button_to "Deploy", app_deployments_path(@app), class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
     <% end %>
     <% if app.deployed? %>

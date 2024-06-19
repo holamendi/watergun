@@ -2,7 +2,7 @@ module ServerActions
   class LinkService < ServerAction
     SLUG = "services.link"
 
-    alias_method :service_link, :actionable
+    actionable ServiceLink
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :dokku_service_id, :string

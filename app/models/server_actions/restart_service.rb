@@ -2,7 +2,7 @@ module ServerActions
   class RestartService < ServerAction
     SLUG = "services.restart"
 
-    alias_method :service, :actionable
+    actionable Service
 
     store_attribute :payload, :dokku_service_id, :string
     store_attribute :payload, :service_type, :string
@@ -14,11 +14,11 @@ module ServerActions
       self.dokku_service_id ||= service.dokku_id
     end
 
+    private
+
     def perform
       restart_dokku_service!
     end
-
-    private
 
     def restart_dokku_service!
       dokku_command_class.call!(ssh, service: dokku_service_id)

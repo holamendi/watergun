@@ -30,16 +30,13 @@ class ServerAction < ApplicationRecord
   def perform_action
     raise "server action must implement #perform" unless respond_to?(:perform, true)
 
-    self.running_at = Time.current
     running!
-
     session = server.ssh_session do |ssh_session|
       with(ssh_session:) do
         perform
       rescue Dokku::CommandExecutionError
       end
     end
-
     create_log!(ssh_commands: session.commands)
     self
   rescue => e
@@ -53,6 +50,10 @@ class ServerAction < ApplicationRecord
     save!
   end
 
+  def running!(at = Time.current)
+    update!(status: :running, running_at: at)
+  end
+
   def finished?
     finished_at.present?
   end
@@ -63,17 +64,25 @@ class ServerAction < ApplicationRecord
     finished_at - running_at
   end
 
-  def self.slug
-    self::SLUG
-  end
-
   def slug
     self.class.slug
   end
 
-  def self.perform_later!(actionable, depends_on: nil, **)
-    action = create!(actionable:, preceding_action: depends_on, **)
-    PerformServerActionJob.perform_later(action)
-    action
+  class << self
+    def actionable(type)
+      alias_method :"#{type.to_s.underscore}", :actionable
+
+      validates :actionable_type, inclusion: {in: [type.to_s]}
+    end
+
+    def slug
+      self::SLUG
+    end
+
+    def perform_later!(actionable, depends_on: nil, **)
+      action = create!(actionable:, preceding_action: depends_on, **)
+      PerformServerActionJob.perform_later(action)
+      action
+    end
   end
 end
