@@ -10,7 +10,7 @@ development:
   workers:
     - queues: "*"
       threads: 5
-      polling_interval: 0.1
+      polling_interval: 0.5
 
 production:
   dispatchers:
@@ -24,4 +24,4 @@ production:
   workers:
     - queues: "*"
       threads: 5
-      polling_interval: 0.1
+      polling_interval: 0.5
