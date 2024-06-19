@@ -25,7 +25,7 @@ module Apps
 
     def logs
       @deployment = @app.deployments.kept.finished.find(params[:id])
-      render plain: @deployment.server_action.log.text_output
+      render plain: @deployment.server_action.log.to_s
     end
 
     private
