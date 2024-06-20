@@ -12,7 +12,7 @@ module Projects
       private
 
       def set_app
-        @app = current_project.app
+        @app = current_project.apps.kept.find(params[:app_id])
       end
     end
   end
