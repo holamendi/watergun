@@ -22,7 +22,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @apps.each do |app| %>
+    <% @apps.select(&:persisted?).each do |app| %>
       <tr>
         <td><%= link_to app.name, project_app_path(@project, app), class: "link" %></td>
       </tr>

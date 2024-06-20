@@ -5,10 +5,10 @@ class ProjectsController < ApplicationController
 
   def show
     @project = current_org.projects.kept.find(params[:id])
-    @apps = @project.apps
-    @services = @project.services
     @app = @project.apps.new
     @app.build_github_repo
+    @apps = @project.apps
+    @services = @project.services
   end
 
   def new

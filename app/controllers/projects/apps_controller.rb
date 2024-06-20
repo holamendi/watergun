@@ -15,7 +15,7 @@ module Projects
 
       if @app.save
         ServerActions::CreateApp.perform_later!(@app)
-        render turbo_stream:
+        redirect_to project_app_path(current_project, @app), notice: "App created successfully.", status: :see_other
       else
         render turbo_stream: turbo_stream.replace(
           @app,
