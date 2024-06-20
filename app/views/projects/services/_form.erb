@@ -1,0 +1,12 @@
+<%= form_with model: [project, service], class: "space-y-4" do |form| %>
+  <div class="form-control">
+    <%= form.label :service_type, "Type", class: "label" %>
+    <%= form.select :service_type, Service.service_types.keys, {}, class: "select select-bordered", disabled: form.object.persisted? %>
+  </div>
+  <%= button_tag type: "submit",
+                 class: "btn btn-primary no-animation",
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+    Save
+  <% end %>
+  <a class="btn btn-ghost" onclick="service_modal.close()">Cancel</a>
+<% end %>

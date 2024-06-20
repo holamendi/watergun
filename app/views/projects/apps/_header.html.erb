@@ -10,7 +10,11 @@
   </div>
   <div class="flex gap-x-2">
     <% if app.github_repo.present?%>
-      <%= button_to "Deploy", project_app_deployments_path(@project, @app), class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
+      <%= button_to project_app_deployments_path(@project, @app),
+          class: "btn btn-primary btn-sm rounded-md font-normal text-sm",
+          data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save"} do %>
+        Deploy
+      <% end %>
     <% end %>
     <% if app.deployed? %>
       <%= button_to "Restart", project_app_restarts_path(@project, @app), class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>

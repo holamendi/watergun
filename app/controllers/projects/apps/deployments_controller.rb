@@ -20,7 +20,7 @@ module Projects
           )
           ServerActions::DeployApp.perform_later!(deployment)
           flash[:notice] = "Deployment scheduled"
-          redirect_to current_app
+          redirect_to project_app_path(current_project, current_app)
         else
           flash.now[:alert] = deployment.errors.full_messages.to_sentence
           render :new, status: :unprocessable_entity

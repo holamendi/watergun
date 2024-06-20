@@ -10,8 +10,8 @@ module ServerActions
     validates :dokku_service_id, presence: true
 
     before_validation on: :create do
-      self.service_type ||= service.service_type
       self.dokku_service_id ||= service.dokku_id
+      self.service_type ||= service.service_type
     end
 
     private
@@ -48,7 +48,7 @@ module ServerActions
       plugins.installed?(service_type)
     end
 
-    def install_plugin!
+    def install_plugin
       Dokku::Plugin::Install.call!(ssh, plugin: service_type)
     end
   end

@@ -18,7 +18,7 @@ module Projects
         redirect_to project_app_path(current_project, @app), notice: "App created successfully.", status: :see_other
       else
         render turbo_stream: turbo_stream.replace(
-          @app,
+          "new_app",
           partial: "projects/apps/form",
           locals: {
             project: current_project,

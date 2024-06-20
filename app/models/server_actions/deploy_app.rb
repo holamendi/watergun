@@ -30,7 +30,7 @@ module ServerActions
       sync_git_repo!
       rebuild_dokku_app!
       schedule_enable_ssl!
-    rescue Dokku::CommandExecutionError => e
+    rescue Ssh::CommandExecutionError => e
       deployment.failure!
       raise e
     else

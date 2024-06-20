@@ -43,7 +43,7 @@ class ServerAction < ApplicationRecord
   rescue => e
     self.status = :failure
     self.failure_message = e.detailed_message
-    Honbeybadger.notify(e)
+    Honeybadger.notify(e)
     self
   ensure
     self.finished_at = Time.current

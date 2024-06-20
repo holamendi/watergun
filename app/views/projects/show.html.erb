@@ -2,35 +2,74 @@
   <span class="pl-2 select-none">/</span>
   <span><%= @project.name %></span>
 <% end %>
-<h1 class="text-2xl font-bold">Apps</h1>
-<hr>
+<div class="flex justify-between">
+  <h1 class="text-2xl font-bold"><%= @project.name %></h1>
+  <% if @apps.any? || @services.any? %>
+    <div>
+      <button class="font-normal btn btn-sm btn-ghost" onclick="app_modal.showModal()">Add Github Repo</button>
+      <button class="font-normal btn btn-sm btn-ghost" onclick="service_modal.showModal()">Add a Database</button>
+    </div>
+  <% end %>
+</div>
 <div class="py-6">
-  <button class="link" onclick="app_modal.showModal()">Connect Github Repo</button>
+  <% if @apps.any? || @services.any? %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Resource</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @apps.each do |app| %>
+          <tr>
+            <td>
+              <div class="flex justify-between">
+                <div>
+                  <a href="<%= project_app_path(@project, app) %>" class="link"><%= app.name %></a>
+                </div>
+                <div>
+                  <a href="<%= edit_project_app_path(@project, app) %>" class="btn btn-sm btn-ghost">Edit</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% @services.each do |service| %>
+          <tr>
+            <td>
+              <div class="flex justify-between">
+                <div>
+                  <a href="<%= project_service_path(@project, service) %>" class="link"><%= service.name %></a>
+                </div>
+                <div>
+                  <a href="<%= edit_project_service_path(@project, service) %>" class="btn btn-sm btn-ghost">Edit</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="flex justify-center py-10">
+      <div>
+        <button class="text-lg font-normal link btn btn-ghost" onclick="app_modal.showModal()">Connect a Github Repo</button> or
+        <button class="text-lg font-normal link btn btn-ghost" onclick="service_modal.showModal()">Add a Database</button>
+      </div>
+    </div>
+  <% end %>
   <dialog id="app_modal" class="modal">
     <div class="modal-box">
       <h3 class="text-lg font-bold">Connect Github Repo</h3>
-      <%= turbo_frame_tag @app do %>
+      <div id="new_app">
         <%= render "projects/apps/form", project: @project, app: @app %>
-      <% end %>
+      </div>
     </div>
   </dialog>
-</div>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @apps.select(&:persisted?).each do |app| %>
-      <tr>
-        <td><%= link_to app.name, project_app_path(@project, app), class: "link" %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-<h1 class="mt-6 text-2xl font-bold">Services</h1>
-<hr>
-<div class="py-6">
-
+  <dialog id="service_modal" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Add a Database</h3>
+      <%= render "projects/services/form", project: @project, service: @service %>
+    </div>
+  </dialog>
 </div>

@@ -25,6 +25,7 @@ class Service < ApplicationRecord
   }, _default: :pending, _prefix: true
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
+  validates :service_type, inclusion: {in: service_types.keys}
 
   after_update_commit -> { broadcast_refresh_to(self) }
 end

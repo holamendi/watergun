@@ -50,7 +50,7 @@ Rails.application.routes.draw do
           resources :restarts, only: :create
         end
       end
-      resources :databases
+      resources :services
     end
   end
 

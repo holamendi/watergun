@@ -1,7 +1,7 @@
 module Projects
   class ServicesController < BaseController
     def create
-      @service = current_project.services.new(service_params)
+      @service = current_project.services.new(service_params.merge(name: SecureRandom.hex(4)))
 
       if @service.save
         ServerActions::CreateService.perform_later!(@service)
@@ -11,7 +11,7 @@ module Projects
             ServerActions::LinkService.perform_later!(service_link)
           end
         end
-        redirect_to current_project, notice: "Service created successfully."
+        redirect_to current_project, notice: "Service created successfully.", status: :see_other
       end
     end
 
