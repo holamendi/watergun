@@ -1,8 +1,0 @@
-<%= form_with model: @app, class: "space-y-4" do |form| %>
-  <%= form.label :name, class: "form-control" do %>
-    <div class="label"><span class="label-text">Name</span></div>
-    <%= form.text_field :name, class: "input input-sm px-2 text-sm rounded-md input-bordered w-full" %>
-    <%= error_messages_for(form.object, :name) %>
-  <% end %>
-  <%= form.submit "Save", class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
-<% end %>

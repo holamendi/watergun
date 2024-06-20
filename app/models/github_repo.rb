@@ -1,22 +1,21 @@
 class GithubRepo < ApplicationRecord
   belongs_to :org, default: -> { Current.org }
-
-  belongs_to :app, inverse_of: :github_repo
+  belongs_to :app
 
   validates :repo, :branch, presence: true
   # validates :repo, format: {with: %r{\A[a-zA-Z0-9-]+/[a-zA-Z0-9-]+\z}}, allow_blank: true
-  validate :validate_repo_exists, on: :create
-  validate :validate_branch_exists, if: :branch_changed?
+  validate :validate_remote_repo_exists
+  validate :validate_remote_branch_exists
 
-  before_create { self.private = remote_repo.private? }
+  before_save { self.private = remote_repo.private? }
 
-  def remote_repo
+  memoize def remote_repo
     oktokit_client.repo(repo)
   rescue Octokit::NotFound, Octokit::InvalidRepository
     nil
   end
 
-  def remote_branch
+  memoize def remote_branch
     oktokit_client.branch(repo, branch)
   rescue Octokit::NotFound
     nil
@@ -30,22 +29,22 @@ class GithubRepo < ApplicationRecord
 
   private
 
-  def oktokit_client
-    @oktokit_client ||= if org.github_access_token
+  memoize def oktokit_client
+    if org.github_access_token
       Octokit::Client.new(access_token: org.github_access_token.token)
     else
       Octokit::Client.new
     end
   end
 
-  def validate_repo_exists
+  def validate_remote_repo_exists
     return if errors.where(:repo).any?
     return if remote_repo
 
     errors.add(:repo, "does not exist")
   end
 
-  def validate_branch_exists
+  def validate_remote_branch_exists
     return if errors.where(:repo).any? || errors.where(:branch).any?
     return if remote_branch
 

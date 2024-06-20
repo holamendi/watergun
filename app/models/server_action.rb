@@ -34,17 +34,17 @@ class ServerAction < ApplicationRecord
     session = server.ssh_session do |ssh_session|
       with(ssh_session:) do
         perform
-      rescue Dokku::CommandExecutionError
+      rescue Ssh::CommandExecutionError
       end
     end
     create_log!(ssh_commands: session.commands)
+    self.status = session.status
     self
   rescue => e
     self.status = :failure
     self.failure_message = e.detailed_message
     Honbeybadger.notify(e)
-  else
-    self.status = :success
+    self
   ensure
     self.finished_at = Time.current
     save!

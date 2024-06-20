@@ -1,6 +1,10 @@
 module Dokku
   module Postgres
     class Create < Base
+      VERSIONS = %w[
+        16.2
+      ]
+
       attr_reader :service
 
       def initialize(ssh_session, service:)

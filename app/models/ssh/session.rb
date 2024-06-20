@@ -37,6 +37,12 @@ module Ssh
       ssh_command
     end
 
+    def execute!(command)
+      result = execute(command)
+      raise CommandExecutionError.new(command, result) if result.failure?
+      result
+    end
+
     def success?
       commands.all?(&:success?)
     end
@@ -53,6 +59,19 @@ module Ssh
 
     def ssh_private_key
       server.ssh_key.private_key
+    end
+  end
+
+  class CommandExecutionError < StandardError
+    attr_reader :command, :result
+
+    def initialize(command, result)
+      @command = command
+      @result = result
+    end
+
+    def message
+      "command failed with status #{result.exit_code}: #{command}"
     end
   end
 end

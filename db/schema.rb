@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -33,8 +33,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
     t.datetime "discarded_at"
     t.datetime "deployed_at"
     t.string "status"
+    t.integer "project_id"
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
+    t.index ["project_id"], name: "index_apps_on_project_id"
     t.index ["server_id"], name: "index_apps_on_server_id"
   end
 
@@ -84,6 +86,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
     t.index ["org_id"], name: "index_containers_on_org_id"
     t.index ["server_id"], name: "index_containers_on_server_id"
     t.index ["status"], name: "index_containers_on_status"
+  end
+
+  create_table "databases", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "name", null: false
+    t.integer "status", null: false
+    t.json "data", default: {}
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "project_id"
+    t.integer "database_type", null: false
+    t.index ["discarded_at"], name: "index_databases_on_discarded_at"
+    t.index ["org_id"], name: "index_databases_on_org_id"
+    t.index ["project_id"], name: "index_databases_on_project_id"
+    t.index ["server_id"], name: "index_databases_on_server_id"
+    t.index ["status"], name: "index_databases_on_status"
   end
 
   create_table "deployments", force: :cascade do |t|
@@ -167,6 +187,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "projects", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "server_id", null: false
+    t.string "name"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_projects_on_discarded_at"
+    t.index ["org_id"], name: "index_projects_on_org_id"
+    t.index ["server_id"], name: "index_projects_on_server_id"
+  end
+
   create_table "server_action_logs", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_action_id", null: false
@@ -244,7 +276,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "dokku_id"
+    t.integer "project_id", null: false
     t.index ["org_id"], name: "index_services_on_org_id"
+    t.index ["project_id"], name: "index_services_on_project_id"
     t.index ["server_id"], name: "index_services_on_server_id"
     t.index ["service_type"], name: "index_services_on_service_type"
     t.index ["status"], name: "index_services_on_status"
@@ -293,6 +327,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
 
   add_foreign_key "api_tokens", "orgs"
   add_foreign_key "apps", "orgs"
+  add_foreign_key "apps", "projects"
   add_foreign_key "apps", "servers"
   add_foreign_key "command_runs", "apps"
   add_foreign_key "command_runs", "orgs"
@@ -300,6 +335,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
   add_foreign_key "container_checks", "orgs"
   add_foreign_key "containers", "orgs"
   add_foreign_key "containers", "servers"
+  add_foreign_key "databases", "orgs"
+  add_foreign_key "databases", "projects"
+  add_foreign_key "databases", "servers"
   add_foreign_key "deployments", "apps"
   add_foreign_key "deployments", "orgs"
   add_foreign_key "domains", "apps"
@@ -310,6 +348,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
   add_foreign_key "github_repos", "orgs"
   add_foreign_key "memberships", "orgs"
   add_foreign_key "memberships", "users"
+  add_foreign_key "projects", "orgs"
+  add_foreign_key "projects", "servers"
   add_foreign_key "server_action_logs", "orgs"
   add_foreign_key "server_action_logs", "server_actions"
   add_foreign_key "server_actions", "orgs"
@@ -320,6 +360,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_19_101810) do
   add_foreign_key "service_links", "orgs"
   add_foreign_key "service_links", "services"
   add_foreign_key "services", "orgs"
+  add_foreign_key "services", "projects"
   add_foreign_key "services", "servers"
   add_foreign_key "sessions", "users"
   add_foreign_key "ssh_keys", "orgs"

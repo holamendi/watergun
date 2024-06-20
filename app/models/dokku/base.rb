@@ -26,7 +26,7 @@ module Dokku
     end
 
     def call!
-      raise Dokku::CommandExecutionError.new("dokku command failed: #{command}", result) if call.failure?
+      @result = ssh_session.execute!(command)
       self
     end
 
