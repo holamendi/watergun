@@ -1,0 +1,9 @@
+<%# locals: (project:) -%>
+
+<%= link_to project do %>
+  <div class="flex h-full rounded-md shadow-lg hover:shadow-xl card bg-base-200">
+    <div class="flex-grow card-body">
+      <h2 class="text-lg font-bold card-title"><%= project.name %></h2>
+    </div>
+  </div>
+<% end %>

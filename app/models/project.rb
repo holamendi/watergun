@@ -5,4 +5,6 @@ class Project < ApplicationRecord
   belongs_to :server, default: -> { Current.server }
   has_many :apps, dependent: :destroy
   has_many :services, dependent: :destroy
+
+  validates :name, presence: true, uniqueness: {scope: :org_id, conditions: -> { undiscarded }}
 end

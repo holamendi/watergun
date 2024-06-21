@@ -25,8 +25,13 @@ module ServerActions
     private
 
     def perform
+      service_link.deleting!
       unlink_dokku_service!
-      service_link.unlinked!
+    rescue Ssh::CommandExecutionError
+      service_link.error!
+      raise
+    else
+      service_link.deleted!
     end
 
     def unlink_dokku_service!

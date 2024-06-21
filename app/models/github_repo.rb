@@ -10,32 +10,32 @@ class GithubRepo < ApplicationRecord
   before_save { self.private = remote_repo.private? }
 
   memoize def remote_repo
-    oktokit_client.repo(repo)
+    octokit_client.repo(repo)
   rescue Octokit::NotFound, Octokit::InvalidRepository
     nil
   end
 
   memoize def remote_branch
-    oktokit_client.branch(repo, branch)
+    octokit_client.branch(repo, branch)
   rescue Octokit::NotFound
     nil
   end
 
   def remote_commit(sha)
-    oktokit_client.commit(repo, sha)
+    octokit_client.commit(repo, sha)
   rescue Octokit::UnprocessableEntity
     nil
   end
 
-  private
-
-  memoize def oktokit_client
+  memoize def octokit_client
     if org.github_access_token
       Octokit::Client.new(access_token: org.github_access_token.token)
     else
       Octokit::Client.new
     end
   end
+
+  private
 
   def validate_remote_repo_exists
     return if errors.where(:repo).any?

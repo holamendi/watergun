@@ -5,8 +5,5 @@ class Container < ApplicationRecord
   belongs_to :containerizable, polymorphic: true
   has_many :checks, class_name: "ContainerCheck", dependent: :delete_all
 
-  enum status: {
-    running: 0,
-    stopped: 1
-  }, _default: :running
+  str_enum :status, [:running, :stopped], default: :running
 end

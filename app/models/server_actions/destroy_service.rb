@@ -17,8 +17,13 @@ module ServerActions
     private
 
     def perform
+      service.deleting!
       destroy_dokku_service!
-      service.status_destroyed!
+    rescue Ssh::CommandExecutionError
+      service.error!
+      raise
+    else
+      service.deleted!
     end
 
     def destroy_dokku_service!

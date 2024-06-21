@@ -15,10 +15,10 @@ module Projects
 
       if @app.save
         ServerActions::CreateApp.perform_later!(@app)
-        redirect_to project_app_path(current_project, @app), notice: "App created successfully.", status: :see_other
+        redirect_to current_project, notice: "App created successfully.", status: :see_other
       else
         render turbo_stream: turbo_stream.replace(
-          "new_app",
+          "app_form",
           partial: "projects/apps/form",
           locals: {
             project: current_project,

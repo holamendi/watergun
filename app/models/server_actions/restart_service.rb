@@ -17,7 +17,13 @@ module ServerActions
     private
 
     def perform
+      service.restarting!
       restart_dokku_service!
+    rescue Ssh::CommandExecutionError
+      service.error!
+      raise
+    else
+      service.active!
     end
 
     def restart_dokku_service!

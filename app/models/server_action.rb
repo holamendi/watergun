@@ -9,13 +9,7 @@ class ServerAction < ApplicationRecord
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
-  enum status: {
-    queued: 0,
-    running: 1,
-    success: 2,
-    failure: 3,
-    cancelled: 4
-  }, _default: :queued
+  str_enum :status, %i[queued running success failure cancelled error], default: :queued
 
   attribute :source, :string, default: "web"
 
@@ -41,9 +35,9 @@ class ServerAction < ApplicationRecord
     self.status = session.status
     self
   rescue => e
-    self.status = :failure
-    self.failure_message = e.detailed_message
-    Honeybadger.notify(e)
+    self.status = :error
+    Honeybadger.notify(e, context: {server_action_id: id})
+    raise if Rails.env.development?
     self
   ensure
     self.finished_at = Time.current

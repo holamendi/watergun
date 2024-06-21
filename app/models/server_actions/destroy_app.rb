@@ -15,8 +15,14 @@ module ServerActions
     private
 
     def perform
+      app.deleting!
       destroy_dokku_app!
       unlink_and_discard_service_links
+    rescue Ssh::CommandExecutionError
+      app.error!
+      raise
+    else
+      app.deleted!
     end
 
     def destroy_dokku_app!

@@ -17,6 +17,11 @@ module ServerActions
     def perform
       create_dokku_app!
       create_domains!
+    rescue Ssh::CommandExecutionError
+      app.error!
+      raise
+    else
+      app.active!
     end
 
     def create_dokku_app!
@@ -24,7 +29,7 @@ module ServerActions
     end
 
     def create_domains!
-      dokku_app_hostnames.each { |hostname| app.domains.create!(hostname:) }
+      dokku_app_hostnames.each { |hostname| app.domains.create!(hostname:, status: :active) }
     end
 
     def dokku_app_hostnames

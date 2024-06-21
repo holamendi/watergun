@@ -12,12 +12,7 @@ class Deployment < ApplicationRecord
   store_attribute :data, :commit_message, :string
   store_attribute :data, :commit_html_url, :string
 
-  enum status: {
-    queued: 0,
-    in_progress: 1,
-    success: 2,
-    failure: 3
-  }, _default: :queued
+  str_enum :status, [:pending, :deploying, :success, :error], default: :pending
 
   scope :kept, -> { joins(:app).merge(App.kept) }
   scope :finished, -> { where.not(finished_at: nil) }
@@ -40,8 +35,8 @@ class Deployment < ApplicationRecord
     finished_at.present?
   end
 
-  def in_progress!(at = Time.current)
-    update!(status: :in_progress, started_at: at)
+  def deploying!(at = Time.current)
+    update!(status: :deploying, started_at: at)
   end
 
   def success!(at = Time.current)
@@ -51,8 +46,8 @@ class Deployment < ApplicationRecord
     end
   end
 
-  def failure!(at = Time.current)
-    update!(status: :failure, finished_at: at)
+  def error!(at = Time.current)
+    update!(status: :error, finished_at: at)
   end
 
   def duration

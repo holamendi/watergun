@@ -23,9 +23,12 @@ module ServerActions
 
     def perform
       add_dokku_domain!
-      domain.status_created!
-
-      schedule_enable_ssl! if domain.resolves_to_server?
+    rescue Ssh::CommandExecutionError
+      domain.error!
+      raise
+    else
+      domain.active!
+      schedule_enable_ssl!
     end
 
     private
@@ -35,6 +38,8 @@ module ServerActions
     end
 
     def schedule_enable_ssl!
+      return unless domain.resolves_to_server?
+
       ServerActions::EnableAppSsl.perform_later!(domain.app)
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_21_104321) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -69,7 +69,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
     t.integer "server_id", null: false
     t.string "containerizable_type", null: false
     t.integer "containerizable_id", null: false
-    t.integer "status"
+    t.string "status"
     t.string "cid", null: false
     t.string "name", null: false
     t.float "cpu_percentage", null: false
@@ -110,7 +110,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
     t.integer "org_id", null: false
     t.integer "app_id", null: false
     t.integer "source"
-    t.integer "status"
+    t.string "status"
     t.string "repo", null: false
     t.string "sha"
     t.datetime "finished_at"
@@ -128,13 +128,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
     t.integer "org_id", null: false
     t.integer "app_id", null: false
     t.string "hostname", null: false
-    t.integer "status", null: false
+    t.string "status"
     t.boolean "ssl_enabled", default: false, null: false
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_default", default: false, null: false
     t.index ["app_id"], name: "index_domains_on_app_id"
     t.index ["discarded_at"], name: "index_domains_on_discarded_at"
+    t.index ["is_default"], name: "index_domains_on_is_default", unique: true, where: "is_default = true"
     t.index ["org_id"], name: "index_domains_on_org_id"
     t.index ["status"], name: "index_domains_on_status"
   end
@@ -216,7 +218,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
     t.string "actionable_type"
     t.integer "actionable_id"
     t.string "source", null: false
-    t.integer "status"
+    t.string "status"
     t.datetime "finished_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -234,7 +236,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
 
   create_table "servers", force: :cascade do |t|
     t.string "name", null: false
-    t.integer "status"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "data", default: {}
@@ -251,12 +253,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
     t.integer "org_id", null: false
     t.integer "service_id", null: false
     t.integer "app_id", null: false
-    t.integer "status"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
-    t.datetime "linked_at"
-    t.datetime "unlinked_at"
     t.index ["app_id"], name: "index_service_links_on_app_id"
     t.index ["discarded_at"], name: "index_service_links_on_discarded_at"
     t.index ["org_id"], name: "index_service_links_on_org_id"
@@ -268,15 +268,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_125555) do
   create_table "services", force: :cascade do |t|
     t.integer "org_id", null: false
     t.integer "server_id", null: false
-    t.integer "service_type"
+    t.string "service_type"
     t.string "name", null: false
-    t.integer "status"
+    t.string "status"
     t.json "data", default: {}, null: false
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "dokku_id"
     t.integer "project_id", null: false
+    t.datetime "deployed_at"
     t.index ["org_id"], name: "index_services_on_org_id"
     t.index ["project_id"], name: "index_services_on_project_id"
     t.index ["server_id"], name: "index_services_on_server_id"

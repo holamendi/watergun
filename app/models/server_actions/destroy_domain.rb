@@ -20,8 +20,13 @@ module ServerActions
     end
 
     def perform
+      domain.deleting!
       remove_dokku_domain!
-      domain.status_destroyed!
+    rescue Ssh::CommandExecutionError
+      domain.error!
+      raise
+    else
+      domain.deleted!
     end
 
     private

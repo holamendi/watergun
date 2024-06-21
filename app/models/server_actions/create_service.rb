@@ -8,6 +8,7 @@ module ServerActions
     store_attribute :payload, :service_type, :string
 
     validates :dokku_service_id, presence: true
+    validates :service_type, presence: true
 
     before_validation on: :create do
       self.dokku_service_id ||= service.dokku_id
@@ -21,7 +22,11 @@ module ServerActions
 
       create_dokku_service!
       service.data = dokku_service_info
-      service.status_created!
+    rescue Ssh::CommandExecutionError
+      service.error!
+      raise
+    else
+      service.active!
     end
 
     def create_dokku_service!
@@ -44,7 +49,7 @@ module ServerActions
       Dokku::Plugin::List.call(ssh)
     end
 
-    memoize def plugin_installed?
+    def plugin_installed?
       plugins.installed?(service_type)
     end
 

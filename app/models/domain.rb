@@ -6,11 +6,7 @@ class Domain < ApplicationRecord
   belongs_to :org, default: -> { Current.org }
   belongs_to :app
 
-  enum status: {
-    pending: 0,
-    created: 1,
-    destroyed: 2
-  }, _default: :pending, _prefix: true
+  str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
 
   scope :ssl_enabled, -> { where(ssl_enabled: true) }
   scope :ssl_disabled, -> { where(ssl_enabled: false) }

@@ -26,7 +26,11 @@ module ServerActions
 
     def perform
       link_dokku_service!
-      service_link.linked!
+    rescue Ssh::CommandExecutionError
+      service_link.error!
+      raise
+    else
+      service_link.active!
     end
 
     private

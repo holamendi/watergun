@@ -12,6 +12,15 @@ module Projects
           end
         end
         redirect_to current_project, notice: "Service created successfully.", status: :see_other
+      else
+        render turbo_stream: turbo_stream.replace(
+          "service_form",
+          partial: "projects/services/form",
+          locals: {
+            project: current_project,
+            service: @service
+          }
+        )
       end
     end
 

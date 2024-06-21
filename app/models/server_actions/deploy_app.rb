@@ -25,16 +25,19 @@ module ServerActions
     private
 
     def perform
-      deployment.in_progress!
+      deployment.deploying!
+      app.deploying!
       authenticate_github_account!
       sync_git_repo!
       rebuild_dokku_app!
       schedule_enable_ssl!
-    rescue Ssh::CommandExecutionError => e
-      deployment.failure!
-      raise e
+    rescue Ssh::CommandExecutionError
+      deployment.error!
+      raise
     else
       deployment.success!
+    ensure
+      app.active!
     end
 
     def sync_git_repo!

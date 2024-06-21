@@ -15,7 +15,10 @@ module ServerActions
     private
 
     def perform
+      app.restarting!
       restart_dokku_app!
+    ensure
+      app.active!
     end
 
     def restart_dokku_app!

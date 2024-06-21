@@ -6,9 +6,11 @@ module ServerActions
 
     store_attribute :payload, :dokku_app_id, :string
     store_attribute :payload, :env, :json
+    store_attribute :payload, :restart, :boolean, default: false
 
     validates :dokku_app_id, presence: true
     validates :env, presence: true
+    validates :restart, inclusion: {in: [true, false]}
 
     delegate :env_configuration, to: :app
 
@@ -21,10 +23,15 @@ module ServerActions
 
     def perform
       set_dokku_app_config!
+      schedule_restart! if restart
     end
 
     def set_dokku_app_config!
       Dokku::Config::Set.call!(ssh, app: dokku_app_id, env:)
+    end
+
+    def schedule_restart!
+      ServerAction::RestartApp.perform_later!(app)
     end
   end
 end
