@@ -18,7 +18,7 @@ class App < ApplicationRecord
   has_many :service_links, dependent: :delete_all
   has_many :services, through: :service_links
 
-  str_enum :status, [:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
+  str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
 
