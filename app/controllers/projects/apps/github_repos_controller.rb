@@ -35,14 +35,11 @@ module Projects
       end
 
       def update
-        sleep(1)
-
         @github_repo = current_app.github_repo
 
         if @github_repo.update(github_repo_params)
           redirect_to current_project, notice: "App source updated successfully."
         else
-          # debugger
           render turbo_stream: turbo_stream.replace(
             @github_repo,
             partial: "projects/apps/github_repos/form",

@@ -29,7 +29,9 @@ module ServerActions
     end
 
     def create_domains!
-      dokku_app_hostnames.each { |hostname| app.domains.create!(hostname:, status: :active) }
+      dokku_app_hostnames.each_with_index do |hostname, index|
+        app.domains.create!(hostname:, status: :active, is_default: index.zero?)
+      end
     end
 
     def dokku_app_hostnames

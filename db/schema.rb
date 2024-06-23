@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_21_104321) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_23_165237) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -150,6 +150,22 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_104321) do
     t.datetime "updated_at", null: false
     t.index ["env_configurable_type", "env_configurable_id"], name: "index_environment_configurations_on_environment_configurable"
     t.index ["org_id"], name: "index_env_configurations_on_org_id"
+  end
+
+  create_table "env_variables", force: :cascade do |t|
+    t.integer "org_id", null: false
+    t.integer "app_id", null: false
+    t.string "key", null: false
+    t.text "value", null: false
+    t.string "status", null: false
+    t.datetime "synced_at"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id", "key"], name: "index_env_variables_on_app_id_and_key", unique: true
+    t.index ["app_id"], name: "index_env_variables_on_app_id"
+    t.index ["discarded_at"], name: "index_env_variables_on_discarded_at"
+    t.index ["org_id"], name: "index_env_variables_on_org_id"
   end
 
   create_table "github_access_tokens", force: :cascade do |t|
@@ -315,17 +331,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_104321) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  create_table "versions", force: :cascade do |t|
-    t.string "item_type", null: false
-    t.bigint "item_id", null: false
-    t.string "event", null: false
-    t.string "whodunnit"
-    t.text "object", limit: 1073741823
-    t.datetime "created_at"
-    t.text "object_changes", limit: 1073741823
-    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
-  end
-
   add_foreign_key "api_tokens", "orgs"
   add_foreign_key "apps", "orgs"
   add_foreign_key "apps", "projects"
@@ -344,6 +349,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_104321) do
   add_foreign_key "domains", "apps"
   add_foreign_key "domains", "orgs"
   add_foreign_key "env_configurations", "orgs"
+  add_foreign_key "env_variables", "apps"
+  add_foreign_key "env_variables", "orgs"
   add_foreign_key "github_access_tokens", "orgs"
   add_foreign_key "github_repos", "apps"
   add_foreign_key "github_repos", "orgs"

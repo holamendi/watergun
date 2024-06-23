@@ -1,5 +1,8 @@
 <tr>
-  <td><%= domain.hostname %></td>
+  <td><%= domain.hostname %> <%= "(default)" if domain.is_default? %></td>
+  <td>
+    <span class="badge <%= status_badge_class(domain.status) %>"><%= domain.status %></span>
+  </td>
   <td>
     <% if domain.ssl_enabled? %>
       <span class="bg-success badge">Enabled</span>
@@ -15,9 +18,13 @@
         </svg>
       </div>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-        <li><a>Item 1</a></li>
+        <% unless domain.is_default? %>
+          <li>
+            <%= link_to "Set as default", make_default_project_app_domain_path(current_project, current_app, domain), data: { turbo_method: :patch } %>
+          </li>
+        <% end %>
         <li>
-          <%= link_to "Delete", project_app_domain_path(current_project, current_app, domain), data: { turbo_method: :delete, turbo_confirm: "Sure? "} %>
+          <%= link_to "Delete", project_app_domain_path(current_project, current_app, domain), class: "text-red-500", data: { turbo_method: :delete, turbo_confirm: "Sure? "} %>
         </li>
       </ul>
     </div>

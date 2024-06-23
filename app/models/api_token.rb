@@ -1,6 +1,5 @@
 class ApiToken < ApplicationRecord
   has_secure_token
-  has_paper_trail
 
   belongs_to :org, default: -> { Current.org }
 

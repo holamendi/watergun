@@ -4,11 +4,9 @@ module Projects
       @service = current_project.services.new(service_params.merge(name: SecureRandom.hex(4)))
 
       if @service.save
-        ServerActions::CreateService.perform_later!(@service)
         if params[:link_to_apps].present?
           current_project.apps.each do |app|
-            service_link = app.service_links.create!(service: @service)
-            ServerActions::LinkService.perform_later!(service_link)
+            app.service_links.create!(service: @service)
           end
         end
         redirect_to current_project, notice: "Service created successfully.", status: :see_other

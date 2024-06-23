@@ -5,10 +5,10 @@ module ServerActions
     actionable Domain
 
     store_attribute :payload, :dokku_app_id, :string
-    store_attribute :payload, :domain, :string
+    store_attribute :payload, :hostname, :string
 
     validates :dokku_app_id, presence: true
-    validates :domain, presence: true
+    validates :hostname, presence: true
 
     delegate :app, to: :actionable
 
@@ -38,7 +38,8 @@ module ServerActions
     end
 
     def schedule_enable_ssl!
-      return unless domain.resolves_to_server?
+      return unless app.deployed?
+      return unless app.domains.kept.all? { |domain| domain.resolves_to_server? }
 
       ServerActions::EnableAppSsl.perform_later!(domain.app)
     end

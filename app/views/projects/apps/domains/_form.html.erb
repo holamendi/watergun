@@ -1,0 +1,14 @@
+<%= form_with model: [domain.project, domain.app, domain], class: "space-y-4", id: "domain_form" do |form| %>
+  <%= form.label :hostname, class: "form-control" do %>
+    <div class="label">
+      <span class="label-text">Hostname</span>
+    </div>
+    <%= form.text_field :hostname, class: "input input-bordered w-full" %>
+    <%= error_messages_for(form.object, :hostname) %>
+  <% end %>
+  <%= button_tag type: "submit",
+                 class: "btn btn-primary no-animation",
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+    Save
+  <% end %>
+<% end %>

@@ -1,15 +1,18 @@
-
 <%= turbo_stream_from current_app %>
-
 <%= render "projects/apps/header", app: current_app %>
+
 <div class="flex justify-between">
   <h1 class="text-2xl font-bold">Domains</h1>
+  <div>
+    <%= button_tag "Add Domain", class: "btn btn-ghost link font-normal", onclick: "domain_modal.showModal()" %>
+  </div>
 </div>
 <div class="py-6">
   <table class="table">
     <thead>
       <tr>
         <th>Domain</th>
+        <th>Status</th>
         <th>SSL</th>
         <th></th>
       </tr>
@@ -19,3 +22,7 @@
     </tbody>
   </table>
 </div>
+
+<%= render "shared/modal", id: "domain_modal", title: "Add Domain" do %>
+  <%= render "projects/apps/domains/form", domain: current_app.domains.new %>
+<% end %>

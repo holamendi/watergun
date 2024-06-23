@@ -4,7 +4,6 @@ module Api
       include Pagy::Backend
 
       before_action :authenticate
-      before_action :set_paper_trail_whodunnit
 
       skip_before_action :verify_authenticity_token
 
@@ -24,10 +23,6 @@ module Api
         end
       rescue ActiveRecord::RecordNotFound
         head :unauthorized
-      end
-
-      def user_for_paper_trail
-        current_api_token&.to_global_id
       end
     end
   end

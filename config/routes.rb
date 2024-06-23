@@ -40,7 +40,9 @@ Rails.application.routes.draw do
     scope module: :projects do
       resources :apps do
         scope module: :apps do
-          resources :domains, only: %i[index create destroy]
+          resources :domains, only: %i[index create destroy] do
+            patch :make_default, on: :member
+          end
           resource :env_configuration, path: :environment, only: %i[edit update]
           resource :github_repo
           resources :deployments, shallow: false, only: :create do

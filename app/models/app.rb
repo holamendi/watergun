@@ -5,8 +5,6 @@ class App < ApplicationRecord
   include EnvConfigurable
   include ServerActionable
 
-  has_paper_trail
-
   belongs_to :org, default: -> { Current.org }
   belongs_to :server, default: -> { Current.server }
   belongs_to :project

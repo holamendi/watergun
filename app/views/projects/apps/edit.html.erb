@@ -3,20 +3,5 @@
 <div class="w-full pb-6 md:w-1/3">
   <%= render "form", project: current_project, app: @app %>
 </div>
-<div class="mb-10">
-  <h2 class="pb-4 text-xl font-bold">Domains</h2>
-  <ul>
-    <% @app.domains.kept.each do |domain| %>
-      <li>
-        <%= domain.hostname %>
-        <%= link_to "Delete", project_app_domain_path(current_project, @app, domain), method: :delete, class: "text-error", data: { turbo_method: :delete, turbo_confirm: "Sure?"} %>
-      </li>
-    <% end %>
-  </ul>
-  <%= form_with model: [current_project, @app, @app.domains.new] do |form| %>
-    <%= form.text_field :hostname, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
-    <%= form.submit "Add", class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
-  <% end %>
-</div>
 <h2 class="pb-4 text-xl font-bold text-error">Danger zone</h2>
 <%= button_to "Delete", project_app_path(current_project, @app), method: :delete, class: "btn btn-error btn-sm rounded-md font-normal text-sm", data: { turbo_confirm: "Sure?"} %>

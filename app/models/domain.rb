@@ -1,8 +1,6 @@
 class Domain < ApplicationRecord
   include Discard::Model
 
-  has_paper_trail
-
   belongs_to :org, default: -> { Current.org }
   belongs_to :app
 
@@ -17,6 +15,16 @@ class Domain < ApplicationRecord
   after_create_commit -> { ServerActions::CreateDomain.perform_later!(self) }
   after_update_commit -> { broadcast_refresh_to(app) }
   after_discard -> { ServerActions::DestroyDomain.perform_later!(self) }
+  after_destroy -> { ServerActions::DestroyDomain.perform_later!(self) }, unless: :discarded?
+
+  delegate :project, to: :app
+
+  def make_default!
+    transaction do
+      app.domains.update_all(is_default: false)
+      update!(is_default: true)
+    end
+  end
 
   def resolves_to_server?
     Resolv.getaddress(hostname) == app.server.public_ip

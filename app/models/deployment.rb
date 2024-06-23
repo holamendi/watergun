@@ -1,6 +1,5 @@
 class Deployment < ApplicationRecord
   include ServerActionable
-  has_paper_trail on: %i[create]
 
   belongs_to :org, default: -> { Current.org }
   belongs_to :app, touch: true
