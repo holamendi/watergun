@@ -12,4 +12,4 @@ jobs:
     steps:
     - name: Deploy to helsinki.waterun.dev
       run: |
-        curl -X POST https://helsinki.watergun.dev/api/v1/apps/9/deployments -H "Authorization: Bearer ${{ secrets.WATERGUN_API_KEY }}"
+        curl -X POST https://helsinki.watergun.dev/api/v1/apps/29/deployments -H "Authorization: Bearer ${{ secrets.WATERGUN_API_KEY }}"

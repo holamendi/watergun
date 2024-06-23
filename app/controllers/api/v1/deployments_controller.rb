@@ -28,7 +28,7 @@ module Api
         end
 
         if commit.present?
-          deployment = @app.deployments.create!(
+          @app.deployments.create!(
             sha: commit.sha,
             author_login: commit.author.login,
             author_url: commit.author.html_url,
@@ -37,7 +37,6 @@ module Api
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
-          ServerActions::DeployApp.perform_later!(deployment)
           render json: DeploymentResource.new(deployment), status: :created
         else
           render json: {errors: "invalid commit"}, status: :unprocessable_entity
