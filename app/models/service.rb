@@ -18,5 +18,10 @@ class Service < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  after_update_commit -> { broadcast_refresh_to(self) }
+  after_create_commit -> { ServerActions::CreateService.perform_later!(self) }
+
+  after_update_commit -> do
+    broadcast_refresh_to(project)
+    broadcast_refresh_to(self)
+  end
 end

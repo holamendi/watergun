@@ -1,3 +1,4 @@
+<%= turbo_stream_from @project %>
 <% content_for :breadcrumb do %>
   <span class="pl-2 select-none">/</span>
   <span><%= @project.name %></span>
@@ -54,7 +55,6 @@
 
 <%= render "shared/modal", id: "app_modal", title: "Connect Github Repo" do %>
   <%= render "projects/apps/form", project: @project, app: @app %>
-  <button onclick="service_modal.showModal()">lolol</button>
 <% end %>
 
 <%= render "shared/modal", id: "service_modal", title: "Add a Database" do %>

@@ -5,10 +5,10 @@ module ServerActions
     actionable Domain
 
     store_attribute :payload, :dokku_app_id, :string
-    store_attribute :payload, :domain, :string
+    store_attribute :payload, :hostname, :string
 
     validates :dokku_app_id, presence: true
-    validates :domain, presence: true
+    validates :hostname, presence: true
 
     before_validation on: :create do
       self.dokku_app_id ||= domain.app.dokku_id

@@ -14,6 +14,10 @@ class Domain < ApplicationRecord
   validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
+  after_create_commit -> { ServerActions::CreateDomain.perform_later!(self) }
+  after_update_commit -> { broadcast_refresh_to(app) }
+  after_discard -> { ServerActions::DestroyDomain.perform_later!(self) }
+
   def resolves_to_server?
     Resolv.getaddress(hostname) == app.server.public_ip
   rescue Resolv::ResolvError

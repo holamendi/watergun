@@ -9,7 +9,7 @@ module Projects
         end
 
         if commit.present?
-          deployment = current_app.deployments.create!(
+          current_app.deployments.create!(
             sha: commit.sha,
             author_login: commit.author.login,
             author_url: commit.author.html_url,
@@ -18,7 +18,6 @@ module Projects
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
-          ServerActions::DeployApp.perform_later!(deployment)
           flash[:notice] = "Deployment scheduled"
           redirect_to project_app_path(current_project, current_app)
         else

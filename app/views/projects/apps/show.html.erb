@@ -20,7 +20,10 @@
     <tbody>
       <% @deployments.each do |deployment| %>
         <tr>
-          <td><%= deployment.short_sha %></td>
+          <td>
+            <div class="tooltip" data-tip="<%= deployment.commit_message %> (<%= deployment.author_login %>)">
+              <%= link_to deployment.short_sha, deployment.commit_html_url, target: :_blank, class: "link"  %>
+            </div>
           <td>
             <% if deployment.finished? %>
               <div class="tooltip" data-tip="<%= deployment.finished_at.to_s %>">

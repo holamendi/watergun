@@ -1,0 +1,25 @@
+<tr>
+  <td><%= domain.hostname %></td>
+  <td>
+    <% if domain.ssl_enabled? %>
+      <span class="bg-success badge">Enabled</span>
+    <% else %>
+      <span class="badge-warning badge">Disabled</span>
+    <% end %>
+  </td>
+  <td class="text-right">
+    <div class="dropdown dropdown-bottom dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+        </svg>
+      </div>
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+        <li><a>Item 1</a></li>
+        <li>
+          <%= link_to "Delete", project_app_domain_path(current_project, current_app, domain), data: { turbo_method: :delete, turbo_confirm: "Sure? "} %>
+        </li>
+      </ul>
+    </div>
+  </td>
+</tr>

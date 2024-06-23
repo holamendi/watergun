@@ -15,16 +15,21 @@ class App < ApplicationRecord
   has_many :deployments, dependent: :delete_all
   has_one :deployment, -> { success.recent }
   has_one :github_repo, dependent: :destroy
-  has_many :service_links, dependent: :delete_all
+  has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 
   str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
 
-  after_update_commit -> { broadcast_refresh_to(self) }
-
   accepts_nested_attributes_for :github_repo
+
+  after_create_commit -> { ServerActions::CreateApp.perform_later!(self) }
+
+  after_update_commit -> do
+    broadcast_refresh_to(project)
+    broadcast_refresh_to(self)
+  end
 
   def deployed?
     deployed_at.present?

@@ -13,7 +13,6 @@ module Projects
         @domain = current_app.domains.new(domain_params)
 
         if @domain.save
-          ServerActions::CreateDomain.perform_later!(@domain)
           redirect_to edit_app_path(current_app), notice: "Domain added successfully."
         else
           render :new
@@ -23,8 +22,7 @@ module Projects
       def destroy
         @domain = current_app.domains.kept.find(params[:id])
         @domain.discard!
-        ServerActions::DestroyDomain.perform_later!(@domain)
-        redirect_to edit_app_path(current_app), notice: "Domain removed successfully."
+        redirect_to project_app_domains_path(current_project, current_app), notice: "Domain removed successfully."
       end
 
       private
