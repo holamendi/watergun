@@ -75,7 +75,11 @@ class ServerAction < ApplicationRecord
 
     def perform_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
-      PerformServerActionJob.perform_later(action)
+      if defined?(Rails::Console)
+        PerformServerActionJob.perform_now(action)
+      else
+        PerformServerActionJob.perform_later(action)
+      end
       action
     end
   end

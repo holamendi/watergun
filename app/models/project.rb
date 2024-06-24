@@ -7,4 +7,9 @@ class Project < ApplicationRecord
   has_many :services, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :org_id, conditions: -> { undiscarded }}
+
+  after_discard do
+    apps.discard_all
+    services.discard_all
+  end
 end

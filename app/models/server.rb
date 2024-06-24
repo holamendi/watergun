@@ -22,7 +22,12 @@ class Server < ApplicationRecord
   after_create :create_ssh_key
 
   def ssh_session(&)
+    attempts = 0
     Ssh::Session.new(server: self).connect(&)
+  rescue Net::SSH::ConnectionTimeout
+    attempts += 1
+    retry if attempts < 4
+    raise
   end
 
   def execute_ssh_commands(commands)

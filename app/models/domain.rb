@@ -2,7 +2,7 @@ class Domain < ApplicationRecord
   include Discard::Model
 
   belongs_to :org, default: -> { Current.org }
-  belongs_to :app
+  belongs_to :app, touch: true
 
   str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
 
@@ -13,9 +13,7 @@ class Domain < ApplicationRecord
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
   after_create_commit -> { ServerActions::CreateDomain.perform_later!(self) }
-  after_update_commit -> { broadcast_refresh_to(app) }
-  after_discard -> { ServerActions::DestroyDomain.perform_later!(self) }
-  after_destroy -> { ServerActions::DestroyDomain.perform_later!(self) }, unless: :discarded?
+  after_discard -> { ServerActions::DestroyDomain.perform_later!(self) }, unless: -> { app.discarded? }
 
   delegate :project, to: :app
 

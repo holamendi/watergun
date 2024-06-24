@@ -4,7 +4,7 @@ module Projects
       @service = current_project.services.new(service_params.merge(name: SecureRandom.hex(4)))
 
       if @service.save
-        if params[:link_to_apps].present?
+        if true # params[:link_to_apps].present?
           current_project.apps.each do |app|
             app.service_links.create!(service: @service)
           end

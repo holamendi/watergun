@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_23_165237) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_24_065415) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -134,9 +134,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_23_165237) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_default", default: false, null: false
+    t.index ["app_id", "is_default"], name: "index_domains_on_app_id_and_is_default", unique: true, where: "discarded_at IS NULL AND is_default = true"
     t.index ["app_id"], name: "index_domains_on_app_id"
     t.index ["discarded_at"], name: "index_domains_on_discarded_at"
-    t.index ["is_default"], name: "index_domains_on_is_default", unique: true, where: "is_default = true"
     t.index ["org_id"], name: "index_domains_on_org_id"
     t.index ["status"], name: "index_domains_on_status"
   end

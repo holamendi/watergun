@@ -1,14 +1,14 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.all
+    @projects = Project.kept
   end
 
   def show
     @project = current_org.projects.kept.find(params[:id])
     @app = App.new
     @app.build_github_repo
-    @apps = @project.apps
-    @services = @project.services
+    @apps = @project.apps.kept
+    @services = @project.services.kept
     @service = Service.new
   end
 

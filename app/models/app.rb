@@ -29,6 +29,11 @@ class App < ApplicationRecord
     broadcast_refresh_to(self)
   end
 
+  after_discard do
+    service_links.discard_all
+    ServerActions::DestroyApp.perform_later!(self)
+  end
+
   def deployed?
     deployed_at.present?
   end
