@@ -28,7 +28,7 @@ module Api
         end
 
         if commit.present?
-          @app.deployments.create!(
+          deployment = @app.deployments.create!(
             sha: commit.sha,
             author_login: commit.author.login,
             author_url: commit.author.html_url,
