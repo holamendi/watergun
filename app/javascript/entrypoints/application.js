@@ -26,9 +26,11 @@ const channels = import.meta.glob('./**/*_channel.js')
 // Example: Import a stylesheet in app/frontend/index.css
 // import '~/index.css'
 import { Application } from '@hotwired/stimulus'
+import RailsNestedForm from '@stimulus-components/rails-nested-form'
 import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
+application.register('nested-form', RailsNestedForm)
 
 application.debug = true
 window.Stimulus   = application

@@ -8,6 +8,7 @@ class Project < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :org_id, conditions: -> { undiscarded }}
 
+  after_update_commit { broadcast_refresh_to(self) }
   after_discard do
     apps.discard_all
     services.discard_all

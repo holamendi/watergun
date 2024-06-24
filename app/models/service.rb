@@ -6,7 +6,7 @@ class Service < ApplicationRecord
 
   belongs_to :org, default: -> { Current.org }
   belongs_to :server, default: -> { Current.server }
-  belongs_to :project
+  belongs_to :project, touch: true
 
   has_many :service_links, dependent: :destroy
   has_many :linked_apps, through: :service_links, source: :app
@@ -18,10 +18,10 @@ class Service < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  after_create_commit -> { ServerActions::CreateService.perform_later!(self) }
-
-  after_update_commit -> do
-    broadcast_refresh_to(project)
-    broadcast_refresh_to(self)
+  after_create_commit { ServerActions::CreateService.perform_later!(self) }
+  after_update_commit { broadcast_refresh_to(self) }
+  after_discard do
+    service_links.discard_all
+    ServerActions::DestroyService.perform_later!(self)
   end
 end

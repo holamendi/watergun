@@ -7,8 +7,8 @@
   <h1 class="text-2xl font-bold"><%= @project.name %></h1>
   <% if @apps.any? || @services.any? %>
     <div>
-      <button class="font-normal btn btn-sm btn-ghost" onclick="app_modal.showModal()">Add Github Repo</button>
-      <button class="font-normal btn btn-sm btn-ghost" onclick="service_modal.showModal()">Add a Database</button>
+      <button class="font-normal btn btn-ghost link" onclick="app_modal.showModal()">Add Github Repo</button>
+      <button class="font-normal btn btn-ghost link" onclick="service_modal.showModal()">Add a Database</button>
     </div>
   <% end %>
 </div>

@@ -268,11 +268,6 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.9.4.tgz#16295ccae354707c9bc6842906bdeaad4f3ba7a5"
   integrity sha512-LfdGXCV9rdEify1oxlN9eamvDSjv9md9ZVMAbNHA87xqIfFCxImxan9qZ8+Un54iK2nnqPlbnSi4R54ONtbWBw==
 
-"@stimulus-components/reveal@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@stimulus-components/reveal/-/reveal-5.0.0.tgz#87a17b91f8a556e3f3975740ebb3e760aea6fafc"
-  integrity sha512-0ShvvDiG4qNLyFUTDrjGiR9MWR6D9EiAJRUSKxTPHA5Cc2Ci/A4Qj7cHDCoK2ZGHhpESfK0LsR9xtySCN6FTQw==
-
 "@tailwindcss/aspect-ratio@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@tailwindcss/aspect-ratio/-/aspect-ratio-0.4.2.tgz#9ffd52fee8e3c8b20623ff0dcb29e5c21fb0a9ba"

@@ -1,0 +1,23 @@
+<%= form_with model: [current_project, current_app, env_variable], class: "flex flex-row p-2 space-x-4 border rounded-md" do |form| %>
+  <div class="w-1/3">
+    <% if form.object.new_record?%>
+      <%= form.text_field :key, class: "input input-bordered input-sm", placeholder: "NAME" %>
+      <%= error_messages_for(form.object, :key) %>
+    <% else %>
+      <%= env_variable.key %>
+    <% end %>
+  </div>
+  <div class="w-1/3">
+    <div class="flex space-x-2">
+      <div>
+        <%= form.text_area :value, class: "textarea textarea-bordered textarea-sm", placeholder: "Value", rows: 1 %>
+        <%= error_messages_for(form.object, :value) %>
+      </div>
+      <div>
+        <%= button_tag type: "submit", class: "btn btn-primary no-animation btn-sm", data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+          Save
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -43,11 +43,15 @@ Rails.application.routes.draw do
           resources :domains, only: %i[index create destroy] do
             patch :make_default, on: :member
           end
+          resources :env_variables, path: :env do
+            patch :update_bulk, on: :collection
+          end
           resource :env_configuration, path: :environment, only: %i[edit update]
           resource :github_repo
           resources :deployments, shallow: false, only: :create do
             get :logs, on: :member
           end
+          resource :logs, only: :show
           resource :metrics, only: :show
           resources :restarts, only: :create
         end

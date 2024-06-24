@@ -12,6 +12,7 @@ class App < ApplicationRecord
   has_many :domains, dependent: :delete_all
   has_many :deployments, dependent: :delete_all
   has_one :deployment, -> { success.recent }
+  has_many :env_variables, dependent: :destroy
   has_one :github_repo, dependent: :destroy
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
@@ -20,7 +21,10 @@ class App < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
 
+  scope :deployed, -> { where.not(deployed_at: nil) }
+
   accepts_nested_attributes_for :github_repo
+  accepts_nested_attributes_for :env_variables, allow_destroy: true
 
   after_create_commit -> { ServerActions::CreateApp.perform_later!(self) }
 

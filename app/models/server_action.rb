@@ -25,12 +25,14 @@ class ServerAction < ApplicationRecord
     raise "server action must implement #perform" unless respond_to?(:perform, true)
 
     running!
+
     session = server.ssh_session do |ssh_session|
       with(ssh_session:) do
         perform
       rescue Ssh::CommandExecutionError
       end
     end
+
     create_log!(ssh_commands: session.commands)
     self.status = session.status
     self
@@ -75,11 +77,13 @@ class ServerAction < ApplicationRecord
 
     def perform_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
+
       if defined?(Rails::Console)
         PerformServerActionJob.perform_now(action)
       else
-        PerformServerActionJob.perform_later(action)
+        PerformServerActionJob.set(wait: 1.second).perform_later(action)
       end
+
       action
     end
   end
