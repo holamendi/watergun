@@ -1,7 +1,6 @@
 class Service < ApplicationRecord
-  include Containerizable
   include Discard::Model
-  include DokkuEntity
+  include Containerizable
   include ServerActionable
 
   belongs_to :org, default: -> { Current.org }
@@ -18,10 +17,11 @@ class Service < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  after_create_commit { ServerActions::CreateService.perform_later!(self) }
-  after_update_commit { broadcast_refresh_to(self) }
-  after_discard do
-    service_links.discard_all
-    ServerActions::DestroyService.perform_later!(self)
+  before_create do
+    self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
+  end
+
+  after_update_commit do
+    broadcast_refresh_to(self)
   end
 end

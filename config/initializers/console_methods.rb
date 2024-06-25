@@ -6,5 +6,7 @@ Rails.application.console do
     Current.session = Session.last
   end
 
+  def l = login
+
   login
 end

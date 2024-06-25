@@ -6,6 +6,7 @@ class Domain < ApplicationRecord
 
   str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
 
+  scope :default, -> { where(is_default: true) }
   scope :ssl_enabled, -> { where(ssl_enabled: true) }
   scope :ssl_disabled, -> { where(ssl_enabled: false) }
 

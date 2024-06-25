@@ -1,4 +1,5 @@
 <%= turbo_stream_from current_app %>
+
 <%= render "projects/apps/header", app: current_app %>
 
 <div class="flex justify-between">
@@ -23,6 +24,6 @@
   </table>
 </div>
 
-<%= render "shared/modal", id: "domain_modal", title: "New Environment Variable" do %>
+<%= render "shared/modal", id: "domain_modal", title: "New Domain" do %>
   <%= render "projects/apps/domains/form", domain: current_app.domains.new %>
 <% end %>

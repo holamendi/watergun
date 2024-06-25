@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_24_065415) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_25_071251) do
   create_table "api_tokens", force: :cascade do |t|
     t.integer "org_id", null: false
     t.string "token", null: false
@@ -34,6 +34,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_065415) do
     t.datetime "deployed_at"
     t.string "status"
     t.integer "project_id"
+    t.boolean "pending_restart", default: false, null: false
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["org_id"], name: "index_apps_on_org_id"
     t.index ["project_id"], name: "index_apps_on_project_id"

@@ -5,33 +5,55 @@ module ServerActions
     actionable App
 
     store_attribute :payload, :dokku_app_id, :string
-    store_attribute :payload, :env, :json
+    store_attribute :payload, :set, :json, default: {}
+    store_attribute :payload, :unset, :json, default: []
     store_attribute :payload, :restart, :boolean, default: false
 
     validates :dokku_app_id, presence: true
-    validates :env, presence: true
     validates :restart, inclusion: {in: [true, false]}
-
-    delegate :env_configuration, to: :app
 
     before_validation on: :create do
       self.dokku_app_id ||= app.dokku_id
-      self.env ||= env_configuration.variables
+    end
+
+    def concurrency_key
+      app
     end
 
     private
 
     def perform
-      set_dokku_app_config!
+      if set.present?
+        set_dokku_app_config!
+        set_env_variables.touch_all(:synced_at)
+      end
+
+      if unset.present?
+        unset_dokku_app_config!
+        unset_env_variables.touch_all(:synced_at)
+      end
+
       schedule_restart! if restart
     end
 
     def set_dokku_app_config!
-      Dokku::Config::Set.call!(ssh, app: dokku_app_id, env:)
+      Dokku::Config::Set.call!(ssh, app: dokku_app_id, env: set)
+    end
+
+    def unset_dokku_app_config!
+      Dokku::Config::Unset.call!(ssh, app: dokku_app_id, variable_names: unset)
     end
 
     def schedule_restart!
       ServerAction::RestartApp.perform_later!(app)
+    end
+
+    def set_env_variables
+      app.env_variables.where(key: set.keys)
+    end
+
+    def unset_env_variables
+      app.env_variables.where(key: unset)
     end
   end
 end

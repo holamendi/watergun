@@ -38,3 +38,4 @@ registerControllers(application, controllers)
 
 import "chartkick/chart.js"
 
+
