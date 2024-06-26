@@ -13,7 +13,6 @@ module Ssh
       Net::SSH.start(server.public_ip, SshKey::USER, key_data: [ssh_private_key], keys_only: true, non_interactive: true) do |session|
         @session = session
         yield(self)
-
         @session.loop
       end
     ensure
@@ -27,10 +26,12 @@ module Ssh
       @commands << ssh_command
       status = {}
 
-      @session.exec(command, status:) do |_channel, stream, data|
+      command = @session.exec!(command, status:) do |_channel, stream, data|
         ssh_command.append_output(stream, data) if save_output
         yield(stream.to_s, data) if block_given?
         Rails.logger.debug(data&.strip) if Rails.env.development?
+
+        _channel.wait
       end
 
       ssh_command.finished_at = Time.current
