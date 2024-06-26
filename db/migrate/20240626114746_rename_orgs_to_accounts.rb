@@ -8,7 +8,6 @@ class RenameOrgsToAccounts < ActiveRecord::Migration[7.1]
     rename_column :command_runs, :org_id, :account_id
     rename_column :container_checks, :org_id, :account_id
     rename_column :containers, :org_id, :account_id
-    rename_column :databases, :org_id, :account_id
     rename_column :deployments, :org_id, :account_id
     rename_column :domains, :org_id, :account_id
     rename_column :env_variables, :org_id, :account_id
@@ -29,7 +28,6 @@ class RenameOrgsToAccounts < ActiveRecord::Migration[7.1]
     rename_index :command_runs, "index_command_runs_on_org_id", "index_command_runs_on_account_id"
     rename_index :container_checks, "index_container_checks_on_org_id", "index_container_checks_on_account_id"
     rename_index :containers, "index_containers_on_org_id", "index_containers_on_account_id"
-    rename_index :databases, "index_databases_on_org_id", "index_databases_on_account_id"
     rename_index :deployments, "index_deployments_on_org_id", "index_deployments_on_account_id"
     rename_index :domains, "index_domains_on_org_id", "index_domains_on_account_id"
     rename_index :env_variables, "index_env_variables_on_org_id", "index_env_variables_on_account_id"
