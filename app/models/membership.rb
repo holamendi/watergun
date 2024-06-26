@@ -1,5 +1,5 @@
 class Membership < ApplicationRecord
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account}
 
   belongs_to :user
 end

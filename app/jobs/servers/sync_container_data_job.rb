@@ -9,7 +9,7 @@ module Servers
     private
 
     def sync_containers(server)
-      Current.set(org: server.org, server:) do
+      Current.set(account: server.account, server:) do
         stats = []
 
         server.ssh_session do |session|

@@ -21,25 +21,14 @@ export default class extends Controller {
   }
 
   _cableConnected() {
-    // Called when the subscription is ready for use on the server
-    console.log("Cable connected")
+
   }
 
   _cableDisconnected() {
-    // Called when the subscription has been terminated by the server
-    console.log("Disconnected from the chat channel")
+
   }
 
   _cableReceived(data) {
-    // Called when there's incoming data on the websocket for this channel
-    console.log("Received data from the chat channel", data)
+    console.log(data)
   }
-
-  sendMessage(event) {
-    event.preventDefault()
-    const input = event.target.querySelector("input[type='text']")
-    this.channel.perform("speak", { message: input.value })
-    input.value = ""
-  }
-
 }

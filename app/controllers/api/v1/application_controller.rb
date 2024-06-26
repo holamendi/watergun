@@ -11,8 +11,8 @@ module Api
         Current.api_token
       end
 
-      def current_org
-        Current.org
+      def current_account
+        Current.account
       end
 
       private

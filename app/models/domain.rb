@@ -1,7 +1,8 @@
 class Domain < ApplicationRecord
   include Discard::Model
+  include ServerActionable
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
 
   str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
@@ -13,12 +14,9 @@ class Domain < ApplicationRecord
   validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
-  after_create_commit -> { ServerActions::CreateDomain.perform_later!(self) }
-  after_discard -> { ServerActions::DestroyDomain.perform_later!(self) }, unless: -> { app.discarded? }
-
   delegate :project, to: :app
 
-  def make_default!
+  def make_default
     transaction do
       app.domains.update_all(is_default: false)
       update!(is_default: true)

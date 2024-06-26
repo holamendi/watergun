@@ -2,7 +2,7 @@ class ServerAction < ApplicationRecord
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :actionable, polymorphic: true, optional: true
   belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
@@ -15,20 +15,20 @@ class ServerAction < ApplicationRecord
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
-  after_save_commit -> { broadcast_refresh_to(org, :server_actions) }
+  after_save_commit -> { broadcast_refresh_to(account, :server_actions) }
 
   def concurrency_key
     actionable
   end
 
-  def perform_action
-    raise "server action must implement #perform" unless respond_to?(:perform, true)
+  def run_action
+    raise "server action must implement #run" unless respond_to?(:run, true)
 
     running!
 
     session = server.ssh_session do |ssh_session|
       with(ssh_session:) do
-        perform
+        run
       rescue Ssh::CommandExecutionError
       end
     end
@@ -75,13 +75,13 @@ class ServerAction < ApplicationRecord
       self::SLUG
     end
 
-    def perform_later!(actionable, depends_on: nil, **)
+    def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
 
       if defined?(Rails::Console)
-        PerformServerActionJob.perform_now(action)
+        RunServerActionJob.perform_now(action)
       else
-        PerformServerActionJob.set(wait: 1.second).perform_later(action)
+        RunServerActionJob.set(wait: 1.second).perform_later(action)
       end
 
       action

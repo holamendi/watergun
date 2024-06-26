@@ -1,7 +1,7 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :api_token,
     :membership,
-    :org,
+    :account,
     :server,
     :server_event_source,
     :session,
@@ -19,15 +19,15 @@ class Current < ActiveSupport::CurrentAttributes
     return unless user
 
     self.membership = user.memberships.first
-    self.org = membership.org
-    self.server = org.servers.first
+    self.account = membership.account
+    self.server = account.servers.first
   end
 
   def api_token=(api_token)
     super
     return unless api_token
 
-    self.org = api_token.org
-    self.server = org.servers.first
+    self.account = api_token.account
+    self.server = account.servers.first
   end
 end

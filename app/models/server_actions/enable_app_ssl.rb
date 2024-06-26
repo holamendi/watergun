@@ -14,7 +14,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       return if all_domains_have_ssl_enabled?
 
       enable_ssl!

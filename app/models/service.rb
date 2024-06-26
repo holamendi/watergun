@@ -3,7 +3,7 @@ class Service < ApplicationRecord
   include Containerizable
   include ServerActionable
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :project, touch: true
 

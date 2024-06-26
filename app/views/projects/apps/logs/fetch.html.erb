@@ -1,5 +1,6 @@
-<%= turbo_frame_tag :logs, data: { turbo_temporary: true } do %>
-  <div id="output" class="px-2 py-1 overflow-scroll text-xs text-sm text-white rounded-md bg-slate-800 max-h-200" data-turbo-temporary>
-    <pre><%= @output.html_safe %></pre>
+<%= turbo_frame_tag :logs do %>
+  <div id="output" class="px-2 py-1 overflow-auto text-xs text-gray-100 rounded-md bg-slate-800 max-h-200 h-200"
+       data-controller="auto-scroll" data-turbo-temporary>
+    <pre><%= ansi_to_html(@output) %></pre>
   </div>
 <% end %>

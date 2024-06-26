@@ -32,5 +32,5 @@
   <%= link_to "Logs", project_app_logs_path(current_project, @app), class: class_names("tab", "tab-active" => (controller_name == "logs")), role: "tab" %>
   <%= link_to "Environment", project_app_env_variables_path(current_project, @app), class: class_names("tab", "tab-active" => (controller_name == "env_variables")), role: "tab" %>
   <%= link_to "Domains", project_app_domains_path(current_project, @app),class: class_names("tab", "tab-active" => (controller_name == "domains")), role: "tab" %>
-  <%= link_to "Settings", edit_project_app_path(current_project, @app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" %>
+  <%= link_to "Settings", edit_project_app_path(current_project, @app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" if false %>
 </div>

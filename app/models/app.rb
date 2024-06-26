@@ -3,7 +3,7 @@ class App < ApplicationRecord
   include Containerizable
   include ServerActionable
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :project, touch: true
   has_many :domains, dependent: :delete_all
@@ -21,6 +21,8 @@ class App < ApplicationRecord
 
   scope :deployed, -> { where.not(deployed_at: nil) }
 
+  accepts_nested_attributes_for :github_repo
+
   before_create do
     self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
   end
@@ -28,8 +30,6 @@ class App < ApplicationRecord
   after_update_commit do
     broadcast_refresh_to(self)
   end
-
-  accepts_nested_attributes_for :github_repo
 
   def pending_restart!
     update!(pending_restart: true)

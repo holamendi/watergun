@@ -1,4 +1,4 @@
-class Org < ApplicationRecord
+class Account < ApplicationRecord
   has_many :api_tokens, dependent: :destroy
   has_many :apps, dependent: :destroy
   has_many :deployments, dependent: :destroy

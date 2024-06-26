@@ -3,10 +3,10 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate!
 
-  helper_method :current_user, :current_org, :current_membership, :current_session, :current_server
+  helper_method :current_user, :current_account, :current_membership, :current_session, :current_server
 
-  def current_org
-    Current.org
+  def current_account
+    Current.account
   end
 
   def current_membership

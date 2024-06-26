@@ -24,7 +24,7 @@ module ServerActions
       service
     end
 
-    def perform
+    def run
       link_dokku_service!
     rescue Ssh::CommandExecutionError
       service_link.error!

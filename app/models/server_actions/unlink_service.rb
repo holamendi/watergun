@@ -24,7 +24,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       service_link.deleting!
       unlink_dokku_service!
     rescue Ssh::CommandExecutionError

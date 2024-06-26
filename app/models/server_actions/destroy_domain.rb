@@ -19,7 +19,7 @@ module ServerActions
       domain.app
     end
 
-    def perform
+    def run
       domain.deleting!
       remove_dokku_domain!
     rescue Ssh::CommandExecutionError

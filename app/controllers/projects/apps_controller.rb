@@ -14,7 +14,7 @@ module Projects
       @app = @project.apps.new(app_params.merge(name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last))
 
       if @app.save
-        ServerActions::CreateApp.perform_later!(@app)
+        ServerActions::CreateApp.run_later!(@app)
         redirect_to current_project, notice: "App created successfully.", status: :see_other
       else
         render turbo_stream: turbo_stream.replace(

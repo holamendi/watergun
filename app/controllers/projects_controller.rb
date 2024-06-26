@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @project = current_org.projects.kept.find(params[:id])
+    @project = current_account.projects.kept.find(params[:id])
     @app = App.new
     @app.build_github_repo
     @apps = @project.apps.kept

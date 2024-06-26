@@ -22,15 +22,18 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       if set.present?
+        set_env_variables.update!(status: :syncing)
         set_dokku_app_config!
-        set_env_variables.touch_all(:synced_at)
+        synced_at = Time.current
+        set_env_variables.update!(status: :synced, synced_at:)
       end
 
       if unset.present?
+        unset_env_variables.update!(status: :syncing)
         unset_dokku_app_config!
-        unset_env_variables.touch_all(:synced_at)
+        unset_env_variables.update_all(status: :synced, synced_at: Time.current)
       end
 
       schedule_restart! if restart
@@ -45,14 +48,14 @@ module ServerActions
     end
 
     def schedule_restart!
-      ServerAction::RestartApp.perform_later!(app)
+      ServerAction::RestartApp.run_later!(app)
     end
 
-    def set_env_variables
+    memoize def set_env_variables
       app.env_variables.where(key: set.keys)
     end
 
-    def unset_env_variables
+    memoize def unset_env_variables
       app.env_variables.where(key: unset)
     end
   end

@@ -1,5 +1,5 @@
 class GithubRepo < ApplicationRecord
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :app
 
   validates :repo, :branch, presence: true
@@ -28,8 +28,8 @@ class GithubRepo < ApplicationRecord
   end
 
   memoize def octokit_client
-    if org.github_access_token
-      Octokit::Client.new(access_token: org.github_access_token.token)
+    if account.github_access_token
+      Octokit::Client.new(access_token: account.github_access_token.token)
     else
       Octokit::Client.new
     end

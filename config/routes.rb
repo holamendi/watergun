@@ -3,19 +3,6 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  # API
-  namespace :api do
-    namespace :v1 do
-      resources :apps, only: %i[index show] do
-        resources :deployments, only: %i[index show create]
-      end
-
-      resources :deployments, only: %i[index show]
-      resource :ping, only: :show
-    end
-  end
-
-  # Web
   root "projects#index"
 
   get "login" => "sessions#new", :as => :login
@@ -45,17 +32,23 @@ Rails.application.routes.draw do
     end
   end
 
-  resource :org, only: :show do
-    scope module: :orgs do
-      resources :api_tokens
-      resource :settings, only: :show
-      resource :github_access_token, only: :update
-    end
-  end
-
-  resources :sessions, only: %i[new create destroy]
-
   resources :server_actions, only: :index do
     get :logs, on: :member
+  end
+
+  # Account settings
+  resource :account do
+    resources :api_tokens, only: %i[index create destroy]
+    resources :github_access_tokens, only: %i[new create destroy]
+  end
+
+  # API
+  namespace :api do
+    namespace :v1 do
+      resources :apps, only: %i[index show] do
+        resources :deployments, only: %i[index show]
+        resource :ping, only: :show
+      end
+    end
   end
 end

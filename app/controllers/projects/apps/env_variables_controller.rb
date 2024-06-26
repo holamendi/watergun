@@ -15,7 +15,7 @@ module Projects
         @env_variable = current_app.env_variables.new(env_variable_params)
 
         if @env_variable.save
-          ServerActions::UpdateAppEnv.perform_later!(current_app, set: @env_variable.to_h)
+          ServerActions::UpdateAppEnv.run_later!(current_app, set: @env_variable.to_h)
           redirect_to project_app_env_variables_path(current_project, current_app), notice: "Environment variable created successfully."
         else
           turbo_stream_errors
@@ -27,7 +27,7 @@ module Projects
 
       def update
         if @env_variable.update(env_variable_params)
-          ServerActions::UpdateAppEnv.perform_later!(current_app, set: @env_variable.to_h)
+          ServerActions::UpdateAppEnv.run_later!(current_app, set: @env_variable.to_h)
           redirect_to project_app_env_variable_path(current_project, current_app, @env_variable), notice: "Environment variable updated successfully."
         else
           render :edit, status: :unprocessable_entity
@@ -36,7 +36,7 @@ module Projects
 
       def destroy
         @env_variable.discard!
-        ServerActions::UpdateAppEnv.perform_later!(current_app, unset: [@env_variable.key])
+        ServerActions::UpdateAppEnv.run_later!(current_app, unset: [@env_variable.key])
         render turbo_stream: turbo_stream.remove(@env_variable)
       end
 

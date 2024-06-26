@@ -1,5 +1,5 @@
 <%= form_with model: [project, app], class: "space-y-4", id: "app_form" do |form| %>
-  <% unless current_org.github_access_token.present? %>
+  <% unless current_account.github_access_token.present? %>
     <%= form.label :github_access_token, class: "form-control" do %>
       <div class="label">
         <span class="label-text">Github access token</span>

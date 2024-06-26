@@ -14,7 +14,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       app.deleting!
       destroy_dokku_app!
       unlink_and_discard_service_links

@@ -21,7 +21,7 @@ module ServerActions
       app
     end
 
-    def perform
+    def run
       add_dokku_domain!
     rescue Ssh::CommandExecutionError
       domain.error!
@@ -41,7 +41,7 @@ module ServerActions
       return unless app.deployed?
       return unless app.domains.kept.all? { |domain| domain.resolves_to_server? }
 
-      ServerActions::EnableAppSsl.perform_later!(domain.app)
+      ServerActions::EnableAppSsl.run_later!(domain.app)
     end
   end
 end

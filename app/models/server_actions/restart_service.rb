@@ -16,7 +16,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       service.restarting!
       restart_dokku_service!
     rescue Ssh::CommandExecutionError

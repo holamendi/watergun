@@ -14,7 +14,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       create_dokku_app!
       create_domains!
     rescue Ssh::CommandExecutionError

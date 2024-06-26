@@ -1,5 +1,5 @@
 class GithubAccessToken < ApplicationRecord
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
 
   validates :token, presence: true
   validate :validate_token_scope

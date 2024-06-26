@@ -1,5 +1,5 @@
 class CommandRun < ApplicationRecord
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
 
   validates :command, presence: true
 

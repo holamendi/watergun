@@ -4,7 +4,7 @@ module Api
       before_action :set_app, :set_github_repo, only: [:create]
 
       def index
-        deployments = current_org.deployments.kept
+        deployments = current_account.deployments.kept
         deployments = deployments.where(app_id: params[:app_id]) if params[:app_id].present?
         render json: DeploymentResource.new(deployments)
       end
@@ -14,7 +14,7 @@ module Api
           set_app
           @app.deployments.kept.find(params[:id])
         else
-          current_org.deployments.kept.find(params[:id])
+          current_account.deployments.kept.find(params[:id])
         end
 
         render json: DeploymentResource.new(deployment)
@@ -37,6 +37,7 @@ module Api
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
+          ServerActions::DeployApp.run_later!(deployment)
           render json: DeploymentResource.new(deployment), status: :created
         else
           render json: {errors: "invalid commit"}, status: :unprocessable_entity
@@ -46,7 +47,7 @@ module Api
       private
 
       def set_app
-        @app = current_org.apps.kept.find(params[:app_id])
+        @app = current_account.apps.kept.find(params[:app_id])
       end
 
       def set_github_repo

@@ -1,7 +1,7 @@
 class Deployment < ApplicationRecord
   include ServerActionable
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
   has_one :server_action, as: :actionable, dependent: :destroy
 
@@ -23,7 +23,7 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  after_create_commit -> { ServerActions::DeployApp.perform_later!(self) }
+  # after_create_commit -> { ServerActions::DeployApp.perform_later!(self) }
 
   def short_sha
     sha&.first(7)

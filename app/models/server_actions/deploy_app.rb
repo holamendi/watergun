@@ -10,7 +10,7 @@ module ServerActions
 
     validates :dokku_app_id, presence: true
 
-    delegate :app, :org, to: :deployment
+    delegate :app, :account, to: :deployment
 
     before_validation on: :create do
       self.dokku_app_id ||= app.dokku_id
@@ -24,7 +24,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       deployment.deploying!
       app.deploying!
       authenticate_github_account!
@@ -55,13 +55,13 @@ module ServerActions
     end
 
     memoize def github_access_token
-      org.github_access_token
+      account.github_access_token
     end
 
     def schedule_enable_ssl!
       return unless app.domains.ssl_disabled.any?
 
-      ServerActions::EnableAppSsl.perform_later!(app)
+      ServerActions::EnableAppSsl.run_later!(app)
     end
   end
 end

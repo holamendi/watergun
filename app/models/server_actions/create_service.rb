@@ -17,7 +17,7 @@ module ServerActions
 
     private
 
-    def perform
+    def run
       return unless plugin_installed? || install_plugin.success?
 
       create_dokku_service!

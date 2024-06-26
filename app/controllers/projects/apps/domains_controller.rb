@@ -15,6 +15,7 @@ module Projects
         @domain = current_app.domains.new(domain_params)
 
         if @domain.save
+          ServerActions::CreateDomain.run_later!(@domain)
           redirect_to project_app_domains_path(current_project, current_app), notice: "Domain added successfully."
         else
           render turbo_stream: turbo_stream.replace(
@@ -30,12 +31,13 @@ module Projects
       end
 
       def make_default
-        @domain.make_default!
+        @domain.make_default
         redirect_to project_app_domains_path(current_project, current_app), notice: "Domain set as default."
       end
 
       def destroy
-        @domain.discard!
+        @domain.discard
+        ServerActions::DestroyDomain.run_later!(@domain)
         redirect_to project_app_domains_path(current_project, current_app), notice: "Domain removed successfully."
       end
 

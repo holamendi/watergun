@@ -1,7 +1,7 @@
 class ApiToken < ApplicationRecord
   has_secure_token
 
-  belongs_to :org, default: -> { Current.org }
+  belongs_to :account, default: -> { Current.account }
 
   attribute :read_only, :boolean, default: false
   attribute :expires_at, :datetime, default: -> { 1.year.from_now }

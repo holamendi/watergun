@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  org: one
+  account: one
   app: one
   status: MyString
   repo: MyString
@@ -10,7 +10,7 @@ one:
   finished_at: 2024-04-24 10:15:32
 
 two:
-  org: two
+  account: two
   app: two
   status: MyString
   repo: MyString
