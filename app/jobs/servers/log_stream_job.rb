@@ -1,6 +1,7 @@
 module Servers
   class LogStreamJob < ApplicationJob
     def perform(app)
+      return
       return unless app.deployed?
 
       app.server.ssh_session do |ssh|

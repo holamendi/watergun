@@ -21,21 +21,6 @@ Rails.application.routes.draw do
   get "login" => "sessions#new", :as => :login
   delete "logout" => "sessions#destroy", :as => :logout
 
-  # resources :apps do
-  #   scope module: :apps do
-  #     resource :command_runs, only: %i[new create show]
-  #     resources :domains, only: %i[index create destroy]
-  #     resource :github_repo
-  #     resources :deployments, only: :create do
-  #       get :logs, on: :member
-  #     end
-  #     resource :env_configuration, path: :environment, only: %i[edit update]
-  #     resource :metrics, only: :show
-  #     resources :restarts, only: :create
-  #     resources :services
-  #   end
-  # end
-
   resources :projects do
     scope module: :projects do
       resources :apps do
@@ -49,7 +34,9 @@ Rails.application.routes.draw do
           resources :deployments, shallow: false, only: :create do
             get :logs, on: :member
           end
-          resource :logs, only: :show
+          resources :logs, only: :index do
+            get :fetch, on: :collection
+          end
           resource :metrics, only: :show
           resources :restarts, only: :create
         end

@@ -15,10 +15,10 @@ module Ssh
         yield(self)
         @session.loop
       end
+      self
     ensure
       @finished_at = Time.current
       @session = nil
-      self
     end
 
     def execute(command, save_output: true)
@@ -26,12 +26,10 @@ module Ssh
       @commands << ssh_command
       status = {}
 
-      command = @session.exec!(command, status:) do |_channel, stream, data|
+      @session.exec!(command, status:) do |_channel, stream, data|
         ssh_command.append_output(stream, data) if save_output
         yield(stream.to_s, data) if block_given?
         Rails.logger.debug(data&.strip) if Rails.env.development?
-
-        _channel.wait
       end
 
       ssh_command.finished_at = Time.current
@@ -55,7 +53,7 @@ module Ssh
     end
 
     def text_output
-      commands.map(&:output).join("\n")
+      commands.map(&:text_output).join("\n")
     end
 
     private
