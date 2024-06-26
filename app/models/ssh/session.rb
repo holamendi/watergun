@@ -22,15 +22,14 @@ module Ssh
       self
     end
 
-    def execute(command)
+    def execute(command, save_output: true)
       ssh_command = Ssh::Command.new(command:, started_at: Time.current)
       @commands << ssh_command
       status = {}
 
-      @session.exec!(command, status:) do |channel, stream, data|
-        ssh_command.append_output(stream, data)
-        yield(channel, stream.to_s, data) if block_given?
-
+      @session.exec(command, status:) do |_channel, stream, data|
+        ssh_command.append_output(stream, data) if save_output
+        yield(stream.to_s, data) if block_given?
         Rails.logger.debug(data&.strip) if Rails.env.development?
       end
 

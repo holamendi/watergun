@@ -6,9 +6,9 @@
   <h1 class="text-2xl font-bold">Logs</h1>
 </div>
 
-<div data-controller="logs"
-     data-logs-app-id-value="<%= current_app.id %>"
-     data-logs-jid-value="<%= @jid %>">
+<div data-controller="log-stream"
+     data-log-stream-app-id-value="<%= current_app.id %>"
+     data-log-stream-jid-value="<%= @log_stream_jid %>">
 </div>
 
-<%= @jid %>
+<%= @log_stream_jid %>

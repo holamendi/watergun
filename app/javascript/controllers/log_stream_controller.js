@@ -8,7 +8,7 @@ export default class extends Controller {
     console.log("Connected to AppLogsController", this.appIdValue, this.jidValue);
 
     this.channel = createConsumer().subscriptions.create(
-      { channel: "AppLogsChannel", app_id: this.appIdValue, jid: this.jidValue},
+      { channel: "LogStreamChannel", app_id: this.appIdValue, jid: this.jidValue},
       { connected: this._cableConnected.bind(this),
         disconnected: this._cableDisconnected.bind(this),
         received: this._cableReceived.bind(this)
