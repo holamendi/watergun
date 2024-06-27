@@ -26,7 +26,11 @@ Rails.application.routes.draw do
           resources :logs, only: :index do
             get :fetch, on: :collection
           end
-          resource :metrics, only: :show
+          resource :metrics, only: :show do
+            get :stats
+            get :cpu_chart
+            get :memory_chart
+          end
           resources :restarts, only: :create
         end
       end

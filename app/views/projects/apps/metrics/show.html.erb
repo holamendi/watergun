@@ -1,43 +1,7 @@
 <%= turbo_stream_from @app %>
 
-<% content_for :breadcrumb do %>
-  <span class="pl-2 select-none">/</span>
-  <span><%= @app.name %></span>
-  <span class="select-none">/</span>
-  <span>Metrics</span>
-<% end %>
-
 <%= render "projects/apps/header", project: current_project, app: current_app %>
 
-<div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
-  <div class="stat bg-base-100">
-    <div class="stat-title">Running Containers</div>
-    <div class="stat-value"><%= current_app.containers.running.size %></div>
-  </div>
-  <div class="stat bg-base-100">
-    <div class="stat-title">CPU Usage</div>
-    <div class="stat-value"><%= current_app.containers.running.sum(:cpu_percentage).round(2) %>%</div>
-  </div>
-  <div class="stat bg-base-100">
-    <div class="stat-title">RAM Usage</div>
-    <div class="stat-value"><%= current_app.containers.running.sum(:memory_percentage).round(2) %>%</div>
-  </div>
-</div>
-
-<div class="w-full p-4 mb-4 shadow rounded-xl">
-  <div class="mb-4">
-    CPU Usage
-  </div>
-  <div class="mb-6">
-    <%= line_chart @containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage) } } %>
-  </div>
-</div>
-
-<div class="w-full p-4 mb-4 shadow rounded-xl">
-  <div class="mb-4">
-    RAM Usage
-  </div>
-  <div class="mb-6">
-    <%= line_chart @containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage) } } %>
-  </div>
-</div>
+<%= turbo_frame_tag :stats, src: stats_project_app_metrics_path(current_project, current_app) %>
+<%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_app_metrics_path(current_project, current_app) %>
+<%= turbo_frame_tag :memory_chart, src: memory_chart_project_app_metrics_path(current_project, current_app) %>

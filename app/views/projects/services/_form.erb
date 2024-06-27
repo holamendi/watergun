@@ -3,9 +3,7 @@
     <%= form.label :service_type, "Type", class: "label" %>
     <%= form.select :service_type, Service.service_types, {}, class: "select select-bordered", disabled: form.object.persisted? %>
   </div>
-  <%= button_tag type: "submit",
+  <%= button_tag "Save", type: "submit",
                  class: "btn btn-primary no-animation",
-                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
-    Save
-  <% end %>
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } %>
 <% end %>

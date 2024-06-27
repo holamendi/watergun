@@ -6,3 +6,19 @@
 .field_with_errors > input {
   @apply input-error;
 }
+
+.btn {
+  @apply font-normal rounded-md btn-sm;
+}
+
+.input {
+  @apply px-2 rounded-md input-sm;
+}
+
+.select {
+  @apply p-2 rounded-md select-sm;
+}
+
+.modal-box {
+  @apply p-4 rounded-lg;
+}
