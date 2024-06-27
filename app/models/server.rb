@@ -5,7 +5,7 @@ class Server < ApplicationRecord
     "nixpacks" => "Nixpacks"
   }
 
-  belongs_to :account, default: -> { Current.account}
+  belongs_to :account, default: -> { Current.account }
 
   has_one :ssh_key, dependent: :destroy
 

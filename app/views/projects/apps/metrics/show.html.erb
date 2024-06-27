@@ -12,15 +12,15 @@
 <div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
   <div class="stat bg-base-100">
     <div class="stat-title">Running Containers</div>
-    <div class="stat-value"><%= @running_containers.count %></div>
+    <div class="stat-value"><%= current_app.containers.running.size %></div>
   </div>
   <div class="stat bg-base-100">
     <div class="stat-title">CPU Usage</div>
-    <div class="stat-value"><%= @running_containers.sum(:cpu_percentage).round(2) %>%</div>
+    <div class="stat-value"><%= current_app.containers.running.sum(:cpu_percentage).round(2) %>%</div>
   </div>
   <div class="stat bg-base-100">
     <div class="stat-title">RAM Usage</div>
-    <div class="stat-value"><%= @running_containers.sum(:memory_percentage).round(2) %>%</div>
+    <div class="stat-value"><%= current_app.containers.running.sum(:memory_percentage).round(2) %>%</div>
   </div>
 </div>
 
@@ -29,7 +29,7 @@
     CPU Usage
   </div>
   <div class="mb-6">
-    <%= line_chart @running_containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage) } } %>
+    <%= line_chart @containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage) } } %>
   </div>
 </div>
 
@@ -38,6 +38,6 @@
     RAM Usage
   </div>
   <div class="mb-6">
-    <%= line_chart @running_containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage) } } %>
+    <%= line_chart @containers.map { |container| {name: container.name, data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage) } } %>
   </div>
 </div>

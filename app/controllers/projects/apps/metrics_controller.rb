@@ -2,7 +2,13 @@ module Projects
   module Apps
     class MetricsController < BaseController
       def show
-        @running_containers = current_app.containers.running
+        @containers = current_app.containers.checked_within(from: 1.hour.ago)
+      end
+
+      def cpu_usage
+      end
+
+      def memory_usage
       end
     end
   end

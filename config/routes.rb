@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   get "login" => "sessions#new", :as => :login
   delete "logout" => "sessions#destroy", :as => :logout
 
+  resources :sessions, only: %i[new create destroy]
+
   resources :projects do
     scope module: :projects do
       resources :apps do
