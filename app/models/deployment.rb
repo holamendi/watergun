@@ -23,8 +23,6 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  # after_create_commit -> { ServerActions::DeployApp.perform_later!(self) }
-
   def short_sha
     sha&.first(7)
   end

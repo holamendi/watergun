@@ -60,6 +60,7 @@ module ServerActions
 
     def schedule_enable_ssl!
       return unless app.domains.ssl_disabled.any?
+      return unless app.domains.kept.all? { |domain| domain.resolves_to_server? }
 
       ServerActions::EnableAppSsl.run_later!(app)
     end
