@@ -5,7 +5,7 @@
         "type": "startup",
         "name": "web check",
         "path": "/up",
-        "attempts": 3
+        "attempts": 5
       }
     ]
   }
