@@ -10,6 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy to helsinki.waterun.dev
+    - name: Deploy to Watergun
       run: |
-        curl -X POST https://helsinki.watergun.dev/api/v1/apps/29/deployments -H "Authorization: Bearer ${{ secrets.WATERGUN_API_KEY }}"
+        curl -X POST https://${{ secrets.WATERGUN_HOSTNAME }}/deployments?app_id=${{ secrets.WATERGUN_APP_ID }} -H "Authorization: Bearer ${{ secrets.WATERGUN_API_KEY }}"
