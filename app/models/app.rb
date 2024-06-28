@@ -38,4 +38,8 @@ class App < ApplicationRecord
   def deployed?
     deployed_at.present?
   end
+
+  def all_domains_resolve_to_server?
+    domains.kept.all?(&:resolves_to_server?)
+  end
 end
