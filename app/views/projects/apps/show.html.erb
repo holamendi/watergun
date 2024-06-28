@@ -42,7 +42,7 @@
           </td>
           <td>
             <% if deployment.finished? %>
-              <%= link_to "logs", logs_project_app_deployment_path(@project, @app, deployment), class: "link", target: :_blank %>
+              <%= link_to "logs", logs_project_app_deployment_path(current_project, @app, deployment), class: "link", target: :_blank %>
             <% end %>
           </td>
         </tr>

@@ -5,13 +5,13 @@ module Projects
     helper_method :current_project
 
     def current_project
-      @project
+      Current.project
     end
 
     private
 
     def set_project
-      @project = Project.kept.find(params[:project_id])
+      Current.project = Project.kept.find(params[:project_id])
     end
   end
 end

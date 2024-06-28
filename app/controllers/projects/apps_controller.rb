@@ -37,7 +37,7 @@ module Projects
 
     def update
       if @app.update(app_params)
-        redirect_to edit_app_path(@app), notice: "App updated successfully."
+        redirect_to edit_project_app_path(current_project, @app), notice: "App updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end

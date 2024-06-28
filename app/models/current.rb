@@ -1,7 +1,9 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :api_token,
+    :app,
     :membership,
     :account,
+    :project,
     :server,
     :server_event_source,
     :session,

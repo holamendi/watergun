@@ -6,13 +6,13 @@ module Projects
       helper_method :current_app
 
       def current_app
-        @app
+        Current.app
       end
 
       private
 
       def set_app
-        @app = current_project.apps.kept.find(params[:app_id])
+        Current.app = current_project.apps.kept.find(params[:app_id])
       end
     end
   end
