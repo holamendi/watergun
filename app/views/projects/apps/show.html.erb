@@ -11,9 +11,10 @@
   <table class="table pt-4">
     <thead>
       <tr>
-        <th>sha</th>
-        <th>finished</th>
-        <th>duration</th>
+        <th>ID</th>
+        <th>SHA</th>
+        <th>Finished</th>
+        <th>Duration</th>
         <th>Status</th>
         <th></th>
       </tr>
@@ -21,6 +22,7 @@
     <tbody>
       <% @deployments.each do |deployment| %>
         <tr>
+          <td><%= deployment.id %></td>
           <td>
             <div class="tooltip" data-tip="<%= deployment.commit_message %> (<%= deployment.author_login %>)">
               <%= link_to deployment.short_sha, deployment.commit_html_url, target: :_blank, class: "link"  %>

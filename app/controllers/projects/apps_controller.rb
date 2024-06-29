@@ -11,7 +11,7 @@ module Projects
     end
 
     def create
-      @app = @project.apps.new(app_params.merge(name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last))
+      @app = current_project.apps.new(app_params.merge(name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last))
 
       if @app.save
         ServerActions::CreateApp.run_later!(@app)
