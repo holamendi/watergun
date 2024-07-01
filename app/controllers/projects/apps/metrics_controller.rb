@@ -11,7 +11,7 @@ module Projects
       end
 
       def cpu_chart
-        @chart_data = current_app.containers.checked_within(from: 1.hour.ago).map do |container|
+        @chart_data = current_app.containers.running.checked_within(from: 1.hour.ago).map do |container|
           {
             name: container.name,
             data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage)
@@ -20,7 +20,7 @@ module Projects
       end
 
       def memory_chart
-        @chart_data = current_app.containers.checked_within(from: 1.hour.ago).map do |container|
+        @chart_data = current_app.containers.running.checked_within(from: 1.hour.ago).map do |container|
           {
             name: container.name,
             data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:memory_percentage)
