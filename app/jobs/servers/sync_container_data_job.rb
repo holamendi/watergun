@@ -34,7 +34,7 @@ module Servers
         stats.uniq!
 
         (server.apps.kept + server.services.kept).each do |entity|
-          containers = stats.select { |stat| stat[:name].include?(entity.dokku_id) }
+          containers = stats.select { |stat| stat[:name].start_with?("#{entity.dokku_id}.") }
 
           containers.each do |stats|
             container = entity.containers.find_or_initialize_by(cid: stats[:id])
