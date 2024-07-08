@@ -9,7 +9,7 @@ module Projects
       @service = current_project.services.new(service_params.merge(name: SecureRandom.hex(4)))
 
       if @service.save
-        ServerActions::CreateService.run_later!(@service)
+        ServerAction::CreateService.run_later!(@service)
         redirect_to current_project, notice: "Service created successfully."
       else
         render turbo_stream: turbo_stream.replace(
@@ -27,7 +27,7 @@ module Projects
       @service.discard
       @service.service_links.each do |service_link|
         service_link.discard
-        ServerActions::UnlinkService.run_later!(service_link)
+        ServerAction::UnlinkService.run_later!(service_link)
       end
 
       redirect_to current_project, notice: "Service scheduled for deletion"

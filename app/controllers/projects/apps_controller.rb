@@ -14,7 +14,7 @@ module Projects
       @app = current_project.apps.new(app_params.merge(name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last))
 
       if @app.save
-        ServerActions::CreateApp.run_later!(@app)
+        ServerAction::CreateApp.run_later!(@app)
         redirect_to current_project, notice: "App created successfully.", status: :see_other
       else
         render turbo_stream: turbo_stream.replace(
@@ -45,6 +45,7 @@ module Projects
 
     def destroy
       @app.discard!
+      ServerAction::DestroyApp.run_later!(@app)
 
       redirect_to current_project, notice: "App deleted successfully."
     end

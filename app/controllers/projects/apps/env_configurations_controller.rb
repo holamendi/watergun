@@ -8,7 +8,7 @@ module Projects
 
       def update
         if @env_configuration.update(env_configuration_params)
-          ServerActions::UpdateAppEnv.run_later!(current_app) if @env_configuration.saved_change_to_variables?
+          ServerAction::UpdateAppEnv.run_later!(current_app) if @env_configuration.saved_change_to_variables?
           redirect_to edit_app_env_configuration_path(current_app), notice: "Env configuration updated successfully."
         else
           render :edit

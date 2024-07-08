@@ -37,7 +37,7 @@ module Api
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
-          ServerActions::DeployApp.run_later!(deployment)
+          ServerAction::DeployApp.run_later!(deployment)
           render json: DeploymentResource.new(deployment), status: :created
         else
           render json: {errors: "invalid commit"}, status: :unprocessable_entity

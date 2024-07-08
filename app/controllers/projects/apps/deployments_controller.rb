@@ -18,7 +18,7 @@ module Projects
             commit_message: commit.commit.message,
             commit_html_url: commit.html_url
           )
-          ServerActions::DeployApp.run_later!(deployment)
+          ServerAction::DeployApp.run_later!(deployment)
           flash[:notice] = "Deployment scheduled"
           redirect_to project_app_path(current_project, current_app)
         else

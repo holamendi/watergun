@@ -3,7 +3,7 @@
 ARG RUBY_VERSION=3.3.3
 FROM registry.docker.com/library/ruby:${RUBY_VERSION}-slim as base
 
-WORKDIR /rails
+WORKDIR /app
 
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
@@ -27,7 +27,7 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
     npm install -g yarn@$YARN_VERSION && \
     rm -rf /tmp/node-build-master /var/lib/apt/lists/*
 
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
@@ -44,11 +44,11 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     rm -rf /var/lib/apt/lists* /var/cache/apt/archives*
 
 COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
+COPY --from=build /app /app
 
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER rails:rails
+RUN useradd deploy --create-home --shell /bin/bash && \
+    chown -R deploy:deploy db log storage tmp
+USER deploy:deploy
 
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+ENTRYPOINT ["/app/bin/docker-entrypoint"]
 CMD ["./bin/rails", "server"]

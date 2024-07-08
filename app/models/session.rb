@@ -1,9 +1,11 @@
 class Session < ApplicationRecord
   has_secure_token length: 32
 
+  DEFAULT_SESSION_DURATION = 1.month
+
   belongs_to :user
 
-  attribute :expires_at, :datetime, default: -> { 1.month.from_now }
+  attribute :expires_at, :datetime, default: -> { DEFAULT_SESSION_DURATION.from_now }
 
   scope :active, -> { where(expires_at: Time.current..) }
 

@@ -20,6 +20,7 @@
           <th>Resource</th>
           <th>Type</th>
           <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,20 @@
             <td>App</td>
             <td>
               <span class="badge <%= status_badge_class(app.status) %>"><%= app.status %></span>
+            </td>
+            <td class="text-right">
+              <div class="dropdown dropdown-bottom dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                  </svg>
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                  <li>
+                    <%= link_to "Delete", project_app_path(@project, app), class: "text-red-500", data: { turbo_method: :delete, turbo_confirm: "Delete #{app.name}? "} %>
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
         <% end %>
@@ -52,11 +67,9 @@
     </div>
   <% end %>
 </div>
-
 <%= render "shared/modal", id: "app_modal", title: "Connect Github Repo" do %>
   <%= render "projects/apps/form", project: @project, app: @app %>
 <% end %>
-
 <%= render "shared/modal", id: "service_modal", title: "Add a Database" do %>
   <%= render "projects/services/form", project: @project, service: @service %>
 <% end %>
