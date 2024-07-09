@@ -2,6 +2,7 @@
 
 SSH_USER="watergun"
 DOKKU_APP="watergun"
+DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_REPO="https://github.com/holamendi/watergun.git"
 WATERGUN_BRANCH="main"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
@@ -48,10 +49,10 @@ dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl ran
 
 # mount storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false
-dokku storage:mount "$DOKKU_APP" /var/lib/dokku/data/storage/"$DOKKU_APP":/app/storage
+dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
 # sync git repo
-dokku git:sync "$DOKKU_APP $WATERGUN_REPO $WATERGUN_BRANCH"
+dokku git:sync "$DOKKU_APP" "$WATERGUN_REPO" "$WATERGUN_BRANCH"
 
 # build app
 dokku ps:rebuild "$DOKKU_APP"
