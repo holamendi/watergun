@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SSH_USER="watergun"
+SSH_DIR="/home/$SSH_USER/.ssh"
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_REPO="https://github.com/holamendi/watergun.git"
@@ -40,6 +41,14 @@ fi
 # TODO: is there a way to install dokku plugins without sudo?
 echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/"$SSH_USER"
 
+# create .ssh directory
+mkdir -p "$SSH_DIR"
+chown -R "$SSH_USER:$SSH_USER" "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+touch "$SSH_DIR/authorized_keys"
+chown "$SSH_USER:$SSH_USER" "$SSH_DIR/authorized_keys"
+chmod 600 "$SSH_DIR/authorized_keys"
+
 # create dokku app
 dokku apps:create "$DOKKU_APP"
 dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
@@ -67,13 +76,13 @@ PUBLIC_KEY=$(echo $SETUP_RESULT | jq -r '.public_key')
 FIRST_SIGNUP_TOKEN=$(echo $SETUP_RESULT | jq -r '.first_signup_token')
 
 # add public key to ssh user
-echo $PUBLIC_KEY > "/home/$SSH_USER/.ssh/authorized_keys"
+echo "$PUBLIC_KEY" >> "$SSH_DIR/authorized_keys"
 
 DOKKU_APP_URL=$(dokku urls "$DOKKU_APP" --quiet | head -n 1)
 
 dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
 
-echo "Setup complete. Visit $APP_URL/first-run/$SIGNUP_TOKEN to create your first user account."
+echo "Setup complete. Visit $DOKKU_APP_URL/first-run/$FIRST_SIGNUP_TOKEN to create your first user account."
 
 
 
