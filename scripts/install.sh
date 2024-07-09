@@ -17,7 +17,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # ensure dependencies
-for cmd in dokku adduser curl jq rake openssl; do
+for cmd in dokku adduser curl jq openssl; do
   if ! command_exists "$cmd"; then
     echo "error: $cmd is not installed."
     exit 1
