@@ -17,7 +17,7 @@ class Server < ApplicationRecord
 
   str_enum :status, %i[pending active deleting deleted error], default: :pending
 
-  after_create :create_ssh_key
+  after_create { create_ssh_key!(account:) }
 
   def ssh_session(&)
     attempts = 0

@@ -2,6 +2,7 @@
 
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
+DOKKU_TAG=v0.34.6
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_REPO="https://github.com/holamendi/watergun.git"
@@ -18,8 +19,14 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# check that dokku 0.33 or higher is installed or install it
+if ! command_exists dokku; then
+  wget -NP . "https://dokku.com/install/$DOKKU_TAG/bootstrap.sh"
+  sudo  bash bootstrap.sh
+fi
+
 # ensure dependencies
-for cmd in dokku adduser curl jq openssl; do
+for cmd in jq openssl; do
   if ! command_exists "$cmd"; then
     echo "error: $cmd is not installed."
     exit 1
@@ -27,7 +34,7 @@ for cmd in dokku adduser curl jq openssl; do
 done
 
 # install required dokku plugins
-if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
+if ! sudo dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
   echo "failed to install dokku-letsencrypt plugin"
   exit 1
 fi
