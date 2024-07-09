@@ -15,9 +15,7 @@ class Server < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :services, dependent: :destroy
 
-  enum status: {
-    active: 0
-  }, _default: :active
+  str_enum :status, %i[pending active deleting deleted error], default: :pending
 
   after_create :create_ssh_key
 

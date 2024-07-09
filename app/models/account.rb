@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  has_secure_token :first_signup_token
+
   has_many :api_tokens, dependent: :destroy
   has_many :apps, dependent: :destroy
   has_many :deployments, dependent: :destroy
@@ -6,7 +8,6 @@ class Account < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :servers, dependent: :destroy
-  has_many :server_identities, dependent: :destroy
   has_many :server_actions, dependent: :destroy
   has_many :server_action_logs, dependent: :destroy
   has_many :services, dependent: :destroy
