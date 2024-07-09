@@ -22,7 +22,7 @@ fi
 # check that dokku 0.33 or higher is installed or install it
 if ! command_exists dokku; then
   wget -NP . "https://dokku.com/install/$DOKKU_TAG/bootstrap.sh"
-  sudo  bash bootstrap.sh
+  sudo bash bootstrap.sh
 fi
 
 # ensure dependencies
