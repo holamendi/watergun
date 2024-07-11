@@ -44,8 +44,7 @@ class ServerAction::DeployApp < ServerAction
   end
 
   def rebuild_dokku_app!
-    rebuild_command = Dokku::Ps::Rebuild.new(ssh, app: dokku_app_id).command
-    ssh.execute!("#{rebuild_command} > #{deployment.id}.log")
+    Dokku::Ps::Rebuild.call!(ssh, app: dokku_app_id)
   end
 
   def authenticate_github_account!
