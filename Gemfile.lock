@@ -12,7 +12,7 @@ GIT
 
 GIT
   remote: https://github.com/holamendi/litestack.git
-  revision: 34ff1d8183eda381f444b7f3bc3487d308f0505c
+  revision: 2d4a1c7a4525b522f01a8f255da65ff2c099add7
   branch: fix-litecable-closed-statements
   specs:
     litestack (0.4.4)
@@ -20,7 +20,7 @@ GIT
       oj (~> 3)
       rack (~> 3)
       rackup (~> 2)
-      sqlite3 (>= 1.6.0, < 3.0.0)
+      sqlite3 (>= 1.6.0, < 2.0.0)
       tilt (~> 2)
 
 GEM
@@ -209,6 +209,7 @@ GEM
       date
       net-protocol
     net-pop (0.1.2)
+      net-protocol
     net-protocol (0.2.2)
       timeout
     net-smtp (0.5.0)
@@ -337,11 +338,11 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     sorbet-runtime (0.5.11480)
-    sqlite3 (2.0.2)
+    sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (2.0.2-aarch64-linux-gnu)
-    sqlite3 (2.0.2-arm64-darwin)
-    sqlite3 (2.0.2-x86_64-linux-gnu)
+    sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm64-darwin)
+    sqlite3 (1.7.3-x86_64-linux)
     sshkey (3.0.0)
     standard (1.39.1)
       language_server-protocol (~> 3.17.0.2)
@@ -441,7 +442,7 @@ DEPENDENCIES
   ruby-lsp-rails
   selenium-webdriver
   solid_queue!
-  sqlite3 (~> 2.0.2)
+  sqlite3
   sshkey
   standard
   store_attribute
@@ -454,7 +455,7 @@ DEPENDENCIES
   yabeda-honeybadger_insights
 
 RUBY VERSION
-   ruby 3.3.3p89
+   ruby 3.3.4p94
 
 BUNDLED WITH
    2.4.19
