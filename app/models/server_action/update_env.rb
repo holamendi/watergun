@@ -23,14 +23,14 @@ class ServerAction::UpdateEnv < ServerAction
 
   def run
     if set.present?
-      set_env_variables.update!(status: :syncing)
+      set_env_variables.update_all(status: :syncing)
       set_dokku_app_config!
       synced_at = Time.current
-      set_env_variables.update!(status: :synced, synced_at:)
+      set_env_variables.update_all(status: :synced, synced_at:)
     end
 
     if unset.present?
-      unset_env_variables.update!(status: :syncing)
+      unset_env_variables.update_all(status: :syncing)
       unset_dokku_app_config!
       unset_env_variables.update_all(status: :synced, synced_at: Time.current)
     end
@@ -51,10 +51,10 @@ class ServerAction::UpdateEnv < ServerAction
   end
 
   memoize def set_env_variables
-    app.env_variables.where(key: set.keys)
+    app.env_variables.kept.where(key: set.keys)
   end
 
   memoize def unset_env_variables
-    app.env_variables.where(key: unset)
+    app.env_variables.kept.where(key: unset)
   end
 end
