@@ -18,7 +18,7 @@ class Service < ApplicationRecord
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
   before_create do
-    self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
+    self.dokku_id ||= "#{name.parameterize}-#{SecureRandom.hex(2)}"
   end
 
   after_update_commit do
