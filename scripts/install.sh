@@ -19,6 +19,9 @@ HOSTNAME=$(hostname)
 CPU_TYPE=$(uname -m)
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 
+DOMAIN=app.watergun.dev
+EMAIL=hola@mendi.cl
+
 # args
 DOMAIN="$1"
 EMAIL="$2"
@@ -110,7 +113,7 @@ dokku git:sync "$DOKKU_APP" "$WATERGUN_REPO" "$WATERGUN_BRANCH"
 dokku ps:rebuild "$DOKKU_APP"
 
 # set up watergun account
-SETUP_RESPONSE=$(dokku run "$DOKKU_APP" bundle exec rake account:setup "$HOSTNAME" "$PUBLIC_IP" "$CPU_TYPE" "$EMAIL")
+SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
 PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
 TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
 
