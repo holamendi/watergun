@@ -19,9 +19,6 @@ HOSTNAME=$(hostname)
 CPU_TYPE=$(uname -m)
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 
-DOMAIN=app.watergun.dev
-EMAIL=hola@mendi.cl
-
 # args
 DOMAIN="$1"
 EMAIL="$2"
