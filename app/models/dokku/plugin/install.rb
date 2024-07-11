@@ -20,7 +20,7 @@ module Dokku
       def initialize(ssh_session, plugin:)
         @ssh_session = ssh_session
         @plugin = plugin
-        @repo = PLUGIN_REPOS.fetch(plugin)
+        @repo = PLUGIN_GITHUB_REPOS.fetch(plugin)
       end
 
       def command
