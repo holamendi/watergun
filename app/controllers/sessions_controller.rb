@@ -13,8 +13,7 @@ class SessionsController < ApplicationController
     @user = User.authenticate_by(session_params)
 
     if @user
-      Current.session = @user.sessions.create!
-      cookies.encrypted[:session_token] = {value: Current.session.token, expires: Current.session.expires_at}
+      sign_in(@user)
       redirect_to root_path
     else
       flash.now[:error] = "Invalid email or password"

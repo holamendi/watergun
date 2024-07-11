@@ -10,6 +10,9 @@ Rails.application.routes.draw do
 
   resources :sessions, only: %i[new create destroy]
 
+  resource :first_run, only: %i[edit update]
+  get "first-run/:signed_id", to: "first_runs#edit"
+
   resources :projects do
     scope module: :projects do
       resources :apps do
@@ -17,20 +20,24 @@ Rails.application.routes.draw do
           resources :domains, only: %i[index create destroy] do
             patch :make_default, on: :member
           end
+
           resources :env_variables, path: :env
           resource :env_configuration, path: :environment, only: %i[edit update]
           resource :github_repo
           resources :deployments, shallow: false, only: :create do
             get :logs, on: :member
           end
+
           resources :logs, only: :index do
             get :fetch, on: :collection
           end
+
           resource :metrics, only: :show do
             get :stats
             get :cpu_chart
             get :memory_chart
           end
+
           resources :restarts, only: :create
         end
       end

@@ -27,6 +27,12 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def sign_in(user)
+    session = user.sessions.create!
+    cookies.encrypted[:session_token] = {value: session.token, expires: session.expires_at}
+    Current.session = session
+  end
+
   def authenticate!
     return if (Current.session = Session.find_by_active_token(cookies.encrypted[:session_token]))
 
