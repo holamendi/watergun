@@ -48,7 +48,7 @@ if ! host "$DOMAIN" | grep -q "$PUBLIC_IP"; then
 fi
 
 # ensure dependencies are installed
-for cmd in jq openssl wget; do
+for cmd in wget; do
   if ! command_exists "$cmd"; then
     echo "error: $cmd is not installed."
     exit 1
