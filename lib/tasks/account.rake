@@ -13,11 +13,14 @@ namespace :account do
       exit 1
     end
 
-    Current.account = Account.create!(name: "default")
-    Current.server = Current.account.servers.create!(name: hostname, public_ip:, cpu_type:)
+    account = Account.create!(name: "default")
+    server = account.servers.create!(name: hostname, public_ip:, cpu_type:)
+
+    Current.account = account
+    Current.server = server
 
     user = account.users.create!(email:, password: SecureRandom.hex(16))
-    Project.create!(name: "watergun")
+    project = account.projects.create!(name: "watergun")
     app = project.apps.create!(name: "watergun", dokku_id: "watergun")
     app.create_github_repo!(repo: "holamendi/watergun", branch: "main")
 
