@@ -66,6 +66,9 @@ if ! command_exists "dokku"; then
   fi
 fi
 
+# set global domain
+dokku domains:set-global "$DOMAIN"
+
 # install letsencrypt plugin
 if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
   echo "failed to install dokku-letsencrypt plugin"
@@ -117,7 +120,7 @@ TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
 # add public key to ssh user
 echo "$PUBLIC_KEY" >> "$SSH_DIR/authorized_keys"
 
-# set domain
+# set app domain
 dokku domains:set "$DOKKU_APP" "$DOMAIN"
 dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
 dokku letsencrypt:enable "$DOKKU_APP"
