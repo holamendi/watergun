@@ -4,6 +4,15 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+SSH_USER="watergun"
+SSH_DIR="/home/$SSH_USER/.ssh"
+DOKKU_TAG=v0.34.6
+DOKKU_APP="watergun"
+DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
+WATERGUN_REPO="https://github.com/holamendi/watergun.git"
+WATERGUN_BRANCH="main"
+LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
+
 # validate script is run as root
 if [ "$EUID" -ne 0 ]; then
   echo "please run as root"
@@ -43,14 +52,7 @@ done
 
 HOSTNAME=$(hostname)
 CPU_TYPE=$(uname -m)
-SSH_USER="watergun"
-SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.34.6
-DOKKU_APP="watergun"
-DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
-WATERGUN_REPO="https://github.com/holamendi/watergun.git"
-WATERGUN_BRANCH="main"
-LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
+
 
 # dokku installation
 if ! command_exists "dokku"; then
@@ -69,7 +71,7 @@ if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
   exit 1
 fi
 
-dokku letsencrypt:set "$DOKKU_APP" email "$EMAIL"
+dokku letsencrypt:set --global email "$EMAIL"
 
 # create user
 if ! adduser --disabled-password --gecos "" "$SSH_USER"; then
@@ -94,7 +96,7 @@ dokku apps:create "$DOKKU_APP"
 dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
 
 # set env vars
-dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64)
+dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64) --no-restart
 
 # mount storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false
