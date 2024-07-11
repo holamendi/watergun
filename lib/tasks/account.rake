@@ -1,13 +1,10 @@
 namespace :account do
   desc "set up a new account"
-  task :setup, [:hostname, :public_ip, :cpu_type, :email] => :environment do |_, args|
-    hostname = args[:hostname]
-    public_ip = args[:public_ip]
-    cpu_type = args[:cpu_type]
-    email = args[:email]
+  task setup: :environment do |_, args|
+    hostname, public_ip, cpu_type, email = ARGV[1..]
 
     if hostname.blank? || public_ip.blank? || cpu_type.blank?
-      puts "Usage: rake server:create[hostname,public_ip,cpu_type]"
+      puts "Usage: rake account:setup <hostname> <public_ip> <cpu_type> <email>"
       exit 1
     end
 

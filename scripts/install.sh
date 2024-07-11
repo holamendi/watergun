@@ -4,6 +4,7 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+# constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
 DOKKU_TAG=v0.34.6
@@ -13,14 +14,20 @@ WATERGUN_REPO="https://github.com/holamendi/watergun.git"
 WATERGUN_BRANCH="main"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
 
+# server info
+HOSTNAME=$(hostname)
+CPU_TYPE=$(uname -m)
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
+
+# args
+DOMAIN="$1"
+EMAIL="$2"
+
 # validate script is run as root
 if [ "$EUID" -ne 0 ]; then
   echo "please run as root"
   exit 1
 fi
-
-DOMAIN="$1"
-EMAIL="$2"
 
 # validate args
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
@@ -33,8 +40,6 @@ if ! echo "$EMAIL" | grep -qE "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
   echo "error: invalid email format"
   exit 1
 fi
-
-PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 
 # validate domain resolves to public ip
 if ! host "$DOMAIN" | grep -q "$PUBLIC_IP"; then
@@ -49,10 +54,6 @@ for cmd in jq openssl wget; do
     exit 1
   fi
 done
-
-HOSTNAME=$(hostname)
-CPU_TYPE=$(uname -m)
-
 
 # dokku installation
 if ! command_exists "dokku"; then
@@ -109,7 +110,7 @@ dokku git:sync "$DOKKU_APP" "$WATERGUN_REPO" "$WATERGUN_BRANCH"
 dokku ps:rebuild "$DOKKU_APP"
 
 # set up watergun account
-SETUP_RESPONSE=$(dokku run "$DOKKU_APP" bundle exec rake "account:setup[$HOSTNAME,$PUBLIC_IP,$CPU_TYPE,$EMAIL]" | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
+SETUP_RESPONSE=$(dokku run "$DOKKU_APP" bundle exec rake account:setup "$HOSTNAME" "$PUBLIC_IP" "$CPU_TYPE" "$EMAIL")
 PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
 TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
 
