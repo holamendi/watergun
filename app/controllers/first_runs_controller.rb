@@ -19,7 +19,7 @@ class FirstRunsController < ApplicationController
   private
 
   def set_user
-    @user = User.find_signed!(signed_id: params[:signed_id], purpose: :first_run)
+    @user = User.find_signed!(params[:signed_id], purpose: :first_run)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     raise ActiveRecord::RecordNotFound
   end
