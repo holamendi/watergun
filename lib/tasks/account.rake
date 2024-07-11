@@ -3,7 +3,7 @@ namespace :account do
   task setup: :environment do |_, args|
     hostname, public_ip, cpu_type, email = ARGV[1..]
 
-    if hostname.blank? || public_ip.blank? || cpu_type.blank?
+    if hostname.blank? || public_ip.blank? || cpu_type.blank? || email.blank?
       puts "Usage: rake account:setup <hostname> <public_ip> <cpu_type> <email>"
       exit 1
     end
@@ -13,12 +13,13 @@ namespace :account do
       exit 1
     end
 
-    account = Account.create!(name: "default")
-    server = account.servers.create!(name: hostname, public_ip:, cpu_type:)
+    Current.account = Account.create!(name: "default")
+    Current.server = Current.account.servers.create!(name: hostname, public_ip:, cpu_type:)
 
     user = account.users.create!(email:, password: SecureRandom.hex(16))
-    project = server.projects.create!(name: "watergun", account:)
-    project.apps.create!(name: "watergun", dokku_id: "watergun", account:, server:)
+    Project.create!(name: "watergun")
+    app = project.apps.create!(name: "watergun", dokku_id: "watergun")
+    app.create_github_repo!(repo: "holamendi/watergun", branch: "main")
 
     token = user.signed_id(expires_at: 1.day.from_now, purpose: :first_run)
     public_key = server.ssh_key.public_key

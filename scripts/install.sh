@@ -83,6 +83,9 @@ if ! adduser --disabled-password --gecos "" "$SSH_USER"; then
   exit 1
 fi
 
+# add user to docker group
+usermod -aG docker "$SSH_USER"
+
 # TODO: is there a way to install dokku plugins without sudo?
 echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/"$SSH_USER"
 chmod 440 /etc/sudoers.d/"$SSH_USER"
