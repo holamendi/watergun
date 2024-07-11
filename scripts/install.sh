@@ -110,7 +110,7 @@ dokku ps:rebuild "$DOKKU_APP"
 
 # set up watergun account
 SETUP_RESPONSE=$(dokku run "$DOKKU_APP" bundle exec rake "account:setup[$HOSTNAME,$PUBLIC_IP,$CPU_TYPE,$EMAIL]" | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
-PUBLIC_KEY=$(echo $SETUP_RESULT | jq -r '.public_key')
+PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
 TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
 
 # add public key to ssh user
