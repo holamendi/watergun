@@ -61,7 +61,7 @@ if ! command_exists "dokku"; then
   if [ -f bootstrap.sh ]; then
     bash bootstrap.sh
   else
-    echo "failed to download Dokku"
+    echo "error:failed to download Dokku"
     exit 1
   fi
 fi
@@ -71,15 +71,16 @@ dokku domains:set-global "$DOMAIN"
 
 # install letsencrypt plugin
 if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
-  echo "failed to install dokku-letsencrypt plugin"
+  echo "error: failed to install dokku-letsencrypt plugin"
   exit 1
 fi
 
 dokku letsencrypt:set --global email "$EMAIL"
+dokku letsencrypt:cron-job --add
 
 # create user
 if ! adduser --disabled-password --gecos "" "$SSH_USER"; then
-  echo "failed to create user $SSH_USER"
+  echo "error:failed to create user $SSH_USER"
   exit 1
 fi
 
@@ -103,9 +104,9 @@ dokku apps:create "$DOKKU_APP"
 dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
 
 # set env vars
-dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64) --no-restart
+dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64) LITESTACK_DATA_PATH=storage --no-restart
 
-# mount storage
+# mount persistent storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false
 dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
@@ -128,6 +129,4 @@ dokku domains:set "$DOKKU_APP" "$DOMAIN"
 dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
 dokku letsencrypt:enable "$DOKKU_APP"
 
-DOKKU_APP_URL=$(dokku urls "$DOKKU_APP" --quiet | head -n 1)
-
-echo "All set. Visit $DOKKU_APP_URL/first-run/$TOKEN to finish setting up your user account."
+echo "All set. Visit https://$DOMAIN/first-run/$TOKEN to finish setting up your user account."
