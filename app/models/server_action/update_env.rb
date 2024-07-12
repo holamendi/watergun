@@ -36,7 +36,7 @@ class ServerAction::UpdateEnv < ServerAction
     Dokku::Config::Unset.call!(ssh, app: dokku_app_id, variable_names: unset)
   end
 
-  def scheule_pull_env!
+  def schedule_pull_env!
     ServerAction::PullEnv.run_later!(app)
   end
 

@@ -37,6 +37,7 @@ class ServerAction::DeployApp < ServerAction
     deployment.success!
   ensure
     app.active!
+    schedule_pull_env!
   end
 
   def sync_git_repo!
@@ -62,5 +63,9 @@ class ServerAction::DeployApp < ServerAction
     return unless app.all_domains_resolve_to_server?
 
     ServerAction::EnableSsl.run_later!(app)
+  end
+
+  def schedule_pull_env!
+    ServerAction::PullEnv.run_later!(app)
   end
 end
