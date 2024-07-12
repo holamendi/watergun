@@ -38,4 +38,8 @@ class ApplicationController < ActionController::Base
 
     redirect_to "/login", notice: "Please sign in"
   end
+
+  def not_found!
+    raise ActiveRecord::RecordNotFound
+  end
 end

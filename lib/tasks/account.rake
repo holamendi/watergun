@@ -1,10 +1,10 @@
 namespace :account do
   desc "set up a new account"
   task setup: :environment do |_, args|
-    hostname, public_ip, cpu_type, email = ARGV[1..]
+    hostname, public_ip, cpu_type, domain, email = ARGV[1..]
 
     if hostname.blank? || public_ip.blank? || cpu_type.blank? || email.blank?
-      puts "Usage: rake account:setup <hostname> <public_ip> <cpu_type> <email>"
+      puts "Usage: rake account:setup <hostname> <public_ip> <cpu_type> <domain> <email>"
       exit 1
     end
 
@@ -21,7 +21,8 @@ namespace :account do
 
     user = account.users.create!(email:, password: SecureRandom.hex(16))
     project = account.projects.create!(name: "watergun")
-    app = project.apps.create!(name: "watergun", dokku_id: "watergun")
+    app = project.apps.create!(name: "watergun", dokku_id: "watergun", status: :active, deployed_at: Time.current)
+    app.domains.create!(hostname: domain, status: :active, is_default: true, ssl_enabled: true)
     app.create_github_repo!(repo: "holamendi/watergun", branch: "main")
 
     token = user.signed_id(expires_at: 1.day.from_now, purpose: :first_run)

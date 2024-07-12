@@ -30,7 +30,7 @@ fi
 
 # validate args
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
-  echo "Usage: $0 <domain> <email> "
+  echo "Usage: curl -sSL https://raw.githubusercontent.com/holamendi/watergun/main/scripts/install.sh | bash -s <domain> <email>"
   exit 1
 fi
 
@@ -119,7 +119,7 @@ dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set up watergun account
-SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
+SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $DOMAIN $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
 PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
 TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
 
@@ -131,4 +131,5 @@ dokku domains:set "$DOKKU_APP" "$DOMAIN"
 dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
 dokku letsencrypt:enable "$DOKKU_APP"
 
-echo "All set. Visit https://$DOMAIN/first-run/$TOKEN to finish setting up your user account."
+echo "Done!"
+echo "Visit https://$DOMAIN/first-run/$TOKEN to set your password."
