@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_11_064405) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_12_073632) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -151,7 +151,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_11_064405) do
   create_table "env_variables", force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "app_id", null: false
-    t.string "key", null: false
+    t.string "name", null: false
     t.text "value", null: false
     t.string "status", null: false
     t.datetime "synced_at"
@@ -159,7 +159,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_11_064405) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_env_variables_on_account_id"
-    t.index ["app_id", "key"], name: "index_env_variables_on_app_id_and_key", unique: true, where: "discarded_at IS NULL"
+    t.index ["app_id", "name"], name: "index_env_variables_on_app_id_and_name", unique: true, where: "discarded_at IS NULL"
     t.index ["app_id"], name: "index_env_variables_on_app_id"
     t.index ["discarded_at"], name: "index_env_variables_on_discarded_at"
   end

@@ -36,7 +36,7 @@ module Projects
 
       def destroy
         @env_variable.discard!
-        ServerAction::UpdateEnv.run_later!(current_app, unset: [@env_variable.key])
+        ServerAction::UpdateEnv.run_later!(current_app, unset: [@env_variable.name])
         render turbo_stream: turbo_stream.remove(@env_variable)
       end
 
@@ -47,7 +47,7 @@ module Projects
       end
 
       def env_variable_params
-        params.require(:env_variable).permit(:key, :value)
+        params.require(:env_variable).permit(:name, :value)
       end
 
       def turbo_stream_errors

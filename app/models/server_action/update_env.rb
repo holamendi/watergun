@@ -22,19 +22,9 @@ class ServerAction::UpdateEnv < ServerAction
   private
 
   def run
-    if set.present?
-      set_env_variables.update_all(status: :syncing)
-      set_dokku_app_config!
-      synced_at = Time.current
-      set_env_variables.update_all(status: :synced, synced_at:)
-    end
-
-    if unset.present?
-      unset_env_variables.update_all(status: :syncing)
-      unset_dokku_app_config!
-      unset_env_variables.update_all(status: :synced, synced_at: Time.current)
-    end
-
+    set_dokku_app_config! if set.present?
+    unset_dokku_app_config! if unset.present?
+    schedule_pull_env!
     schedule_restart! if restart
   end
 
@@ -46,15 +36,19 @@ class ServerAction::UpdateEnv < ServerAction
     Dokku::Config::Unset.call!(ssh, app: dokku_app_id, variable_names: unset)
   end
 
+  def scheule_pull_env!
+    ServerAction::PullEnv.run_later!(app)
+  end
+
   def schedule_restart!
     ServerAction::RestartApp.run_later!(app)
   end
 
-  memoize def set_env_variables
-    app.env_variables.kept.where(key: set.keys)
+  def set_env_variables
+    app.env_variables.kept.where(name: set.keys)
   end
 
-  memoize def unset_env_variables
-    app.env_variables.kept.where(key: unset)
+  def unset_env_variables
+    app.env_variables.kept.where(name: unset)
   end
 end
