@@ -1,3 +1,5 @@
+<%= turbo_stream_from current_account, :projects %>
+
 <div class="flex justify-between">
   <h1 class="pb-6 text-2xl font-bold">Projects</h1>
   <% if @projects.any? %>
@@ -6,17 +8,20 @@
     </div>
   <% end %>
 </div>
-<% if @projects.any? %>
-  <div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-3">
-    <%= render @projects %>
-  </div>
-<% else %>
-  <div class="flex justify-center py-10">
-    <div>
-      <p><%= button_tag "Create your first project", class: "btn btn-lg btn-ghost link font-normal no-animation", onclick: "project_modal.showModal()" %></p>
+
+<div id="projects">
+  <% if @projects.any? %>
+    <div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+      <%= render @projects %>
     </div>
-  </div>
-<% end %>
+  <% else %>
+    <div class="flex justify-center py-10">
+      <div>
+        <p><%= button_tag "Create your first project", class: "btn btn-lg btn-ghost link font-normal no-animation", onclick: "project_modal.showModal()" %></p>
+      </div>
+    </div>
+  <% end %>
+</div>
 
 <%= render "shared/modal", id: "project_modal", title: "New Project" do %>
   <%= render "form", project: Project.new %>

@@ -13,11 +13,11 @@ class ProjectsController < ApplicationController
   end
 
   def new
-    @project = Project.new
+    @project = current_account.projects.new
   end
 
   def create
-    @project = Project.new(project_params)
+    @project = current_account.projects.new(project_params)
 
     if @project.save
       redirect_to projects_path, notice: "Project was successfully created."
@@ -33,12 +33,9 @@ class ProjectsController < ApplicationController
   end
 
   def edit
-    @project = Project.find(params[:id])
   end
 
   def update
-    @project = Project.find(params[:id])
-
     if @project.update(project_params)
       redirect_to project_path(@project), notice: "Project was successfully updated."
     else
@@ -47,13 +44,16 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project = Project.find(params[:id])
-    @project.destroy
+    @project.discard
 
     redirect_to projects_path, notice: "Project was successfully destroyed."
   end
 
   private
+
+  def set_project
+    @project = current_account.projects.kept.find(params[:id])
+  end
 
   def project_params
     params.require(:project).permit(:name)

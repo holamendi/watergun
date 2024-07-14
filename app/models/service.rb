@@ -1,4 +1,5 @@
 class Service < ApplicationRecord
+  include Broadcast
   include Discard::Model
   include Containerizable
   include ServerActionable
@@ -19,9 +20,5 @@ class Service < ApplicationRecord
 
   before_create do
     self.dokku_id ||= "#{name.parameterize}-#{SecureRandom.hex(2)}"
-  end
-
-  after_update_commit do
-    broadcast_refresh_to(self)
   end
 end
