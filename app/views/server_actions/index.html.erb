@@ -15,33 +15,8 @@
         <th></th>
       </tr>
     </thead>
-    <tbody>
-      <% @server_actions.each do |action| %>
-        <tr>
-          <td><%= action.id %></td>
-          <td><%= action.slug %></td>
-          <td><%= "#{action.actionable_type.downcase}_#{action.actionable_id}" %></td>
-          <td class="overflow-scroll overflow-ellipsis max-w-48 whitespace-nowrap">
-            <span>
-            <%= action.payload.map{|k,v| "#{k}: #{v}"}.join("<br>").html_safe %>
-            </span>
-          </td>
-          <td>
-            <% if action.finished? %>
-              <div class="tooltip" data-tip="<%= action.finished_at.to_s %>">
-                <%= time_ago_in_words(action.finished_at) %> ago
-              </div>
-            <% end %>
-          </td>
-          <td><% if action.finished? %><%= action.duration.round(1) %>s<% end %></td>
-          <td><span class="badge <%= status_badge_class(action.status) %> badge-sm"><%= action.status %></span></td>
-          <td>
-            <% if action.log.present? %>
-              <%= link_to "logs", logs_server_action_path(action), class: "link", target: :_blank %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
+    <tbody id="server_actions">
+      <%= render @server_actions %>
     </tbody>
   </table>
 </div>

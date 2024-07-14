@@ -1,0 +1,25 @@
+
+<tr id="<%= dom_id(server_action) %>">
+  <td><%= server_action.id %></td>
+  <td><%= server_action.slug %></td>
+  <td><%= "#{server_action.actionable_type.downcase}_#{server_action.actionable_id}" %></td>
+  <td class="overflow-scroll overflow-ellipsis max-w-48 whitespace-nowrap">
+    <span>
+      <%= server_action.payload.map{|k,v| "#{k}: #{v}"}.join("<br>").html_safe %>
+    </span>
+  </td>
+  <td>
+    <% if server_action.finished? %>
+      <div class="tooltip" data-tip="<%= server_action.finished_at.to_s %>">
+        <%= time_ago_in_words(server_action.finished_at) %> ago
+      </div>
+    <% end %>
+  </td>
+  <td><% if server_action.finished? %><%= server_action.duration.round(1) %>s<% end %></td>
+  <td><span class="badge <%= status_badge_class(server_action.status) %> badge-sm"><%= server_action.status %></span></td>
+  <td>
+    <% if server_action.finished? %>
+      <%= link_to "logs", logs_server_action_path(server_action), class: "link", target: :_blank %>
+    <% end %>
+  </td>
+</tr>

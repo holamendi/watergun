@@ -1,6 +1,6 @@
 class ServerAction < ApplicationRecord
-  attr_accessor :ssh_session
-  alias_method :ssh, :ssh_session
+  include Broadcast
+  include Runner
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
@@ -15,35 +15,12 @@ class ServerAction < ApplicationRecord
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
-  after_save_commit -> { broadcast_refresh_to(account, :server_actions) }
+  def slug
+    self.class.slug
+  end
 
   def concurrency_key
     actionable
-  end
-
-  def run_action
-    raise "server action must implement #run" unless respond_to?(:run, true)
-
-    running!
-
-    session = server.ssh_session do |ssh_session|
-      with(ssh_session:) do
-        run
-      rescue Ssh::CommandExecutionError
-      end
-    end
-
-    create_log!(ssh_commands: session.commands)
-    self.status = session.status
-    self
-  rescue => e
-    self.status = :error
-    Honeybadger.notify(e, context: {server_action_id: id})
-    raise if Rails.env.development?
-    self
-  ensure
-    self.finished_at = Time.current
-    save!
   end
 
   def running!(at = Time.current)
@@ -60,10 +37,6 @@ class ServerAction < ApplicationRecord
     finished_at - running_at
   end
 
-  def slug
-    self.class.slug
-  end
-
   class << self
     def actionable(type)
       alias_method :"#{type.to_s.underscore}", :actionable
@@ -75,16 +48,8 @@ class ServerAction < ApplicationRecord
       self::SLUG
     end
 
-    def run_later!(actionable, depends_on: nil, **)
-      action = create!(actionable:, preceding_action: depends_on, **)
-
-      if defined?(Rails::Console)
-        RunServerActionJob.perform_now(action)
-      else
-        RunServerActionJob.set(wait: 1.second).perform_later(action)
-      end
-
-      action
+    def model_name
+      ActiveModel::Name.new(ServerAction)
     end
   end
 end
