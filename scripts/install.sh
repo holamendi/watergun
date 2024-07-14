@@ -30,7 +30,7 @@ fi
 
 # validate args
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
-  echo "Usage: curl -sSL https://raw.githubusercontent.com/holamendi/watergun/main/scripts/install.sh | bash -s <domain> <email>"
+  echo "Usage: curl -sSL https://install.watergun.dev | bash -s <domain> <email>"
   exit 1
 fi
 
