@@ -1,6 +1,6 @@
 module Dokku
   module Mongo
-    class List < Base
+    class List < Dokku::Command
       def initialize(ssh_session)
         @ssh_session = ssh_session
       end

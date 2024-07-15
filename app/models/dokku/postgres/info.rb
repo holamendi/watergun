@@ -1,6 +1,6 @@
 module Dokku
   module Postgres
-    class Info < Base
+    class Info < Dokku::Command
       attr_reader :service
 
       def initialize(ssh_session, service:)

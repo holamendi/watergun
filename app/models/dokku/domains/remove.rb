@@ -1,6 +1,6 @@
 module Dokku
   module Domains
-    class Remove < Base
+    class Remove < Dokku::Command
       attr_reader :app, :domain
 
       def initialize(ssh_session, app:, domain:)

@@ -1,6 +1,6 @@
 module Dokku
   module Apps
-    class Destroy < Base
+    class Destroy < Dokku::Command
       attr_reader :app
 
       def initialize(ssh_session, app:)

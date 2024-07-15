@@ -1,6 +1,6 @@
 module Dokku
   module Storage
-    class EnsureDirectory < Base
+    class EnsureDirectory < Dokku::Command
       attr_reader :directory
 
       def initialize(ssh_session, directory:, chown: nil)

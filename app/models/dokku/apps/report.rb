@@ -1,6 +1,6 @@
 module Dokku
   module Apps
-    class Report < Base
+    class Report < Dokku::Command
       attr_reader :app
 
       def initialize(ssh_session, app:)

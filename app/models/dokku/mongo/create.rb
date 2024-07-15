@@ -1,6 +1,6 @@
 module Dokku
   module Mongo
-    class Create < Base
+    class Create < Dokku::Command
       attr_reader :service
 
       def initialize(ssh_session, service:)

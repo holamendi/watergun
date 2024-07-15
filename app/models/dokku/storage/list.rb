@@ -1,6 +1,6 @@
 module Dokku
   module Storage
-    class List < Base
+    class List < Dokku::Command
       attr_reader :app
 
       def initialize(ssh_session, app:)

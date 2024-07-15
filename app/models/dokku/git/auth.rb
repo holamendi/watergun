@@ -1,6 +1,6 @@
 module Dokku
   module Git
-    class Auth < Base
+    class Auth < Dokku::Command
       attr_reader :host, :access_token
 
       def initialize(ssh_session, access_token:, host: "github.com")

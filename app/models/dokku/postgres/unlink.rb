@@ -1,6 +1,6 @@
 module Dokku
   module Postgres
-    class Unlink < Base
+    class Unlink < Dokku::Command
       attr_reader :app, :service, :restart
 
       def initialize(ssh_session, service:, app:, restart: false)

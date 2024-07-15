@@ -1,6 +1,6 @@
 module Dokku
   module Mongo
-    class Destroy < Base
+    class Destroy < Dokku::Command
       attr_reader :service
 
       def initialize(ssh_session, service:)

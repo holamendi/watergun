@@ -1,6 +1,6 @@
 module Dokku
   module Storage
-    class Mount < Base
+    class Mount < Dokku::Command
       attr_reader :app, :host_directory, :container_directory
 
       def initialize(ssh_session, app:, host_directory:, container_directory: nil)

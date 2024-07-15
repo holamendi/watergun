@@ -1,6 +1,6 @@
 module Dokku
   module Postgres
-    class Create < Base
+    class Create < Dokku::Command
       VERSIONS = %w[
         16.2
       ]

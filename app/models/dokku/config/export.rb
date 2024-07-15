@@ -1,6 +1,6 @@
 module Dokku
   module Config
-    class Export < Base
+    class Export < Dokku::Command
       attr_reader :app, :env, :restart
 
       def initialize(ssh_session, app:)

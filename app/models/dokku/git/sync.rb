@@ -1,6 +1,6 @@
 module Dokku
   module Git
-    class Sync < Base
+    class Sync < Dokku::Command
       attr_reader :app, :repo, :branch, :sha, :build_if_changes
 
       def initialize(ssh_session, app:, repo:, branch: nil, sha: nil, build_if_changes: false)

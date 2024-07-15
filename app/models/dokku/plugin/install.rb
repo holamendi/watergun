@@ -1,6 +1,6 @@
 module Dokku
   module Plugin
-    class Install < Base
+    class Install < Dokku::Command
       attr_reader :plugin, :repo
 
       PLUGIN_GITHUB_REPOS = {

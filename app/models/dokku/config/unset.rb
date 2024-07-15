@@ -1,6 +1,6 @@
 module Dokku
   module Config
-    class Unset < Base
+    class Unset < Dokku::Command
       attr_reader :app, :variable_names, :restart
 
       def initialize(ssh_session, app:, variable_names:, restart: false)

@@ -1,6 +1,6 @@
 module Dokku
   module Mongo
-    class Restart < Base
+    class Restart < Dokku::Command
       attr_reader :service
 
       def initialize(ssh_session, service:)

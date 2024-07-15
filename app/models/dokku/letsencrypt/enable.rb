@@ -1,6 +1,6 @@
 module Dokku
   module Letsencrypt
-    class Enable < Base
+    class Enable < Dokku::Command
       attr_reader :app
 
       def initialize(ssh_session, app:)

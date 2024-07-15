@@ -1,6 +1,6 @@
 module Dokku
   module Domains
-    class Add < Base
+    class Add < Dokku::Command
       attr_reader :app, :domain
 
       def initialize(ssh_session, app:, domain:)
