@@ -1,4 +1,5 @@
 class Domain < ApplicationRecord
+  include Broadcast
   include Discard::Model
   include ServerActionable
 
@@ -16,7 +17,7 @@ class Domain < ApplicationRecord
 
   delegate :project, to: :app
 
-  def make_default
+  def make_default!
     transaction do
       app.domains.update_all(is_default: false)
       update!(is_default: true)

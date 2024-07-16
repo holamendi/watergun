@@ -4,6 +4,12 @@ class GithubAccessToken < ApplicationRecord
   validates :token, presence: true
   validate :validate_token_scope
 
+  def obfuscated_token
+    return nil unless token.present?
+
+    "#{token.first(6)}#{"*" * (token.length - 6)}"
+  end
+
   private
 
   def validate_token_scope

@@ -24,10 +24,9 @@ module Projects
     end
 
     def destroy
-      @service.discard
-      @service.service_links.each do |service_link|
-        service_link.discard
-        ServerAction::UnlinkService.run_later!(service_link)
+      if @service.discard
+        @service.service_links.discard_all
+        ServerAction::DestroyService.run_later!(@service)
       end
 
       redirect_to current_project, notice: "Service scheduled for deletion"

@@ -31,7 +31,7 @@ module Projects
       end
 
       def make_default
-        @domain.make_default
+        @domain.make_default!
         redirect_to project_app_domains_path(current_project, current_app), notice: "Domain set as default."
       end
 

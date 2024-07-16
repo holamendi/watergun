@@ -1,5 +1,3 @@
-module Dokku
-  class Command
-    include ::SshCommandable
-  end
+class Dokku::Command
+  include SshCommandable
 end

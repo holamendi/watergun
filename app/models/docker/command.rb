@@ -1,5 +1,3 @@
-module Docker
-  class Command
-    include SshCommandable
-  end
+class Docker::Command
+  include SshCommandable
 end

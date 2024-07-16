@@ -25,7 +25,7 @@ class App < ApplicationRecord
   accepts_nested_attributes_for :github_repo
 
   before_create do
-    self.dokku_id ||= "#{name.parameterize}-#{SecureRandom.hex(2)}"
+    self.dokku_id ||= "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
   end
 
   def pending_restart!

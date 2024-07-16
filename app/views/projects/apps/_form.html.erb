@@ -1,12 +1,4 @@
 <%= form_with model: [project, app], class: "space-y-4", id: "app_form" do |form| %>
-  <% unless current_account.github_access_token.present? %>
-    <%= form.label :github_access_token, class: "form-control" do %>
-      <div class="label">
-        <span class="label-text">Github access token</span>
-      </div>
-      <%= text_field_tag :github_access_token, params[:github_access_token], class: "input input-bordered w-full" %>
-    <% end %>
-  <% end %>
   <%= form.fields_for :github_repo do |repo_form| %>
     <%= repo_form.label :repository, class: "form-control" do %>
       <div class="label">

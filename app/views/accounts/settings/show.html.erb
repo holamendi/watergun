@@ -1,9 +1,28 @@
 <h1 class="pb-6 text-xl font-bold">Account settings</h1>
+
+<h2 class="pb-4 text-lg font-bold">Github Access Token</h2>
+<div class="pb-6">
+<% if @github_access_token.persisted? %>
+  <div class="flex justify-start w-full pb-6">
+    <span class="pr-6">
+      <%= @github_access_token.obfuscated_token %>
+    </span>
+    <%= button_to "Delete", account_github_access_token_path(current_account.github_access_token), method: :delete, class: "link text-error", data: { turbo_confirm: "Are you sure? "} %>
+  </div>
+<% else %>
+  <div class="flex justify-start w-full pb-6">
+    <%= render "accounts/github_access_tokens/form", github_access_token: @github_access_token %>
+  </div>
+  <%= link_to "Generate a new token", "https://github.com/settings/tokens/new?scopes=repo&description=Watergun", target: :_blank, class: "link" %>
+<% end %>
+</div>
+
+
 <h2 class="pb-4 text-lg font-bold">API Tokens</h2>
 <div class="flex justify-start w-full pb-6">
-  <%= button_to "Create API Token", org_api_tokens_path, class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
+  <%= button_to "Create API Token", account_api_tokens_path, class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
 </div>
-<table class="table">
+<table class="table table-lg">
   <thead>
     <tr>
       <th>Token</th>
@@ -19,7 +38,7 @@
           In <%= distance_of_time_in_words_to_now(api_token.expires_at) %>
         </td>
         <td>
-          <%= button_to "Delete", org_api_token_path(api_token), method: :delete, class: "text-error", form: { data: { turbo_confirm: "Do you really…" } } %>
+          <%= button_to "Delete", account_api_token_path(api_token), method: :delete, class: "text-error link", form: { data: { turbo_confirm: "Do you really…" } } %>
         </td>
       </tr>
     <% end %>

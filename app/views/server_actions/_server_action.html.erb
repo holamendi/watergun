@@ -2,12 +2,7 @@
 <tr id="<%= dom_id(server_action) %>">
   <td><%= server_action.id %></td>
   <td><%= server_action.slug %></td>
-  <td><%= "#{server_action.actionable_type.downcase}_#{server_action.actionable_id}" %></td>
-  <td class="overflow-scroll overflow-ellipsis max-w-48 whitespace-nowrap">
-    <span>
-      <%= server_action.payload.map{|k,v| "#{k}: #{v}"}.join("<br>").html_safe %>
-    </span>
-  </td>
+  <td><%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %></td>
   <td>
     <% if server_action.finished? %>
       <div class="tooltip" data-tip="<%= server_action.finished_at.to_s %>">

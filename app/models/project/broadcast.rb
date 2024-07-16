@@ -3,8 +3,6 @@ module Project::Broadcast
   include ActionView::RecordIdentifier
 
   included do
-    after_save_commit do
-      broadcast_refresh_to(account, :projects)
-    end
+    broadcasts_refreshes_to ->(project) { [project.account, :projects] }
   end
 end
