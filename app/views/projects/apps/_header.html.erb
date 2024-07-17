@@ -26,12 +26,12 @@
       <% end %>
     </div>
   </div>
-  <div role="tablist" class="w-full pb-6 overflow-auto lg:w-2/3 tabs tabs-lifted">
+ <div role="tablist" class="pb-6 overflow-auto lg:overflow-hidden tabs tabs-lifted">
     <%= link_to "Deployments", project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name  == "show")), role: "tab" %>
     <%= link_to "Metrics", project_app_metrics_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
     <%= link_to "Logs", project_app_logs_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "logs")), role: "tab" %>
     <%= link_to "Environment", project_app_env_variables_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "env_variables")), role: "tab" %>
     <%= link_to "Domains", project_app_domains_path(app.project, app),class: class_names("tab", "tab-active" => (controller_name == "domains")), role: "tab" %>
-    <%= link_to "Settings", edit_project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab" if false %>
+    <%= link_to "Settings", edit_project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab"  %>
   </div>
 </div>

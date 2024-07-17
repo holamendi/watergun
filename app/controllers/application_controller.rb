@@ -27,6 +27,14 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def turbo_stream_toast(message, type: :notice)
+    render turbo_stream: turbo_stream.append(
+      "toasts",
+      partial: "shared/toast",
+      locals: {message:, type:}
+    )
+  end
+
   def sign_in(user)
     session = user.sessions.create!
     cookies.encrypted[:session_token] = {value: session.token, expires: session.expires_at}

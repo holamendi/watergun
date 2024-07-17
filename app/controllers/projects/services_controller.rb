@@ -10,6 +10,14 @@ module Projects
 
       if @service.save
         ServerAction::CreateService.run_later!(@service)
+
+        if params[:link_to_apps].present?
+          current_project.apps.kept.each do |app|
+            link = @service.service_links.create!(app:)
+            ServerAction::LinkService.run_later!(link)
+          end
+        end
+
         redirect_to current_project, notice: "Service created successfully."
       else
         render turbo_stream: turbo_stream.replace(
@@ -25,7 +33,9 @@ module Projects
 
     def destroy
       if @service.discard
-        @service.service_links.discard_all
+        @service.service_links.kept.each do |service_link|
+          ServerAction::UnlinkService.run_later!(service_link)
+        end
         ServerAction::DestroyService.run_later!(@service)
       end
 

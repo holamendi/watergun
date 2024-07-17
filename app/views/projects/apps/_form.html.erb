@@ -1,13 +1,13 @@
-<%= form_with model: [project, app], class: "space-y-4", id: "app_form" do |form| %>
+<%= form_with model: [project, app],  id: "app_form" do |form| %>
   <%= form.fields_for :github_repo do |repo_form| %>
-    <%= repo_form.label :repository, class: "form-control" do %>
+    <%= repo_form.label :repository, class: "form-control pb-6" do %>
       <div class="label">
         <span class="label-text">Repository</span>
       </div>
       <%= repo_form.text_field :repo, class: "input input-bordered w-full" %>
       <%= error_messages_for(repo_form.object, :repo) %>
     <% end %>
-    <%= repo_form.label :branch, class: "form-control" do %>
+    <%= repo_form.label :branch, class: "form-control pb-6" do %>
       <div class="label">
         <span class="label-text">Branch</span>
       </div>

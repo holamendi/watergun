@@ -1,0 +1,23 @@
+<%# locals: (github_repo:) -%>
+
+<%= form_with model: github_repo, url: project_app_github_repo_path(github_repo.app.project, github_repo.app), class: "space-y-4", id: "github_repo_form" do |form| %>
+  <%= form.label :repository, class: "form-control pb-6" do %>
+    <div class="label">
+      <span class="label-text">Repository</span>
+    </div>
+    <%= form.text_field :repo, class: "input input-bordered w-full" %>
+    <%= error_messages_for(form.object, :repo) %>
+  <% end %>
+  <%= form.label :branch, class: "form-control pb-6" do %>
+    <div class="label">
+      <span class="label-text">Branch</span>
+    </div>
+    <%= form.text_field :branch, class: "input input-bordered w-full" %>
+    <%= error_messages_for(form.object, :branch) %>
+  <% end %>
+  <%= button_tag type: "submit",
+                 class: "btn btn-primary no-animation",
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+    Save
+  <% end %>
+<% end %>

@@ -1,0 +1,16 @@
+<%# locals: (app:) -%>
+
+<%= form_with model: app, url: project_app_builder_path(app.project, app), class: "space-y-4", id: "builder_form" do |form| %>
+  <%= form.label :builder, class: "form-control pb-6" do %>
+    <div class="label">
+      <span class="label-text">Builder</span>
+    </div>
+    <%= form.select :builder, App.builders, {}, class: "select select-bordered" %>
+    <%= error_messages_for(form.object, :builder) %>
+  <% end %>
+  <%= button_tag type: "submit",
+                 class: "btn btn-primary no-animation",
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+    Save
+  <% end %>
+<% end %>

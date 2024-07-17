@@ -15,7 +15,7 @@ module Dokku
       memoize def parsed_output
         return unless success?
 
-        JSON.parse(text_output)
+        JSON.parse(text_output) || []
       end
     end
   end

@@ -20,7 +20,7 @@ class ProjectsController < ApplicationController
     @project = current_account.projects.new(project_params)
 
     if @project.save
-      redirect_to projects_path, notice: "Project was successfully created."
+      redirect_to @project, notice: "Project was successfully created."
     else
       render turbo_stream: turbo_stream.replace(
         "project_form",

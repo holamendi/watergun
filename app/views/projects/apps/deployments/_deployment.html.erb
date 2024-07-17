@@ -1,0 +1,28 @@
+<%# locals: (deployment:) -%>
+<tr id="<%= dom_id(deployment) %>">
+  <td><%= deployment.id %></td>
+  <td>
+    <div class="tooltip" data-tip="<%= deployment.commit_message %> (<%= deployment.author_login %>)">
+      <%= link_to deployment.short_sha, deployment.commit_html_url, target: :_blank, class: "link"  %>
+    </div>
+    <td>
+      <% if deployment.finished? %>
+        <div class="tooltip" data-tip="<%= deployment.finished_at.to_s %>">
+          <%= time_ago_in_words(deployment.finished_at) %> ago
+        </div>
+      <% end %>
+    </td>
+    <td>
+      <% if deployment.finished?%>
+        <%= deployment.duration.round %> seconds
+      <% end %>
+    </td>
+    <td>
+      <span class="badge <%= status_badge_class(deployment.status) %>"><%= deployment.status %></span>
+    </td>
+    <td>
+      <% if deployment.finished? %>
+        <%= link_to "logs", logs_project_app_deployment_path(deployment.app.project, deployment.app, deployment), class: "link", target: :_blank %>
+      <% end %>
+    </td>
+  </tr>

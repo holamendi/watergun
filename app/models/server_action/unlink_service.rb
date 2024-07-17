@@ -26,6 +26,7 @@ class ServerAction::UnlinkService < ServerAction
   def run
     service_link.deleting!
     unlink_dokku_service!
+    schedule_pull_env!
   rescue Ssh::CommandExecutionError
     service_link.error!
     raise
@@ -39,5 +40,9 @@ class ServerAction::UnlinkService < ServerAction
 
   def dokku_command_class
     "Dokku::#{service_type.camelcase}::Unlink".constantize
+  end
+
+  def schedule_pull_env!
+    ServerAction::PullEnv.run_later!(app)
   end
 end

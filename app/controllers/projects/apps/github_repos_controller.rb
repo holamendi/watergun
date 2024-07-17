@@ -18,15 +18,9 @@ module Projects
         end
 
         if @github_repo.save
-          redirect_to current_project, notice: "App source updated successfully."
+          turbo_stream_toast("App source updated successfully.")
         else
-          render turbo_stream: turbo_stream.replace(
-            @github_repo,
-            partial: "projects/apps/github_repos/form",
-            locals: {
-              github_repo: @github_repo
-            }
-          )
+          turbo_stream_errors
         end
       end
 
@@ -38,15 +32,9 @@ module Projects
         @github_repo = current_app.github_repo
 
         if @github_repo.update(github_repo_params)
-          redirect_to current_project, notice: "App source updated successfully."
+          turbo_stream_toast("App source updated successfully.")
         else
-          render turbo_stream: turbo_stream.replace(
-            @github_repo,
-            partial: "projects/apps/github_repos/form",
-            locals: {
-              github_repo: @github_repo
-            }
-          )
+          turbo_stream_errors
         end
       end
 
@@ -54,6 +42,16 @@ module Projects
 
       def github_repo_params
         params.require(:github_repo).permit(:repo, :branch)
+      end
+
+      def turbo_stream_errors
+        render turbo_stream: turbo_stream.replace(
+          "github_repo_form",
+          partial: "projects/apps/github_repos/form",
+          locals: {
+            github_repo: @github_repo
+          }
+        )
       end
     end
   end

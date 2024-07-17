@@ -3,6 +3,13 @@
     <%= form.label :service_type, "Type", class: "label" %>
     <%= form.select :service_type, Service.service_types, {}, class: "select select-bordered", disabled: form.object.persisted? %>
   </div>
+  <div class="form-control">
+    <%= form.label :link_to_apps, "Link to Apps", class: "label cursor-pointer" do %>
+      <span class="label-text">Link to existing apps
+        <%= check_box_tag :link_to_apps, true, true, class: "checkbox" %>
+      </span>
+    <% end %>
+  </div>
   <%= button_tag "Save", type: "submit",
                  class: "btn btn-primary no-animation",
                  data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } %>

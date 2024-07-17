@@ -16,6 +16,7 @@ class App < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 
+  str_enum :builder, [:herokuish, :dockerfile, :nixpacks], default: :herokuish
   str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}

@@ -23,6 +23,8 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
+  broadcasts_to ->(deployment) { [deployment.app, :deployments] }, partial: "projects/apps/deployments/deployment", inserts_by: :prepend
+
   def short_sha
     sha&.first(7)
   end

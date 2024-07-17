@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
-  include Broadcast
   include Discard::Model
+
+  broadcasts_refreshes
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
@@ -8,9 +9,4 @@ class Project < ApplicationRecord
   has_many :services, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
-
-  after_discard do
-    apps.discard_all
-    services.discard_all
-  end
 end

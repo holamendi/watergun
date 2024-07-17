@@ -1,7 +1,27 @@
 <%= turbo_stream_from @app %>
 <%= render "header", app: @app %>
-<div class="w-full pb-6 md:w-1/3">
-  <%= render "form", project: current_project, app: @app %>
+<div class="flex w-full pb-6">
+  <div class="w-1/6">
+    <h1 class="text-xl font-bold">Github Repo</h1>
+  </div>
+  <div class="w-full p-6 border rounded-md">
+    <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
+  </div>
 </div>
-<h2 class="pb-4 text-xl font-bold text-error">Danger zone</h2>
-<%= button_to "Delete", project_app_path(current_project, @app), method: :delete, class: "btn btn-error btn-sm rounded-md font-normal text-sm", data: { turbo_confirm: "Sure?"} %>
+<div class="flex w-full pb-6">
+  <div class="w-1/6">
+    <h1 class="text-xl font-bold">Builder</h1>
+  </div>
+  <div class="w-full p-6 border rounded-md">
+    <%= render "projects/apps/builders/form", app: @app %>
+  </div>
+</div>
+<div class="flex w-full pb-6">
+  <div class="w-1/6">
+    <h1 class="text-xl font-bold text-error">Danger zone</h1>
+  </div>
+  <div class="w-full p-6 border rounded-md">
+    <%= button_to "Delete", project_app_path(current_project, @app), method: :delete, class: "btn btn-error btn-sm rounded-md font-normal text-sm", data: { turbo_confirm: "Sure?"} %>
+  </div>
+</div>
+

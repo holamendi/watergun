@@ -1,0 +1,15 @@
+<%# locals: (message:, type:) -%>
+
+<% class_mapping = {
+    "notice" => "alert-success",
+    "success" => "alert-success",
+    "alert" => "alert-error",
+    "error" => "alert-error",
+    "warning" => "alert-warning",
+    "info" => "alert-info"
+  }
+%>
+
+<div role="alert" class="alert <%= class_mapping[type.to_s] %> mb-6" data-turbo-temporary>
+  <span><%= message %></span>
+</div>

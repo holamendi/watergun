@@ -1,8 +1,9 @@
 class Service < ApplicationRecord
-  include Broadcast
-  include Discard::Model
   include Containerizable
+  include Discard::Model
   include ServerActionable
+
+  broadcasts_refreshes
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }

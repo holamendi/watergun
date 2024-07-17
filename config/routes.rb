@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     scope module: :projects do
       resources :apps do
         scope module: :apps do
+          resource :builder, only: %i[update]
           resources :domains, only: %i[index create destroy] do
             patch :make_default, on: :member
           end

@@ -29,10 +29,18 @@ class ServerAction::PullEnv < ServerAction
       )
     end
 
-    EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name])
+    # sync env variables
+    EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
+
+    # discard out of sync env variables
+    out_of_sync_env_variables.delete_all
   end
 
-  def dokku_config_export
+  memoize def dokku_config_export
     Dokku::Config::Export.call!(ssh, app: dokku_app_id).parsed_output
+  end
+
+  def out_of_sync_env_variables
+    app.env_variables.kept.where.not(name: dokku_config_export.pluck("name"))
   end
 end

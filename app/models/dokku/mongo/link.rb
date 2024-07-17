@@ -1,6 +1,8 @@
 module Dokku
   module Mongo
     class Link < Dokku::Command
+      DEFAULT_ENV_NAME = "MONGO_URL"
+
       attr_reader :app, :service, :restart
 
       def initialize(ssh_session, service:, app:, restart: false)

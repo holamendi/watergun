@@ -1,16 +1,6 @@
-<% class_mapping = {
-    "notice" => "alert-success",
-    "success" => "alert-success",
-    "alert" => "alert-error",
-    "error" => "alert-error",
-    "warning" => "alert-warning",
-    "info" => "alert-info"
-  }
-%>
-<div class="toast" data-turbo-permanent>
+
+<div id="toasts" class="toast" data-turbo-permanent>
   <% flash.each do |type, message| %>
-    <div role="alert" class="alert <%= class_mapping[type.to_s] %> mb-6" data-turbo-temporary>
-      <span><%= message %></span>
-    </div>
+    <%= render "shared/toast", message:, type: %>
   <% end %>
 </div>
