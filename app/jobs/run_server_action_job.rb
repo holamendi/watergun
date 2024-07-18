@@ -5,7 +5,7 @@ class RunServerActionJob < ApplicationJob
     return unless server_action.queued?
     return server_action.cancelled! if server_action.preceding_action&.failure?
 
-    Current.set(account: server_action.account, server: server_action.server) do
+    Current.set(account: server_action.account, server: server_action.server, user: server_action.user) do
       server_action.run_action
     end
   end
