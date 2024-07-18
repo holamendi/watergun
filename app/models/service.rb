@@ -22,4 +22,8 @@ class Service < ApplicationRecord
   before_create do
     self.dokku_id ||= "#{name.parameterize}-#{SecureRandom.hex(2)}"
   end
+
+  def related_server_actions
+    ServerAction.where(server_id:).where("json_extract(payload, '$.dokku_service_id') = ?", dokku_id)
+  end
 end

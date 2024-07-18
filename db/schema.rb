@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_17_160134) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_18_052326) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -234,11 +234,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_17_160134) do
     t.string "type"
     t.string "failure_message"
     t.integer "preceding_server_action_id"
+    t.integer "user_id"
+    t.index "json_extract(payload, '$.dokku_app_id')", name: "index_server_actions_on_dokku_app_id"
     t.index ["account_id"], name: "index_server_actions_on_account_id"
     t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
     t.index ["preceding_server_action_id"], name: "index_server_actions_on_preceding_server_action_id"
     t.index ["server_id"], name: "index_server_actions_on_server_id"
     t.index ["status"], name: "index_server_actions_on_status"
+    t.index ["user_id"], name: "index_server_actions_on_user_id"
   end
 
   create_table "servers", force: :cascade do |t|
@@ -353,6 +356,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_17_160134) do
   add_foreign_key "server_actions", "accounts"
   add_foreign_key "server_actions", "server_actions", column: "preceding_server_action_id"
   add_foreign_key "server_actions", "servers"
+  add_foreign_key "server_actions", "users"
   add_foreign_key "servers", "accounts"
   add_foreign_key "service_links", "accounts"
   add_foreign_key "service_links", "apps"

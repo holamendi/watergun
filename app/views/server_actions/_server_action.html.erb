@@ -3,6 +3,7 @@
   <td><%= server_action.id %></td>
   <td><%= server_action.slug %></td>
   <td><%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %></td>
+  <td><%= server_action.user&.email %></td>
   <td>
     <% if server_action.finished? %>
       <div class="tooltip" data-tip="<%= server_action.finished_at.to_s %>">

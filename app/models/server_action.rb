@@ -4,6 +4,7 @@ class ServerAction < ApplicationRecord
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
+  belongs_to :user, default: -> { Current.user }
   belongs_to :actionable, polymorphic: true, optional: true
   belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
 

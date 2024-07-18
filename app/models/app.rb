@@ -15,7 +15,6 @@ class App < ApplicationRecord
   has_one :github_repo, dependent: :destroy
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
-
   str_enum :builder, [:herokuish, :dockerfile, :nixpacks], default: :herokuish
   str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
@@ -27,6 +26,10 @@ class App < ApplicationRecord
 
   before_create do
     self.dokku_id ||= "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
+  end
+
+  def related_server_actions
+    ServerAction.where("json_extract(payload, '$.dokku_app_id') = ?", dokku_id)
   end
 
   def pending_restart!
