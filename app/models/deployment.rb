@@ -3,6 +3,7 @@ class Deployment < ApplicationRecord
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
+  belongs_to :user, default: -> { Current.user }
   has_one :server_action, as: :actionable, dependent: :destroy
 
   store_attribute :data, :author_login, :string
@@ -13,6 +14,9 @@ class Deployment < ApplicationRecord
   store_attribute :data, :commit_html_url, :string
 
   str_enum :status, [:pending, :deploying, :success, :error], default: :pending
+  str_enum :source, [:web, :api_v1]
+
+  attribute :source, :string, default: -> { Current.source }
 
   scope :kept, -> { joins(:app).merge(App.kept) }
   scope :finished, -> { where.not(finished_at: nil) }
@@ -23,7 +27,10 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  broadcasts_to ->(deployment) { [deployment.app, :deployments] }, partial: "projects/apps/deployments/deployment", inserts_by: :prepend
+  broadcasts_to ->(deployment) { [deployment.app, :deployments] },
+    partial: "projects/apps/deployments/deployment",
+    target: "deployments",
+    inserts_by: :prepend
 
   def short_sha
     sha&.first(7)

@@ -19,8 +19,7 @@ module Projects
             commit_html_url: commit.html_url
           )
           ServerAction::DeployApp.run_later!(deployment)
-          flash[:notice] = "Deployment scheduled"
-          redirect_to project_app_path(current_project, current_app)
+          turbo_stream_toast("Deployment scheduled")
         else
           flash.now[:alert] = deployment.errors.full_messages.to_sentence
           render :new, status: :unprocessable_entity

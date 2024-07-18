@@ -17,7 +17,9 @@
     </div>
     <div class="flex gap-x-2">
       <% if app.deployed? %>
-        <%= button_to "Restart", project_app_restarts_path(app.project, app), class: "btn" %>
+        <%= button_to "Restart", project_app_restarts_path(app.project, app),
+          class: "btn",
+          data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Deploy"} %>
       <% end %>
       <% if app.github_repo.present?%>
         <%= button_to "Deploy", project_app_deployments_path(app.project, app),

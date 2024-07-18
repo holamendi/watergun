@@ -54,7 +54,7 @@ class ServerAction::DeployApp < ServerAction
     Dokku::Git::Auth.call!(ssh, access_token: github_access_token.token)
   end
 
-  memoize def github_access_token
+  def github_access_token
     account.github_access_token
   end
 

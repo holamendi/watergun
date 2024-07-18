@@ -6,6 +6,7 @@ class Current < ActiveSupport::CurrentAttributes
     :project,
     :server,
     :session,
+    :source,
     :user
 
   def session=(session)

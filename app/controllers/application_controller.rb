@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
 
+  before_action :set_source
   before_action :authenticate!
 
   helper_method :current_user, :current_account, :current_membership, :current_session, :current_server
@@ -39,6 +40,10 @@ class ApplicationController < ActionController::Base
     session = user.sessions.create!
     cookies.encrypted[:session_token] = {value: session.token, expires: session.expires_at}
     Current.session = session
+  end
+
+  def set_source
+    Current.source = :web
   end
 
   def authenticate!

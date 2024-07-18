@@ -3,6 +3,7 @@ module Api
     class ApplicationController < ActionController::Base
       include Pagy::Backend
 
+      before_action :set_source
       before_action :authenticate
 
       skip_before_action :verify_authenticity_token
@@ -23,6 +24,10 @@ module Api
         end
       rescue ActiveRecord::RecordNotFound
         head :unauthorized
+      end
+
+      def set_source
+        Current.source = :api_v1
       end
     end
   end

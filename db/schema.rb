@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_18_052326) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_18_133907) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -117,7 +117,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_18_052326) do
   create_table "deployments", force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "app_id", null: false
-    t.integer "source"
     t.string "status"
     t.string "repo", null: false
     t.string "sha"
@@ -126,10 +125,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_18_052326) do
     t.datetime "updated_at", null: false
     t.datetime "started_at"
     t.json "data", default: {}
+    t.integer "user_id"
+    t.string "source"
     t.index ["account_id"], name: "index_deployments_on_account_id"
     t.index ["app_id"], name: "index_deployments_on_app_id"
-    t.index ["source"], name: "index_deployments_on_source"
     t.index ["status"], name: "index_deployments_on_status"
+    t.index ["user_id"], name: "index_deployments_on_user_id"
   end
 
   create_table "domains", force: :cascade do |t|
@@ -340,6 +341,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_18_052326) do
   add_foreign_key "databases", "servers"
   add_foreign_key "deployments", "accounts"
   add_foreign_key "deployments", "apps"
+  add_foreign_key "deployments", "users"
   add_foreign_key "domains", "accounts"
   add_foreign_key "domains", "apps"
   add_foreign_key "env_variables", "accounts"

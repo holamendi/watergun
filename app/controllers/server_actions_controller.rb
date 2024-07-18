@@ -1,6 +1,6 @@
 class ServerActionsController < ApplicationController
   def index
-    @server_actions = current_server.actions.recent.includes(:user).limit(50)
+    @server_actions = current_server.actions.recent.includes(:user).limit(200)
   end
 
   def update
