@@ -1,5 +1,5 @@
 <%= turbo_frame_tag :logs do %>
-  <div id="output" class="px-2 py-1 overflow-auto text-xs text-gray-100 rounded-md bg-slate-800 max-h-200 h-200"
+  <div id="output" class="px-2 py-1 overflow-auto text-xs text-gray-100 rounded-md bg-slate-800 h-[calc(100vh-20rem)]"
        data-controller="auto-scroll" data-turbo-temporary>
     <pre><%= ansi_to_html(@output) %></pre>
   </div>
