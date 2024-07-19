@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_18_133907) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_19_102519) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -187,6 +187,21 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_18_133907) do
     t.index ["app_id"], name: "index_github_repos_on_app_id"
   end
 
+  create_table "log_streams", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "server_id", null: false
+    t.string "log_streamable_type", null: false
+    t.integer "log_streamable_id", null: false
+    t.string "uuid", null: false
+    t.datetime "last_ping_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_log_streams_on_account_id"
+    t.index ["log_streamable_type", "log_streamable_id"], name: "index_log_streams_on_log_streamable"
+    t.index ["server_id"], name: "index_log_streams_on_server_id"
+    t.index ["uuid"], name: "index_log_streams_on_uuid", unique: true
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "account_id", null: false
@@ -349,6 +364,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_18_133907) do
   add_foreign_key "github_access_tokens", "accounts"
   add_foreign_key "github_repos", "accounts"
   add_foreign_key "github_repos", "apps"
+  add_foreign_key "log_streams", "accounts"
+  add_foreign_key "log_streams", "servers"
   add_foreign_key "memberships", "accounts"
   add_foreign_key "memberships", "users"
   add_foreign_key "projects", "accounts"

@@ -1,13 +1,18 @@
 module Servers
   class LogStreamJob < ApplicationJob
-    def perform(app)
-      return
-      return unless app.deployed?
+    include ActionView::RecordIdentifier
 
-      app.server.ssh_session do |ssh|
-        puts "Starting log stream app:#{app.dokku_id} jid:#{job_id}"
-        ssh.execute("dokku logs #{app.dokku_id} -t STREAM_JID=#{job_id}", save_output: false) do |stream, data|
-          ActionCable.server.broadcast("log_stream_#{job_id}", {body: data})
+    def perform(log_stream)
+      app = log_stream.log_streamable
+
+      log_stream.server.ssh_session do |ssh|
+        ssh.execute("dokku logs #{app.dokku_id} -t LOG_STREAM_UUID=#{log_stream.uuid}", save_output: false) do |stream, data|
+          Turbo::StreamsChannel.broadcast_append_to(
+            log_stream,
+            target: dom_id(log_stream),
+            partial: "projects/apps/log_streams/log",
+            locals: {log: data}
+          )
         end
       end
     end

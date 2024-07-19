@@ -8,10 +8,14 @@
   <h1 class="text-2xl font-bold">Logs</h1>
 </div>
 
+<div data-controller="ping"
+     data-ping-url-value="<%= project_app_log_stream_ping_path(current_project, current_app, @log_stream) %>"
+     data-ping-interval-value="10000">
+</div>
+
 <div data-controller="log-stream"
      data-log-stream-app-id-value="<%= current_app.id %>"
-     data-log-stream-jid-value="<%= @log_stream_jid %>">
-</div>
+     data-log-stream-jid-value="<%= @log_stream_jid %>"></div>
 
 <%= @log_stream_jid %>
 

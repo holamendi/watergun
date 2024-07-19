@@ -2,6 +2,7 @@ class App < ApplicationRecord
   include Broadcast
   include Discard::Model
   include Containerizable
+  include LogStreamable
   include ServerActionable
 
   belongs_to :account, default: -> { Current.account }

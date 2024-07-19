@@ -1,34 +1,58 @@
-import { Controller } from "@hotwired/stimulus"
-import { createConsumer } from "@rails/actioncable"
+import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static values = { appId: Number, jid: String};
+  static values = {
+    url: String,
+    pingInterval: {
+      type: Number,
+      default: 1000,
+    },
+  };
 
   connect() {
-    console.log("Connected to AppLogsController", this.appIdValue, this.jidValue);
-
-    this.channel = createConsumer().subscriptions.create(
-      { channel: "LogStreamChannel", app_id: this.appIdValue, jid: this.jidValue},
-      { connected: this._cableConnected.bind(this),
-        disconnected: this._cableDisconnected.bind(this),
-        received: this._cableReceived.bind(this)
-      }
-    );
+    this.crsfToken = document
+      .querySelector("meta[name='csrf-token']")
+      .getAttribute("content");
+    this.startLogStream();
+    this.startPing();
   }
 
   disconnect() {
-    this.channel.unsubscribe();
+    this.stopLogStream();
+    this.stopPing();
   }
 
-  _cableConnected() {
-
+  startLogStream() {
+    fetch(this.urlValue, {
+      method: "PATCH",
+      headers: {
+        "X-CSRF-Token": this.crsfToken,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
   }
 
-  _cableDisconnected() {
-
+  startPing() {
+    this.ping = setInterval(() => {
+      fetch(this.urlValue, { method: "GET" });
+    }, this.pingIntervalValue);
   }
 
-  _cableReceived(data) {
-    console.log(data)
+  stopLogStream() {
+    fetch(this.urlValue, {
+      method: "DELETE",
+      headers: {
+        "X-CSRF-Token": this.crsfToken,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+  }
+
+  stopPing() {
+    clearInterval(this.ping);
   }
 }

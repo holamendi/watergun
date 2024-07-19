@@ -29,9 +29,7 @@ Rails.application.routes.draw do
             get :logs, on: :member
           end
 
-          resources :logs, only: :index do
-            get :fetch, on: :collection
-          end
+          resources :log_streams, path: :logs, only: %i[index create show update destroy]
 
           resource :metrics, only: :show do
             get :stats
