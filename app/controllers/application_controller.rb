@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   private
 
   def turbo_stream_toast(message, type: :notice)
-    render turbo_stream: turbo_stream.append(
+    render turbo_stream: turbo_stream.prepend(
       "toasts",
       partial: "shared/toast",
       locals: {message:, type:}

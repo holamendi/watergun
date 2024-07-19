@@ -9,12 +9,7 @@ module ServerAction::Runner
   class_methods do
     def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
-
-      if false # #defined?(Rails::Console)
-        RunServerActionJob.perform_now(action)
-      else
-        RunServerActionJob.set(wait: 1.second).perform_later(action)
-      end
+      RunServerActionJob.set(wait: 1.second).perform_later(action)
 
       action
     end

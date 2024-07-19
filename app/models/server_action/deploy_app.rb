@@ -37,6 +37,7 @@ class ServerAction::DeployApp < ServerAction
     deployment.success!
   ensure
     app.active!
+    notify_user
     schedule_pull_env!
   end
 
@@ -67,5 +68,15 @@ class ServerAction::DeployApp < ServerAction
 
   def schedule_pull_env!
     ServerAction::PullEnv.run_later!(app)
+  end
+
+  def notify_user
+    message, type = if deployment.success?
+      ["#{app.name}: deployment finished", :success]
+    else
+      ["#{app.name}: deployment failed", :notice]
+    end
+
+    Toast.stream_later_to(deployment.user, message, type:)
   end
 end

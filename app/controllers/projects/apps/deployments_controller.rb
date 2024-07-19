@@ -19,7 +19,7 @@ module Projects
             commit_html_url: commit.html_url
           )
           ServerAction::DeployApp.run_later!(deployment)
-          turbo_stream_toast("Deployment scheduled")
+          turbo_stream_toast("#{current_app.name}: deployment scheduled")
         else
           flash.now[:alert] = deployment.errors.full_messages.to_sentence
           render :new, status: :unprocessable_entity

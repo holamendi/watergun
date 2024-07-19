@@ -16,11 +16,16 @@ class ServerAction::RestartApp < ServerAction
   def run
     app.restarting!
     restart_dokku_app!
+    notify_user
   ensure
     app.active!
   end
 
   def restart_dokku_app!
     Dokku::Ps::Restart.call!(ssh, app: dokku_app_id)
+  end
+
+  def notify_user
+    Toast.stream_later_to(user, "#{app.name}: restart finished")
   end
 end

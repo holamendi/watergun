@@ -30,8 +30,8 @@ production:
     - queues: "default"
       threads: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
       polling_interval: <%= ENV.fetch("SOLID_QUEUE_POLLING_INTERVAL") { 0.5 }.to_f %>
-      processes: <%= ENV.fetch("SOLID_QUEUE_PROCESSES") { Concurrent.physical_processor_count }.to_i %>
+      processes: <%= ENV.fetch("SOLID_QUEUE_PROCESSES") { 1 }.to_i %>
     - queues: "turbo_streams"
       threads: <%= ENV.fetch("RAILS_MAX_THREADS") { 3 } %>
       polling_interval: <%= ENV.fetch("SOLID_QUEUE_POLLING_INTERVAL") { 0.1 }.to_f %>
-      processes: <%= ENV.fetch("SOLID_QUEUE_PROCESSES") { Concurrent.physical_processor_count }.to_i %>
+      processes: <%= ENV.fetch("SOLID_QUEUE_PROCESSES") { 1 }.to_i %>

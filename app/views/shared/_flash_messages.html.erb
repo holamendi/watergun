@@ -1,3 +1,4 @@
+<%= turbo_stream_from current_user, :toasts %>
 
 <div id="toasts" class="toast" data-turbo-permanent>
   <% flash.each do |type, message| %>
