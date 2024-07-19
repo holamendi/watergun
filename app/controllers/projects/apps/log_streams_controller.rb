@@ -4,6 +4,10 @@ module Projects
       before_action :set_log_stream, only: [:show, :update, :destroy]
 
       def index
+        current_app.log_streams.each do |log_stream|
+          Servers::StopLogStreamJob.perform_later(log_stream)
+        end
+
         @log_stream = current_app.log_streams.create!
       end
 
@@ -18,7 +22,7 @@ module Projects
       end
 
       def destroy
-        Servers::StopLogStreamJob.perform_later(@log_stream)
+        Servers::StopLogStreamJob.perform_now(@log_stream)
         head :no_content
       end
 
