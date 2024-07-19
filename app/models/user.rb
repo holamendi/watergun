@@ -8,4 +8,8 @@ class User < ApplicationRecord
   normalizes :email, with: ->(email) { email.strip.downcase }
 
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
+
+  def notify_later(message, type: :notice)
+    Notification.stream_later_to(self, message, type:)
+  end
 end

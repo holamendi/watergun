@@ -26,6 +26,6 @@ class ServerAction::RestartApp < ServerAction
   end
 
   def notify_user
-    Toast.stream_later_to(user, "#{app.name}: restart finished")
+    user.notify_later("#{app.name}: restart finished")
   end
 end
