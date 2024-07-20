@@ -4,4 +4,5 @@ class LogStream < ApplicationRecord
   belongs_to :log_streamable, polymorphic: true
 
   attribute :uuid, :string, default: -> { SecureRandom.uuid }
+  attribute :last_ping_at, :datetime, default: -> { Time.current }
 end

@@ -25,7 +25,7 @@ module Ssh
     end
 
     def success?
-      exit_code.zero?
+      exit_code&.zero?
     end
 
     def failure?

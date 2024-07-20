@@ -25,11 +25,7 @@ export default class extends Controller {
   startLogStream() {
     fetch(this.urlValue, {
       method: "PATCH",
-      headers: {
-        "X-CSRF-Token": this.crsfToken,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers: this.requestHeaders(),
       body: JSON.stringify({}),
     });
   }
@@ -43,16 +39,20 @@ export default class extends Controller {
   stopLogStream() {
     fetch(this.urlValue, {
       method: "DELETE",
-      headers: {
-        "X-CSRF-Token": this.crsfToken,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers: this.requestHeaders(),
       body: JSON.stringify({}),
     });
   }
 
   stopPing() {
     clearInterval(this.ping);
+  }
+
+  requestHeaders() {
+    return {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "X-CSRF-Token": this.crsfToken,
+    };
   }
 }
