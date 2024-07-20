@@ -1,6 +1,5 @@
 class ServerAction < ApplicationRecord
   include Broadcast
-  include Runner
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
@@ -15,6 +14,9 @@ class ServerAction < ApplicationRecord
   attribute :source, :string, default: "web"
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
+
+  attr_accessor :ssh_session
+  alias_method :ssh, :ssh_session
 
   def slug
     self.class.slug
@@ -38,6 +40,14 @@ class ServerAction < ApplicationRecord
     finished_at - running_at
   end
 
+  def run_now(force: false)
+    RunServerActionJob.perform_now(self, force:)
+  end
+
+  def run_later(wait: 1.second, force: false)
+    RunServerActionJob.set(wait:).perform_later(self, force:)
+  end
+
   class << self
     def actionable(type)
       alias_method :"#{type.to_s.underscore}", :actionable
@@ -51,6 +61,12 @@ class ServerAction < ApplicationRecord
 
     def model_name
       ActiveModel::Name.new(ServerAction)
+    end
+
+    def run_later!(actionable, depends_on: nil, **)
+      action = create!(actionable:, preceding_action: depends_on, **)
+      RunServerActionJob.set(wait: 1.second).perform_later(action)
+      action
     end
   end
 end
