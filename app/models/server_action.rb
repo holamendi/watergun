@@ -10,24 +10,29 @@ class ServerAction < ApplicationRecord
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
   str_enum :status, %i[queued running success failure cancelled error], default: :queued
+  str_enum :source, [:web, :api_v1]
 
-  attribute :source, :string, default: "web"
+  attribute :source, :string, default: -> { Current.source }
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
-  def slug
-    self.class.slug
+  def run_now(force: false)
+    RunServerActionJob.perform_now(self, force:)
   end
 
-  def concurrency_key
-    actionable
+  def run_later(wait: 1.second, force: false)
+    RunServerActionJob.set(wait:).perform_later(self, force:)
   end
 
   def running!(at = Time.current)
     update!(status: :running, running_at: at)
+  end
+
+  def concurrency_key
+    actionable
   end
 
   def finished?
@@ -40,12 +45,8 @@ class ServerAction < ApplicationRecord
     finished_at - running_at
   end
 
-  def run_now(force: false)
-    RunServerActionJob.perform_now(self, force:)
-  end
-
-  def run_later(wait: 1.second, force: false)
-    RunServerActionJob.set(wait:).perform_later(self, force:)
+  def slug
+    self.class.slug
   end
 
   class << self
@@ -65,7 +66,7 @@ class ServerAction < ApplicationRecord
 
     def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
-      RunServerActionJob.set(wait: 1.second).perform_later(action)
+      action.run_later
       action
     end
   end
