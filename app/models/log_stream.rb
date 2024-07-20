@@ -5,4 +5,8 @@ class LogStream < ApplicationRecord
 
   attribute :uuid, :string, default: -> { SecureRandom.uuid }
   attribute :last_ping_at, :datetime, default: -> { Time.current }
+
+  def streaming?
+    streaming_at.present?
+  end
 end

@@ -2,6 +2,8 @@ class StartLogStreamJob < ApplicationJob
   include ActionView::RecordIdentifier
 
   def perform(log_stream)
+    return if log_stream.streaming?
+
     log_stream.server.ssh_session do |ssh|
       log_stream.touch(:streaming_at)
       ssh.execute(log_command(log_stream), save_output: false) do |_stream, data|
