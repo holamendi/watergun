@@ -17,7 +17,7 @@ class ServerAction::CreateService < ServerAction
   private
 
   def run
-    return unless plugin_installed? || install_plugin.success?
+    install_plugin! unless plugin_installed?
 
     create_dokku_service!
     service.data = dokku_service_info
@@ -52,7 +52,7 @@ class ServerAction::CreateService < ServerAction
     plugins.installed?(service_type)
   end
 
-  def install_plugin
+  def install_plugin!
     Dokku::Plugin::Install.call!(ssh, plugin: service_type)
   end
 end
