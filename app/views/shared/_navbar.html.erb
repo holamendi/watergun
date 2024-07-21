@@ -15,7 +15,6 @@
       </div>
       <div class="navbar-end">
         <div class="dropdown dropdown-end">
-          <%= link_to "jobs", "/jobs", class: "font-normal btn btn-sm btn-ghost" %>
           <div tabindex="0" role="button" class="font-normal btn btn-sm btn-ghost">
             <%= current_user.email %>
           </div>
@@ -24,7 +23,7 @@
               <%= link_to "Settings", account_settings_path %>
             </li>
             <li>
-              <%= link_to "Activity", server_actions_path %>
+              <%= link_to "Solid Queue", "/jobs" %>
             </li>
             <li>
               <%= link_to "Sign out", logout_path, data: { turbo_method: :delete } %>

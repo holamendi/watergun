@@ -18,7 +18,7 @@
     <% end %>
   </td>
   <td>
-    <span class="badge <%= status_badge_class(deployment.status) %>"><%= deployment.status %></span>
+    <span class="badge <%= status_badge_class(deployment.status) %> badge-outline"><%= deployment.status %></span>
   </td>
   <td>
     <% if deployment.finished? %>

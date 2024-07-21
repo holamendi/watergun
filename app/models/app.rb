@@ -5,6 +5,8 @@ class App < ApplicationRecord
   include LogStreamable
   include ServerActionable
 
+  TEMPORARY_STATUSES = %w[deploying restarting scaling stopping].freeze
+
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :project, touch: true
@@ -17,7 +19,7 @@ class App < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
   str_enum :builder, [:herokuish, :dockerfile, :nixpacks], default: :herokuish
-  str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
+  str_enum :status, [:pending, :active, :deploying, :restarting, :scaling, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
 
@@ -41,6 +43,10 @@ class App < ApplicationRecord
 
   def all_domains_resolve_to_server?
     domains.kept.all?(&:resolves_to_server?)
+  end
+
+  def temporary_status?
+    status.in?(TEMPORARY_STATUSES)
   end
 
   private

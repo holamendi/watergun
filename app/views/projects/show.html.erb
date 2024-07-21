@@ -31,7 +31,7 @@
             <td><a href="<%= project_app_path(@project, app) %>" class="link"><%= app.name %></a></td>
             <td>App</td>
             <td>
-              <span class="badge <%= status_badge_class(app.status) %>"><%= app.status %></span>
+              <span class="badge <%= status_badge_class(app.status) %> badge-outline"><%= app.status %></span>
             </td>
             <td class="text-right">
               <div class="dropdown dropdown-bottom dropdown-end">
@@ -54,7 +54,7 @@
             <td><a href="<%= project_service_path(@project, service) %>" class="link"><%= service.name %></a></td>
             <td><%= service.service_type.titleize %> Database</td>
             <td>
-              <span class="badge <%= status_badge_class(service.status) %>"><%= service.status %></span>
+              <span class="badge <%= status_badge_class(service.status) %> badge-outline"><%= service.status %></span>
             </td>
             <td class="text-right">
               <div class="dropdown dropdown-bottom dropdown-end">

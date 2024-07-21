@@ -66,7 +66,7 @@ class ServerAction < ApplicationRecord
 
     def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
-      action.run_later
+      action.run_later(wait: 0.seconds)
       action
     end
   end
