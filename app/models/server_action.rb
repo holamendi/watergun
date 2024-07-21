@@ -19,12 +19,12 @@ class ServerAction < ApplicationRecord
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
-  def run_now(force: false)
-    RunServerActionJob.perform_now(self, force:)
+  def run_now
+    RunServerActionJob.perform_now(self)
   end
 
-  def run_later(wait: 1.second, force: false)
-    RunServerActionJob.set(wait:).perform_later(self, force:)
+  def run_later(wait: 1.second)
+    RunServerActionJob.set(wait:).perform_later(self)
   end
 
   def running!(at = Time.current)

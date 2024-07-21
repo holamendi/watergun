@@ -1,8 +1,8 @@
 class RunServerActionJob < ApplicationJob
   limits_concurrency to: 1, key: ->(server_action) { server_action.concurrency_key }, duration: 30.minutes
 
-  def perform(server_action, force: false)
-    return if server_action.running_at? && !force
+  def perform(server_action)
+    return if server_action.running_at?
     return server_action.cancelled! if server_action.preceding_action&.failure?
 
     Current.set(account: server_action.account, server: server_action.server, user: server_action.user) do
@@ -17,9 +17,10 @@ class RunServerActionJob < ApplicationJob
       server_action.status = session.status
       server_action
     rescue => e
-      server_action.status = :error
       Honeybadger.notify(e, context: {server_action_id: server_action.id})
+      server_action.status = :error
       raise if Rails.env.development?
+
       server_action
     ensure
       server_action.finished_at = Time.current
