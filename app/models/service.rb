@@ -19,11 +19,31 @@ class Service < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
 
-  before_create do
-    self.dokku_id ||= "#{name.parameterize}-#{SecureRandom.hex(2)}"
-  end
+  before_validation :set_default_name, on: :create
+  before_create :set_dokku_id
 
   def related_server_actions
     ServerAction.where(server_id:).where("json_extract(payload, '$.dokku_service_id') = ?", dokku_id)
+  end
+
+  private
+
+  def set_default_name
+    return unless name.blank?
+    return unless service_type.present?
+
+    self.name = service_type.titleize
+
+    while server.services.kept.exists?(name:)
+      self.name = "#{service_type.titleize}-#{SecureRandom.hex(2)}"
+    end
+  end
+
+  def set_dokku_id
+    self.dokku_id = name.parameterize
+
+    while server.apps.kept.exists?(dokku_id:)
+      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
+    end
   end
 end

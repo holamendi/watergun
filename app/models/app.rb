@@ -25,9 +25,7 @@ class App < ApplicationRecord
 
   accepts_nested_attributes_for :github_repo
 
-  before_create do
-    self.dokku_id ||= "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
-  end
+  before_create :set_dokku_id
 
   def related_server_actions
     ServerAction.where("json_extract(payload, '$.dokku_app_id') = ?", dokku_id)
@@ -43,5 +41,15 @@ class App < ApplicationRecord
 
   def all_domains_resolve_to_server?
     domains.kept.all?(&:resolves_to_server?)
+  end
+
+  private
+
+  def set_dokku_id
+    self.dokku_id = name.parameterize
+
+    while server.apps.kept.exists?(dokku_id:)
+      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
+    end
   end
 end

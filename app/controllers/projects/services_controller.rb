@@ -6,7 +6,7 @@ module Projects
     end
 
     def create
-      @service = current_project.services.new(service_params.merge(name: SecureRandom.hex(4)))
+      @service = current_project.services.new(service_params)
 
       if @service.save
         ServerAction::CreateService.run_later!(@service)
