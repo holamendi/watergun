@@ -24,6 +24,18 @@ GIT
       tilt (~> 2)
 
 GIT
+  remote: https://github.com/holamendi/mission_control-jobs.git
+  revision: efe9fcc911dad91118b6eaafe7bfbb465fc219fb
+  branch: auto-refresh
+  specs:
+    mission_control-jobs (0.2.1)
+      importmap-rails
+      irb (~> 1.13)
+      rails (>= 7.1)
+      stimulus-rails
+      turbo-rails
+
+GIT
   remote: https://github.com/rails/rails.git
   revision: 9b63450fe40749d2481b6b6b3e0a7c711750e2a0
   branch: 7-2-stable
@@ -217,11 +229,6 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.7)
     minitest (5.24.1)
-    mission_control-jobs (0.2.1)
-      importmap-rails
-      rails (~> 7.1)
-      stimulus-rails
-      turbo-rails
     mocha (2.4.0)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.7.2)
@@ -430,7 +437,7 @@ DEPENDENCIES
   litestack!
   lograge
   memery
-  mission_control-jobs
+  mission_control-jobs!
   mocha
   net-ssh
   octokit
