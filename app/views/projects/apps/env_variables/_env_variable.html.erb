@@ -1,12 +1,15 @@
 <%= turbo_frame_tag env_variable do %>
-  <div class="flex flex-row p-2 space-x-4 border rounded-md">
+  <div class="flex flex-row px-2 pt-3 space-x-4 border rounded-md">
     <div class="w-1/3">
       <%= env_variable.name %>
       <% if env_variable.syncing? %>
         <span class='loading loading-spinner'></span>
       <% end %>
     </div>
-    <div class="w-2/3"><%= env_variable.value %></div>
+    <div class="w-2/3 overflow-auto group">
+      <span class="group-hover:hidden">*******</span>
+      <span class="hidden group-hover:inline-block"><%= env_variable.value %></span>
+    </div>
     <div class="text-right">
       <div class="dropdown dropdown-bottom dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
