@@ -1,15 +1,31 @@
-<%# locals: (github_access_token:) -%>
-<%= form_with model: github_access_token, url: account_github_access_tokens_path, class: "space-y-4", id: "github_access_token_form" do |form| %>
-  <%= form.label :token, class: "form-control" do %>
-    <div class="label">
-      <span class="label-text">Token</span>
+<%= form_with model: github_access_token, url: account_github_access_tokens_path, method: :post, id: "github_access_token_form" do |form| %>
+  <div class="flex flex-col gap-5">
+    <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
+      <div class="w-full md:w-1/2">
+        <label class="form-control">
+          <div class="py-4 pl-0 label">
+            <span class="label-text">Personal access token</span>
+          </div>
+          <% if form.object.persisted? %>
+            <div class="text-sm text-white">
+              <%= form.object.obfuscated_token %>
+              <%= button_to "Disconnect", account_github_access_tokens_path, method: :delete, class: "btn btn-ghost text-error font-normal rounded-full", data: { turbo_confirm: "Are you sure? "} %>
+            </div>
+          <% else %>
+            <%= form.text_field :token, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", placeholder: "ghp_abc123" %>
+            <%= error_messages_for(form.object, :token) %>
+          <% end %>
+        </label>
+      </div>
     </div>
-    <%= form.text_field :token, class: "input input-bordered w-full" %>
-    <%= error_messages_for(form.object, :token) %>
-  <% end %>
-  <%= button_tag type: "submit",
-                 class: "btn btn-primary no-animation",
-                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
-    Save
-  <% end %>
+    <% if form.object.new_record?%>
+      <div>
+        <%= button_tag type: "submit",
+                  class: "px-6 text-sm font-normal text-white rounded-full btn-primary btn",
+                  data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+          Save
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 <% end %>

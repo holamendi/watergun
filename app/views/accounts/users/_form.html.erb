@@ -1,0 +1,29 @@
+<%= form_with model: user, url: account_user_path, id: "user_form" do |form| %>
+  <div class="flex flex-col gap-5">
+    <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
+      <div class="flex-1">
+        <label class="form-control">
+          <div class="py-4 pl-0 label">
+            <span class="label-text">Name</span>
+          </div>
+          <%= form.text_field :name, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", placeholder: "Veronika" %>
+        </label>
+      </div>
+      <div class="flex-1">
+        <label class="form-control">
+          <div class="py-4 pl-0 label">
+            <span class="text-sm text-white uppercase font-space-grotesk font-extralight label-text">Email</span>
+          </div>
+          <%= form.email_field :email, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", placeholder: "hello@bebest.com", disabled: true %>
+        </label>
+      </div>
+    </div>
+    <div>
+      <%= button_tag type: "submit",
+                 class: "px-6 text-sm font-normal text-white rounded-full btn-primary btn",
+                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
+        Save
+      <% end %>
+    </div>
+  </div>
+<% end %>

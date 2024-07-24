@@ -18,7 +18,7 @@ module Projects
         end
 
         if @github_repo.save
-          turbo_stream_toast("App source updated successfully.")
+          render turbo_stream: notify("App source updated successfully.")
         else
           turbo_stream_errors
         end
@@ -32,7 +32,7 @@ module Projects
         @github_repo = current_app.github_repo
 
         if @github_repo.update(github_repo_params)
-          turbo_stream_toast("App source updated successfully.")
+          render turbo_stream: notify("App source updated successfully.")
         else
           turbo_stream_errors
         end

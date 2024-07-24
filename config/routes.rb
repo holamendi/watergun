@@ -51,11 +51,11 @@ Rails.application.routes.draw do
   end
 
   # Account settings
-  resource :account do
+  resource :account, controller: "accounts/settings" do
     scope module: :accounts do
-      resource :settings, only: :show
-      resources :api_tokens, only: %i[index create destroy]
-      resources :github_access_tokens, only: %i[create destroy]
+      resource :user, only: :update
+      resources :api_tokens, path: "api-tokens", only: %i[index create destroy]
+      resource :github_access_tokens, only: %i[create destroy]
     end
   end
 

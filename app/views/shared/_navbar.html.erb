@@ -1,4 +1,4 @@
-<div class="w-full">
+<div class="w-full mb-10">
   <div class="mx-auto max-w-7xl">
     <div class="px-4 py-0 navbar">
       <div class="navbar-start">
@@ -9,9 +9,6 @@
             </svg>
           <% end %>
         </div>
-        <div class="text-sm">
-          <%= yield :breadcrumb %>
-        </div>
       </div>
       <div class="navbar-end">
         <div class="dropdown dropdown-end">
@@ -19,10 +16,7 @@
           </div>
           <ul tabindex="0" class="menu dropdown-content z-[1] p-2 bg-base-200 rounded-box w-52 mt-4 shadow-xl text-sm">
             <li>
-              <%= link_to "Settings", account_settings_path %>
-            </li>
-            <li>
-              <%= link_to "Settings V2", "/settings" %>
+              <%= link_to "Settings", account_path %>
             </li>
             <li>
               <%= link_to "Solid Queue", "/jobs" %>

@@ -1,61 +1,19 @@
-<h1 class="pb-6 text-xl font-bold">API Tokens</h1>
-
-<% if false %>
-<h2 class="pb-4 text-lg font-bold">Github Access Token</h2>
-<div class="pb-6">
-<% if @github_access_token.persisted? %>
-  <div class="flex justify-start w-full pb-6">
-    <span class="pr-6">
-      <%= @github_access_token.obfuscated_token %>
-    </span>
-    <%= button_to "Delete", account_github_access_token_path(current_account.github_access_token), method: :delete, class: "link text-error", data: { turbo_confirm: "Are you sure? "} %>
+<div class="flex flex-col w-full gap-8 md:flex-row">
+  <div class="flex-none w-full md:w-2/12">
+    <%= render "accounts/settings/menu" %>
   </div>
-<% else %>
-  <div class="flex justify-start w-full pb-6">
-    <%= render "accounts/github_access_tokens/form", github_access_token: @github_access_token %>
-  </div>
-  <%= link_to "Generate a new token", "https://github.com/settings/tokens/new?scopes=repo&description=Watergun", target: :_blank, class: "link" %>
-<% end %>
-</div>
-<% end %>
-
-
-<%= form_with model: ApiToken.new, url: account_api_tokens_path, class: "space-y-4", id: "api_token_form" do |form| %>
-  <%= form.label :name, class: "form-control" do %>
-    <div class="label">
-      <span class="label-text">Name</span>
+  <div class="flex-col w-full md:w-10/12">
+    <div class="page-title">
+      <h1>General Settings</h1>
     </div>
-    <%= form.text_field :name, class: "input input-bordered w-1/3", required: true %>
-    <%= error_messages_for(form.object, :name) %>
-  <% end %>
- <%= button_tag type: "submit",
-                 class: "btn btn-primary no-animation",
-                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
-    Save
-  <% end %>
-<% end %>
-
-<% if token = cookies.delete(:api_token) %>
-  <%= token  %>
-<% end%>
-
-  <table class="table table-lg">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Token</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @api_tokens.each do |api_token| %>
-      <tr>
-        <td><%= api_token.name %></td>
-        <td>******<%= api_token.token.last(4) %></td>
-        <td>
-          <%= button_to "Delete", account_api_token_path(api_token), method: :delete, class: "text-error link", form: { data: { turbo_confirm: "Do you really…" } } %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    <div class="settings-section">
+      <h2>Profile</h2>
+      <%= render "accounts/users/form", user: current_user %>
+    </div>
+    <div class="my-10 divider"></div>
+    <div class="settings-section">
+      <h2>Github Integration</h2>
+      <%= render "accounts/github_access_tokens/form", github_access_token: current_account.github_access_token || current_account.build_github_access_token %>
+    </div>
+  </div>
+</div>

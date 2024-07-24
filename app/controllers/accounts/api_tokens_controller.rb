@@ -1,5 +1,8 @@
 module Accounts
   class ApiTokensController < ApplicationController
+    def index
+    end
+
     def create
       @api_token = current_account.api_tokens.create(api_token_params)
 

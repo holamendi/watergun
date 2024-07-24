@@ -4,12 +4,38 @@
 @import "tailwindcss/utilities";
 
 [data-theme="watergun"] {
+  body {
+    @apply font-poppins;
+  }
+
   .field_with_errors > input {
     @apply input-error;
   }
 
   .input {
-    @apply text-white rounded-lg bg-base-300;
+    @apply text-white rounded-lg bg-base-300 input-bordered;
+
+    &:disabled {
+      @apply bg-base-200 text-neutral-400;
+    }
+  }
+
+  div.page-title {
+    @apply pb-12;
+
+    h1 {
+      @apply text-3xl font-light text-white;
+    }
+  }
+
+  div.settings-section {
+    h2 {
+      @apply pb-6 text-xl font-normal text-white;
+    }
+  }
+
+  span.label-text {
+    @apply text-sm uppercase font-space-grotesk font-extralight;
   }
 }
 

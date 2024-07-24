@@ -1,6 +1,6 @@
 <div class="flex flex-row w-full gap-8 pt-10">
   <div class="w-2/12">
-    <ul class="w-full gap-2 px-0 pt-20 text-sm menu font-poppins">
+    <ul class="w-full gap-2 px-0 text-sm menu">
       <li>
         <a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -19,15 +19,22 @@
       </li>
     </ul>
   </div>
+
   <div class="flex-col w-6/12">
-    <h1 class="pb-12 text-3xl font-light text-white font-poppins">Account Settings</h1>
-    <h2 class="pb-6 text-xl font-normal text-white font-poppins">Personal details</h2>
+    <div class="page-title">
+      <h1>Account Settings</h1>
+    </div>
+
+    <div class="form-section">
+      <h2>Personal details</h2>
+    </div>
+
     <div class="flex flex-col gap-5">
       <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
         <div class="flex-1">
           <label class="form-control">
             <div class="py-4 pl-0 label">
-              <span class="text-sm text-white uppercase font-space-grotesk font-extralight label-text">Name</span>
+              <span class="label-text">Name</span>
             </div>
             <input type="text" class="w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none" placeholder="Veronika">
           </label>

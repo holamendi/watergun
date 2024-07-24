@@ -4,7 +4,7 @@ module Projects
       def update
         if current_app.update(app_params)
           ServerAction::UpdateBuilder.run_later!(current_app)
-          turbo_stream_toast("Builder updated successfully.")
+          render turbo_stream: notify("Builder updated successfully.")
         else
           turbo_stream_errors
         end
