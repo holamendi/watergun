@@ -8,11 +8,15 @@
 }
 
 .btn {
-  @apply font-normal rounded-md btn-sm no-animation;
+  @apply no-animation;
+}
+
+.btn-primary {
+  @apply text-white;
 }
 
 .input {
-  @apply px-2 rounded-md input-sm;
+  @apply text-white rounded-lg bg-base-200;
 }
 
 .modal-box {

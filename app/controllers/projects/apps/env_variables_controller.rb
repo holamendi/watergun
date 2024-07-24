@@ -27,7 +27,7 @@ module Projects
 
       def update
         if @env_variable.update(env_variable_params)
-          ServerAction::UpdateEnv.run_later!(current_app, set: @env_variable.to_h)
+          ServerAction::UpdateEnv.run_later!(current_app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
           redirect_to project_app_env_variable_path(current_project, current_app, @env_variable), notice: "Environment variable updated successfully."
         else
           render :edit, status: :unprocessable_entity

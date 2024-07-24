@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_20_060131) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_23_141448) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -24,6 +24,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_20_060131) do
     t.datetime "expires_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
     t.index ["account_id"], name: "index_api_tokens_on_account_id"
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
   end

@@ -3,6 +3,8 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
+  get "sandbox" => "sandbox#index"
+
   root "projects#index"
 
   get "login" => "sessions#new", :as => :login

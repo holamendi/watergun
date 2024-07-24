@@ -5,10 +5,12 @@ class RunServerActionJob < ApplicationJob
     return if server_action.running_at?
     return server_action.cancelled! if server_action.preceding_action&.failure?
 
-    Current.set(account: server_action.account, server: server_action.server, user: server_action.user) do
+    account, server, user = server_action.values_at(:account, :server, :user)
+
+    Current.set(account:, server:, user:) do
       server_action.running!
 
-      session = server_action.server.ssh_session do |ssh_session|
+      session = server.ssh_session do |ssh_session|
         server_action.with(ssh_session:) { server_action.send(:run) }
       rescue Ssh::CommandExecutionError
       end
