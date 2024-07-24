@@ -3,22 +3,14 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.field_with_errors > input {
-  @apply input-error;
+[data-theme="watergun"] {
+  .field_with_errors > input {
+    @apply input-error;
+  }
+
+  .input {
+    @apply text-white rounded-lg bg-base-300;
+  }
 }
 
-.btn {
-  @apply no-animation;
-}
 
-.btn-primary {
-  @apply text-white;
-}
-
-.input {
-  @apply text-white rounded-lg bg-base-200;
-}
-
-.modal-box {
-  @apply p-4 rounded-lg;
-}
