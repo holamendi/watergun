@@ -1,0 +1,8 @@
+<%= turbo_frame_tag :github_settings do %>
+  <% if github_access_token.persisted? %>
+    <%= github_access_token.obfuscated_token %>
+    <%= button_to "Disconnect", account_github_access_tokens_path, method: :delete, class: "btn btn-ghost text-error font-normal rounded-full", data: { turbo_confirm: "Are you sure? "} %>
+  <% else %>
+    <%= render "accounts/github_access_tokens/form", github_access_token:  %>
+  <% end %>
+<% end %>

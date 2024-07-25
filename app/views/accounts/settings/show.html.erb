@@ -8,12 +8,16 @@
     </div>
     <div class="settings-section">
       <h2>Profile</h2>
-      <%= render "accounts/users/form", user: current_user %>
+      <%= turbo_frame_tag :profile_settings do %>
+        <%= render "accounts/profiles/form", user: current_user %>
+      <% end %>
     </div>
     <div class="my-10 divider"></div>
     <div class="settings-section">
       <h2>Github Integration</h2>
-      <%= render "accounts/github_access_tokens/form", github_access_token: current_account.github_access_token || current_account.build_github_access_token %>
+      <%= turbo_frame_tag :github_settings do %>
+        <%= render "accounts/github_access_tokens/settings", github_access_token: current_account.github_access_token || current_account.build_github_access_token %>
+      <% end %>
     </div>
   </div>
 </div>

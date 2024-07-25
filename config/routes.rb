@@ -53,7 +53,7 @@ Rails.application.routes.draw do
   # Account settings
   resource :account, controller: "accounts/settings" do
     scope module: :accounts do
-      resource :user, only: :update
+      resource :profile, only: :update
       resources :api_tokens, path: "api-tokens", only: %i[index create destroy]
       resource :github_access_tokens, only: %i[create destroy]
     end

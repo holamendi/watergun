@@ -4,15 +4,15 @@ module Accounts
       @github_access_token = current_account.build_github_access_token(github_access_token_params)
 
       if @github_access_token.save
-        redirect_to account_path, notice: "Github account connected successfully."
+        render turbo_stream: [notify("Github account connected"), replace_settings]
       else
-        render turbo_stream: replace_form, status: :unprocessable_entity
+        render turbo_stream: replace_settings, status: :unprocessable_entity
       end
     end
 
     def destroy
       current_account.github_access_token&.destroy
-      redirect_to account_path, notice: "Github account disconnected successfully."
+      render turbo_stream: [notify("Github account disconnected"), replace_settings]
     end
 
     private
@@ -21,13 +21,11 @@ module Accounts
       params.require(:github_access_token).permit(:token)
     end
 
-    def replace_form
+    def replace_settings
       turbo_stream.replace(
-        "github_access_token_form",
-        partial: "accounts/github_access_tokens/form",
-        locals: {
-          github_access_token: @github_access_token || current_account.github_access_token
-        }
+        "github_settings",
+        partial: "accounts/github_access_tokens/settings",
+        locals: {github_access_token: @github_access_token || current_account.build_github_access_token}
       )
     end
   end

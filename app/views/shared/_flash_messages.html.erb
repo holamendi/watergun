@@ -1,6 +1,6 @@
 <%= turbo_stream_from current_user, :toasts %>
 
-<div id="toasts" class="toast" data-turbo-permanent>
+<div id="toasts" class="toast">
   <% flash.each do |type, message| %>
     <%= render "shared/toast", message:, type: %>
   <% end %>
