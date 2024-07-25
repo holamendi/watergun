@@ -42,7 +42,8 @@ module.exports = {
         "--tab-radius": "0.5rem", // border radius of tabs
 
       }
-    }]
+    },
+    'light']
   }
 }
 

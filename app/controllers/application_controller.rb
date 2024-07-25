@@ -29,11 +29,11 @@ class ApplicationController < ActionController::Base
   private
 
   def notify(message, type: :notice)
-    turbo_stream.prepend(
-      "toasts",
-      partial: "shared/toast",
-      locals: {message:, type:}
-    )
+    turbo_stream.prepend("toasts", partial: "shared/toast", locals: {message:, type:})
+  end
+
+  def notify_error(message)
+    notify(message, type: :error)
   end
 
   def sign_in(user)

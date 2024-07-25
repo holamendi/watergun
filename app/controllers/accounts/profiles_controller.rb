@@ -2,7 +2,10 @@ module Accounts
   class ProfilesController < ApplicationController
     def update
       if current_user.update(user_params)
-        render turbo_stream: [notify("Profile updated"), render_form]
+        render turbo_stream: [
+          notify("Profile updated"),
+          render_form
+        ]
       else
         render turbo_stream: render_form, status: :unprocessable_entity
       end

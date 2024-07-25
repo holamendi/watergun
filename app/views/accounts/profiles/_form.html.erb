@@ -3,11 +3,11 @@
     <div class="flex flex-col gap-5">
       <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
         <label class="flex-1 form-control">
-          <div class="py-4 pl-0 label"> <span class="label-text">Name</span></div>
+          <div class="pl-0 label"> <span class="label-text">Name</span></div>
           <%= form.text_field :name, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", placeholder: "Veronika" %>
         </label>
         <label class="flex-1 form-control">
-          <div class="py-4 pl-0 label"><span class="text-sm text-white uppercase font-space-grotesk font-extralight label-text">Email</span></div>
+          <div class="pl-0 label"><span class="text-sm text-white uppercase font-space-grotesk font-extralight label-text">Email</span></div>
           <%= form.email_field :email, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", placeholder: "hello@bebest.com", disabled: true %>
         </label>
       </div>

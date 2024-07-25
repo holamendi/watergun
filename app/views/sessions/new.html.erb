@@ -1,16 +1,18 @@
 <div class="flex flex-col min-h-full px-4 pt-40 lg:px-4">
-  <div class="px-6 pt-2 pb-8 shadow-lg rounded-xl sm:mx-auto sm:w-full sm:max-w-sm bg-base-100">
-    <%= form_with(scope: :session, url: sessions_path, class: "space-y-4") do |form| %>
-      <%= form.label :email, class: "form-control" do %>
-        <div class="label"><span class="label-text">Email</span></div>
-        <%= form.email_field :email, class: "input input-sm px-2 text-sm rounded-md input-bordered", value: params.dig(:session, :email), required: true %>
-      <% end %>
-      <%= form.label :password, class: "form-control" do %>
-        <div class="label"><span class="label-text">Password</span></div>
-        <%= form.password_field :password, class: "input input-sm px-2 text-sm rounded-md input-bordered", required: true %>
-      <% end %>
-      <div class="pt-2">
-        <%= form.submit "Sign in", class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
+  <div class="px-6 py-10 border shadow-lg rounded-xl sm:mx-auto sm:w-full sm:max-w-sm border-base-300">
+    <%= form_with(scope: :session, url: sessions_path ) do |form| %>
+      <div class="flex flex-col gap-5">
+        <%= form.label :email, class: "flex-1 form-control" do %>
+          <div class="pl-0 label"><span class="label-text">Email</span></div>
+          <%= form.email_field :email, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", value: params.dig(:session, :email), required: true %>
+        <% end %>
+        <%= form.label :password, class: "flex-1 form-control" do %>
+          <div class="pl-0 label"><span class="label-text">Password</span></div>
+          <%= form.password_field :password, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none" %>
+        <% end %>
+        <div>
+          <%= button_tag "Sign in", type: "submit", class: "px-6 text-sm font-normal text-white rounded-full btn-primary btn inline-block" %>
+        </div>
       </div>
     <% end %>
   </div>
