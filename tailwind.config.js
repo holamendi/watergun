@@ -4,6 +4,7 @@ module.exports = {
     './public/*.html',
     './app/helpers/**/*.rb',
     './app/javascript/**/*.js',
+    './app/components/**/*.rb',
     './app/views/**/*',
   ],
   theme: {
