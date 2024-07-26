@@ -8,14 +8,6 @@
     @apply input-error;
   }
 
-  .input {
-    @apply text-white rounded-lg bg-base-300 input-bordered;
-
-    &:disabled {
-      @apply bg-base-200 text-neutral-400;
-    }
-  }
-
   div.page-title {
     @apply pb-12;
 
@@ -32,6 +24,10 @@
 
   span.label-text {
     @apply text-sm uppercase font-space-grotesk font-extralight;
+  }
+
+  .btn {
+    @apply font-normal;
   }
 }
 

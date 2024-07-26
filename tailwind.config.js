@@ -24,12 +24,14 @@ module.exports = {
   daisyui: {
     themes: [{
       watergun: {
-        "primary": "#2B99FF",
+        "primary": "#cc45ed",
+        "primary-content": "#eee",
         "secondary": "#f6d860",
         "accent": "#37cdbe",
-        "neutral": "#3d4451",
+        "neutral": "#070818",
         "neutral-content": "#eee",
-        "base-100": "#292828",
+        "base-100": "#0f1022",
+        "base-content": "#fff",
 
         "--rounded-box": "1rem", // border radius rounded-box utility class, used in card and other large boxes
         "--rounded-btn": "0.5rem", // border radius rounded-btn utility class, used in buttons and similar element

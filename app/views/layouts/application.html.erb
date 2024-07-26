@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="watergun">
+<html data-theme="watergun">
   <head>
     <title>Watergun</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,16 +8,14 @@
     <%= vite_client_tag %>
     <%= vite_stylesheet_tag "application", data: { "turbo-track": "reload" } %>
     <%= vite_javascript_tag 'application' %>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
   </head>
-  <body class="h-full text-white bg-[#070818] font-poppins">
+  <body class="h-full pb-10 bg-neutral font-poppins">
     <%= render "shared/navbar" %>
-    <div class="px-4 mx-auto lg:px-[30px] max-w-[1440px]">
+    <div class="min-h-full px-4 mx-auto lg:px-7 max-w-screen-2xl">
       <%= render "shared/flash_messages" %>
       <%= yield %>
     </div>

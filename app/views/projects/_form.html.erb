@@ -1,14 +1,16 @@
-<%= form_with model: project, class: "space-y-4", id: "project_form" do |form| %>
+<%= form_with model: project, class: "flex flex-col gap-5", id: "project_form" do |form| %>
   <%= form.label :name, class: "form-control" do %>
     <div class="label">
       <span class="label-text">Name</span>
     </div>
     <%= form.text_field :name, class: "input input-bordered w-full" %>
-    <%= error_messages_for(form.object, :name) %>
+    <%= error_messages_for(project, :name) %>
   <% end %>
+  <div>
   <%= button_tag type: "submit",
                  class: "btn btn-primary no-animation",
                  data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
     Save
   <% end %>
+  </div>
 <% end %>
