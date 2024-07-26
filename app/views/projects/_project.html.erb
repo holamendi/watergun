@@ -1,13 +1,12 @@
-<%# locals: (project:) -%>
-
 <%= link_to project do %>
-  <div class="flex h-full rounded-md shadow-lg hover:shadow-xl card bg-base-200">
-    <div class="flex-grow card-body">
-      <h2 class="text-lg font-bold"><%= project.name %></h2>
-      <ul class="text-sm">
-        <li><%= pluralize project.apps.kept.count, "app" %></li>
-        <li><%= pluralize project.services.kept.count, "service" %></li>
-      </ul>
+  <div class="bg-[#222121] rounded-[15px] p-10 outline-1 hover:outline hover:outline-primary">
+    <h2 class="pb-5 text-base font-normal"><%= project.name %></h2>
+    <div class="flex flex-col gap-[10px] mb-5 font-thin">
+      <p class="text-sm"><%= pluralize project.apps.kept.size, "app" %></p>
+      <p class="text-sm"><%= pluralize project.services.kept.size, "service" %></p>
+    </div>
+    <div class="flex gap-2">
+      <span class="text-sm uppercase font-space-grotesk"><%= time_ago_in_words(project.updated_at) %> ago</span>
     </div>
   </div>
-<% end %>
+<% end%>

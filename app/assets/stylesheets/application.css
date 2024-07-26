@@ -4,10 +4,6 @@
 @import "tailwindcss/utilities";
 
 [data-theme="watergun"] {
-  body {
-    @apply font-poppins;
-  }
-
   .field_with_errors > input {
     @apply input-error;
   }
