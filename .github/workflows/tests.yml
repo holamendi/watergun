@@ -1,0 +1,36 @@
+name: Rails Tests
+
+on:
+  push:
+    branches: [ pre-release ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.3.4 # Adjust this to your Ruby version
+        bundler-cache: true # This will cache your gems
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev
+        bundle install --jobs 4 --retry 3
+
+    - name: Setup database
+      env:
+        RAILS_ENV: test
+      run: |
+        bundle exec rails db:create
+        bundle exec rails db:schema:load
+
+    - name: Run tests
+      env:
+        RAILS_ENV: test
+      run: bundle exec rails test
