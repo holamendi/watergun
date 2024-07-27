@@ -14,8 +14,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.3.4 # Adjust this to your Ruby version
-        bundler-cache: true # This will cache your gems
+        ruby-version: 3.3.4
+        bundler-cache: true
 
     - name: Install dependencies
       run: |
