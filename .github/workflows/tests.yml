@@ -17,13 +17,19 @@ jobs:
         ruby-version: 3.3.4
         bundler-cache: true
 
+    - name: Set up node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22.2.0' # Adjust this to your preferred Node.js version
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y libsqlite3-dev
         bundle install --jobs 4 --retry 3
+        yarn install
 
-    - name: Setup database
+    - name: Set up database
       env:
         RAILS_ENV: test
       run: |
