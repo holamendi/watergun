@@ -2,20 +2,11 @@
 
 <%= render PageHeaderComponent.new(title: "Projects") do |component| %>
   <% component.with_actions do %>
-    <%= link_to "+ Project", new_project_path, class: "btn btn-primary btn-outline w-32" %>
+    <%= link_to "+ Project", new_project_path, class: "btn text-primary hover:btn-outline w-32" %>
   <% end %>
 <% end %>
 
-<div id="projects w-full">
-  <% if @projects.any? %>
-    <div class="grid grid-cols-1 gap-7 lg:grid-cols-3 xl:grid-cols-4">
-      <%= render @projects %>
-    </div>
-  <% else %>
-    <div class="flex justify-center py-10">
-      <div>
-        <p><%= button_tag "Create your first project", class: "btn btn-lg btn-ghost link font-normal no-animation", onclick: "project_modal.showModal()" %></p>
-      </div>
-    </div>
-  <% end %>
+<div class="grid grid-cols-1 gap-7 lg:grid-cols-3 xl:grid-cols-4">
+  <%= render @projects %>
 </div>
+

@@ -36,18 +36,18 @@ class ApplicationController < ActionController::Base
     notify(message, type: :error)
   end
 
-  def sign_in(user)
-    session = user.sessions.create!
-    cookies.encrypted[:session_token] = {value: session.token, expires: session.expires_at}
-    Current.session = session
-  end
-
   def set_source
     Current.source = :web
   end
 
+  def sign_in(user)
+    session = user.sessions.create!
+    cookies.signed.permanent[:session_token] = {value: session.token, http_only: true, same_site: :lax}
+    Current.session = session
+  end
+
   def authenticate!
-    return if (Current.session = Session.find_by_active_token(cookies.encrypted[:session_token]))
+    return if (Current.session = Session.find_by_active_token(cookies.signed[:session_token]))
 
     redirect_to "/login", notice: "Please sign in"
   end

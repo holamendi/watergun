@@ -1,6 +1,6 @@
 <div class="flex flex-col min-h-full px-4 pt-40 lg:px-4">
   <div class="px-6 py-10 border shadow-lg rounded-xl sm:mx-auto sm:w-full sm:max-w-sm border-base-300">
-    <%= form_with(scope: :session, url: sessions_path ) do |form| %>
+    <%= form_with(scope: :session, url: session_path ) do |form| %>
       <div class="flex flex-col gap-5">
         <%= form.label :email, class: "flex-1 form-control" do %>
           <div class="pl-0 label"><span class="label-text">Email</span></div>

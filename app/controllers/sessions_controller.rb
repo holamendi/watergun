@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    Current.session&.destroy
+    current_session&.destroy
     cookies.delete(:session_token)
     redirect_to login_path, notice: "Logged out", status: :see_other
   end
@@ -34,6 +34,6 @@ class SessionsController < ApplicationController
   end
 
   def current_session
-    Session.find_by_active_token(cookies.encrypted[:session_token])
+    Session.find_by_active_token(cookies.signed[:session_token])
   end
 end

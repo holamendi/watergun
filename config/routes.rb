@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get "login" => "sessions#new", :as => :login
   delete "logout" => "sessions#destroy", :as => :logout
 
-  resources :sessions, only: %i[new create destroy]
+  resource :session, only: %i[new create destroy]
 
   resource :first_run, only: %i[edit update]
   get "first-run/:signed_id", to: "first_runs#edit"
