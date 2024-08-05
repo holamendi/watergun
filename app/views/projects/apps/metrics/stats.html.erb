@@ -5,12 +5,13 @@
       <div class="stat-value"><%= @running_containers_count %></div>
     </div>
     <div class="stat bg-base-100">
-      <div class="stat-title">CPU Usage</div>
+      <div class="stat-title">Total CPU Usage</div>
       <div class="stat-value"><%= @total_cpu_usage %>%</div>
     </div>
     <div class="stat bg-base-100">
-      <div class="stat-title">RAM Usage</div>
+      <div class="stat-title">Total Memory Usage</div>
       <div class="stat-value"><%= @total_memory_usage %>%</div>
+      <div class="stat-desc">
     </div>
   </div>
 <% end %>

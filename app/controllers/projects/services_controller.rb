@@ -1,9 +1,6 @@
 module Projects
   class ServicesController < BaseController
-    before_action :set_service, only: [:show, :destroy]
-
-    def show
-    end
+    before_action :set_service, only: [:show, :edit, :update, :destroy]
 
     def create
       @service = current_project.services.new(service_params)
@@ -28,6 +25,20 @@ module Projects
             service: @service
           }
         )
+      end
+    end
+
+    def show
+    end
+
+    def edit
+    end
+
+    def update
+      if @service.update(service_params)
+        redirect_to project_service_path(current_project, @service), notice: "Service updated successfully."
+      else
+        render :edit, status: :unprocessable_entity
       end
     end
 

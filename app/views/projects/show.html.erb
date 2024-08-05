@@ -4,6 +4,7 @@
   <% component.with_actions do %>
     <button class="w-32 btn btn-primary btn-outline" onclick="app_modal.showModal()">+ App</button>
     <button class="w-32 btn btn-primary btn-outline" onclick="service_modal.showModal()">+ Service</button>
+    <%= button_to "Delete", project_path(@project), method: :delete, class: "btn btn-error btn-outline", data: { turbo_confirm: "Sure?"} %>
   <% end %>
 <% end %>
 

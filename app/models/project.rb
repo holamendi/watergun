@@ -1,8 +1,6 @@
 class Project < ApplicationRecord
   include Discard::Model
 
-  broadcasts_refreshes
-
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   has_many :apps, dependent: :destroy
@@ -10,6 +8,11 @@ class Project < ApplicationRecord
   has_many :services, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
+
+  broadcasts_refreshes
+
+  broadcasts_to ->(project) { [project.account, :projects] },
+    inserts_by: :prepend
 
   def last_deployment
     deployments.success.last

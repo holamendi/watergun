@@ -20,7 +20,10 @@
               <%= link_to "Settings", account_path %>
             </li>
             <li>
-              <%= link_to "Solid Queue", "/jobs" %>
+              <%= link_to "Server actions", server_actions_path %>
+            </li>
+            <li>
+              <%= link_to "Solid Queue", "/jobs/in_progress" %>
             </li>
             <li>
               <%= link_to "Sign out", logout_path, data: { turbo_method: :delete } %>

@@ -2,30 +2,22 @@
   <div class="flex justify-between pb-6">
     <div>
       <h1 class="pb-2 text-3xl font-bold">
-        <%= app.name %>
-        <% if app.temporary_status? %>
+        <%= service.name %>
+        <% if service.temporary_status? %>
           <span class="text-sm font-normal text-success">
-            <%= app.status %>
+            <%= service.status %>
             <span class="loading loading-spinner loading-xs"></span>
           </span>
         <% end %>
       </h1>
-      <% if app.github_repo.present? %>
-        <div class="flex space-x-1">
-          <span class="text-sm text-content">
-            <%= app.github_repo.repo %>
-          </span>
-        </div>
-      <% end %>
     </div>
     <div class="flex gap-x-2">
       <%# actions %>
     </div>
   </div>
   <div role="tablist" class="w-full pb-6 overflow-auto md:w-1/2 lg:overflow-hidden tabs tabs-lifted">
-    <%= link_to "Metrics", project_app_metrics_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
-    <%= link_to "Logs", project_app_log_streams_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "log_streams")), data: { turbo_prefetch: false}, role: "tab" %>
-    <%= link_to "Environment", project_app_env_variables_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "env_variables")), role: "tab" %>
-    <%= link_to "Settings", edit_project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab"  %>
+    <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
+    <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "log_streams")), data: { turbo_prefetch: false}, role: "tab" %>
+    <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab"  %>
   </div>
 </div>

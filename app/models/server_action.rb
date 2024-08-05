@@ -1,6 +1,4 @@
 class ServerAction < ApplicationRecord
-  include Broadcast
-
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :user, default: -> { Current.user }
@@ -18,6 +16,10 @@ class ServerAction < ApplicationRecord
 
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
+
+  broadcasts_to ->(server_action) { [server_action.account, :server_actions] },
+    partial: "server_actions/server_action",
+    inserts_by: :prepend
 
   def run_now
     RunServerActionJob.perform_now(self)

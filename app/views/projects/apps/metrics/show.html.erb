@@ -1,6 +1,6 @@
-<%= turbo_stream_from @app %>
+<%= turbo_stream_from current_app, :metrics %>
 
-<%= render "projects/apps/header", project: current_project, app: current_app %>
+<%= render "projects/apps/header", app: current_app %>
 
 <%= turbo_frame_tag :stats, src: stats_project_app_metrics_path(current_project, current_app) %>
 <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_app_metrics_path(current_project, current_app) %>

@@ -5,6 +5,7 @@ class Current < ActiveSupport::CurrentAttributes
     :account,
     :project,
     :server,
+    :service,
     :session,
     :source,
     :user

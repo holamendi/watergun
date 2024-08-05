@@ -11,20 +11,15 @@ module Projects
     end
 
     def create
-      @app = current_project.apps.new(app_params.merge(name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last))
+      @app = current_project.apps.new(app_params.merge(
+        name: app_params.dig(:github_repo_attributes, :repo)&.split("/")&.last
+      ))
 
       if @app.save
         ServerAction::CreateApp.run_later!(@app)
-        redirect_to current_project, notice: "App created successfully.", status: :see_other
+        redirect_to project_app_path(current_project, @app), notice: "App created"
       else
-        render turbo_stream: turbo_stream.replace(
-          "app_form",
-          partial: "projects/apps/form",
-          locals: {
-            project: current_project,
-            app: @app
-          }
-        )
+        render turbo_stream: render_form
       end
     end
 
@@ -58,6 +53,14 @@ module Projects
 
     def set_app
       @app = current_project.apps.kept.find(params[:id])
+    end
+
+    def render_form
+      turbo_stream.replace(
+        "app_form",
+        partial: "projects/apps/form",
+        locals: {project: current_project, app: @app}
+      )
     end
   end
 end

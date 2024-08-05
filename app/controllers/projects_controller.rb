@@ -1,4 +1,5 @@
 class ProjectsController < ApplicationController
+  before_action :set_project, only: [:show, :destroy]
   def index
     @projects = Project.kept
   end
@@ -44,9 +45,19 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project.discard
+    @project.apps.kept.each do |app|
+      app.discard
+      ServerAction::DestroyApp.run_later!(app)
+    end
 
-    redirect_to projects_path, notice: "Project was successfully destroyed."
+    @project.services.kept.each do |service|
+      service.discard
+      ServerAction::DestroyService.run_later!(service)
+    end
+
+    @project.destroy
+
+    redirect_to projects_path, notice: "Project destroyed"
   end
 
   private

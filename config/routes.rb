@@ -20,6 +20,10 @@ Rails.application.routes.draw do
       resources :apps do
         scope module: :apps do
           resource :builder, only: %i[update]
+          resources :deployments, shallow: false, only: :create do
+            get :logs, on: :member
+          end
+
           resources :domains, only: %i[index create destroy] do
             patch :make_default, on: :member
           end
@@ -27,10 +31,6 @@ Rails.application.routes.draw do
           resources :env_variables, path: :env
           resource :env_configuration, path: :environment, only: %i[edit update]
           resource :github_repo
-          resources :deployments, shallow: false, only: :create do
-            get :logs, on: :member
-          end
-
           resources :log_streams, path: :logs, only: %i[index create show update destroy]
 
           resource :metrics, only: :show do
@@ -42,7 +42,20 @@ Rails.application.routes.draw do
           resources :restarts, only: :create
         end
       end
-      resources :services
+
+      resources :services do
+        scope module: :services do
+          resources :restarts, only: :create
+
+          resource :metrics, only: :show do
+            get :stats
+            get :cpu_chart
+            get :memory_chart
+          end
+
+          resources :log_streams, path: :logs, only: %i[index create show update destroy]
+        end
+      end
     end
   end
 

@@ -32,11 +32,24 @@ class FetchContainerMetricsJob < ApplicationJob
       # TODO: I forgot why I added this line
       stats.uniq!
 
-      (server.apps.kept + server.services.kept).each do |entity|
-        containers = stats.select { |stat| stat[:name].start_with?("#{entity.dokku_id}.") }
+      server.apps.kept.each do |app|
+        containers = stats.select { |stat| stat[:name].start_with?("#{app.dokku_id}.") }
 
         containers.each do |stats|
-          container = entity.containers.find_or_initialize_by(cid: stats[:id])
+          container = app.containers.find_or_initialize_by(cid: stats[:id])
+
+          Container.transaction do
+            container.update!(stats.to_h.except(:id).merge(last_synced_at: synced_at))
+            container.checks.create!(stats.to_h.except(:id, :name).merge(timestamp: synced_at))
+          end
+        end
+      end
+
+      server.services.kept.each do |service|
+        containers = stats.select { |stat| stat[:name] == "dokku.#{service.service_type}.#{service.dokku_id}" }
+
+        containers.each do |stats|
+          container = service.containers.find_or_initialize_by(cid: stats[:id])
 
           Container.transaction do
             container.update!(stats.to_h.except(:id).merge(last_synced_at: synced_at))

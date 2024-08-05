@@ -1,0 +1,10 @@
+<%= turbo_frame_tag :memory_chart do %>
+  <div class="w-full p-4 mb-4 shadow rounded-xl">
+    <div class="mb-4">
+      RAM Usage
+    </div>
+    <div class="mb-6">
+      <%= line_chart @chart_data, id: "memory-chart" %>
+    </div>
+  </div>
+<% end %>

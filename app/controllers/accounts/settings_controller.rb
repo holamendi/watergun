@@ -1,6 +1,4 @@
-module Accounts
-  class SettingsController < ApplicationController
-    def show
-    end
+class Accounts::SettingsController < ApplicationController
+  def show
   end
 end

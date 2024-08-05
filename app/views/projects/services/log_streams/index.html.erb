@@ -1,0 +1,13 @@
+<%= turbo_stream_from current_service %>
+<%= turbo_stream_from @log_stream %>
+
+<%= render "projects/services/header", service: current_service %>
+
+<div data-controller="log-stream"
+     data-log-stream-url-value="<%= project_service_log_stream_path(current_project, current_service, @log_stream) %>"
+     data-log-stream-ping-interval-value="5000"></div>
+
+<div id="<%= dom_id(@log_stream) %>"
+     class="px-2 py-1 overflow-auto text-xs text-gray-100 rounded-md bg-slate-800 h-[calc(100vh-20rem)]"
+     data-controller="auto-scroll"
+     data-turbo-temporary></div>

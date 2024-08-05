@@ -1,0 +1,11 @@
+<%= turbo_stream_from @service %>
+<%= render "header", service: @service %>
+<div class="flex w-full pb-6">
+  <div class="w-1/6">
+    <h1 class="text-xl font-bold text-error">Danger zone</h1>
+  </div>
+  <div class="w-full p-6 border rounded-md">
+    <%= button_to "Delete", project_service_path(current_project, @service), method: :delete, class: "btn btn-error btn-sm rounded-md font-normal text-sm", data: { turbo_confirm: "Sure?"} %>
+  </div>
+</div>
+

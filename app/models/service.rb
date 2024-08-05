@@ -1,7 +1,10 @@
 class Service < ApplicationRecord
   include Containerizable
   include Discard::Model
+  include LogStreamable
   include ServerActionable
+
+  TEMPORARY_STATUSES = %w[deleting restarting stopping].freeze
 
   broadcasts_refreshes
 
@@ -24,6 +27,10 @@ class Service < ApplicationRecord
 
   def related_server_actions
     ServerAction.where(server_id:).where("json_extract(payload, '$.dokku_service_id') = ?", dokku_id)
+  end
+
+  def temporary_status?
+    status.in?(TEMPORARY_STATUSES)
   end
 
   private
