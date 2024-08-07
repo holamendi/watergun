@@ -45,17 +45,9 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project.apps.kept.each do |app|
-      app.discard
-      ServerAction::DestroyApp.run_later!(app)
-    end
-
-    @project.services.kept.each do |service|
-      service.discard
-      ServerAction::DestroyService.run_later!(service)
-    end
-
-    @project.destroy
+    @project.discard
+    discard_apps
+    discard_services
 
     redirect_to projects_path, notice: "Project destroyed"
   end
@@ -68,5 +60,19 @@ class ProjectsController < ApplicationController
 
   def project_params
     params.require(:project).permit(:name)
+  end
+
+  def discard_apps
+    @project.apps.kept.each do |app|
+      app.discard
+      ServerAction::DestroyApp.run_later!(app)
+    end
+  end
+
+  def discard_services
+    @project.services.kept.each do |service|
+      service.discard
+      ServerAction::DestroyService.run_later!(service)
+    end
   end
 end

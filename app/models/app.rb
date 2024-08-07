@@ -18,6 +18,7 @@ class App < ApplicationRecord
   has_one :github_repo, dependent: :destroy
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
+
   str_enum :builder, [:herokuish, :dockerfile, :nixpacks], default: :herokuish
   str_enum :status, [:pending, :active, :deploying, :restarting, :scaling, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
@@ -55,7 +56,7 @@ class App < ApplicationRecord
     self.dokku_id = name.parameterize.dasherize
 
     while server.apps.kept.exists?(dokku_id:)
-      self.dokku_id = "#{dokku_id}-#{SecureRandom.hex(2)}"
+      self.dokku_id = "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
     end
   end
 end

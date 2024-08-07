@@ -13,16 +13,15 @@ module Projects
       end
 
       def update
-        current_app.log_streams.excluding(@log_stream).each do |log_stream|
-          StopLogStreamJob.perform_later(log_stream)
-        end
-
+        stop_active_log_streams
         StartLogStreamJob.perform_later(@log_stream)
         head :ok
       end
 
       def destroy
-        StopLogStreamJob.perform_now(@log_stream)
+        @log_stream.destroy
+        StopLogStreamJob.perform_now(@log_stream.server, @log_stream.uuid)
+
         head :no_content
       end
 
@@ -30,6 +29,13 @@ module Projects
 
       def set_log_stream
         @log_stream = current_app.log_streams.find(params[:id])
+      end
+
+      def stop_active_log_streams
+        current_app.log_streams.excluding(@log_stream).each do |log_stream|
+          log_stream.destroy
+          StopLogStreamJob.perform_later(log_stream.server, log_stream.uuid)
+        end
       end
     end
   end
