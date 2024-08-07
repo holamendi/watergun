@@ -1,5 +1,4 @@
 class Domain < ApplicationRecord
-  include Broadcast
   include Discard::Model
   include ServerActionable
 
