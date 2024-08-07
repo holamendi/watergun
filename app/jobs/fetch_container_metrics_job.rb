@@ -41,8 +41,6 @@ class FetchContainerMetricsJob < ApplicationJob
     container_stats.each do |stats|
       container = containarizable.containers.find_or_initialize_by(cid: stats.id)
 
-      # debugger
-
       Container.transaction do
         container.update!(metrics_attributes(stats).merge(name: stats.name, checked_at:))
         container.checks.create!(metrics_attributes(stats).merge(timestamp: checked_at))
