@@ -72,6 +72,12 @@ class ProjectsController < ApplicationController
   def discard_services
     @project.services.kept.each do |service|
       service.discard
+
+      service.service_links.kept.each do |service_link|
+        service_link.discard
+        ServerAction::UnlinkService.run_later!(service_link)
+      end
+
       ServerAction::DestroyService.run_later!(service)
     end
   end
