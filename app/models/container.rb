@@ -8,4 +8,8 @@ class Container < ApplicationRecord
   scope :checked_within, ->(from:, to: Time.current) { joins(:checks).where(container_checks: {timestamp: from..to}).distinct }
 
   str_enum :status, [:running, :stopped], default: :running
+
+  def self.stop_all
+    update_all(status: "stopped", stopped_at: Time.current)
+  end
 end

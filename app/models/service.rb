@@ -33,6 +33,10 @@ class Service < ApplicationRecord
     status.in?(TEMPORARY_STATUSES)
   end
 
+  def container_name
+    "dokku.#{service_type}.#{dokku_id}"
+  end
+
   private
 
   def set_default_name

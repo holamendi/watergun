@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_07_24_141020) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_07_151042) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -65,9 +65,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_24_141020) do
     t.datetime "timestamp", null: false
     t.float "cpu_percentage", null: false
     t.float "memory_percentage", null: false
-    t.string "memory_usage", null: false
-    t.string "block_io", null: false
-    t.string "network_io", null: false
+    t.integer "block_io_read_bytes"
+    t.integer "block_io_write_bytes"
+    t.integer "network_io_in_bytes"
+    t.integer "network_io_out_bytes"
+    t.integer "memory_used_bytes"
+    t.integer "memory_limit_bytes"
     t.index ["account_id"], name: "index_container_checks_on_account_id"
     t.index ["container_id"], name: "index_container_checks_on_container_id"
     t.index ["timestamp"], name: "index_container_checks_on_timestamp"
@@ -83,13 +86,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_24_141020) do
     t.string "name", null: false
     t.float "cpu_percentage", null: false
     t.float "memory_percentage", null: false
-    t.string "memory_usage", null: false
-    t.string "block_io", null: false
-    t.string "network_io", null: false
-    t.datetime "last_synced_at", null: false
+    t.datetime "checked_at", null: false
     t.datetime "stopped_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "block_io_read_bytes"
+    t.integer "block_io_write_bytes"
+    t.integer "network_io_in_bytes"
+    t.integer "network_io_out_bytes"
+    t.integer "memory_used_bytes"
+    t.integer "memory_limit_bytes"
     t.index ["account_id"], name: "index_containers_on_account_id"
     t.index ["cid"], name: "index_containers_on_cid"
     t.index ["containerizable_type", "containerizable_id"], name: "index_containers_on_containerizable"
