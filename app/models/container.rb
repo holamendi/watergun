@@ -9,6 +9,10 @@ class Container < ApplicationRecord
 
   str_enum :status, [:running, :stopped], default: :running
 
+  def dokku_process_type
+    name.split(".").second_to_last
+  end
+
   def self.stop_all
     update_all(status: "stopped", stopped_at: Time.current)
   end

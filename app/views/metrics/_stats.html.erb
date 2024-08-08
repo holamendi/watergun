@@ -2,16 +2,28 @@
   <div class="w-full mb-4 shadow stats stats-vertical lg:stats-horizontal">
     <div class="stat bg-base-100">
       <div class="stat-title">Running Containers</div>
-      <div class="stat-value"><%= running_containers_count %></div>
+      <div class="stat-value"><%= containers.size %></div>
+      <div class="stat-desc">
+        <% containers.map(&:dokku_process_type).tally.each do |process_type, count| %>
+          <span class="mt-4 badge badge-secondary"><%= process_type %>: <%= count %></span>
+        <% end %>
+      </div>
     </div>
     <div class="stat bg-base-100">
       <div class="stat-title">Total CPU Usage</div>
       <div class="stat-value"><%= total_cpu_usage %>%</div>
+      <span class="mt-4 badge badge-secondary">
+        Have nothing to write here
+      </span>
     </div>
     <div class="stat bg-base-100">
       <div class="stat-title">Total Memory Usage</div>
       <div class="stat-value"><%= memory_usage_percentage %>%</div>
-      <div class="stat-desc"><%= memory_usage_megabytes.to_s %> / <%= memory_usage_limit_megabytes.to_s %></div>
+      <div class="stat-desc">
+        <span class="mt-4 badge badge-secondary">
+          <%= memory_usage_megabytes.to_s %> / <%= memory_usage_limit_megabytes.to_s %>
+        </span>
+      </div>
     </div>
   </div>
 <% end %>

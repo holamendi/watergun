@@ -37,9 +37,9 @@ class FetchContainerMetricsJob < ApplicationJob
     end
   end
 
-  def save_metrics!(container_stats, containarizable, checked_at)
+  def save_metrics!(container_stats, containerizable, checked_at)
     container_stats.each do |stats|
-      container = containarizable.containers.find_or_initialize_by(cid: stats.id)
+      container = containerizable.containers.find_or_initialize_by(cid: stats.id)
 
       Container.transaction do
         container.update!(metrics_attributes(stats).merge(name: stats.name, checked_at:))

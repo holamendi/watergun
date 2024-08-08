@@ -3,7 +3,7 @@ module PolymorphicMetrics
 
   def stats
     render partial: "metrics/stats", locals: {
-      running_containers_count: containers.size,
+      containers:,
       total_cpu_usage: containers.sum(:cpu_percentage).round(2),
       memory_usage_percentage: containers.sum(:memory_percentage).round(2),
       memory_usage_megabytes: IECByteSize.new(containers.sum(:memory_used_bytes)),
@@ -36,11 +36,11 @@ module PolymorphicMetrics
 
   private
 
-  def containarizable
-    raise "implement in subclass"
+  def containerizable
+    raise "implement in class"
   end
 
   def containers
-    containarizable.containers.running
+    containerizable.containers.running
   end
 end

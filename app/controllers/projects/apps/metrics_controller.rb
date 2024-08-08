@@ -3,7 +3,7 @@ class Projects::Apps::MetricsController < Projects::Apps::BaseController
 
   private
 
-  def containarizable
+  def containerizable
     current_app
   end
 end

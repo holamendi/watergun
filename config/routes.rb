@@ -15,6 +15,18 @@ Rails.application.routes.draw do
   resource :first_run, only: %i[edit update]
   get "first-run/:signed_id", to: "first_runs#edit"
 
+  concern :log_streamable do
+    resources :log_streams, path: :logs, only: %i[index create show update destroy]
+  end
+
+  concern :metrizable do
+    resource :metrics, only: :show do
+      get :stats
+      get :cpu_chart
+      get :memory_chart
+    end
+  end
+
   resources :projects do
     scope module: :projects do
       resources :apps do
@@ -29,31 +41,19 @@ Rails.application.routes.draw do
           end
 
           resources :env_variables, path: :env
-          resource :env_configuration, path: :environment, only: %i[edit update]
           resource :github_repo
-          resources :log_streams, path: :logs, only: %i[index create show update destroy]
-
-          resource :metrics, only: :show do
-            get :stats
-            get :cpu_chart
-            get :memory_chart
-          end
-
           resources :restarts, only: :create
+
+          concerns :log_streamable
+          concerns :metrizable
         end
       end
 
       resources :services do
         scope module: :services do
           resources :restarts, only: :create
-
-          resource :metrics, only: :show do
-            get :stats
-            get :cpu_chart
-            get :memory_chart
-          end
-
-          resources :log_streams, path: :logs, only: %i[index create show update destroy]
+          concerns :log_streamable
+          concerns :metrizable
         end
       end
     end

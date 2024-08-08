@@ -3,7 +3,7 @@ class Projects::Services::MetricsController < Projects::Services::BaseController
 
   private
 
-  def containarizable
+  def containerizable
     current_service
   end
 end
