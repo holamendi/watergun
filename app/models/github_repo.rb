@@ -5,4 +5,8 @@ class GithubRepo < ApplicationRecord
   belongs_to :app
 
   validates :repo, :branch, presence: true
+
+  def web_url
+    "https://github.com/#{repo}/tree/#{branch}"
+  end
 end

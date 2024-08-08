@@ -29,4 +29,8 @@
   .btn {
     @apply font-normal;
   }
+
+  a.tab {
+    @apply text-sm font-normal;
+  }
 }

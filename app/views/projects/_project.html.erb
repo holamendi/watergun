@@ -1,5 +1,5 @@
 <%= link_to project, id: dom_id(project) do %>
-  <div class="p-9 bg-base-100 rounded-2xl outline-1 hover:outline hover:outline-primary">
+  <div class="h-full p-9 bg-base-100 rounded-2xl outline-1 hover:outline hover:outline-primary">
     <h2 class="pb-5 text-lg font-normal"><%= project.name %></h2>
     <div class="flex flex-col gap-2 mb-5 font-extralight">
       <p class="text-sm"><%= pluralize project.apps.kept.size, "app" %></p>

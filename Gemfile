@@ -28,6 +28,7 @@ end
 
 gem "activerecord-enhancedsqlite3-adapter"
 gem "alba"
+gem "bytesize"
 gem "chartkick"
 gem "discard"
 gem "dotenv"

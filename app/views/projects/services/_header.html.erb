@@ -1,7 +1,7 @@
-<div id="<%= dom_id(service, :header) %>">
+<div id="<%= dom_id(service, :header) %>" class="mb-12">
   <div class="flex justify-between pb-6">
     <div>
-      <h1 class="pb-2 text-3xl font-bold">
+      <h1 class="pb-2 text-3xl font-normal">
         <%= service.name %>
         <% if service.temporary_status? %>
           <span class="text-sm font-normal text-success">
@@ -10,14 +10,17 @@
           </span>
         <% end %>
       </h1>
+      <span class="text-sm font-extralight">
+        <%= service.service_type.titleize %> Database
+      </span>
     </div>
     <div class="flex gap-x-2">
       <%# actions %>
     </div>
   </div>
-  <div role="tablist" class="w-full pb-6 overflow-auto md:w-1/2 lg:overflow-hidden tabs tabs-lifted">
-    <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "metrics")), role: "tab" %>
-    <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "log_streams")), data: { turbo_prefetch: false}, role: "tab" %>
-    <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update]))), role: "tab"  %>
+  <div role="tablist" class="flex w-full mb-6 overflow-auto md:w-2/3 lg:overflow-hidden gap-x-4">
+    <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "metrics")) %>
+    <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "log_streams")), data: { turbo_prefetch: false} %>
+    <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "services" && action_name.in?(%w[edit update])))  %>
   </div>
 </div>

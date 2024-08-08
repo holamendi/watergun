@@ -4,82 +4,18 @@
   <% component.with_actions do %>
     <button class="w-32 btn btn-primary btn-outline" onclick="app_modal.showModal()">+ App</button>
     <button class="w-32 btn btn-primary btn-outline" onclick="service_modal.showModal()">+ Service</button>
-    <%= button_to "Delete", project_path(@project), method: :delete, class: "btn btn-error btn-outline", data: { turbo_confirm: "Sure?"} %>
   <% end %>
 <% end %>
 
-<div class="py-6">
-  <% if @apps.any? || @services.any? %>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Resource</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @apps.each do |app| %>
-          <tr>
-            <td><a href="<%= project_app_path(@project, app) %>" class="link"><%= app.name %></a></td>
-            <td>App</td>
-            <td>
-              <span class="badge <%= status_badge_class(app.status) %> badge-outline"><%= app.status %></span>
-            </td>
-            <td class="text-right">
-              <div class="dropdown dropdown-bottom dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                  </svg>
-                </div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                  <li>
-                    <%= link_to "Delete", project_app_path(@project, app), class: "text-red-500", data: { turbo_method: :delete, turbo_confirm: "Delete #{app.name}? "} %>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-        <% @services.each do |service| %>
-          <tr>
-            <td><a href="<%= project_service_path(@project, service) %>" class="link"><%= service.name %></a></td>
-            <td><%= service.service_type.titleize %> Database</td>
-            <td>
-              <span class="badge <%= status_badge_class(service.status) %> badge-outline"><%= service.status %></span>
-            </td>
-            <td class="text-right">
-              <div class="dropdown dropdown-bottom dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                  </svg>
-                </div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                  <li>
-                    <%= link_to "Delete", project_service_path(@project, service), class: "text-red-500", data: { turbo_method: :delete, turbo_confirm: "Delete #{service.name}? "} %>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% else %>
-    <div class="flex justify-center py-10">
-      <div>
-        <button class="text-lg font-normal link btn btn-ghost no-animation" onclick="app_modal.showModal()">Connect a Github Repo</button> or
-        <button class="text-lg font-normal link btn btn-ghost no-animation" onclick="service_modal.showModal()">Add a Database</button>
-      </div>
-    </div>
-  <% end %>
+<div id="<%= dom_id(@project) %>" class="grid grid-cols-1 gap-7 lg:grid-cols-3 xl:grid-cols-4">
+  <%= render partial: "projects/apps/app", collection: @apps, as: :app %>
+  <%= render partial: "projects/services/service", collection: @services, as: :service %>
 </div>
+
 <%= render "shared/modal", id: "app_modal", title: "Connect Github Repo" do %>
   <%= render "projects/apps/form", project: @project, app: @app %>
 <% end %>
+
 <%= render "shared/modal", id: "service_modal", title: "Add a Database" do %>
   <%= render "projects/services/form", project: @project, service: @service %>
 <% end %>

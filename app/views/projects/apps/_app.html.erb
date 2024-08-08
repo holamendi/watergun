@@ -1,0 +1,20 @@
+<%= link_to project_app_path(app.project, app), id: dom_id(app) do %>
+  <div class="h-full p-9 bg-base-100 rounded-2xl outline-1 hover:outline hover:outline-primary">
+    <h2 class="pb-1 text-lg font-normal"><%= app.name %></h2>
+    <h3 class="mb-8 text-sm font-extralight">App</h3>
+    <div>
+      <div class="flex items-center gap-2 text-sm uppercase font-space-grotesk">
+        <% if app.deployed? %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 stroke-green-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <span>
+            Deployed <%= time_ago_in_words(app.deployed_at) %> ago
+          </span>
+        <% else %>
+          Not deployed
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

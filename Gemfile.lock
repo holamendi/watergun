@@ -151,6 +151,7 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     builder (3.3.0)
+    bytesize (0.1.2)
     capybara (3.40.0)
       addressable
       matrix
@@ -429,6 +430,7 @@ DEPENDENCIES
   alba
   bcrypt (~> 3.1.7)
   bootsnap
+  bytesize
   capybara
   chartkick
   debug

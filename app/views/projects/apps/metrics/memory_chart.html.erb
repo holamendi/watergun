@@ -4,7 +4,7 @@
       RAM Usage
     </div>
     <div class="mb-6">
-      <%= line_chart @chart_data, id: "memory-chart" %>
+      <%= line_chart @chart_data, id: "memory-chart", suffix: "MiB", max: @max_memory_megabytes %>
     </div>
   </div>
 <% end %>
