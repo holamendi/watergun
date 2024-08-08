@@ -35,6 +35,6 @@
   }
 
   .table :where(thead tr, tbody tr:not(:last-child),tbody tr:first-child:last-child) {
-    @apply border-b border-b-neutral-300;
+    @apply border-b border-b-base-100;
   }
 }

@@ -1,4 +1,5 @@
 class Deployment < ApplicationRecord
+  include LogStreamable
   include ServerActionable
 
   belongs_to :account, default: -> { Current.account }

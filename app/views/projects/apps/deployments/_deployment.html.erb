@@ -20,9 +20,4 @@
   <td>
     <span class="badge <%= status_badge_class(deployment.status) %> badge-outline"><%= deployment.status %></span>
   </td>
-  <td>
-    <% if deployment.finished? %>
-      <%= link_to "logs", logs_project_app_deployment_path(deployment.app.project, deployment.app, deployment), class: "link", target: :_blank %>
-    <% end %>
-  </td>
 </tr>

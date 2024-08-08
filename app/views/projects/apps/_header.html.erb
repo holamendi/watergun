@@ -18,8 +18,7 @@
           </svg>
           <%= link_to app.github_repo.web_url, target: :_blank do %>
             <span class="text-sm font-extralight hover:link">
-              <%= app.github_repo.repo %>
-              <span class="text-sm text-neutral-500">#<%= app.github_repo.branch %></span>
+              <%= app.github_repo.repo %><span class="text-sm">#<%= app.github_repo.branch %></span>
             </span>
           <% end %>
         </div>

@@ -1,14 +1,11 @@
-<div data-controller="log-stream"
-     data-log-stream-url-value="<%= url %>"
-     data-log-stream-ping-interval-value="5000"></div>
 
 <div id="<%= dom_id(log_stream) %>"
-     class="px-2 py-1 overflow-auto text-xs text-gray-100 rounded-md bg-base-100 h-[calc(100vh-25rem)]"
-     data-controller="auto-scroll"
+     class="px-2 py-1 relative overflow-auto text-xs text-gray-100 rounded-md bg-base-100 h-[calc(100vh-25rem)]"
+     data-controller="log-stream"
+     data-log-stream-url-value="<%= url %>"
+     data-log-stream-ping-interval-value="5000"
      data-turbo-temporary>
-
-  <div id="<%= dom_id(log_stream, :overlay) %>">
-    <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50"></div>
+  <div data-log-stream-target="overlay">
     <div class="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full">
       <div class="text-2xl font-space-grotesk">
         Initializing stream <span class="loading loading-spinner loading-sm"></span>

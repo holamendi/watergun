@@ -6,7 +6,6 @@ class StartLogStreamJob < ApplicationJob
 
     log_stream.server.ssh_session do |ssh|
       log_stream.touch(:streaming_at)
-      remove_overlay(log_stream)
 
       ssh.execute(log_command(log_stream), save_output: false) do |_stream, data|
         broadcast_log(log_stream, data)
@@ -15,10 +14,6 @@ class StartLogStreamJob < ApplicationJob
   end
 
   private
-
-  def remove_overlay(log_stream)
-    Turbo::StreamsChannel.broadcast_remove_to(log_stream, target: dom_id(log_stream, :overlay))
-  end
 
   def broadcast_log(log_stream, data)
     Turbo::StreamsChannel.broadcast_append_to(

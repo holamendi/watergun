@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
+  static targets = ["overlay"];
+
   static values = {
     url: String,
     pingInterval: {
@@ -13,6 +15,26 @@ export default class extends Controller {
     this.crsfToken = document
       .querySelector("meta[name='csrf-token']")
       .getAttribute("content");
+
+    this.scrollObserver = new MutationObserver(() => {
+      this.scrollToBottom()
+    })
+
+    this.scrollObserver.observe(this.element, {
+      childList: true,
+      subtree: true
+    })
+
+    this.overlayObserver = new MutationObserver(() => {
+      this.overlayTarget.remove()
+      this.overlayObserver.disconnect()
+    })
+
+    this.overlayObserver.observe(this.element, {
+      childList: true,
+      subtree: true
+    })
+
     this.startLogStream();
     this.startPing();
   }
@@ -20,13 +42,19 @@ export default class extends Controller {
   disconnect() {
     this.stopLogStream();
     this.stopPing();
+
+    if (this.scrollObserver) {
+      this.scrollObserver.disconnect();
+    }
+
+    if (this.overlayObserver) {
+      this.overlayObserver.disconnect();
+    }
   }
 
   startLogStream() {
     fetch(this.urlValue, {
-      method: "PATCH",
-      headers: this.requestHeaders(),
-      body: JSON.stringify({}),
+      method: "PATCH", headers: this.requestHeaders(), body: JSON.stringify({})
     });
   }
 
@@ -46,6 +74,10 @@ export default class extends Controller {
 
   stopPing() {
     clearInterval(this.ping);
+  }
+
+  scrollToBottom() {
+    this.element.scrollTop = this.element.scrollHeight
   }
 
   requestHeaders() {
