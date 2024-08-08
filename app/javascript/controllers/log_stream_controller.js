@@ -12,29 +12,10 @@ export default class extends Controller {
   };
 
   connect() {
-    this.crsfToken = document
-      .querySelector("meta[name='csrf-token']")
-      .getAttribute("content");
+    this.crsfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 
-    this.scrollObserver = new MutationObserver(() => {
-      this.scrollToBottom()
-    })
-
-    this.scrollObserver.observe(this.element, {
-      childList: true,
-      subtree: true
-    })
-
-    this.overlayObserver = new MutationObserver(() => {
-      this.overlayTarget.remove()
-      this.overlayObserver.disconnect()
-    })
-
-    this.overlayObserver.observe(this.element, {
-      childList: true,
-      subtree: true
-    })
-
+    this.observeAutoScroll();
+    this.observeOverlay();
     this.startLogStream();
     this.startPing();
   }
@@ -42,14 +23,8 @@ export default class extends Controller {
   disconnect() {
     this.stopLogStream();
     this.stopPing();
-
-    if (this.scrollObserver) {
-      this.scrollObserver.disconnect();
-    }
-
-    if (this.overlayObserver) {
-      this.overlayObserver.disconnect();
-    }
+    this.disconectAutoScroll();
+    this.disconectOverlay();
   }
 
   startLogStream() {
@@ -76,8 +51,39 @@ export default class extends Controller {
     clearInterval(this.ping);
   }
 
-  scrollToBottom() {
-    this.element.scrollTop = this.element.scrollHeight
+  observeAutoScroll() {
+    this.scrollObserver = new MutationObserver(() => {
+      this.element.scrollTop = this.element.scrollHeight
+    })
+
+    this.scrollObserver.observe(this.element, {
+      childList: true,
+      subtree: true
+    })
+  }
+
+  disconectAutoScroll() {
+    if (this.scrollObserver) {
+      this.scrollObserver.disconnect();
+    }
+  }
+
+  observeOverlay() {
+    this.overlayObserver = new MutationObserver(() => {
+      this.overlayTarget.remove()
+      this.overlayObserver.disconnect()
+    })
+
+    this.overlayObserver.observe(this.element, {
+      childList: true,
+      subtree: true
+    })
+  }
+
+  disconectOverlay() {
+    if (this.overlayObserver) {
+      this.overlayObserver.disconnect();
+    }
   }
 
   requestHeaders() {
