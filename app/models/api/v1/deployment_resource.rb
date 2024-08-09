@@ -1,4 +1,4 @@
-class Api::V1::DeploymentResource < ApplicationResource
+class Api::V1::DeploymentResource < Api::ApplicationResource
   root_key :deployment, :deployments
 
   attributes :id,
