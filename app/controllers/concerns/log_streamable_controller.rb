@@ -1,4 +1,4 @@
-module PolymorphicLogStreams
+module LogStreamableController
   extend ActiveSupport::Concern
 
   included do

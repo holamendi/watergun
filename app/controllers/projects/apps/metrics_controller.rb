@@ -1,5 +1,5 @@
 class Projects::Apps::MetricsController < Projects::Apps::BaseController
-  include PolymorphicMetrics
+  include MetrizableController
 
   private
 

@@ -1,4 +1,4 @@
-module PolymorphicMetrics
+module MetrizableController
   extend ActiveSupport::Concern
 
   def stats

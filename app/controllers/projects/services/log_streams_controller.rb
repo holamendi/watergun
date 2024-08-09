@@ -1,5 +1,5 @@
 class Projects::Services::LogStreamsController < Projects::Services::BaseController
-  include PolymorphicLogStreams
+  include LogStreamableController
 
   private
 
