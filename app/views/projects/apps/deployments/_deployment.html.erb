@@ -1,7 +1,7 @@
 <tr id="<%= dom_id(deployment) %>">
   <td><%= deployment.id %></td>
   <td>
-    <div class="tooltip" data-tip="<%= deployment.commit_message %> (<%= deployment.author_login %>)">
+    <div class="tooltip tooltip-secondary" data-tip="<%= deployment.commit_message %> (<%= deployment.author_login %>)">
       <%= link_to deployment.short_sha, deployment.commit_html_url, target: :_blank, class: "link"  %>
     </div>
   </td>

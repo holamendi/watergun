@@ -11,7 +11,7 @@ class Account < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :users, through: :memberships
 
-  has_one :github_access_token, dependent: :destroy
+  has_one :github_integration, class_name: "Github::Integration", dependent: :destroy
 
   validates :name, presence: true
 end

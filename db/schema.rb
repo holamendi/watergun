@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_07_151042) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -173,12 +173,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_07_151042) do
     t.index ["discarded_at"], name: "index_env_variables_on_discarded_at"
   end
 
-  create_table "github_access_tokens", force: :cascade do |t|
+  create_table "github_integrations", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.string "token", null: false
+    t.string "personal_access_token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_github_access_tokens_on_account_id"
+    t.index ["account_id"], name: "index_github_integrations_on_account_id"
   end
 
   create_table "github_repos", force: :cascade do |t|
@@ -370,7 +370,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_07_151042) do
   add_foreign_key "domains", "apps"
   add_foreign_key "env_variables", "accounts"
   add_foreign_key "env_variables", "apps"
-  add_foreign_key "github_access_tokens", "accounts"
+  add_foreign_key "github_integrations", "accounts"
   add_foreign_key "github_repos", "accounts"
   add_foreign_key "github_repos", "apps"
   add_foreign_key "log_streams", "accounts"

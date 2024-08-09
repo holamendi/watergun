@@ -30,7 +30,7 @@ class ServerAction::DeployApp < ServerAction
     sync_git_repo!
     rebuild_dokku_app!
     schedule_enable_ssl!
-  rescue Ssh::CommandExecutionError
+  rescue
     deployment.error!
     raise
   else
@@ -50,13 +50,13 @@ class ServerAction::DeployApp < ServerAction
   end
 
   def authenticate_github_account!
-    return unless github_access_token
+    return unless github_personal_access_token
 
-    Dokku::Git::Auth.call!(ssh, access_token: github_access_token.token)
+    Dokku::Git::Auth.call!(ssh, access_token: github_personal_access_token)
   end
 
-  def github_access_token
-    account.github_access_token
+  def github_personal_access_token
+    account.github_integration&.personal_access_token
   end
 
   def schedule_enable_ssl!

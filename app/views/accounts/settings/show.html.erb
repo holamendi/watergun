@@ -15,8 +15,8 @@
     <div class="my-10 divider"></div>
     <div class="settings-section">
       <h2>Github Integration</h2>
-      <%= turbo_frame_tag :github_settings do %>
-        <%= render "accounts/github_access_tokens/settings", github_access_token: current_account.github_access_token || current_account.build_github_access_token %>
+      <%= turbo_frame_tag :github_integration_settings do %>
+        <%= render "accounts/github_integrations/settings", github_integration: current_account.github_integration || current_account.build_github_integration %>
       <% end %>
     </div>
   </div>
