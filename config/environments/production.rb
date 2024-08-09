@@ -90,4 +90,9 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  #
+  config.action_mailer.default_url_options = {host: ENV["DEFAULT_URL"], protocol: "https"}
+  config.action_controller.default_url_options = {host: ENV["DEFAULT_URL"], protocol: "https"}
 end
+
+Rails.application.routes.default_url_options = {host: ENV["DEFAULT_URL"], protocol: "https"}

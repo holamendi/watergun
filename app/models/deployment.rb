@@ -5,6 +5,8 @@ class Deployment < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
   belongs_to :user, default: -> { Current.user }
+  belongs_to :github_event, class_name: "Github::Event", optional: true
+
   has_one :server_action, as: :actionable, dependent: :destroy
 
   store_attribute :data, :author_login, :string
@@ -15,7 +17,7 @@ class Deployment < ApplicationRecord
   store_attribute :data, :commit_html_url, :string
 
   str_enum :status, [:pending, :deploying, :success, :error], default: :pending
-  str_enum :source, [:web, :api_v1]
+  str_enum :source, [:web, :api_v1, :github_webhook]
 
   attribute :source, :string, default: -> { Current.source }
 

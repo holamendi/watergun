@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_09_155017) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -134,8 +134,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
     t.json "data", default: {}
     t.integer "user_id"
     t.string "source"
+    t.integer "github_event_id"
     t.index ["account_id"], name: "index_deployments_on_account_id"
     t.index ["app_id"], name: "index_deployments_on_app_id"
+    t.index ["github_event_id"], name: "index_deployments_on_github_event_id"
     t.index ["status"], name: "index_deployments_on_status"
     t.index ["user_id"], name: "index_deployments_on_user_id"
   end
@@ -173,6 +175,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
     t.index ["discarded_at"], name: "index_env_variables_on_discarded_at"
   end
 
+  create_table "github_events", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "github_hook_id", null: false
+    t.json "headers"
+    t.json "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_github_events_on_account_id"
+    t.index ["github_hook_id"], name: "index_github_events_on_github_hook_id"
+  end
+
+  create_table "github_hooks", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "github_repo_id", null: false
+    t.string "token", null: false
+    t.string "secret", null: false
+    t.json "events", null: false
+    t.integer "github_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_github_hooks_on_account_id"
+    t.index ["github_repo_id"], name: "index_github_hooks_on_github_repo_id"
+    t.index ["token"], name: "index_github_hooks_on_token", unique: true
+  end
+
   create_table "github_integrations", force: :cascade do |t|
     t.integer "account_id", null: false
     t.string "personal_access_token", null: false
@@ -189,6 +216,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
     t.boolean "private", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "webhook_deploy", default: false
     t.index ["account_id"], name: "index_github_repos_on_account_id"
     t.index ["app_id", "repo"], name: "index_github_repos_on_app_id_and_repo", unique: true
     t.index ["app_id"], name: "index_github_repos_on_app_id"
@@ -365,11 +393,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_09_072302) do
   add_foreign_key "databases", "servers"
   add_foreign_key "deployments", "accounts"
   add_foreign_key "deployments", "apps"
+  add_foreign_key "deployments", "github_events"
   add_foreign_key "deployments", "users"
   add_foreign_key "domains", "accounts"
   add_foreign_key "domains", "apps"
   add_foreign_key "env_variables", "accounts"
   add_foreign_key "env_variables", "apps"
+  add_foreign_key "github_events", "accounts"
+  add_foreign_key "github_events", "github_hooks"
+  add_foreign_key "github_hooks", "accounts"
+  add_foreign_key "github_hooks", "github_repos"
   add_foreign_key "github_integrations", "accounts"
   add_foreign_key "github_repos", "accounts"
   add_foreign_key "github_repos", "apps"

@@ -15,6 +15,8 @@ Rails.application.routes.draw do
   resource :first_run, only: %i[edit update]
   get "first-run/:signed_id", to: "first_runs#edit"
 
+  resources :hooks
+
   concern :log_streamable do
     resources :log_streams, path: :logs, only: %i[index create show update destroy]
   end
@@ -70,6 +72,11 @@ Rails.application.routes.draw do
       resources :api_tokens, path: "api-tokens", only: %i[index create destroy]
       resource :github_integrations, only: %i[create destroy]
     end
+  end
+
+  # Github events
+  namespace :github do
+    post "events/:token", to: "events#create"
   end
 
   # API

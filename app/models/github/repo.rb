@@ -2,6 +2,8 @@ class Github::Repo < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
   belongs_to :app
 
+  scope :kept, -> { joins(:app).merge(App.kept) }
+
   validates :repo, :branch, presence: true
   validate :validate_remote_repo_exists, :validate_remote_branch_exists
 

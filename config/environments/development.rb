@@ -74,4 +74,12 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.hosts = nil
+
+  # for local tunneling
+  config.action_controller.forgery_protection_origin_check = false
+
+  config.action_mailer.default_url_options = {host: "localhost:3000"}
+  config.action_controller.default_url_options = {host: "localhost:3000"}
 end
+
+Rails.application.routes.default_url_options = {host: "localhost:3000"}
