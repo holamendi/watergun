@@ -4,13 +4,13 @@ class Github::EventsController < ApplicationController
 
   def create
     @github_integration = Github::Integration.find_by!(token: params[:token])
-    create_and_process_event! if valid_signature?
+    create_and_process_event! if valid_request?
     head :ok
   end
 
   private
 
-  def valid_signature?
+  def valid_request?
     signature = "sha256=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @github_integration.webhook_secret, request.body.read)
     Rack::Utils.secure_compare(signature, request.headers["HTTP_X_HUB_SIGNATURE_256"])
   end

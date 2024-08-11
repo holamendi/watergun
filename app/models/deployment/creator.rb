@@ -1,6 +1,7 @@
 class Deployment::Creator
   include ActiveModel::Model
   include ActiveModel::Attributes
+  include Memery
 
   attribute :app
   attribute :commit_sha
@@ -26,16 +27,12 @@ class Deployment::Creator
 
   private
 
-  def remote_commit
+  memoize def remote_commit
     if commit_sha.present?
       github_api_client.commit(app.github_repo.repo, commit_sha)
     else
       github_api_client.branch(app.github_repo.repo, app.github_repo.branch).commit
     end
-  end
-
-  def remote_repo
-    @remote_repo ||= github_api_client.repo(app.github_repo.repo)
   end
 
   def github_api_client
