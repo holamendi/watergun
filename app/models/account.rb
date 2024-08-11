@@ -3,6 +3,7 @@ class Account < ApplicationRecord
   has_many :apps, dependent: :destroy
   has_many :deployments, dependent: :destroy
   has_many :domains, dependent: :destroy
+  has_many :github_repos, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :servers, dependent: :destroy

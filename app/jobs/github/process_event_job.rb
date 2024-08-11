@@ -4,14 +4,19 @@ class Github::ProcessEventJob < ApplicationJob
   def perform(github_event)
     return unless github_event.push_event?
 
-    github_repo = github_event.github_repo
-    return unless github_repo.webhook_deploy? && github_repo.branch == github_event.push_branch
+    account = github_event.account
+    github_repos = account.github_repos.kept.where(
+      repo: github_event.payload["repository"]["full_name"],
+      branch: github_event.push_branch,
+      webhook_deploy: true
+    )
 
-    app = github_repo.app
     commit_sha = github_event.payload["after"]
 
-    Current.set(account: app.account, server: app.server) do
-      Deployment::Creator.new(app:, commit_sha:).create!
+    github_repos.each do |github_repo|
+      Current.set(account:, server: github_repo.app.server) do
+        Deployment::Creator.new(app: github_repo.app, commit_sha:).create!
+      end
     end
   end
 end
