@@ -74,6 +74,7 @@ if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
   exit 1
 fi
 
+# set up letsencrypt
 dokku letsencrypt:set --global email "$EMAIL"
 dokku letsencrypt:cron-job --add
 
@@ -103,7 +104,7 @@ dokku apps:create "$DOKKU_APP"
 dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
 
 # set env vars
-dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64) LITESTACK_DATA_PATH=storage --no-restart
+dokku config:set "$DOKKU_APP" RAILS_ENV=production DEFAULT_URL="$DOMAIN" SECRET_KEY_BASE=$(openssl rand -hex 64) LITESTACK_DATA_PATH=storage --no-restart
 
 # mount persistent storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false

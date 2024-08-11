@@ -1,5 +1,5 @@
 class Github::Integration < ApplicationRecord
-  REQUIRED_SCOPES = %w[repo admin:repo_hook].freeze
+  REQUIRED_SCOPES = %w[repo admin:org_hook].freeze
 
   belongs_to :account, default: -> { Current.account }
 
