@@ -69,6 +69,8 @@ class ServerAction::DeployApp < ServerAction
   end
 
   def notify_user
+    return unless user
+
     message, type = if deployment.success?
       ["#{app.name}: deployment finished", :success]
     else
