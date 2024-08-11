@@ -1,8 +1,6 @@
 class Github::Event < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
-  belongs_to :github_hook, class_name: "Github::Hook", inverse_of: :github_events
-
-  delegate :github_repo, to: :github_hook
+  belongs_to :github_integration, class_name: "Github::Integration", inverse_of: :github_events
 
   def event
     headers["HTTP_X_GITHUB_EVENT"]

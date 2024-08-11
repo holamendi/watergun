@@ -2,6 +2,7 @@ class Github::Integration < ApplicationRecord
   has_secure_token :token
 
   belongs_to :account, default: -> { Current.account }
+  has_many :github_events, class_name: "Github::Event", foreign_key: :github_integration_id
 
   store_attribute :data, :app_id, :integer
   store_attribute :data, :app_slug, :string

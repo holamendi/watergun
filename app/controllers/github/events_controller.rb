@@ -11,7 +11,7 @@ class Github::EventsController < ApplicationController
   private
 
   def valid_signature?
-    signature = "sha256=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @github_integration.secret, request.body.read)
+    signature = "sha256=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @github_integration.webhook_secret, request.body.read)
     Rack::Utils.secure_compare(signature, request.headers["HTTP_X_HUB_SIGNATURE_256"])
   end
 
