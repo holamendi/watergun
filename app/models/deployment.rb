@@ -4,7 +4,7 @@ class Deployment < ApplicationRecord
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
-  belongs_to :user, default: -> { Current.user }
+  belongs_to :user, default: -> { Current.user }, optional: true
   belongs_to :github_event, class_name: "Github::Event", optional: true
 
   has_one :server_action, as: :actionable, dependent: :destroy
