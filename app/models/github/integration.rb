@@ -35,7 +35,8 @@ class Github::Integration < ApplicationRecord
   end
 
   def access_token
-    access_token_expired? ? refresh_access_token! : super
+    refresh_access_token! if access_token_expired?
+    super
   end
 
   def api_client
