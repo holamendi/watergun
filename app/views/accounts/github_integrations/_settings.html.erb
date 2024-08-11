@@ -1,7 +1,7 @@
 <%= turbo_frame_tag :github_integration_settings do %>
   <% if github_integration.app_registered? %>
     <% if github_integration.app_installed? %>
-      installed
+      <%= button_to "Uninstall Github App", github_installation_path, method: :delete, class: "btn btn-error rounded-full" %>
     <% else %>
       <%= link_to "Install Github App", "#{github_integration.app_url}/installations/new", class: "btn btn-primary rounded-full" %>
     <% end%>

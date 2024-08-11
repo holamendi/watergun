@@ -3,8 +3,6 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  get "settings" => "sandbox#index"
-
   root "projects#index"
 
   get "login" => "sessions#new", :as => :login
@@ -69,15 +67,20 @@ Rails.application.routes.draw do
   resource :account, controller: "accounts/settings" do
     scope module: :accounts do
       resource :profile, only: :update
-      resources :api_tokens, path: "api-tokens", only: %i[index create destroy]
+      resources :api_tokens, only: %i[index create destroy]
       resource :github_integrations, only: %i[create destroy]
     end
   end
 
   # Github events
   namespace :github do
-    get "registrations/callback", to: "registrations#callback", as: :registrations_callback
-    get "installations/callback", to: "installations#callback", as: :installations_callback
+    resource :installation, only: %i[destroy] do
+      get :callback, on: :collection
+    end
+
+    resource :registration, only: [] do
+      get :callback, on: :collection
+    end
 
     post ":token/events", to: "events#create", as: :events
   end

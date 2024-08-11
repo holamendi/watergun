@@ -7,6 +7,7 @@ class Deployment::Creator
   attribute :commit_sha
 
   validates :app, presence: true
+  validate :validate_commit_sha, if: -> { commit_sha.present? }
 
   def create!
     validate!
@@ -36,6 +37,10 @@ class Deployment::Creator
   end
 
   def github_api_client
-    Current.account.github_integration.api_client
+    app.github_integration.api_client
+  end
+
+  def validate_commit_sha
+    errors.add(:commit_sha, "does not exist") unless remote_commit.present?
   end
 end

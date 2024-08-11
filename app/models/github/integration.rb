@@ -43,6 +43,10 @@ class Github::Integration < ApplicationRecord
     Octokit::Client.new(access_token:)
   end
 
+  def app_api_client
+    Octokit::Client.new(bearer_token: jwt)
+  end
+
   def refresh_access_token!
     token = Octokit::Client.new(bearer_token: jwt).create_app_installation_access_token(installation_id)
     update!(access_token: token.token, access_token_expires_at: Time.at(token.expires_at))
@@ -58,8 +62,8 @@ class Github::Integration < ApplicationRecord
       description: "Yup",
       url: Rails.application.routes.url_helpers.root_url,
       public: false,
-      redirect_url: Rails.application.routes.url_helpers.github_registrations_callback_url,
-      setup_url: Rails.application.routes.url_helpers.github_installations_callback_url,
+      redirect_url: Rails.application.routes.url_helpers.callback_github_registration_url,
+      setup_url: Rails.application.routes.url_helpers.callback_github_installation_url,
       default_permissions: {
         checks: "read",
         contents: "read"

@@ -31,6 +31,8 @@ class App < ApplicationRecord
 
   before_create :set_dokku_id
 
+  delegate :github_integration, to: :account
+
   def related_server_actions
     ServerAction.where("json_extract(payload, '$.dokku_app_id') = ?", dokku_id)
   end
