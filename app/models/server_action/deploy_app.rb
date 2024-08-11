@@ -50,13 +50,11 @@ class ServerAction::DeployApp < ServerAction
   end
 
   def authenticate_github_account!
-    return unless github_personal_access_token
-
-    Dokku::Git::Auth.call!(ssh, access_token: github_personal_access_token)
+    Dokku::Git::Auth.call!(ssh, access_token: github_access_token)
   end
 
-  def github_personal_access_token
-    account.github_integration&.personal_access_token
+  def github_access_token
+    account.github_integration.access_token
   end
 
   def schedule_enable_ssl!

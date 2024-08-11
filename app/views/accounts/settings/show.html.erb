@@ -16,7 +16,7 @@
     <div class="settings-section">
       <h2>Github Integration</h2>
       <%= turbo_frame_tag :github_integration_settings do %>
-        <%= render "accounts/github_integrations/settings", github_integration: current_account.github_integration || current_account.build_github_integration %>
+        <%= render "accounts/github_integrations/settings", github_integration: current_account.github_integration %>
       <% end %>
     </div>
   </div>

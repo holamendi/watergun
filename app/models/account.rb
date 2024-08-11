@@ -14,4 +14,6 @@ class Account < ApplicationRecord
   has_one :github_integration, class_name: "Github::Integration", dependent: :destroy
 
   validates :name, presence: true
+
+  after_create :create_github_integration!
 end

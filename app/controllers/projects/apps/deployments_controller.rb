@@ -1,27 +1,9 @@
 class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   def create
-    commit = if params[:sha].present?
-      github_repo.remote_commit(params[:sha])
-    else
-      github_repo.remote_branch.commit
-    end
-
-    if commit.present?
-      deployment = current_app.deployments.create!(
-        sha: commit.sha,
-        author_login: commit.author.login,
-        author_url: commit.author.html_url,
-        author_avatar_url: commit.author.avatar_url,
-        author_date: commit.commit.author.date,
-        commit_message: commit.commit.message,
-        commit_html_url: commit.html_url
-      )
-      ServerAction::DeployApp.run_later!(deployment)
-      render turbo_stream: notify("#{current_app.name}: deployment scheduled")
-    else
-      flash.now[:alert] = deployment.errors.full_messages.to_sentence
-      render :new, status: :unprocessable_entity
-    end
+    Deployment::Creator.new(app: current_app, commit_sha: params[:sha]).create!
+    render turbo_stream: notify("#{current_app.name}: deployment scheduled")
+  rescue ActiveRecord::RecordInvalid
+    render turbo_stream: notify("Invalid deployment parameters")
   end
 
   def logs

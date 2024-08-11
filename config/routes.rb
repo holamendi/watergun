@@ -76,7 +76,10 @@ Rails.application.routes.draw do
 
   # Github events
   namespace :github do
-    post "events/:token", to: "events#create"
+    get "registrations/callback", to: "registrations#callback", as: :registrations_callback
+    get "installations/callback", to: "installations#callback", as: :installations_callback
+
+    post ":token/events", to: "events#create", as: :events
   end
 
   # API

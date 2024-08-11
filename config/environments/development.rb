@@ -78,8 +78,8 @@ Rails.application.configure do
   # for local tunneling
   config.action_controller.forgery_protection_origin_check = false
 
-  config.action_mailer.default_url_options = {host: "localhost:3000"}
-  config.action_controller.default_url_options = {host: "localhost:3000"}
+  config.action_mailer.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
+  config.action_controller.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
 end
 
-Rails.application.routes.default_url_options = {host: "localhost:3000"}
+Rails.application.routes.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}

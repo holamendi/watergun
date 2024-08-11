@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_09_155017) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_11_130642) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -202,10 +202,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_09_155017) do
 
   create_table "github_integrations", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.string "personal_access_token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "github_installation_id"
+    t.json "data"
+    t.string "token"
     t.index ["account_id"], name: "index_github_integrations_on_account_id"
+    t.index ["token"], name: "index_github_integrations_on_token", unique: true
   end
 
   create_table "github_repos", force: :cascade do |t|

@@ -3,7 +3,7 @@ class Github::EventsController < ApplicationController
   skip_before_action :authenticate!
 
   def create
-    @hook = Github::Hook.find_by!(token: params[:token])
+    @github_integration = Github::Integration.find_by!(token: params[:token])
     create_and_process_event! if valid_signature?
     head :ok
   end
@@ -11,13 +11,13 @@ class Github::EventsController < ApplicationController
   private
 
   def valid_signature?
-    signature = "sha256=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @hook.secret, request.body.read)
+    signature = "sha256=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @github_integration.secret, request.body.read)
     Rack::Utils.secure_compare(signature, request.headers["HTTP_X_HUB_SIGNATURE_256"])
   end
 
   def create_and_process_event!
-    event = @hook.github_events.create!(
-      account: @hook.account,
+    event = @github_integration.github_events.create!(
+      account: @github_integration.account,
       headers: request.headers.to_h.slice(
         "HTTP_X_GITHUB_HOOK_ID",
         "HTTP_X_GITHUB_EVENT",

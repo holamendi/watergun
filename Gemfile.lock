@@ -207,6 +207,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.7.2)
+    jwt (2.8.2)
+      base64
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
     logger (1.6.0)
@@ -440,6 +442,7 @@ DEPENDENCIES
   groupdate
   honeybadger
   httpx
+  jwt
   litestack!
   lograge
   memery
