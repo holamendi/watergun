@@ -22,8 +22,8 @@ class Github::EventsController < ApplicationController
         "HTTP_X_GITHUB_HOOK_ID",
         "HTTP_X_GITHUB_EVENT",
         "HTTP_X_GITHUB_DELIVERY",
-        "HTTP_X_GITHUB_INSTALLATION_TARGET_ID",
-        "HTTP_X_GITHUB_INSTALLATION_TARGET_TYPE"
+        "HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_ID",
+        "HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_TYPE"
       ),
       payload: JSON.parse(request.body.read)
     )

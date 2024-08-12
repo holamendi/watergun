@@ -4,15 +4,19 @@ class Github::Integration < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
   has_many :github_events, class_name: "Github::Event", foreign_key: :github_integration_id
 
+  # app attributes
   store_attribute :data, :app_id, :integer
   store_attribute :data, :app_slug, :string
   store_attribute :data, :app_url, :string
   store_attribute :data, :client_id, :string
   store_attribute :data, :pem, :string
   store_attribute :data, :webhook_secret, :string
-  store_attribute :data, :installation_id, :integer
   store_attribute :data, :permissions, :json
   store_attribute :data, :events, :json
+
+  # installation attributes
+  store_attribute :data, :installation_id, :integer
+  store_attribute :data, :installation_account_login, :string
   store_attribute :data, :access_token, :string
   store_attribute :data, :access_token_expires_at, :datetime
 
@@ -24,7 +28,23 @@ class Github::Integration < ApplicationRecord
     installation_id.present?
   end
 
-  def jwt
+  def install!(installation_id:, account_login:)
+    update!(installation_id:, installation_account_login: account_login)
+  end
+
+  def uninstall!
+    update!(installation_id: nil, installation_account_login: nil, access_token: nil, access_token_expires_at: nil)
+  end
+
+  def api_client
+    Octokit::Client.new(access_token:)
+  end
+
+  def app_api_client
+    Octokit::Client.new(bearer_token: app_api_bearer_token)
+  end
+
+  def app_api_bearer_token
     payload = {
       iat: Time.now.to_i - 60,
       exp: Time.now.to_i + (10 * 60),
@@ -39,16 +59,8 @@ class Github::Integration < ApplicationRecord
     super
   end
 
-  def api_client
-    Octokit::Client.new(access_token:)
-  end
-
-  def app_api_client
-    Octokit::Client.new(bearer_token: jwt)
-  end
-
   def refresh_access_token!
-    token = Octokit::Client.new(bearer_token: jwt).create_app_installation_access_token(installation_id)
+    token = app_api_client.create_app_installation_access_token(installation_id)
     update!(access_token: token.token, access_token_expires_at: Time.at(token.expires_at))
   end
 

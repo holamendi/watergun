@@ -1,7 +1,7 @@
 class Github::InstallationsController < ApplicationController
   def callback
-    installation = github_integration.app_api_client.installation(params[:installation_id])
-    github_integration.update!(installation_id: installation.id)
+    installation = app_api_client.installation(params[:installation_id])
+    github_integration.install!(installation_id: installation.id, account_login: installation.account.login)
     redirect_to account_path, notice: "Github App installed"
   rescue Octokit::NotFound
     flash[:error] = "Invalid installation id"
@@ -9,8 +9,8 @@ class Github::InstallationsController < ApplicationController
   end
 
   def destroy
-    github_integration.app_api_client.delete_installation(github_integration.installation_id)
-    github_integration.update!(installation_id: nil)
+    app_api_client.delete_installation(github_integration.installation_id)
+    github_integration.uninstall!
     redirect_to account_path, notice: "Github App uninstalled"
   end
 
@@ -18,5 +18,9 @@ class Github::InstallationsController < ApplicationController
 
   def github_integration
     current_account.github_integration
+  end
+
+  def app_api_client
+    github_integration.app_api_client
   end
 end
