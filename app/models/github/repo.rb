@@ -5,9 +5,10 @@ class Github::Repo < ApplicationRecord
   scope :kept, -> { joins(:app).merge(App.kept) }
 
   validates :repo, :branch, presence: true
-  validate :validate_remote_repo_exists, :validate_remote_branch_exists
+  validate :validate_remote_repo_exists, if: :repo_changed?
+  validate :validate_remote_branch_exists, if: :branch_changed?
 
-  before_save { self.private = remote_repo.private? }
+  before_create { self.private = remote_repo.private? }
 
   delegate :github_integration, to: :account
 

@@ -1,58 +1,39 @@
-module Projects
-  module Apps
-    class GithubReposController < BaseController
-      def new
-        @github_repo = current_app.build_github_repo
-      end
+class Projects::Apps::GithubReposController < Projects::Apps::BaseController
+  before_action :set_github_repo, only: %i[edit update]
 
-      def create
-        @github_repo = current_app.build_github_repo(github_repo_params)
+  def new
+    @github_repo = current_app.build_github_repo
+  end
 
-        if params[:github_access_token].present?
-          @github_access_token = current_account.build_github_access_token(token: params[:github_access_token])
+  def create
+  end
 
-          unless @github_access_token.save
-            flash.now[:alert] = @github_access_token.errors.full_messages.to_sentence
-            return render :new, status: :unprocessable_entity
-          end
-        end
+  def edit
+  end
 
-        if @github_repo.save
-          render turbo_stream: notify("App source updated successfully.")
-        else
-          turbo_stream_errors
-        end
-      end
-
-      def edit
-        @github_repo = current_app.github_repo
-      end
-
-      def update
-        @github_repo = current_app.github_repo
-
-        if @github_repo.update(github_repo_params)
-          render turbo_stream: notify("App source updated successfully.")
-        else
-          turbo_stream_errors
-        end
-      end
-
-      private
-
-      def github_repo_params
-        params.require(:github_repo).permit(:repo, :branch)
-      end
-
-      def turbo_stream_errors
-        render turbo_stream: turbo_stream.replace(
-          "github_repo_form",
-          partial: "projects/apps/github_repos/form",
-          locals: {
-            github_repo: @github_repo
-          }
-        )
-      end
+  def update
+    if @github_repo.update(update_github_repo_params)
+      render turbo_stream: notify("Settings updated")
+    else
+      render turbo_stream: render_form, status: :unprocessable_entity
     end
+  end
+
+  private
+
+  def set_github_repo
+    @github_repo = current_app.github_repo
+  end
+
+  def update_github_repo_params
+    params.require(:github_repo).permit(:webhook_deploy)
+  end
+
+  def render_form
+    turbo_stream.replace(
+      "github_repo_form",
+      partial: "projects/apps/github_repos/form",
+      locals: {github_repo: @github_repo}
+    )
   end
 end

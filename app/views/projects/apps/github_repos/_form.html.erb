@@ -10,5 +10,12 @@
         <%= form.text_field :branch, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none", readonly: true, disabled: true %>
       </label>
     </div>
+    <label class="form-control">
+      <div class="pl-0 label"><span class="label-text">Deploy on push</span></div>
+      <%= form.check_box :webhook_deploy, class: "checkbox" %>
+    </label>
+    <div>
+      <%= button_tag "Save", type: "submit", class: "px-6 text-sm font-normal text-white rounded-full btn-primary btn inline-block flex-none" %>
+    </div>
   </div>
 <% end %>
