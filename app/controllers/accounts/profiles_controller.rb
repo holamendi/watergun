@@ -3,7 +3,7 @@ module Accounts
     def update
       if current_user.update(user_params)
         render turbo_stream: [
-          notify("Profile updated"),
+          notify("Setting saved"),
           render_form
         ]
       else
