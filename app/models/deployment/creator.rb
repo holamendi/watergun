@@ -34,6 +34,8 @@ class Deployment::Creator
     else
       github_api_client.branch(app.github_repo.repo, app.github_repo.branch).commit
     end
+  rescue Octokit::UnprocessableEntity
+    nil
   end
 
   def github_api_client
