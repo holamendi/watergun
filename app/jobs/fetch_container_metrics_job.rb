@@ -1,6 +1,8 @@
 class FetchContainerMetricsJob < ApplicationJob
   queue_as :default
 
+  retry_on Errno::ECONNRESET, Net::SSH::Disconnect, wait: 1.second, attempts: 3
+
   def perform
     Server.all.each { |server| sync_containers(server) }
   end
@@ -18,8 +20,6 @@ class FetchContainerMetricsJob < ApplicationJob
       end
 
       checked_at = Time.current
-
-      # TODO: I forgot why I added this line
       stats.uniq!
 
       server.apps.kept.each do |app|
