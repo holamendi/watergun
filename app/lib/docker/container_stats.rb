@@ -8,7 +8,7 @@ class Docker::ContainerStats
     @block_io_bytes = parse_size_string(json["block_io"])
     @cpu_perc = json["cpu_perc"].to_f.round(2)
     @mem_perc = json["mem_perc"].to_f.round(2)
-    @mem_usage = json["mem_usage"].to_f.round(2)
+    @mem_usage = json["mem_usage"]
     @mem_usage_bytes = parse_size_string(json["mem_usage"])
     @id = json["id"]
     @name = json["name"]

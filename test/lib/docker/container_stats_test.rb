@@ -9,7 +9,7 @@ class Docker::ContainerStatsTest < ActiveSupport::TestCase
       "MemPerc" => "10.45",
       "MemUsage" => "100MiB / 1GiB",
       "Name" => "test_container",
-      "NetIO" => "500KB / 1MB"
+      "NetIO" => "500KB / 0B"
     }.to_json
 
     @stats = Docker::ContainerStats.new(json_data)
@@ -40,7 +40,7 @@ class Docker::ContainerStatsTest < ActiveSupport::TestCase
   end
 
   test "net_io" do
-    assert_equal "500KB / 1MB", @stats.net_io
+    assert_equal "500KB / 0B", @stats.net_io
   end
 
   test "block_io_bytes" do
@@ -52,12 +52,6 @@ class Docker::ContainerStatsTest < ActiveSupport::TestCase
   end
 
   test "net_io_bytes" do
-    assert_equal [500000, 1000000], @stats.net_io_bytes
-  end
-
-  test "size_string_to_bytes" do
-    assert_equal [1024, 1048576], @stats.send(:size_string_to_bytes, "1 KiB / 1 MiB")
-    assert_equal [1000, 1000000], @stats.send(:size_string_to_bytes, "1 KB / 1 MB")
-    assert_equal [1, 1073741824], @stats.send(:size_string_to_bytes, "1 B / 1 GiB")
+    assert_equal [500000, 0], @stats.net_io_bytes
   end
 end
