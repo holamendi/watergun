@@ -23,7 +23,7 @@ module MetrizableController
   end
 
   def memory_chart
-    max_memory_megabytes = IECByteSize.bytes(containers.checked_within(from: 1.hour.ago).maximum(:memory_limit_bytes)).to_mib.round(2)
+    memory_limit_bytes = containers.checked_within(from: 1.hour.ago).maximum(:memory_limit_bytes) || 0
     data = containers.checked_within(from: 1.hour.ago).map do |container|
       {
         name: container.name,
@@ -31,7 +31,7 @@ module MetrizableController
       }
     end
 
-    render partial: "metrics/memory_chart", locals: {data:, max_memory_megabytes:}
+    render partial: "metrics/memory_chart", locals: {data:, max: IECByteSize.bytes(memory_limit_bytes).to_mib.round(2)}
   end
 
   private
@@ -41,6 +41,6 @@ module MetrizableController
   end
 
   def containers
-    containerizable.containers.running
+    containerizable.containers
   end
 end
