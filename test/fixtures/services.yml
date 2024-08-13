@@ -1,0 +1,20 @@
+postgres:
+  account: watergun
+  server: x86
+  project: calendar
+  name: Postgres Database
+  service_type: postgres
+
+redis:
+  account: watergun
+  server: x86
+  project: calendar
+  name: Redis Database
+  service_type: redis
+
+mongo:
+  account: watergun
+  server: x86
+  project: calendar
+  name: Mongo Database
+  service_type: mongo

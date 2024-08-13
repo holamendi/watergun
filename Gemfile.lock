@@ -155,6 +155,9 @@ GEM
     chartkick (5.0.7)
     concurrent-ruby (1.3.3)
     connection_pool (2.4.1)
+    crack (1.0.0)
+      bigdecimal
+      rexml
     crass (1.0.6)
     date (3.3.4)
     debug (1.9.2)
@@ -183,6 +186,7 @@ GEM
       activesupport (>= 6.1)
     groupdate (6.4.0)
       activesupport (>= 6.1)
+    hashdiff (1.1.1)
     honeybadger (5.14.0)
     http-2 (1.0.0)
     httpx (1.3.0)
@@ -380,6 +384,7 @@ GEM
     unicode-display_width (2.5.0)
     uri (0.13.0)
     useragent (0.16.10)
+    vcr (6.2.0)
     view_component (3.13.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
@@ -396,6 +401,10 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
+    webmock (3.23.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.8.1)
     websocket (1.2.11)
     websocket-driver (0.7.6)
@@ -456,9 +465,11 @@ DEPENDENCIES
   turbo-rails
   turbo_power
   tzinfo-data
+  vcr
   view_component
   vite_rails
   web-console
+  webmock
   yabeda-honeybadger_insights
 
 RUBY VERSION

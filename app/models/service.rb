@@ -20,7 +20,7 @@ class Service < ApplicationRecord
   str_enum :status, [:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
   str_enum :service_type, [:postgres, :redis, :mongo], validate: true
 
-  validates :name, presence: true, uniqueness: {scope: :server_id, conditions: -> { undiscarded }}
+  validates :name, presence: true
 
   before_validation :set_default_name, on: :create
   before_create :set_dokku_id
@@ -53,7 +53,7 @@ class Service < ApplicationRecord
   def set_dokku_id
     self.dokku_id = name.parameterize
 
-    while server.apps.kept.exists?(dokku_id:)
+    while server.services.kept.exists?(dokku_id:)
       self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
     end
   end

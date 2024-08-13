@@ -22,11 +22,7 @@ class App < ApplicationRecord
   str_enum :builder, [:herokuish, :dockerfile, :nixpacks], default: :herokuish
   str_enum :status, [:pending, :active, :deploying, :restarting, :scaling, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
 
-  validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
-
   scope :deployed, -> { where.not(deployed_at: nil) }
-
-  accepts_nested_attributes_for :github_repo
 
   before_create :set_dokku_id
 

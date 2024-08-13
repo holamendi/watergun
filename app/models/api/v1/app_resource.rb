@@ -7,6 +7,6 @@ class Api::V1::AppResource < Api::ApplicationResource
     :created_at,
     :updated_at
 
-  one :github_repo, resource: GithubRepoResource
-  one :deployment, resource: DeploymentResource
+  one :github_repo, resource: Api::V1::GithubRepoResource
+  one :deployment, resource: Api::V1::DeploymentResource
 end

@@ -1,0 +1,11 @@
+x86:
+  name: vps
+  account: watergun
+  public_ip: 127.0.0.1
+  cpu_type: x86_64
+
+arm:
+  name: raspberry
+  account: watergun
+  public_ip: 127.0.0.1
+  cpu_type: arm64

@@ -23,6 +23,8 @@ end
 group :test do
   gem "mocha"
   gem "selenium-webdriver"
+  gem "vcr"
+  gem "webmock"
 end
 
 gem "activerecord-enhancedsqlite3-adapter"

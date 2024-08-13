@@ -20,12 +20,11 @@ class App::Creator
   def create
     return false unless valid?
 
-    Current.set(account: project.account, server: project.server) do
-      self.app = project.apps.create!(name: app_name, github_repo_attributes: {repo:, branch:, webhook_deploy:, private: remote_repo.private?})
-
+    ApplicationRecord.transaction do
+      self.app = project.apps.create!(name: app_name)
+      app.create_github_repo!(repo:, branch:, webhook_deploy:, private: remote_repo.private?)
       ServerAction::CreateApp.run_later!(app)
     end
-
     true
   end
 

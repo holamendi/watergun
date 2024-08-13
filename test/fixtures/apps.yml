@@ -1,0 +1,6 @@
+calendar:
+  account: watergun
+  project: calendar
+  server: x86
+  name: Calendar
+  dokku_id: calendar
