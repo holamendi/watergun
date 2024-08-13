@@ -19,7 +19,7 @@ class StartLogStreamJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_append_to(
       log_stream,
       target: dom_id(log_stream),
-      partial: "log_streams/log",
+      partial: "shared/log_streams/log",
       locals: {log: data}
     )
   end
