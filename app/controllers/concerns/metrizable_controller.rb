@@ -3,11 +3,11 @@ module MetrizableController
 
   def stats
     render partial: "metrics/stats", locals: {
-      containers:,
-      total_cpu_usage: containers.sum(:cpu_percentage).round(2),
-      memory_usage_percentage: containers.sum(:memory_percentage).round(2),
-      memory_usage_megabytes: IECByteSize.new(containers.sum(:memory_used_bytes)),
-      memory_usage_limit_megabytes: IECByteSize.bytes(containers.last.memory_limit_bytes)
+      containers: running_containers,
+      total_cpu_usage: running_containers.sum(:cpu_percentage).round(2),
+      memory_usage_percentage: running_containers.sum(:memory_percentage).round(2),
+      memory_usage_megabytes: IECByteSize.new(running_containers.sum(:memory_used_bytes)),
+      memory_usage_limit_megabytes: IECByteSize.bytes(running_containers.last.memory_limit_bytes)
     }
   end
 
@@ -42,5 +42,9 @@ module MetrizableController
 
   def containers
     containerizable.containers
+  end
+
+  def running_containers
+    containers.running
   end
 end
