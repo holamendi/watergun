@@ -12,9 +12,6 @@
   <%= render partial: "projects/services/service", collection: @services, as: :service %>
 </div>
 
-<%= render "shared/modal", id: "app_modal", title: "Connect Github Repo" do %>
-  <%= render "projects/apps/form", project: @project, app: @app %>
-<% end %>
 
 <%= render "shared/modal", id: "service_modal", title: "Add a Database" do %>
   <%= render "projects/services/form", project: @project, service: @service %>

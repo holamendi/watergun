@@ -6,8 +6,6 @@ class ProjectsController < ApplicationController
 
   def show
     @project = current_account.projects.kept.find(params[:id])
-    @app = App.new
-    @app.build_github_repo
     @apps = @project.apps.kept
     @services = @project.services.kept
     @service = Service.new
