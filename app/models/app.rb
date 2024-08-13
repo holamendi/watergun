@@ -1,5 +1,4 @@
 class App < ApplicationRecord
-  include Broadcast
   include Discard::Model
   include Containerizable
   include LogStreamable
@@ -30,6 +29,10 @@ class App < ApplicationRecord
   accepts_nested_attributes_for :github_repo
 
   before_create :set_dokku_id
+
+  after_update_commit do
+    broadcast_replace_later_to self, target: dom_id(self, :header), partial: "projects/apps/header", locals: {app: self}
+  end
 
   delegate :github_integration, to: :account
 

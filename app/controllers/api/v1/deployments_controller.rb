@@ -4,7 +4,7 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   def index
     deployments = current_account.deployments.kept
     deployments = deployments.where(app_id: params[:app_id]) if params[:app_id].present?
-    render json: DeploymentResource.new(deployments)
+    render json: Api::V1::DeploymentResource.new(deployments)
   end
 
   def show
@@ -15,12 +15,12 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
       current_account.deployments.kept.find(params[:id])
     end
 
-    render json: DeploymentResource.new(deployment)
+    render json: Api::V1::DeploymentResource.new(deployment)
   end
 
   def create
-    deployment = Deployment::Creator.new(app: current_app, commit_sha: params[:sha]).create!
-    render json: DeploymentResource.new(deployment), status: :created
+    deployment = Deployment::Creator.new(app: @app, commit_sha: params[:sha]).create!
+    render json: Api::V1::DeploymentResource.new(deployment), status: :created
   rescue ActiveModel::ValidationError => e
     render json: {errors: e.model.errors.messages}, status: :unprocessable_entity
   end

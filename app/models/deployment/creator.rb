@@ -5,6 +5,7 @@ class Deployment::Creator
 
   attribute :app
   attribute :commit_sha
+  attribute :github_event
 
   validates :app, presence: true
   validate :validate_commit_sha, if: -> { commit_sha.present? }
@@ -19,7 +20,8 @@ class Deployment::Creator
       author_avatar_url: remote_commit.author.avatar_url,
       author_date: remote_commit.commit.author.date,
       commit_message: remote_commit.commit.message,
-      commit_html_url: remote_commit.html_url
+      commit_html_url: remote_commit.html_url,
+      github_event:
     )
 
     ServerAction::DeployApp.run_later!(deployment)

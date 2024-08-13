@@ -1,9 +1,5 @@
-module Api
-  module V1
-    class GithubRepoResource < ApplicationResource
-      attributes :repo,
-        :branch,
-        :private
-    end
-  end
+class Api::V1::GithubRepoResource < Api::ApplicationResource
+  attributes :repo,
+    :branch,
+    :private
 end

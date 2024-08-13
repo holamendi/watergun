@@ -74,7 +74,7 @@ Rails.application.routes.draw do
 
   # Github events
   namespace :github do
-    resource :installation, only: %i[destroy] do
+    resource :installation, only: %i[create destroy] do
       get :callback, on: :collection
     end
 

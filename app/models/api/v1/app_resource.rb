@@ -1,16 +1,12 @@
-module Api
-  module V1
-    class AppResource < ApplicationResource
-      root_key :app, :apps
+class Api::V1::AppResource < Api::ApplicationResource
+  root_key :app, :apps
 
-      attributes :id,
-        :name,
-        :dokku_id,
-        :created_at,
-        :updated_at
+  attributes :id,
+    :name,
+    :dokku_id,
+    :created_at,
+    :updated_at
 
-      one :github_repo, resource: GithubRepoResource
-      one :deployment, resource: DeploymentResource
-    end
-  end
+  one :github_repo, resource: GithubRepoResource
+  one :deployment, resource: DeploymentResource
 end

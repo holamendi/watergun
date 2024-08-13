@@ -1,19 +1,17 @@
-<%= turbo_frame_tag :github_integration_settings do %>
-  <% if github_integration.app_registered? %>
-    <% if github_integration.app_installed? %>
-      <div class="flex flex-col gap-5">
-        <span class="font-space-grotesk">Connected to <%= github_integration.installation_account_login %></span>
-        <%= button_to "Disconnect", github_installation_path, method: :delete, class: "btn btn-error rounded-full" %>
-      </div>
-
-    <% else %>
-      <%= link_to "Connect Github account", "#{github_integration.app_url}/installations/new", class: "btn btn-primary rounded-full" %>
-    <% end%>
+<% if github_integration.app_registered? %>
+  <% if github_integration.app_installed? %>
+    <div class="flex flex-col gap-5">
+      <span class="font-space-grotesk">Connected to <%= github_integration.installation_account_login %></span>
+      <%= button_to "Disconnect", github_installation_path, method: :delete, class: "btn btn-error rounded-full" %>
+    </div>
 
   <% else %>
-    <%= form_with url: "https://github.com/settings/apps/new", method: :post do |form| %>
-      <%= form.hidden_field :manifest, value: github_integration.app_manifest.to_json %>
-      <%= form.submit "Create Github App", class: "btn btn-primary rounded-full" %>
-    <% end %>
+    <%= button_to "Connect Github account", github_installation_path, class: "btn btn-primary rounded-full", data: { turbo: false } %>
+  <% end%>
+
+<% else %>
+  <%= form_with url: "https://github.com/settings/apps/new", method: :post do |form| %>
+    <%= form.hidden_field :manifest, value: github_integration.app_manifest.to_json %>
+    <%= form.submit "Create Github App", class: "btn btn-primary rounded-full" %>
   <% end %>
 <% end %>

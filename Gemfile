@@ -21,7 +21,6 @@ group :development do
 end
 
 group :test do
-  gem "capybara"
   gem "mocha"
   gem "selenium-webdriver"
 end
@@ -51,6 +50,7 @@ gem "store_attribute"
 gem "store_model"
 gem "str_enum"
 gem "turbo-rails"
+gem "turbo_power"
 gem "vite_rails"
 gem "view_component"
 gem "yabeda-honeybadger_insights"

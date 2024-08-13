@@ -2,7 +2,7 @@
 
 <%= render PageHeaderComponent.new(title: @project.name) do |component| %>
   <% component.with_actions do %>
-    <button class="w-32 btn btn-primary btn-outline" onclick="app_modal.showModal()">+ App</button>
+    <%= link_to "+ App", new_project_app_path(@project), class: "btn btn-primary btn-outline" %>
     <button class="w-32 btn btn-primary btn-outline" onclick="service_modal.showModal()">+ Service</button>
   <% end %>
 <% end %>

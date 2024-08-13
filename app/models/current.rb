@@ -3,6 +3,7 @@ class Current < ActiveSupport::CurrentAttributes
     :app,
     :membership,
     :account,
+    :github_integration,
     :project,
     :server,
     :service,
@@ -24,6 +25,7 @@ class Current < ActiveSupport::CurrentAttributes
     self.membership = user.memberships.first
     self.account = membership.account
     self.server = account.servers.first
+    self.github_integration = account.github_integration
   end
 
   def api_token=(api_token)

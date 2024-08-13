@@ -2,4 +2,4 @@
 <%= turbo_stream_from @log_stream %>
 
 <%= render "projects/services/header", service: current_service %>
-<%= render "log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(current_project, current_service, @log_stream) %>
+<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(current_project, current_service, @log_stream) %>

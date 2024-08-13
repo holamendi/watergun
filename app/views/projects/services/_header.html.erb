@@ -1,4 +1,4 @@
-<div id="<%= dom_id(service, :header) %>" class="mb-12">
+<div id="<%= dom_id(service, :header) %>">
   <div class="flex justify-between pb-6">
     <div>
       <h1 class="pb-2 text-3xl font-normal">
@@ -18,9 +18,10 @@
       <%# actions %>
     </div>
   </div>
-  <div role="tablist" class="flex w-full mb-6 overflow-auto md:w-2/3 lg:overflow-hidden gap-x-2">
-    <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "metrics")) %>
-    <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "log_streams")), data: { turbo_prefetch: false} %>
-    <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "services" && action_name.in?(%w[edit update])))  %>
-  </div>
+</div>
+
+<div role="tablist" class="flex w-full mb-12 overflow-auto md:w-2/3 lg:overflow-hidden gap-x-2">
+  <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "metrics")) %>
+  <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "log_streams")), data: { turbo_prefetch: false} %>
+  <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "services" && action_name.in?(%w[edit update])))  %>
 </div>

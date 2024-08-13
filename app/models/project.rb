@@ -11,8 +11,7 @@ class Project < ApplicationRecord
 
   broadcasts_refreshes
 
-  broadcasts_to ->(project) { [project.account, :projects] },
-    inserts_by: :prepend
+  broadcasts_to ->(project) { [project.account, :projects] }, inserts_by: :prepend
 
   def last_deployment
     deployments.success.last
