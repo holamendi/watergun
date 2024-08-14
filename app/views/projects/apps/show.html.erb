@@ -7,6 +7,7 @@
 <% end %>
 
 <%= render "header", app: @app %>
+<%= render "tabs", app: @app %>
 
 <% if @app.github_repo.present? %>
   <table class="table pt-4">

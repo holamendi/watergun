@@ -1,5 +1,6 @@
 <%= turbo_stream_from @service %>
 <%= render "header", service: @service %>
+<%= render "tabs", service: @service %>
 <div class="settings-section">
   <h2>Danger Zone</h2>
   <%= button_to "Delete Service", project_service_path(current_project, @service), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
