@@ -15,10 +15,7 @@
 
 // Example: Load Rails libraries in Vite.
 //
-import * as Turbo from '@hotwired/turbo'
-import TurboPower from 'turbo_power'
-
-TurboPower.initialize(Turbo.StreamActions)
+import '@hotwired/turbo-rails'
 //
 // import ActiveStorage from '@rails/activestorage'
 // ActiveStorage.start()
