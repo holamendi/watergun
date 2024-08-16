@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :accounts, through: :memberships
+  has_many :projects, through: :accounts
   has_many :sessions, dependent: :destroy
 
   normalizes :email, with: ->(email) { email.strip.downcase }
@@ -11,5 +12,9 @@ class User < ApplicationRecord
 
   def notify_later(message, type: :notice)
     Notification.stream_later_to(self, message, type:)
+  end
+
+  def visit_project!(project)
+    update!(last_visited_project_id: project.id)
   end
 end

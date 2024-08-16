@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_16_064018) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_16_154602) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -366,7 +366,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_16_064018) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
+    t.integer "last_visited_project_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["last_visited_project_id"], name: "index_users_on_last_visited_project_id"
   end
 
   add_foreign_key "api_tokens", "accounts"
@@ -417,4 +419,5 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_16_064018) do
   add_foreign_key "sessions", "users"
   add_foreign_key "ssh_keys", "accounts"
   add_foreign_key "ssh_keys", "servers"
+  add_foreign_key "users", "projects", column: "last_visited_project_id"
 end

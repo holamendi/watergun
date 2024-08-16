@@ -12,8 +12,9 @@ export default class extends Controller {
   };
 
   connect() {
-    this.crsfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-
+    this.crsfToken = document
+      .querySelector("meta[name='csrf-token']")
+      .getAttribute("content");
     this.observeAutoScroll();
     this.observeOverlay();
     this.startLogStream();
@@ -21,10 +22,10 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.stopLogStream();
-    this.stopPing();
     this.disconectAutoScroll();
     this.disconectOverlay();
+    this.stopPing();
+    this.stopLogStream();
   }
 
   startLogStream() {

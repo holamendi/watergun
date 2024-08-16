@@ -5,10 +5,10 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @project = Current.account.projects.kept.find(params[:id])
     @apps = @project.apps.kept
     @services = @project.services.kept
     @service = Service.new
+    Current.user.visit_project!(@project)
   end
 
   def new
