@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    Current.session&.destroy
+    Session.find_by_active_token(cookies.signed[:session_token])&.destroy
     cookies.delete(:session_token)
     redirect_to login_path, notice: "Logged out", status: :see_other
   end
@@ -31,9 +31,5 @@ class SessionsController < ApplicationController
 
   def session_params
     params.require(:session).permit(:email, :password)
-  end
-
-  def Current.session
-    Session.find_by_active_token(cookies.signed[:session_token])
   end
 end
