@@ -1,10 +1,5 @@
 <%= turbo_stream_from @app %>
-<%= turbo_stream_from @app, :deployments %>
-
-<% content_for :breadcrumb do %>
-  <span class="pl-2 select-none">/</span>
-  <span><%= @app.name %></span>
-<% end %>
+<%= turbo_stream_from @app, :deployments %>>
 
 <%= render "header", app: @app %>
 <%= render "tabs", app: @app %>
@@ -13,8 +8,7 @@
   <table class="table pt-4">
     <thead>
       <tr class="text-white uppercase font-space-grotesk">
-        <th>ID</th>
-        <th>SHA</th>
+        <th>Commit</th>
         <th>Finished</th>
         <th>Duration</th>
         <th>Status</th>
