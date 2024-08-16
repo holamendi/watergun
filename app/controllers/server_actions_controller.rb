@@ -1,14 +1,14 @@
 class ServerActionsController < ApplicationController
   def index
-    @server_actions = current_server.actions.recent.includes(:user).limit(200)
+    @server_actions = Current.server.actions.recent.includes(:user).limit(200)
   end
 
   def update
-    @server_action = current_server.actions.find(params[:id])
+    @server_action = Current.server.actions.find(params[:id])
   end
 
   def logs
-    @server_action = current_server.actions.find(params[:id])
+    @server_action = Current.server.actions.find(params[:id])
     render plain: @server_action.log.to_s
   end
 end

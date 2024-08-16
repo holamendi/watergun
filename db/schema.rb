@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_12_141004) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_16_064018) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -43,7 +43,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_12_141004) do
     t.integer "project_id"
     t.boolean "pending_restart", default: false, null: false
     t.string "builder"
+    t.string "deploy_token"
     t.index ["account_id"], name: "index_apps_on_account_id"
+    t.index ["deploy_token"], name: "index_apps_on_deploy_token", unique: true
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
     t.index ["project_id"], name: "index_apps_on_project_id"
     t.index ["server_id"], name: "index_apps_on_server_id"

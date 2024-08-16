@@ -4,6 +4,8 @@ class App < ApplicationRecord
   include LogStreamable
   include ServerActionable
 
+  has_secure_token :deploy_token, length: 32
+
   TEMPORARY_STATUSES = %w[deploying restarting scaling stopping].freeze
 
   belongs_to :account, default: -> { Current.account }
@@ -12,10 +14,13 @@ class App < ApplicationRecord
 
   has_many :domains, dependent: :delete_all
   has_one :default_domain, -> { default }, class_name: "Domain"
+
   has_many :deployments, dependent: :delete_all
   has_one :deployment, -> { success.recent }
+
   has_many :env_variables, dependent: :destroy
   has_one :github_repo, class_name: "Github::Repo", dependent: :destroy
+
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 

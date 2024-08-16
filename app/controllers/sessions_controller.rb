@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   layout "sessions"
 
   def new
-    redirect_to root_path if current_session
+    redirect_to root_path if Current.session
 
     @session = Session.new
   end
@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    current_session&.destroy
+    Current.session&.destroy
     cookies.delete(:session_token)
     redirect_to login_path, notice: "Logged out", status: :see_other
   end
@@ -33,7 +33,7 @@ class SessionsController < ApplicationController
     params.require(:session).permit(:email, :password)
   end
 
-  def current_session
+  def Current.session
     Session.find_by_active_token(cookies.signed[:session_token])
   end
 end
