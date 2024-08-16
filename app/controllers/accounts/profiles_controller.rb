@@ -1,7 +1,7 @@
 module Accounts
   class ProfilesController < ApplicationController
     def update
-      if current_user.update(user_params)
+      if Current.user.update(user_params)
         render turbo_stream: [
           notify("Setting saved"),
           render_form
@@ -18,7 +18,7 @@ module Accounts
     end
 
     def render_form
-      turbo_stream.replace("profile_form", partial: "accounts/profiles/form", locals: {user: current_user})
+      turbo_stream.replace("profile_form", partial: "accounts/profiles/form", locals: {user: Current.user})
     end
   end
 end

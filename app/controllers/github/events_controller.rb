@@ -1,6 +1,6 @@
 class Github::EventsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  skip_before_action :authenticate!
+  skip_before_action :authenticate
 
   def create
     @github_integration = Github::Integration.find_by!(token: params[:token])

@@ -32,5 +32,5 @@
 
 <div class="settings-section">
   <h2>Danger Zone</h2>
-  <%= button_to "Delete App", project_app_path(current_project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
+  <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
 </div>

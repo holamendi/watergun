@@ -4,7 +4,6 @@ class App::CreatorTest < ActiveSupport::TestCase
   setup do
     Current.account = accounts(:watergun)
     Current.server = servers(:x86)
-    Current.github_integration = github_integrations(:watergun)
 
     @creator = App::Creator.new(
       project: projects(:calendar),

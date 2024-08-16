@@ -1,4 +1,4 @@
-<%= turbo_stream_from current_user, :toasts %>
+<%= turbo_stream_from Current.user, :toasts %>
 
 <div id="toasts" class="toast">
   <% flash.each do |type, message| %>

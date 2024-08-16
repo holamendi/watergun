@@ -1,7 +1,7 @@
-<%= turbo_stream_from current_app %>
+<%= turbo_stream_from @app %>
 <%= turbo_stream_from @log_stream %>
 
-<%= render "projects/apps/header", app: current_app %>
-<%= render "projects/apps/tabs", app: current_app %>
-<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_app_log_stream_path(current_project, current_app, @log_stream) %>
+<%= render "projects/apps/header", app: @app %>
+<%= render "projects/apps/tabs", app: @app %>
+<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_app_log_stream_path(@project, @app, @log_stream) %>
 

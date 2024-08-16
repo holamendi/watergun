@@ -4,7 +4,7 @@ module Accounts
     end
 
     def create
-      @api_token = current_account.api_tokens.create(api_token_params)
+      @api_token = Current.account.api_tokens.create(api_token_params)
 
       if @api_token.save
         redirect_to account_settings_path, notice: "API token created successfully"
@@ -21,7 +21,7 @@ module Accounts
     end
 
     def destroy
-      @api_token = current_account.api_tokens.find(params[:id])
+      @api_token = Current.account.api_tokens.find(params[:id])
       @api_token.destroy
       redirect_to account_settings_path, notice: "API token deleted successfully"
     end

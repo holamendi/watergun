@@ -4,6 +4,6 @@ class Projects::Apps::MetricsController < Projects::Apps::BaseController
   private
 
   def containerizable
-    current_app
+    @app
   end
 end

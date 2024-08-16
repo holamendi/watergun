@@ -1,6 +1,6 @@
-<%= turbo_stream_from current_service %>
+<%= turbo_stream_from @service %>
 <%= turbo_stream_from @log_stream %>
 
-<%= render "projects/services/header", service: current_service %>
-<%= render "projects/services/tabs", service: current_service %>
-<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(current_project, current_service, @log_stream) %>
+<%= render "projects/services/header", service: @service %>
+<%= render "projects/services/tabs", service: @service %>
+<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(@project, @service, @log_stream) %>

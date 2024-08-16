@@ -12,7 +12,7 @@ module Api
         Current.api_token
       end
 
-      def current_account
+      def Current.account
         Current.account
       end
 

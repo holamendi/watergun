@@ -22,7 +22,7 @@ class Github::InstallationsController < ApplicationController
   private
 
   def github_integration
-    current_account.github_integration
+    Current.account.github_integration
   end
 
   def app_api_client

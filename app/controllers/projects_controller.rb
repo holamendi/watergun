@@ -5,18 +5,18 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @project = current_account.projects.kept.find(params[:id])
+    @project = Current.account.projects.kept.find(params[:id])
     @apps = @project.apps.kept
     @services = @project.services.kept
     @service = Service.new
   end
 
   def new
-    @project = current_account.projects.new
+    @project = Current.account.projects.new
   end
 
   def create
-    @project = current_account.projects.new(project_params)
+    @project = Current.account.projects.new(project_params)
 
     if @project.save
       redirect_to @project, notice: "Project was successfully created."
@@ -53,7 +53,7 @@ class ProjectsController < ApplicationController
   private
 
   def set_project
-    @project = current_account.projects.kept.find(params[:id])
+    @project = Current.account.projects.kept.find(params[:id])
   end
 
   def project_params

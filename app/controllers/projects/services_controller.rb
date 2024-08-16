@@ -3,25 +3,25 @@ module Projects
     before_action :set_service, only: [:show, :edit, :update, :destroy]
 
     def create
-      @service = current_project.services.new(service_params)
+      @service = @project.services.new(service_params)
 
       if @service.save
         ServerAction::CreateService.run_later!(@service)
 
         if params[:link_to_apps].present?
-          current_project.apps.kept.each do |app|
+          @project.apps.kept.each do |app|
             link = @service.service_links.create!(app:)
             ServerAction::LinkService.run_later!(link)
           end
         end
 
-        redirect_to current_project, notice: "Service created successfully."
+        redirect_to @project, notice: "Service created successfully."
       else
         render turbo_stream: turbo_stream.replace(
           "service_form",
           partial: "projects/services/form",
           locals: {
-            project: current_project,
+            project: @project,
             service: @service
           }
         )
@@ -36,7 +36,7 @@ module Projects
 
     def update
       if @service.update(service_params)
-        redirect_to project_service_path(current_project, @service), notice: "Service updated successfully."
+        redirect_to project_service_path(@project, @service), notice: "Service updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -50,13 +50,13 @@ module Projects
         ServerAction::DestroyService.run_later!(@service)
       end
 
-      redirect_to current_project, notice: "Service scheduled for deletion"
+      redirect_to @project, notice: "Service scheduled for deletion"
     end
 
     private
 
     def set_service
-      @service = current_project.services.kept.find(params[:id])
+      @service = @project.services.kept.find(params[:id])
     end
 
     def service_params

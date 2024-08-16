@@ -31,7 +31,7 @@ class App::Creator
   private
 
   def github_api_client
-    Current.github_integration.api_client
+    Current.account.github_integration.api_client
   end
 
   memoize def remote_repo

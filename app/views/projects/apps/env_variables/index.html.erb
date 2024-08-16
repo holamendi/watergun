@@ -1,10 +1,10 @@
-<%= turbo_stream_from current_app %>
-<%= render "projects/apps/header", app: current_app %>
-<%= render "projects/apps/tabs", app: current_app %>
+<%= turbo_stream_from @app %>
+<%= render "projects/apps/header", app: @app %>
+<%= render "projects/apps/tabs", app: @app %>
 
 <div class="flex justify-between pb-6">
   <div>
-    <%= link_to "New Variable", new_project_app_env_variable_path(current_project, current_app), class: "btn btn-ghost link font-normal", data: { turbo_frame: "new_env_variable" } %>
+    <%= link_to "New Variable", new_project_app_env_variable_path(@project, @app), class: "btn btn-ghost link font-normal", data: { turbo_frame: "new_env_variable" } %>
   </div>
 </div>
 

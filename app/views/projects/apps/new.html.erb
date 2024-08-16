@@ -1,6 +1,6 @@
 
 <%= render PageHeaderComponent.new(title: "New App") %>
-<% if Current.github_integration.app_installed? %>
+<% if Current.account.github_integration.app_installed? %>
   <%= render "projects/apps/create_form", app_creator: @app_creator %>
 <% else %>
   <%= button_to "Connect Github account", github_installation_path, class: "btn btn-primary rounded-full", data: { turbo: false } %>

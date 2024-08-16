@@ -2,7 +2,7 @@ class Projects::Apps::GithubReposController < Projects::Apps::BaseController
   before_action :set_github_repo, only: %i[edit update]
 
   def new
-    @github_repo = current_app.build_github_repo
+    @github_repo = @app.build_github_repo
   end
 
   def create
@@ -22,7 +22,7 @@ class Projects::Apps::GithubReposController < Projects::Apps::BaseController
   private
 
   def set_github_repo
-    @github_repo = current_app.github_repo
+    @github_repo = @app.github_repo
   end
 
   def update_github_repo_params

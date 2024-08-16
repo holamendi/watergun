@@ -1,6 +1,6 @@
 class Accounts::GithubIntegrationsController < ApplicationController
   def create
-    @github_integration = current_account.build_github_integration(github_integration_params)
+    @github_integration = Current.account.build_github_integration(github_integration_params)
 
     if @github_integration.save
       render turbo_stream: [notify("Github account connected"), render_form]
@@ -10,7 +10,7 @@ class Accounts::GithubIntegrationsController < ApplicationController
   end
 
   def destroy
-    current_account.github_integration&.destroy
+    Current.account.github_integration&.destroy
     render turbo_stream: [
       notify("Github account disconnected"),
       render_form
@@ -28,7 +28,7 @@ class Accounts::GithubIntegrationsController < ApplicationController
       "github_integration_settings",
       partial: "accounts/github_integrations/settings",
       locals: {
-        github_integration: @github_integration || current_account.build_github_integration
+        github_integration: @github_integration || Current.account.build_github_integration
       }
     )
   end

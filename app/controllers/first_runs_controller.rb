@@ -1,5 +1,5 @@
 class FirstRunsController < ApplicationController
-  skip_before_action :authenticate!
+  skip_before_action :authenticate
   before_action :set_user
 
   layout "sessions"

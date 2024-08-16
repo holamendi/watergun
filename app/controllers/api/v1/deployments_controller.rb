@@ -2,7 +2,7 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   before_action :set_app, :set_github_repo, only: [:create]
 
   def index
-    deployments = current_account.deployments.kept
+    deployments = Current.account.deployments.kept
     deployments = deployments.where(app_id: params[:app_id]) if params[:app_id].present?
     render json: Api::V1::DeploymentResource.new(deployments)
   end
@@ -12,7 +12,7 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
       set_app
       @app.deployments.kept.find(params[:id])
     else
-      current_account.deployments.kept.find(params[:id])
+      Current.account.deployments.kept.find(params[:id])
     end
 
     render json: Api::V1::DeploymentResource.new(deployment)
@@ -28,7 +28,7 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   private
 
   def set_app
-    @app = current_account.apps.kept.find(params[:app_id])
+    @app = Current.account.apps.kept.find(params[:app_id])
   end
 
   def set_github_repo

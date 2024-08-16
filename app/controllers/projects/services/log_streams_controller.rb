@@ -4,6 +4,6 @@ class Projects::Services::LogStreamsController < Projects::Services::BaseControl
   private
 
   def log_streamable
-    current_service
+    @service
   end
 end

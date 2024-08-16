@@ -4,19 +4,19 @@ module Projects
       before_action :set_env_variable, only: %i[show edit update destroy]
 
       def new
-        @env_variable = current_app.env_variables.new
+        @env_variable = @app.env_variables.new
       end
 
       def index
-        @env_variables = current_app.env_variables.recent.kept
+        @env_variables = @app.env_variables.recent.kept
       end
 
       def create
-        @env_variable = current_app.env_variables.new(env_variable_params)
+        @env_variable = @app.env_variables.new(env_variable_params)
 
         if @env_variable.save
-          ServerAction::UpdateEnv.run_later!(current_app, set: @env_variable.to_h)
-          redirect_to project_app_env_variables_path(current_project, current_app), notice: "Environment variable created successfully."
+          ServerAction::UpdateEnv.run_later!(@app, set: @env_variable.to_h)
+          redirect_to project_app_env_variables_path(@project, @app), notice: "Environment variable created successfully."
         else
           turbo_stream_errors
         end
@@ -27,8 +27,8 @@ module Projects
 
       def update
         if @env_variable.update(env_variable_params)
-          ServerAction::UpdateEnv.run_later!(current_app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
-          redirect_to project_app_env_variable_path(current_project, current_app, @env_variable), notice: "Environment variable updated successfully."
+          ServerAction::UpdateEnv.run_later!(@app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
+          redirect_to project_app_env_variable_path(@project, @app, @env_variable), notice: "Environment variable updated successfully."
         else
           render :edit, status: :unprocessable_entity
         end
@@ -36,14 +36,14 @@ module Projects
 
       def destroy
         @env_variable.discard!
-        ServerAction::UpdateEnv.run_later!(current_app, unset: [@env_variable.name])
+        ServerAction::UpdateEnv.run_later!(@app, unset: [@env_variable.name])
         render turbo_stream: turbo_stream.remove(@env_variable)
       end
 
       private
 
       def set_env_variable
-        @env_variable = current_app.env_variables.kept.find(params[:id])
+        @env_variable = @app.env_variables.kept.find(params[:id])
       end
 
       def env_variable_params
@@ -55,8 +55,8 @@ module Projects
           @env_variable,
           partial: "projects/apps/env_variables/form",
           locals: {
-            project: current_project,
-            app: current_app,
+            project: @project,
+            app: @app,
             env_variable: @env_variable
           }
         )

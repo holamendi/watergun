@@ -4,6 +4,6 @@ class Projects::Services::MetricsController < Projects::Services::BaseController
   private
 
   def containerizable
-    current_service
+    @service
   end
 end

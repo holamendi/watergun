@@ -27,6 +27,6 @@ class Github::RegistrationsController < ApplicationController
   private
 
   def github_integration
-    current_account.github_integration
+    Current.account.github_integration
   end
 end

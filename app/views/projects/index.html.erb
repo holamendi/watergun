@@ -1,4 +1,4 @@
-<%= turbo_stream_from current_account, :projects %>
+<%= turbo_stream_from Current.account, :projects %>
 
 <%= render PageHeaderComponent.new(title: "Projects") do |component| %>
   <% component.with_actions do %>
