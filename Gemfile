@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "rails", github: "rails/rails", branch: "7-2-stable"
+gem "rails", "~> 7.2.0"
 gem "propshaft"
 gem "sqlite3"
 gem "puma", ">= 5.0"
