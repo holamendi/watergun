@@ -8,14 +8,6 @@ module Api
 
       skip_before_action :verify_authenticity_token
 
-      def current_api_token
-        Current.api_token
-      end
-
-      def Current.account
-        Current.account
-      end
-
       private
 
       def authenticate
