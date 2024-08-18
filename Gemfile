@@ -2,9 +2,9 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "rails", "~> 7.2.0"
+gem "rails", github: "rails/rails", branch: "main"
 gem "propshaft"
-gem "sqlite3"
+gem "sqlite3", "~> 2.0.0"
 gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1.7"
 gem "tzinfo-data", platforms: %i[windows jruby]
