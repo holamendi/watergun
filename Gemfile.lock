@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/ankane/groupdate.git
+  revision: efcf66f5bb68224cb7d0ae3d87841b2f51cef31b
+  branch: master
+  specs:
+    groupdate (6.4.0)
+      activesupport (>= 6.1)
+
+GIT
   remote: https://github.com/holamendi/litestack.git
   revision: 108a778d5ca95e0328201e29ecf0ba553af60b63
   branch: fix-litecable-closed-statements
@@ -171,8 +179,6 @@ GEM
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
     globalid (1.2.1)
-      activesupport (>= 6.1)
-    groupdate (6.4.0)
       activesupport (>= 6.1)
     hashdiff (1.1.1)
     honeybadger (5.15.6)
@@ -425,7 +431,7 @@ DEPENDENCIES
   discard
   dotenv
   faraday-retry
-  groupdate
+  groupdate!
   honeybadger
   httpx
   jwt
