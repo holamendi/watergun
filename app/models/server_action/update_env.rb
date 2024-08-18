@@ -43,12 +43,4 @@ class ServerAction::UpdateEnv < ServerAction
   def schedule_restart!
     ServerAction::RestartApp.run_later!(app)
   end
-
-  def set_env_variables
-    app.env_variables.kept.where(name: set.keys)
-  end
-
-  def unset_env_variables
-    app.env_variables.kept.where(name: unset)
-  end
 end

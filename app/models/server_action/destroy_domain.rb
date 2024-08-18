@@ -25,7 +25,7 @@ class ServerAction::DestroyDomain < ServerAction
     domain.error!
     raise
   else
-    domain.deleted!
+    domain.destroy!
   end
 
   private

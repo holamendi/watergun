@@ -16,6 +16,7 @@ class ServerAction::EnableSsl < ServerAction
   def run
     return if all_domains_have_ssl_enabled?
 
+    app.domains.ssl_disabled.each(&:enabling_ssl!)
     enable_ssl!
     update_domains
   end
@@ -29,6 +30,6 @@ class ServerAction::EnableSsl < ServerAction
   end
 
   def update_domains
-    app.domains.update_all(ssl_enabled: true)
+    app.domains.update(ssl_enabled: true, status: :active)
   end
 end

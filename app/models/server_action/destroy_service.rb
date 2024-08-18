@@ -22,7 +22,7 @@ class ServerAction::DestroyService < ServerAction
     service.error!
     raise
   else
-    service.deleted!
+    service.destroy!
   end
 
   def destroy_dokku_service!

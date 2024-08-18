@@ -31,7 +31,7 @@ class ServerAction::UnlinkService < ServerAction
     service_link.error!
     raise
   else
-    service_link.deleted!
+    service_link.destroy!
   end
 
   def unlink_dokku_service!

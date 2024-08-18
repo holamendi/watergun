@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
-  get "up" => "rails/health#show", :as => :rails_health_check
+  get "up", to: "rails/health#show", as: :rails_health_check
 
   root "root#index"
 
-  get "login" => "sessions#new", :as => :login
-  delete "logout" => "sessions#destroy", :as => :logout
+  get "login", to: "sessions#new", as: :login
+  delete "logout", to: "sessions#destroy", as: :logout
 
   resource :session, only: %i[new create destroy]
 

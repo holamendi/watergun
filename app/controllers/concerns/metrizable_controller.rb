@@ -7,7 +7,7 @@ module MetrizableController
       total_cpu_usage: running_containers.sum(:cpu_percentage).round(2),
       memory_usage_percentage: running_containers.sum(:memory_percentage).round(2),
       memory_usage_megabytes: IECByteSize.new(running_containers.sum(:memory_used_bytes)),
-      memory_usage_limit_megabytes: IECByteSize.bytes(running_containers.last.memory_limit_bytes)
+      memory_usage_limit_megabytes: running_containers.any? ? IECByteSize.bytes(running_containers.last.memory_limit_bytes) : 0
     }
   end
 

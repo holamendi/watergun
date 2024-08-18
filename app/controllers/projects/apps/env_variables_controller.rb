@@ -8,7 +8,7 @@ module Projects
       end
 
       def index
-        @env_variables = @app.env_variables.recent.kept
+        @env_variables = @app.env_variables.kept.not_reserved.sorted_by_name
       end
 
       def create

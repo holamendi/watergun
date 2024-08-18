@@ -35,10 +35,8 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def destroy
-    @app.discard!
-    ServerAction::DestroyApp.run_later!(@app)
-
-    redirect_to @project, notice: "App deleted successfully."
+    App::Destroyer.new(@app).destroy
+    redirect_to @project, notice: "App destroyed"
   end
 
   private

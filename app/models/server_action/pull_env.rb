@@ -32,7 +32,7 @@ class ServerAction::PullEnv < ServerAction
     # sync env variables
     EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
 
-    # discard out of sync env variables
+    # delete out of sync env variables
     out_of_sync_env_variables.delete_all
   end
 

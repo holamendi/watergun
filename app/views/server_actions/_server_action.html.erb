@@ -2,7 +2,13 @@
 <tr id="<%= dom_id(server_action) %>">
   <td><%= server_action.id %></td>
   <td><%= server_action.slug %></td>
-  <td><%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %></td>
+  <td>
+    <% if server_action.actionable_type.present? %>
+      <%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %>
+    <% else %>
+      destroyed
+    <% end %>
+  </td>
   <td><%= server_action.user&.email %></td>
   <td>
     <% if server_action.finished? %>

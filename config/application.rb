@@ -42,5 +42,10 @@ module Watergun
     config.mission_control.jobs.base_controller_class = "ApplicationController"
     config.solid_queue.connects_to = {database: {writing: :solid_queue, reading: :solid_queue}}
     # config.solid_queue.logger = Rails.application.logger
+    #
+    config.active_record.encryption.support_unencrypted_data = true
+    config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+    config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+    config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
   end
 end

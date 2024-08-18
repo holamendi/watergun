@@ -14,29 +14,33 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
 
     if @domain.save
       ServerAction::CreateDomain.run_later!(@domain)
-      redirect_to project_app_domains_path(@project, @app), notice: "Domain added successfully."
+      render turbo_stream: [
+        notify("Domain added"),
+        turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app})
+      ]
     else
       render turbo_stream: turbo_stream.replace(
         "domain_form",
         partial: "projects/apps/domains/form",
-        locals: {
-          project: @project,
-          app: @app,
-          domain: @domain
-        }
+        locals: {domain: @domain}
       )
     end
   end
 
   def make_default
     @domain.make_default!
-    redirect_to project_app_domains_path(@project, @app), notice: "Domain set as default."
+    render turbo_stream: [
+      turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app}),
+      notify("Domain set as default")
+    ]
   end
 
   def destroy
-    @domain.discard
-    ServerAction::DestroyDomain.run_later!(@domain)
-    redirect_to project_app_domains_path(@project, @app), notice: "Domain removed successfully."
+    Domain::Destroyer.new(@domain).destroy
+    render turbo_stream: [
+      notify("Domain deleted"),
+      turbo_stream.remove(@domain)
+    ]
   end
 
   private

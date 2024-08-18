@@ -18,7 +18,8 @@ class App < ApplicationRecord
   has_many :deployments, dependent: :delete_all
   has_one :deployment, -> { success.recent }
 
-  has_many :env_variables, dependent: :destroy
+  has_many :env_variables, dependent: :delete_all
+
   has_one :github_repo, class_name: "Github::Repo", dependent: :destroy
 
   has_many :service_links, dependent: :destroy

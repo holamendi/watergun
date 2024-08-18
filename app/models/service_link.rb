@@ -5,7 +5,7 @@ class ServiceLink < ApplicationRecord
   belongs_to :app, touch: true
   belongs_to :service, touch: true
 
-  str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
+  str_enum :status, [:pending, :active, :deleting, :error], default: :pending
 
   validates :app, uniqueness: {scope: :service, conditions: -> { undiscarded }}
 end
