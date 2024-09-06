@@ -1,4 +1,4 @@
 
 vite: bin/vite dev
 web: bin/rails s -p 3000
-solid_queue: bundle exec rake solid_queue:start
+worker: bundle exec rake solid_queue:start
