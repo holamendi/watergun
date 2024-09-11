@@ -1,4 +1,4 @@
-class ServerAction::PullEnv < ServerAction
+class ServerActions::PullEnv < ServerAction
   SLUG = "apps.pull_env"
 
   actionable App

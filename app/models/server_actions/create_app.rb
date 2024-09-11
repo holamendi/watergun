@@ -1,4 +1,4 @@
-class ServerAction::CreateApp < ServerAction
+class ServerActions::CreateApp < ServerAction
   SLUG = "apps.create"
 
   actionable App

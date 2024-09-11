@@ -1,5 +1,5 @@
-class ServerAction::LinkService < ServerAction
-  SLUG = "services.link"
+class ServerActions::UnlinkService < ServerAction
+  SLUG = "services.unlink"
 
   actionable ServiceLink
 
@@ -7,11 +7,7 @@ class ServerAction::LinkService < ServerAction
   store_attribute :payload, :dokku_service_id, :string
   store_attribute :payload, :service_type, :string
 
-  validates :dokku_app_id, presence: true
-  validates :dokku_service_id, presence: true
-  validates :service_type, presence: true
-
-  delegate :app, :service, to: :service_link
+  validates :dokku_app_id, :dokku_service_id, :service_type, presence: true
 
   before_validation on: :create do
     self.dokku_app_id ||= app.dokku_id
@@ -19,31 +15,34 @@ class ServerAction::LinkService < ServerAction
     self.service_type ||= service.service_type
   end
 
+  delegate :app, :service, to: :service_link
+
   def concurrency_key
     service
   end
 
+  private
+
   def run
-    link_dokku_service!
+    service_link.deleting!
+    unlink_dokku_service!
     schedule_pull_env!
   rescue Ssh::CommandExecutionError
     service_link.error!
     raise
   else
-    service_link.active!
+    service_link.destroy!
   end
 
-  private
-
-  def link_dokku_service!
+  def unlink_dokku_service!
     dokku_command_class.call!(ssh, service: dokku_service_id, app: dokku_app_id)
   end
 
   def dokku_command_class
-    "Dokku::#{service_type.camelcase}::Link".constantize
+    "Dokku::#{service_type.camelcase}::Unlink".constantize
   end
 
   def schedule_pull_env!
-    ServerAction::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(app)
   end
 end

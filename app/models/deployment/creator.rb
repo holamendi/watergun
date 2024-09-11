@@ -24,7 +24,7 @@ class Deployment::Creator
       github_event:
     )
 
-    ServerAction::DeployApp.run_later!(deployment)
+    ServerActions::DeployApp.run_later!(deployment)
     deployment
   end
 

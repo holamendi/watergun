@@ -6,7 +6,7 @@ module Projects
       @service = @project.services.new(service_params)
 
       if @service.save
-        ServerAction::CreateService.run_later!(@service)
+        ServerActions::CreateService.run_later!(@service)
 
         redirect_to @project, notice: "Service created successfully."
       else

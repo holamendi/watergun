@@ -23,7 +23,7 @@ class App::Creator
     ApplicationRecord.transaction do
       self.app = project.apps.create!(name: app_name)
       app.create_github_repo!(repo:, branch:, webhook_deploy:, private: remote_repo.private?)
-      ServerAction::CreateApp.run_later!(app)
+      ServerActions::CreateApp.run_later!(app)
     end
     true
   end

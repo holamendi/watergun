@@ -1,4 +1,4 @@
-class ServerAction::UpdateBuilder < ServerAction
+class ServerActions::UpdateBuilder < ServerAction
   SLUG = "apps.update_builder"
 
   actionable App

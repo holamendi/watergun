@@ -1,4 +1,4 @@
-class ServerAction::DeployApp < ServerAction
+class ServerActions::DeployApp < ServerAction
   SLUG = "apps.deploy"
 
   actionable Deployment
@@ -61,11 +61,11 @@ class ServerAction::DeployApp < ServerAction
     return unless app.domains.ssl_disabled.any?
     return unless app.all_domains_resolve_to_server?
 
-    ServerAction::EnableSsl.run_later!(app)
+    ServerActions::EnableSsl.run_later!(app)
   end
 
   def schedule_pull_env!
-    ServerAction::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(app)
   end
 
   def notify_user

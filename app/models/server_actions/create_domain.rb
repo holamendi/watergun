@@ -1,4 +1,4 @@
-class ServerAction::CreateDomain < ServerAction
+class ServerActions::CreateDomain < ServerAction
   SLUG = "apps.add_domain"
 
   actionable Domain
@@ -40,6 +40,6 @@ class ServerAction::CreateDomain < ServerAction
     return unless app.deployed?
     return unless app.all_domains_resolve_to_server?
 
-    ServerAction::EnableSsl.run_later!(domain.app)
+    ServerActions::EnableSsl.run_later!(domain.app)
   end
 end

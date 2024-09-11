@@ -1,4 +1,4 @@
-class ServerAction::UpdateEnv < ServerAction
+class ServerActions::UpdateEnv < ServerAction
   SLUG = "apps.update_env"
 
   actionable App
@@ -37,10 +37,10 @@ class ServerAction::UpdateEnv < ServerAction
   end
 
   def schedule_pull_env!
-    ServerAction::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(app)
   end
 
   def schedule_restart!
-    ServerAction::RestartApp.run_later!(app)
+    ServerActions::RestartApp.run_later!(app)
   end
 end

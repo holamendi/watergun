@@ -1,4 +1,4 @@
-class ServerAction::EnableSsl < ServerAction
+class ServerActions::EnableSsl < ServerAction
   SLUG = "apps.enable_ssl"
 
   actionable App

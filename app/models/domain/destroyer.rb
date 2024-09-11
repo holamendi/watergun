@@ -5,6 +5,6 @@ class Domain::Destroyer
 
   def destroy
     @domain.discard
-    ServerAction::DestroyDomain.run_later!(@domain)
+    ServerActions::DestroyDomain.run_later!(@domain)
   end
 end

@@ -63,7 +63,7 @@ class ProjectsController < ApplicationController
   def discard_apps
     @project.apps.kept.each do |app|
       app.discard
-      ServerAction::DestroyApp.run_later!(app)
+      ServerActions::DestroyApp.run_later!(app)
     end
   end
 
@@ -73,10 +73,10 @@ class ProjectsController < ApplicationController
 
       service.service_links.kept.each do |service_link|
         service_link.discard
-        ServerAction::UnlinkService.run_later!(service_link)
+        ServerActions::UnlinkService.run_later!(service_link)
       end
 
-      ServerAction::DestroyService.run_later!(service)
+      ServerActions::DestroyService.run_later!(service)
     end
   end
 end

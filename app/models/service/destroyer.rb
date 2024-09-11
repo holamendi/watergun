@@ -14,7 +14,7 @@ class Service::Destroyer
 
   def destroy_service
     @service.discard
-    ServerAction::DestroyService.run_later!(@service)
+    ServerActions::DestroyService.run_later!(@service)
   end
 
   def destroy_service_links

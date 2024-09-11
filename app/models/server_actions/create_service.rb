@@ -1,4 +1,4 @@
-class ServerAction::CreateService < ServerAction
+class ServerActions::CreateService < ServerAction
   SLUG = "services.create"
 
   actionable Service

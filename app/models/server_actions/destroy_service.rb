@@ -1,5 +1,5 @@
-class ServerAction::RestartService < ServerAction
-  SLUG = "services.restart"
+class ServerActions::DestroyService < ServerAction
+  SLUG = "services.destroy"
 
   actionable Service
 
@@ -16,20 +16,20 @@ class ServerAction::RestartService < ServerAction
   private
 
   def run
-    service.restarting!
-    restart_dokku_service!
+    service.deleting!
+    destroy_dokku_service!
   rescue Ssh::CommandExecutionError
     service.error!
     raise
   else
-    service.active!
+    service.destroy!
   end
 
-  def restart_dokku_service!
+  def destroy_dokku_service!
     dokku_command_class.call!(ssh, service: dokku_service_id)
   end
 
   def dokku_command_class
-    "Dokku::#{service_type.camelcase}::Restart".constantize
+    "Dokku::#{service_type.camelcase}::Destroy".constantize
   end
 end

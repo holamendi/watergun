@@ -5,6 +5,6 @@ class ServiceLink::Destroyer
 
   def destroy
     @service_link.discard
-    ServerAction::UnlinkService.run_later!(@service_link)
+    ServerActions::UnlinkService.run_later!(@service_link)
   end
 end

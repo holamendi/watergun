@@ -1,4 +1,4 @@
-class ServerAction::DestroyDomain < ServerAction
+class ServerActions::DestroyDomain < ServerAction
   SLUG = "apps.remove_domain"
 
   actionable Domain

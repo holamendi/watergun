@@ -13,7 +13,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
     @domain = @app.domains.new(domain_params)
 
     if @domain.save
-      ServerAction::CreateDomain.run_later!(@domain)
+      ServerActions::CreateDomain.run_later!(@domain)
       render turbo_stream: [
         notify("Domain added"),
         turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app})

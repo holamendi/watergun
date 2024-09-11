@@ -5,6 +5,6 @@ class App::Destroyer
 
   def destroy
     @app.discard
-    ServerAction::DestroyApp.run_later!(@app)
+    ServerActions::DestroyApp.run_later!(@app)
   end
 end

@@ -1,4 +1,4 @@
-class ServerAction::DestroyApp < ServerAction
+class ServerActions::DestroyApp < ServerAction
   SLUG = "apps.destroy"
 
   actionable App

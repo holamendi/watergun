@@ -1,4 +1,4 @@
-class ServerAction::RestartApp < ServerAction
+class ServerActions::RestartApp < ServerAction
   SLUG = "apps.restart"
 
   actionable App
