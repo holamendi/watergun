@@ -27,7 +27,7 @@
   }
 
   .btn {
-    @apply font-normal;
+    @apply font-normal rounded-full no-animation;
   }
 
   a.tab {

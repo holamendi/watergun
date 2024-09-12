@@ -1,17 +1,4 @@
-<%= turbo_stream_from @app %>
-
-<%= render "apps/header", app: @app %>
-<h1 class="text-xl font-bold">Attach service</h1>
-<div class="w-full md:w-1/3">
-  <%= form_with model: [@app, @service], class: "space-y-4" do |form| %>
-    <div class="form-control">
-      <%= form.label :service_type, "Type", class: "label" %>
-      <%= form.select :service_type, Service.service_types.keys, {}, class: "select select-bordered select-sm text-sm rounded-md", disabled: form.object.persisted? %>
-    </div>
-    <div class="form-control">
-      <%= form.label :name, class: "label" %>
-      <%= form.text_field :name, class: "input input-sm px-2 text-sm rounded-md input-bordered" %>
-    </div>
-    <%= form.submit "Save", class: "btn btn-primary btn-sm rounded-md font-normal text-sm" %>
-  <% end %>
+<div class="max-w-screen-sm mx-auto">
+  <%= render PageHeaderComponent.new(title: "New Service") %>
+  <%= render "form", service: @service %>
 </div>

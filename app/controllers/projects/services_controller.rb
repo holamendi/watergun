@@ -2,22 +2,18 @@ module Projects
   class ServicesController < BaseController
     before_action :set_service, only: [:show, :edit, :update, :destroy]
 
+    def new
+      @service = @project.services.new
+    end
+
     def create
       @service = @project.services.new(service_params)
 
       if @service.save
         ServerActions::CreateService.run_later!(@service)
-
-        redirect_to @project, notice: "Service created successfully."
+        redirect_to project_service_path(@project, @service)
       else
-        render turbo_stream: turbo_stream.replace(
-          "service_form",
-          partial: "projects/services/form",
-          locals: {
-            project: @project,
-            service: @service
-          }
-        )
+        render :new, status: :unprocessable_entity
       end
     end
 

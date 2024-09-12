@@ -1,14 +1,14 @@
 <%= form_with model: app_creator, url: project_apps_path(app_creator.project), method: :post do |form| %>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-6">
     <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
       <label class="flex-1 form-control">
         <div class="pl-0 label"> <span class="label-text">Repo</span></div>
-        <%= form.text_field :repo, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none" %>
+        <%= form.text_field :repo, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none input-bordered" %>
         <%= error_messages_for(app_creator, :repo) %>
       </label>
       <label class="flex-1 form-control">
         <div class="pl-0 label"><span class="text-sm text-white uppercase font-space-grotesk font-extralight label-text">Branch</span></div>
-        <%= form.text_field :branch, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none" %>
+        <%= form.text_field :branch, class: "w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none input-bordered" %>
         <%= error_messages_for(app_creator, :branch) %>
       </label>
     </div>
@@ -17,8 +17,9 @@
       <%= form.check_box :webhook_deploy, class: "checkbox" %>
       <%= error_messages_for(app_creator, :webhook_deploy) %>
     </label>
-    <div>
-      <%= button_tag "Save", type: "submit", class: "px-6 text-sm font-normal text-white rounded-full btn-primary btn inline-block flex-none" %>
+    <div class="flex justify-end gap-4">
+      <%= link_to "Cancel", project_path(app_creator.project), class: "btn" %>
+      <%= button_tag "Save", type: "submit", class: "btn btn-primary" %>
     </div>
   </div>
 <% end %>

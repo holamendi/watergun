@@ -2,8 +2,8 @@
 
 <%= render PageHeaderComponent.new(title: @project.name) do |component| %>
   <% component.with_actions do %>
-    <%= link_to "+ App", new_project_app_path(@project), class: "btn btn-primary btn-outline" %>
-    <button class="w-32 btn btn-primary btn-outline" onclick="service_modal.showModal()">+ Service</button>
+    <%= link_to "+ App", new_project_app_path(@project), class: "btn text-primary" %>
+    <%= link_to "+ Service", new_project_service_path(@project), class: "btn text-primary" %>
   <% end %>
 <% end %>
 
@@ -11,7 +11,3 @@
   <%= render partial: "projects/apps/app", collection: @apps, as: :app %>
   <%= render partial: "projects/services/service", collection: @services, as: :service %>
 </div>
-
-<%= render "shared/modal", id: "service_modal", title: "Add a Database" do %>
-  <%= render "projects/services/form", project: @project, service: @service %>
-<% end %>

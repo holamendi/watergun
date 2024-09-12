@@ -8,7 +8,6 @@ class Api::V1::AppsController < Api::V1::ApplicationController
 
   def show
     app = Current.account.apps.kept.find(params[:id])
-
     render json: AppResource.new(app)
   end
 end
