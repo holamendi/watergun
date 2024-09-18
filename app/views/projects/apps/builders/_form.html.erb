@@ -7,6 +7,8 @@
         <%= error_messages_for(form.object, :builder) %>
       </label>
     </div>
-    <%= button_tag "Save", type: "submit", class: "btn btn-primary no-animation w-20 rounded-full" %>
+    <div class="flex justify-end">
+      <%= button_tag "Save", type: "submit", class: "btn btn-primary no-animation w-20 rounded-full" %>
+    </div>
   </div>
 <% end %>

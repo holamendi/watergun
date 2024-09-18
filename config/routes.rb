@@ -56,6 +56,8 @@ Rails.application.routes.draw do
           concerns :metrizable
         end
       end
+
+      resources :service_links, only: %i[create destroy]
     end
   end
 

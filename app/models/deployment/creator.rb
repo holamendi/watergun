@@ -13,17 +13,7 @@ class Deployment::Creator
   def create!
     validate!
 
-    deployment = app.deployments.create!(
-      sha: remote_commit.sha,
-      author_login: remote_commit.author.login,
-      author_url: remote_commit.author.html_url,
-      author_avatar_url: remote_commit.author.avatar_url,
-      author_date: remote_commit.commit.author.date,
-      commit_message: remote_commit.commit.message,
-      commit_html_url: remote_commit.html_url,
-      github_event:
-    )
-
+    deployment = app.deployments.create!(deployment_params)
     ServerActions::DeployApp.run_later!(deployment)
     deployment
   end
@@ -38,6 +28,18 @@ class Deployment::Creator
     end
   rescue Octokit::UnprocessableEntity
     nil
+  end
+
+  def deployment_params
+    {
+      sha: remote_commit.sha,
+      author_login: remote_commit.author.login,
+      author_url: remote_commit.author.html_url,
+      author_avatar_url: remote_commit.author.avatar_url,
+      author_date: remote_commit.commit.author.date,
+      commit_message: remote_commit.commit.message,
+      commit_html_url: remote_commit.html_url
+    }
   end
 
   def github_api_client

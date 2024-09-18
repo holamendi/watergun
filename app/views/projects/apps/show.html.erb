@@ -1,23 +1,33 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @app, :deployments %>
 
-<%= render "header", app: @app %>
-<%= render "tabs", app: @app %>
+<div class="max-w-screen-lg mx-auto">
+  <%= render "header", app: @app %>
+  <%= render "tabs", app: @app %>
 
-<% if @app.github_repo.present? %>
-  <table class="table pt-4">
-    <thead>
-      <tr class="text-white uppercase font-space-grotesk">
-        <th>Commit</th>
-        <th>Finished</th>
-        <th>Duration</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="deployments">
-      <%= render partial: "projects/apps/deployments/deployment", collection: @deployments %>
-    </tbody>
-  </table>
-<% else %>
-  <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "btn btn-ghost link btn-sm rounded-md font-normal text-sm" %>
-<% end %>
+  <% if @app.github_repo.present? %>
+    <div class="flex justify-end">
+      <% if @app.github_repo.present? %>
+        <%= button_to "Deploy", project_app_deployments_path(@app.project, @app),
+          class: "btn btn-primary rounded-full",
+          data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Deploy"} %>
+      <% end %>
+    </div>
+
+    <table class="table pt-4">
+      <thead>
+        <tr class="text-white uppercase font-space-grotesk">
+          <th>Commit</th>
+          <th>Finished</th>
+          <th>Duration</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="deployments">
+        <%= render partial: "projects/apps/deployments/deployment", collection: @deployments %>
+      </tbody>
+    </table>
+  <% else %>
+    <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "btn btn-ghost link btn-sm rounded-md font-normal text-sm" %>
+  <% end %>
+</div>

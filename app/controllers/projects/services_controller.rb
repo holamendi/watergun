@@ -11,6 +11,15 @@ module Projects
 
       if @service.save
         ServerActions::CreateService.run_later!(@service)
+
+        @project.apps.kept.each do |app|
+          ServiceLink::Creator.new(
+            service: @service,
+            app: app,
+            env_name: "INTERNAL_#{SecureRandom.alphanumeric(4).upcase}_URL"
+          ).create
+        end
+
         redirect_to project_service_path(@project, @service)
       else
         render :new, status: :unprocessable_entity

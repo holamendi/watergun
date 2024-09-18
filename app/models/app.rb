@@ -12,13 +12,13 @@ class App < ApplicationRecord
   belongs_to :server, default: -> { Current.server }
   belongs_to :project, touch: true
 
-  has_many :domains, dependent: :delete_all
+  has_many :domains, dependent: :destroy
   has_one :default_domain, -> { default }, class_name: "Domain"
 
-  has_many :deployments, dependent: :delete_all
+  has_many :deployments, dependent: :destroy
   has_one :deployment, -> { success.recent }
 
-  has_many :env_variables, dependent: :delete_all
+  has_many :env_variables, dependent: :destroy
 
   has_one :github_repo, class_name: "Github::Repo", dependent: :destroy
 

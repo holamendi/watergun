@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
+ActiveRecord::Schema[8.0].define(version: 2024_09_18_062435) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -105,24 +105,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
     t.index ["status"], name: "index_containers_on_status"
   end
 
-  create_table "databases", force: :cascade do |t|
-    t.integer "account_id", null: false
-    t.integer "server_id", null: false
-    t.string "name", null: false
-    t.integer "status", null: false
-    t.json "data", default: {}
-    t.datetime "discarded_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "project_id"
-    t.integer "database_type", null: false
-    t.index ["account_id"], name: "index_databases_on_account_id"
-    t.index ["discarded_at"], name: "index_databases_on_discarded_at"
-    t.index ["project_id"], name: "index_databases_on_project_id"
-    t.index ["server_id"], name: "index_databases_on_server_id"
-    t.index ["status"], name: "index_databases_on_status"
-  end
-
   create_table "deployments", force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "app_id", null: false
@@ -171,6 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "internal", default: false
     t.index ["account_id"], name: "index_env_variables_on_account_id"
     t.index ["app_id", "name"], name: "index_env_variables_on_app_id_and_name", unique: true, where: "discarded_at IS NULL"
     t.index ["app_id"], name: "index_env_variables_on_app_id"
@@ -310,9 +293,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
+    t.integer "env_variable_id", null: false
     t.index ["account_id"], name: "index_service_links_on_account_id"
     t.index ["app_id"], name: "index_service_links_on_app_id"
     t.index ["discarded_at"], name: "index_service_links_on_discarded_at"
+    t.index ["env_variable_id"], name: "index_service_links_on_env_variable_id"
     t.index ["service_id", "app_id"], name: "index_service_links_on_service_id_and_app_id", unique: true
     t.index ["service_id"], name: "index_service_links_on_service_id"
     t.index ["status"], name: "index_service_links_on_status"
@@ -381,9 +366,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
   add_foreign_key "container_checks", "containers"
   add_foreign_key "containers", "accounts"
   add_foreign_key "containers", "servers"
-  add_foreign_key "databases", "accounts"
-  add_foreign_key "databases", "projects"
-  add_foreign_key "databases", "servers"
   add_foreign_key "deployments", "accounts"
   add_foreign_key "deployments", "apps"
   add_foreign_key "deployments", "github_events"
@@ -412,6 +394,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_09_11_071611) do
   add_foreign_key "servers", "accounts"
   add_foreign_key "service_links", "accounts"
   add_foreign_key "service_links", "apps"
+  add_foreign_key "service_links", "env_variables"
   add_foreign_key "service_links", "services"
   add_foreign_key "services", "accounts"
   add_foreign_key "services", "projects"

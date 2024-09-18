@@ -2,7 +2,7 @@ class RunServerActionJob < ApplicationJob
   limits_concurrency to: 1, key: ->(server_action) { server_action.concurrency_key }, duration: 30.minutes
 
   def perform(server_action)
-    return if server_action.running_at?
+    # return if server_action.running_at?
     return server_action.cancelled! if server_action.preceding_action&.failure?
 
     account, server, user = server_action.values_at(:account, :server, :user)

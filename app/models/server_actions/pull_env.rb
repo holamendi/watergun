@@ -31,9 +31,8 @@ class ServerActions::PullEnv < ServerAction
 
     # sync env variables
     EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
-
     # delete out of sync env variables
-    out_of_sync_env_variables.delete_all
+    out_of_sync_env_variables.destroy_all
   end
 
   memoize def dokku_config_export

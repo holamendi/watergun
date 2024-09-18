@@ -9,7 +9,7 @@ class ServerActions::DeployApp < ServerAction
 
   validates :dokku_app_id, presence: true
 
-  delegate :app, :account, to: :deployment
+  delegate :app, :account, to: :deployment, allow_nil: true
 
   before_validation on: :create do
     self.dokku_app_id ||= app.dokku_id

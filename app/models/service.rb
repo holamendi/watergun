@@ -6,8 +6,6 @@ class Service < ApplicationRecord
 
   TEMPORARY_STATUSES = %w[deleting restarting stopping].freeze
 
-  broadcasts_refreshes
-
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
   belongs_to :project, touch: true
@@ -15,6 +13,7 @@ class Service < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :linked_apps, through: :service_links, source: :app
 
+  store_attribute :data, :dsn, :string
   store_attribute :data, :version, :string
 
   str_enum :status, [:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending

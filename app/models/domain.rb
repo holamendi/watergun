@@ -21,7 +21,7 @@ class Domain < ApplicationRecord
   end
 
   after_destroy_commit do
-    broadcast_remove_later_to [app, :domains], target: dom_id(self)
+    broadcast_remove_to [app, :domains], target: dom_id(self)
   end
 
   def make_default!

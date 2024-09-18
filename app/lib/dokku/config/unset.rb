@@ -6,7 +6,7 @@ module Dokku
       def initialize(ssh_session, app:, variable_names:, restart: false)
         @ssh_session = ssh_session
         @app = app
-        @variable_names = variable_names
+        @variable_names = Array(variable_names)
         @restart = restart
       end
 

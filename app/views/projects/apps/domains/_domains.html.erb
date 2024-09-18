@@ -1,7 +1,9 @@
 <%= turbo_stream_from app, :domains %>
 
 <div id="domains">
-  <button class="w-32 btn btn-primary btn-outline" onclick="domain_modal.showModal()">+ Domain</button>
+  <div class="flex justify-end mb-4">
+    <button class="w-32 btn btn-primary btn-outline" onclick="domain_modal.showModal()">+ Domain</button>
+  </div>
   <table class="table">
     <thead>
       <tr>

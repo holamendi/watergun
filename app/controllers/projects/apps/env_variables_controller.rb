@@ -8,7 +8,11 @@ module Projects
       end
 
       def index
-        @env_variables = @app.env_variables.kept.not_reserved.sorted_by_name
+        @env_variables = @app.env_variables.kept
+          .includes(service_link: :service)
+          .not_internal
+          .not_reserved
+          .sorted_by_name
       end
 
       def create

@@ -8,6 +8,8 @@ class EnvVariable < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
   belongs_to :app, touch: true
 
+  has_one :service_link, dependent: :destroy
+
   str_enum :status, [:pending, :syncing, :synced, :error], default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
@@ -15,6 +17,7 @@ class EnvVariable < ApplicationRecord
 
   scope :sorted_by_name, -> { order(name: :asc) }
   scope :not_reserved, -> { where.not("name LIKE ?", "#{RESERVED_PREFIX}%") }
+  scope :not_internal, -> { where(internal: false) }
 
   delegate :project, to: :app
 

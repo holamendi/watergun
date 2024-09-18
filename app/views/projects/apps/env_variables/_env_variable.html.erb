@@ -1,11 +1,16 @@
 <%= turbo_frame_tag env_variable do %>
-  <div class="flex flex-row px-4 py-3 space-x-4 border rounded-md group">
-    <div class="w-1/4">
+  <div class="flex flex-row px-4 py-3 space-x-4 border-b border-b-base-100">
+    <div class="w-1/4 truncate">
       <%= env_variable.name %>
+      <% if env_variable.service_link.present? %>
+        <span class="text-xs text-gray-500">
+          (references <%= link_to env_variable.service_link.service.name, project_service_path(env_variable.app.project, env_variable.service_link.service), class: "link", data: { turbo_frame: "_top" } %>)
+        </span>
+      <% end %>
     </div>
-    <div class="w-2/4 overflow-auto ">
+    <div class="w-2/4 group">
       <span class="group-hover:hidden">*******</span>
-      <span class="hidden group-hover:inline-block"><%= env_variable.value %></span>
+      <span class="hidden group-hover:overflow-scroll group-hover:flex"><%= env_variable.value %></span>
     </div>
     <div class="w-1/4 text-right">
       <%= link_to "Edit", edit_project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "btn btn-xs btn-ghost" %>

@@ -1,5 +1,5 @@
 <%= link_to project_service_metrics_path(service.project, service), id: dom_id(service) do %>
-  <div class="h-full p-9 bg-base-100 rounded-2xl outline-1 hover:outline hover:outline-primary">
+  <div class="h-full p-9 bg-base-200 hover:bg-base-300 rounded-2xl outline-1">
     <h2 class="pb-1 text-lg font-normal"><%= service.name %></h2>
     <h3 class="mb-8 text-sm font-extralight"><%= service.service_type.titleize %> Database</h3>
     <div>

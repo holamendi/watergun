@@ -2,8 +2,8 @@
 
 <%= render PageHeaderComponent.new(title: @project.name) do |component| %>
   <% component.with_actions do %>
-    <%= link_to "+ App", new_project_app_path(@project), class: "btn text-primary" %>
-    <%= link_to "+ Service", new_project_service_path(@project), class: "btn text-primary" %>
+    <%= link_to "+ App", new_project_app_path(@project), class: "btn" %>
+    <%= link_to "+ Service", new_project_service_path(@project), class: "btn" %>
   <% end %>
 <% end %>
 

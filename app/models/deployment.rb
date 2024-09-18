@@ -7,8 +7,6 @@ class Deployment < ApplicationRecord
   belongs_to :user, default: -> { Current.user }, optional: true
   belongs_to :github_event, class_name: "Github::Event", optional: true
 
-  has_one :server_action, as: :actionable, dependent: :destroy
-
   store_attribute :data, :author_login, :string
   store_attribute :data, :author_url, :string
   store_attribute :data, :author_avatar_url, :string
