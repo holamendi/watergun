@@ -1,53 +1,51 @@
 <%= turbo_stream_from @app %>
 
-<div class="max-w-screen-lg mx-auto">
-  <%= render "header", app: @app %>
-  <%= render "tabs", app: @app %>
-  <div class="flex settings-section">
-    <h2 class="w-2/6">General</h2>
-    <div class="flex flex-col w-2/3 gap-5">
-      <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
-        <label class="w-full md:w-1/2 form-control">
-          <div class="pl-0 label"> <span class="label-text">Dokku ID</span></div>
-          <input type="text" value="<%= @app.dokku_id %>" class="input input-bordered" readonly disabled>
-        </label>
-      </div>
+<%= render "header", app: @app %>
+<%= render "tabs", app: @app %>
+<div class="flex settings-section">
+  <h2 class="w-2/6">General</h2>
+  <div class="flex flex-col w-2/3 gap-5">
+    <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
+      <label class="w-full md:w-1/2 form-control">
+        <div class="pl-0 label"> <span class="label-text">Dokku ID</span></div>
+        <input type="text" value="<%= @app.dokku_id %>" class="input input-bordered" readonly disabled>
+      </label>
     </div>
   </div>
-  <div class="my-10 divider"></div>
-  <div class="flex settings-section">
-    <div class="w-2/6">
-      <h2>Github Repo</h2>
-    </div>
-    <div class="w-4/6">
-      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
-    </div>
+</div>
+<div class="my-10 divider"></div>
+<div class="flex settings-section">
+  <div class="w-2/6">
+    <h2>Github Repo</h2>
   </div>
-  <div class="my-10 divider"></div>
-  <div class="flex settings-section">
-    <div class="w-2/6">
-      <h2>Builder</h2>
-    </div>
-    <div class="w-4/6">
-      <%= render "projects/apps/builders/form", app: @app %>
-    </div>
+  <div class="w-4/6">
+    <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
   </div>
-  <div class="my-10 divider"></div>
-  <div class="flex settings-section">
-    <div class="w-2/6">
-      <h2>Domains</h2>
-    </div>
-    <div class="w-4/6">
-      <%= render "projects/apps/domains/domains", app: @app %>
-    </div>
+</div>
+<div class="my-10 divider"></div>
+<div class="flex settings-section">
+  <div class="w-2/6">
+    <h2>Builder</h2>
   </div>
-  <div class="my-10 divider"></div>
-  <div class="flex settings-section">
-    <div class="w-2/6">
-      <h2>Danger Zone</h2>
-    </div>
-    <div class="w-4/6">
-      <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
-    </div>
+  <div class="w-4/6">
+    <%= render "projects/apps/builders/form", app: @app %>
+  </div>
+</div>
+<div class="my-10 divider"></div>
+<div class="flex settings-section">
+  <div class="w-2/6">
+    <h2>Domains</h2>
+  </div>
+  <div class="w-4/6">
+    <%= render "projects/apps/domains/domains", app: @app %>
+  </div>
+</div>
+<div class="my-10 divider"></div>
+<div class="flex settings-section">
+  <div class="w-2/6">
+    <h2>Danger Zone</h2>
+  </div>
+  <div class="w-4/6">
+    <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
   </div>
 </div>

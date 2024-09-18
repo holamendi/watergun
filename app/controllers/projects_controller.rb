@@ -1,5 +1,5 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :destroy]
+  before_action :set_project, only: [:show, :edit, :update, :destroy]
   def index
     @projects = Project.kept
   end
@@ -43,10 +43,7 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project.discard
-    discard_apps
-    discard_services
-
+    Project::Destroyer.new(@project).destroy!
     redirect_to projects_path, notice: "Project destroyed"
   end
 
@@ -58,25 +55,5 @@ class ProjectsController < ApplicationController
 
   def project_params
     params.require(:project).permit(:name)
-  end
-
-  def discard_apps
-    @project.apps.kept.each do |app|
-      app.discard
-      ServerActions::DestroyApp.run_later!(app)
-    end
-  end
-
-  def discard_services
-    @project.services.kept.each do |service|
-      service.discard
-
-      service.service_links.kept.each do |service_link|
-        service_link.discard
-        ServerActions::UnlinkService.run_later!(service_link)
-      end
-
-      ServerActions::DestroyService.run_later!(service)
-    end
   end
 end
