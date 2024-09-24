@@ -2,7 +2,9 @@
 
 <%= render "header", app: @app %>
 <%= render "tabs", app: @app %>
-<div class="flex settings-section">
+
+<div class="max-w-screen-md">
+  <div class="flex settings-section">
   <h2 class="w-2/6">General</h2>
   <div class="flex flex-col w-2/3 gap-5">
     <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
@@ -49,3 +51,6 @@
     <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
   </div>
 </div>
+
+</div>
+

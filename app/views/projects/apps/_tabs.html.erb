@@ -1,7 +1,7 @@
-<div role="tablist" class="flex w-full mb-12 overflow-auto md:w-2/3 lg:overflow-hidden gap-x-2">
-  <%= link_to "Deployments", project_app_path(app.project, app), class: class_names("bg-base-100 px-4 py-1 rounded-lg hover:border", "border border-primary" => (controller_name == "apps" && action_name  == "show")) %>
-  <%= link_to "Metrics", project_app_metrics_path(app.project, app), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "metrics")) %>
-  <%= link_to "Logs", project_app_log_streams_path(app.project, app), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "log_streams")), data: { turbo_prefetch: false} %>
-  <%= link_to "Variables", project_app_env_variables_path(app.project, app), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "env_variables")) %>
-  <%= link_to "Settings", edit_project_app_path(app.project, app), class: class_names("bg-base-100 px-4 py-1 rounded-lg", "border border-primary" => (controller_name == "apps" && action_name.in?(%w[edit update])))  %>
+<div role="tablist" class="px-0 mb-12 overflow-auto lg:overflow-hidden tabs tabs-bordered md:w-2/3">
+  <%= link_to "Deployments", project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name == "show")) %>
+  <%= link_to "Metrics", project_app_metrics_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "metrics")) %>
+  <%= link_to "Logs", project_app_log_streams_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "log_streams")), data: { turbo_prefetch: false} %>
+  <%= link_to "Variables", project_app_env_variables_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "env_variables")) %>
+  <%= link_to "Settings", edit_project_app_path(app.project, app), class: class_names("tab", "tab-active" => (controller_name == "apps" && action_name.in?(%w[edit update])))  %>
 </div>
