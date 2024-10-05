@@ -13,7 +13,7 @@ class Deployment::Creator
   def create!
     validate!
 
-    deployment = app.deployments.create!(deployment_params)
+    deployment = app.deployments.create!(deployment_attributes)
     ServerActions::DeployApp.run_later!(deployment)
     deployment
   end
@@ -30,7 +30,7 @@ class Deployment::Creator
     nil
   end
 
-  def deployment_params
+  def deployment_attributes
     {
       sha: remote_commit.sha,
       author_login: remote_commit.author.login,

@@ -3,7 +3,7 @@ class Accounts::GithubIntegrationsController < ApplicationController
     @github_integration = Current.account.build_github_integration(github_integration_params)
 
     if @github_integration.save
-      render turbo_stream: [notify("Github account connected"), render_form]
+      render turbo_stream: [append_toast("Github account connected"), render_form]
     else
       render turbo_stream: render_form, status: :unprocessable_entity
     end
@@ -12,7 +12,7 @@ class Accounts::GithubIntegrationsController < ApplicationController
   def destroy
     Current.account.github_integration&.destroy
     render turbo_stream: [
-      notify("Github account disconnected"),
+      append_toast("Github account disconnected"),
       render_form
     ]
   end

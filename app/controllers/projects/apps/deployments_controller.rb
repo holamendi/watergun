@@ -1,9 +1,9 @@
 class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   def create
     Deployment::Creator.new(app: @app, commit_sha: params[:sha]).create!
-    render turbo_stream: notify("#{@app.name}: deployment scheduled")
+    render turbo_stream: append_toast("#{@app.name}: deployment scheduled")
   rescue ActiveRecord::RecordInvalid
-    render turbo_stream: notify("Invalid deployment parameters")
+    render turbo_stream: append_toast("Invalid deployment parameters")
   end
 
   def logs

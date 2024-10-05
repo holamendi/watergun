@@ -15,4 +15,9 @@ module ApplicationHelper
       success: "badge-success"
     }.fetch(status&.to_sym, "badge-default")
   end
+
+  def component(name, *, **, &)
+    component = "#{name.to_s.camelize}Component".constantize
+    render(component.new(*, **), &)
+  end
 end

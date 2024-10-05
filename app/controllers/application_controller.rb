@@ -6,12 +6,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def notify(message, type: :notice)
-    turbo_stream.prepend("toasts", partial: "shared/toast", locals: {message:, type:})
-  end
-
-  def notify_error(message)
-    notify(message, type: :error)
+  def append_toast(message, title: nil, type: :notice)
+    turbo_stream.append("toasts", ToastComponent.new(message:, title:, type:))
   end
 
   def set_source

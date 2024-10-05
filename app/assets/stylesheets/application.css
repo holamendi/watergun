@@ -3,38 +3,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-div.page-title {
-  @apply pb-12;
-
-  h1 {
-    @apply text-3xl font-light;
-  }
-}
-
-div.settings-section {
-  h2 {
-    @apply pb-6 text-xl font-normal;
-  }
-}
-
-[data-theme="watergun"] {
-  .field_with_errors > input {
-    @apply input-error;
-  }
-
-  .label {
-    @apply pt-0;
-
-    .label-text {
-      @apply text-sm uppercase font-space-grotesk font-extralight;
-    }
-  }
-
-  .btn {
-    @apply font-normal no-animation;
-  }
-
-  .table :where(thead tr, tbody tr:not(:last-child),tbody tr:first-child:last-child) {
-    @apply border-b border-b-base-300;
-  }
+input[type="submit"] {
+  cursor: pointer;
 }

@@ -1,6 +1,15 @@
-<div class="max-w-screen-sm mx-auto">
-  <%= render PageHeaderComponent.new(title: "Edit Project") %>
-  <%= render "form", project: @project %>
-  <div class="my-10 divider"></div>
-  <%= button_to "Delete Project", project_path(@project), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
+<% @title = @project.name %>
+
+<% content_for :header do %>
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"><%= @title %></h2>
+    </div>
+  </div>
+<% end %>
+
+<div class="flex justify-center">
+  <div class="w-full max-w-lg">
+    <%= render "form", project: @project %>
+  </div>
 </div>

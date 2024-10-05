@@ -1,21 +1,24 @@
-<div id="<%= dom_id(service, :header) %>">
-  <div class="flex justify-between pb-6">
-    <div>
-      <h1 class="pb-6 text-3xl font-normal">
-        <%= service.name %>
-        <% if service.temporary_status? %>
-          <span class="text-sm font-normal text-success">
-            <%= service.status %>
-            <span class="loading loading-spinner loading-xs"></span>
-          </span>
-        <% end %>
-      </h1>
-      <span class="text-sm font-extralight">
+<div id="<%= dom_id(service, :header) %>" class="lg:flex lg:items-center lg:justify-between">
+  <div class="flex-1 min-w-0">
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+      <%= service.name %>
+      <% if service.temporary_status? %>
+        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <%= service.status %>
+          <span class="w-2 h-2 ml-1 bg-green-400 rounded-full"></span>
+        </span>
+      <% end %>
+    </h2>
+    <div class="flex flex-col mt-1 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+      <div class="flex items-center mt-2 text-sm text-gray-500">
+        <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+        </svg>
         <%= service.service_type.titleize %> Database
-      </span>
+      </div>
     </div>
-    <div class="flex gap-x-2">
-      <%# actions %>
-    </div>
+  </div>
+  <div class="flex mt-5 lg:ml-4 lg:mt-0">
+    <%# Add any action buttons here, similar to the Deploy button in the app header %>
   </div>
 </div>

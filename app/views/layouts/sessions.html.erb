@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="watergun">
+<html class="h-full">
   <head>
     <title>Watergun</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,8 +9,8 @@
     <%= vite_stylesheet_tag "application", data: { "turbo-track": "reload" } %>
     <%= vite_javascript_tag 'application' %>
   </head>
-  <body class="h-full font-mono">
-    <%= render "shared/flash_messages" %>
+  <body class="h-full">
+    <%= render "shared/toasts" %>
     <%= yield %>
   </body>
 </html>

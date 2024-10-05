@@ -1,21 +1,45 @@
 <%= turbo_stream_from @project %>
-
-<%= render PageHeaderComponent.new(title: @project.name) do |component| %>
-  <% component.with_actions do %>
-    <%= link_to "+ App", new_project_app_path(@project), class: "btn" %>
-    <%= link_to "+ Service", new_project_service_path(@project), class: "btn" %>
-
-    <%= link_to edit_project_path(@project), class: "btn" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      <span class="sr-only">Settings</span>
-    <% end %>
-  <% end %>
+<% @title = @project.name %>
+<% content_for :header do %>
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"><%= @title %></h2>
+    </div>
+    <div class="flex flex-shrink-0 gap-2 mt-4 md:ml-4 md:mt-0">
+      <div class="flex items-center h-full">
+        <%= link_to edit_project_path(@project), class: "inline-flex items-center justify-center rounded-md bg-gray-100 p-2 text-gray-500", title: "Settings" do %>
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+          </svg>
+          <span class="sr-only">Settings</span>
+        <% end %>
+      </div>
+      <div class="relative inline-block text-left" data-controller="dropdown">
+        <div>
+          <button type="button" class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-pink-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600" id="new-resource-menu-button" aria-expanded="false" aria-haspopup="true" data-action="click->dropdown#toggle">
+            Add new resource
+            <svg class="w-5 h-5 -mr-1 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div class="absolute right-0 z-10 hidden w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="new-resource-menu-button" tabindex="-1" data-dropdown-target="menu">
+          <div class="py-1" role="none">
+            <%= link_to "App", new_project_app_path(@project), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1", id: "new-resource-menu-item-0" %>
+            <%= link_to "Service", new_project_service_path(@project), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1", id: "new-resource-menu-item-1" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <% end %>
-
-<div id="<%= dom_id(@project) %>" class="grid grid-cols-1 gap-7 lg:grid-cols-3 xl:grid-cols-4">
-  <%= render partial: "projects/apps/app", collection: @apps, as: :app %>
-  <%= render partial: "projects/services/service", collection: @services, as: :service %>
-</div>
+<% if @apps.any? || @services.any? %>
+  <ul role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+    <% @apps.each do |app| %>
+      <%= render partial: "projects/apps/app", locals: { app: app } %>
+    <% end %>
+    <% @services.each do |service| %>
+      <%= render partial: "projects/services/service", locals: { service: service } %>
+    <% end %>
+  </ul>
+<% end %>

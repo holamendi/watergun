@@ -26,6 +26,7 @@ const channels = import.meta.glob('./**/*_channel.js')
 // Example: Import a stylesheet in app/frontend/index.css
 // import '~/index.css'
 import { Application } from '@hotwired/stimulus'
+import Notification from '@stimulus-components/notification'
 import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
@@ -33,8 +34,11 @@ const application = Application.start()
 application.debug = false
 window.Stimulus   = application
 
+application.register('notification', Notification)
+
 const controllers = import.meta.glob('~/controllers/*_controller.js', { eager: true })
 registerControllers(application, controllers)
+
 
 import "chartkick/chart.js"
 

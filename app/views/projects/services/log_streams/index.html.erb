@@ -1,6 +1,13 @@
 <%= turbo_stream_from @service %>
 <%= turbo_stream_from @log_stream %>
 
-<%= render "projects/services/header", service: @service %>
-<%= render "projects/services/tabs", service: @service %>
-<%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(@project, @service, @log_stream) %>
+<% @main_width = "full" %>
+
+<% content_for :header do %>
+  <%= render "projects/services/header", service: @service %>
+  <%= render "projects/services/tabs", service: @service %>
+<% end %>
+
+<div class="bg-gray-800 rounded-md">
+  <%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(@project, @service, @log_stream) %>
+</div>

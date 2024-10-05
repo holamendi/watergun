@@ -1,30 +1,42 @@
-<div id="<%= dom_id(app, :header) %>">
-  <div class="flex justify-between pb-6">
-    <div>
-      <h1 class="pb-6 text-3xl font-normal">
-        <%= app.name %>
-        <% if app.temporary_status? %>
-          <span class="text-sm font-normal text-success">
-            <%= app.status %>
-            <span class="loading loading-spinner loading-xs"></span>
-          </span>
-        <% end %>
-      </h1>
+<div id="<%= dom_id(app, :header) %>" class="lg:flex lg:items-center lg:justify-between">
+  <div class="flex-1 min-w-0">
+    <h2 class="font-mono text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+      <%= app.name %>
+      <% if app.temporary_status? %>
+        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <%= app.status %>
+          <span class="w-2 h-2 ml-1 bg-green-400 rounded-full"></span>
+        </span>
+      <% end %>
+    </h2>
+    <div class="flex flex-col mt-1 sm:mt-2 sm:flex-row sm:flex-wrap sm:space-x-6">
       <% if app.github_repo.present? %>
-        <div class="flex mb-4 space-x-10">
-          <%= link_to app.github_repo.web_url, target: :_blank ,class: "font-extralight text-sm link" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.11.82-.26.82-.577v-2.165c-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.492.998.108-.775.42-1.305.763-1.605-2.665-.3-5.466-1.335-5.466-5.93 0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.98-.398 3-.403 1.02.005 2.043.137 3 .403 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.24 2.873.118 3.176.77.84 1.233 1.91 1.233 3.22 0 4.61-2.803 5.625-5.475 5.92.43.37.823 1.102.823 2.222v3.293c0 .32.218.694.825.577C20.565 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <div class="flex items-center mt-2 text-sm text-gray-500">
+          <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+          </svg>
+          <%= link_to app.github_repo.web_url, target: :_blank, class: "hover:text-gray-700 underline" do %>
             <%= app.github_repo.repo %>
           <% end %>
-
-          <% if app.deployed? && app.default_domain.present? %>
-            <%= link_to app.default_domain.url, target: :_blank, class: "font-extralight text-sm link" do %>
-              <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.514 0-10-4.486-10-10S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8 3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8zm0 14c-3.313 0-6-2.687-6-6s2.687-6 6-6 6 2.687 6 6-2.687 6-6 6z"/></svg>
-              <%= app.default_domain.url %>
-            <% end %>
-          <% end %>
+        </div>
+      <% end %>
+      <% if app.deployed? && app.default_domain.present? %>
+        <div class="flex items-center mt-2 text-sm text-gray-500">
+          <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <%= link_to app.default_domain.url, app.default_domain.url, target: :_blank, class: "hover:text-gray-700 underline" %>
         </div>
       <% end %>
     </div>
   </div>
+  <% if false%>
+  <div class="flex mt-5 lg:ml-4 lg:mt-0">
+    <% if app.github_repo.present? %>
+      <%= button_to "Deploy", project_app_deployments_path(app.project, app),
+        class: "inline-flex items-center rounded-md bg-pink-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600",
+        data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Deploy"} %>
+    <% end %>
+  </div>
+  <% end %>
 </div>

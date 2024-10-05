@@ -1,56 +1,91 @@
 <%= turbo_stream_from @app %>
 
-<%= render "header", app: @app %>
-<%= render "tabs", app: @app %>
+<% content_for :header do %>
+  <%= render "header", app: @app %>
+  <%= render "tabs", app: @app %>
+<% end %>
 
-<div class="max-w-screen-md">
-  <div class="flex settings-section">
-  <h2 class="w-2/6">General</h2>
-  <div class="flex flex-col w-2/3 gap-5">
+<div class="space-y-10 divide-y divide-gray-900/10">
+  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div>
+      <h2 class="text-base font-semibold leading-7 text-gray-900">General</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+    </div>
+    <div class="md:col-span-2">
+      <%= render "form", app: @app %>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="px-4 sm:px-0">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Github Repository</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+    </div>
+    <div class="md:col-span-2">
+      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="px-4 sm:px-0">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Builder</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+    </div>
+    <div class="md:col-span-2">
+      <%= render "projects/apps/builders/form", app: @app %>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="px-4 sm:px-0">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Domains</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+    </div>
+    <div class="md:col-span-2">
+      <%= render "projects/apps/domains/domains", app: @app %>
+    </div>
+  </div>
+</div>
+
+<% if false %>
+<div class="settings-section">
+  <h2>General</h2>
+  <div class="flex flex-col gap-5">
     <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
       <label class="w-full md:w-1/2 form-control">
         <div class="pl-0 label"> <span class="label-text">Dokku ID</span></div>
-        <input type="text" value="<%= @app.dokku_id %>" class="input input-bordered" readonly disabled>
+        <input type="text" value="<%= @app.dokku_id %>" class="w-full p-3 text-sm font-light input font-poppins focus:border-primary focus:outline-none" readonly disabled>
       </label>
     </div>
   </div>
 </div>
+
 <div class="my-10 divider"></div>
-<div class="flex settings-section">
-  <div class="w-2/6">
-    <h2>Github Repo</h2>
-  </div>
-  <div class="w-4/6">
-    <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
-  </div>
-</div>
-<div class="my-10 divider"></div>
-<div class="flex settings-section">
-  <div class="w-2/6">
-    <h2>Builder</h2>
-  </div>
-  <div class="w-4/6">
-    <%= render "projects/apps/builders/form", app: @app %>
-  </div>
-</div>
-<div class="my-10 divider"></div>
-<div class="flex settings-section">
-  <div class="w-2/6">
-    <h2>Domains</h2>
-  </div>
-  <div class="w-4/6">
-    <%= render "projects/apps/domains/domains", app: @app %>
-  </div>
-</div>
-<div class="my-10 divider"></div>
-<div class="flex settings-section">
-  <div class="w-2/6">
-    <h2>Danger Zone</h2>
-  </div>
-  <div class="w-4/6">
-    <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
-  </div>
+
+<div class="settings-section">
+  <h2>Github Repo</h2>
+  <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
 </div>
 
+<div class="my-10 divider"></div>
+
+<div class="settings-section">
+  <h2>Builder</h2>
+  <%= render "projects/apps/builders/form", app: @app %>
 </div>
+
+<div class="my-10 divider"></div>
+
+<div class="settings-section">
+  <h2>Domains</h2>
+  <%= render "projects/apps/domains/domains", app: @app %>
+</div>
+
+<div class="my-10 divider"></div>
+
+<div class="settings-section">
+  <h2>Danger Zone</h2>
+  <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn rounded-full btn-error text-white", data: { turbo_confirm: "Sure?"} %>
+</div>
+
+<% end %>
+
+
 

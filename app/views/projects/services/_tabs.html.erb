@@ -1,5 +1,21 @@
-<div role="tablist" class="px-0 mb-12 overflow-auto lg:overflow-hidden tabs tabs-bordered md:w-1/3">
-  <%= link_to "Metrics", project_service_metrics_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "metrics")) %>
-  <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "log_streams")) %>
-  <%= link_to "Settings", edit_project_service_path(service.project, service), class: class_names("tab", "tab-active" => (controller_name == "services" && action_name.in?(%w[edit update])))  %>
+<div class="pt-4">
+  <%= component :tabs, [
+    {
+      title: "Metrics",
+      path: project_service_metrics_path(service.project, service),
+      current: controller_name == "metrics"
+    },
+    {
+      title: "Logs",
+      path: project_service_log_streams_path(service.project, service),
+      current: controller_name == "log_streams",
+      prefetch: false
+    },
+    {
+      title: "Settings",
+      path: edit_project_service_path(service.project, service),
+      current: controller_name == "services" && action_name.in?(%w[edit update])
+    }
+  ] %>
 </div>
+

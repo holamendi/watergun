@@ -1,26 +1,9 @@
 <%= turbo_stream_from @service %>
-<%= render "header", service: @service %>
-<%= render "tabs", service: @service %>
-<div class="flex settings-section">
-  <h2 class="w-2/6">Info</h2>
-  <div class="flex flex-col w-2/3 gap-5">
-    <div class="flex flex-col flex-wrap w-full gap-x-4 md:flex-row">
-      <label class="w-full form-control">
-        <div class="pl-0 label"> <span class="label-text">Internal URL</span></div>
-        <div class="relative" data-controller="clipboard">
-          <input type="text" value="<%= @service.dsn %>" class="w-full pr-10 input input-bordered" readonly>
-          <button data-action="clipboard#copy" data-clipboard-target="source" class="absolute inset-y-0 right-0 px-3 text-gray-600 hover:text-gray-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-            </svg>
-          </button>
-        </div>
-      </label>
-    </div>
-  </div>
-</div>
-  <div class="my-10 divider"></div>
+
+<% content_for :header do %>
+  <%= render "header", service: @service %>
+  <%= render "tabs", service: @service %>
+<% end %>
 
 <div class="settings-section">
   <h2>Danger Zone</h2>
