@@ -10,6 +10,15 @@
 
 <div class="flex justify-center">
   <div class="w-full max-w-lg">
-    <%= render "form", project: @project %>
+    <div class="space-y-10 divide-y divide-gray-900/10">
+      <div>
+        <%= render "form", project: @project %>
+      </div>
+      <div class="pt-10">
+        <%= button_to "Delete Project", project_path(@project), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
+      </div>
+    </div>
   </div>
 </div>
+
+

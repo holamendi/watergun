@@ -17,7 +17,7 @@
       <%= form.check_box :webhook_deploy, class: "checkbox" %>
       <%= error_messages_for(app_creator, :webhook_deploy) %>
     </label>
-    <div class="flex justify-end gap-4">
+    <div class="flex  gap-4">
       <%= link_to "Cancel", project_path(app_creator.project), class: "btn" %>
       <%= button_tag "Save", type: "submit", class: "btn btn-primary" %>
     </div>
