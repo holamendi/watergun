@@ -47,10 +47,6 @@ class ServerActions::LinkService < ServerAction
     "Dokku::#{service_type.camelcase}::Link".constantize
   end
 
-  def default_env_name
-    dokku_command_class::DEFAULT_ENV_NAME
-  end
-
   def unset_existing_dokku_env
     Dokku::Config::Unset.call(ssh, app: dokku_app_id, variable_names: env_name)
   end

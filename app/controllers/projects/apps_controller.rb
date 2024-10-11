@@ -10,7 +10,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def create
-    @app_creator = App::Creator.new(app_creator_params)
+    @app_creator = App::Creator.new(create_app_params)
 
     if @app_creator.create
       redirect_to project_app_path(@project, @app_creator.app), notice: "App created"
@@ -41,7 +41,11 @@ class Projects::AppsController < Projects::BaseController
 
   private
 
-  def app_creator_params
+  def app_params
+    params.require(:app).permit(:name)
+  end
+
+  def create_app_params
     params.require(:app_creator).permit(:name, :repo, :branch).merge(project: @project)
   end
 
