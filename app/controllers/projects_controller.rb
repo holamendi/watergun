@@ -19,7 +19,7 @@ class ProjectsController < ApplicationController
     @project = Current.account.projects.new(project_params)
 
     if @project.save
-      redirect_to @project, notice: "Project was successfully created."
+      redirect_to @project, notice: "Project created."
     else
       render turbo_stream: turbo_stream.replace(
         "project_form",
@@ -36,7 +36,7 @@ class ProjectsController < ApplicationController
 
   def update
     if @project.update(project_params)
-      redirect_to project_path(@project), notice: "Project was successfully updated."
+      redirect_to project_path(@project), notice: "Project updated"
     else
       render :edit
     end

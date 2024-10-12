@@ -7,7 +7,7 @@ module Accounts
       @api_token = Current.account.api_tokens.create(api_token_params)
 
       if @api_token.save
-        redirect_to account_settings_path, notice: "API token created successfully"
+        redirect_to account_settings_path, notice: "API token created"
         cookies[:api_token] = @api_token.token
       else
         render turbo_stream: turbo_stream.replace(

@@ -10,7 +10,7 @@ class FirstRunsController < ApplicationController
   def update
     if @user.update(user_params)
       sign_in(@user)
-      redirect_to root_path, notice: "Account created successfully."
+      redirect_to root_path, notice: "Account created"
     else
       render :new, status: :unprocessable_entity
     end

@@ -5,8 +5,6 @@
   <%= render "projects/services/tabs", service: @service %>
 <% end %>
 
-<div class="mt-8 space-y-8">
-  <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
-  <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
-  <%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
-</div>
+<%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
+<%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
+<%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
