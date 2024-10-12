@@ -32,7 +32,7 @@ Rails.application.routes.draw do
       resources :apps do
         scope module: :apps do
           resource :builder, only: %i[update]
-          resources :deployments, only: :create do
+          resources :deployments, only: %i[index create] do
             get :logs, on: :member
           end
 

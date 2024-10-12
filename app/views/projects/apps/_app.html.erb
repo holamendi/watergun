@@ -2,7 +2,7 @@
   <div class="flex min-w-0 gap-x-4">
     <div class="flex-auto min-w-0">
       <p class="text-sm font-semibold leading-6 text-gray-900">
-        <%= link_to project_app_path(app.project, app) do %>
+        <%= link_to project_app_deployments_path(app.project, app) do %>
           <span class="absolute inset-x-0 bottom-0 -top-px"></span>
           <%= app.name %>
         <% end %>

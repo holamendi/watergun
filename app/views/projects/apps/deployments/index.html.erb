@@ -1,0 +1,32 @@
+<%= turbo_stream_from @app, :deployments %>
+
+<% content_for :header do %>
+  <%= render "projects/apps/header", app: @app %>
+  <%= render "projects/apps/tabs", app: @app %>
+<% end %>
+
+<% if @app.github_repo.present? %>
+  <%= button_to "Deploy", project_app_deployments_path(@app.project, @app), class: "inline-flex justify-center rounded-md border border-transparent bg-teal-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" %>
+
+  <div class="mt-4">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Commit</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Finished</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Duration</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody id="deployments" class="bg-white divide-y divide-gray-200">
+          <%= render partial: "projects/apps/deployments/deployment", collection: @deployments %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="mt-8">
+    <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" %>
+  </div>
+<% end %>

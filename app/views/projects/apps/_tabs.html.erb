@@ -2,8 +2,8 @@
   <%= component :tabs, [
     {
       title: "Deployments",
-      path: project_app_path(app.project, app),
-      current: controller_name == "apps" && action_name == "show"
+      path: project_app_deployments_path(app.project, app),
+      current: controller_name == "deployments"
     },
     {
       title: "Metrics",
