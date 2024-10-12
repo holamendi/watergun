@@ -4,7 +4,7 @@ ruby file: ".ruby-version"
 
 gem "rails", github: "rails/rails", branch: "main"
 gem "propshaft"
-gem "sqlite3", "~> 2.0.0"
+gem "sqlite3", "~> 2.1.0"
 gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1.7"
 gem "tzinfo-data", platforms: %i[windows jruby]
