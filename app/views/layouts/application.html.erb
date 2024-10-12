@@ -14,7 +14,7 @@
   <body class="h-full">
     <div class="min-h-full">
       <%= render "shared/navbar" %>
-      <div class="py-6">
+      <div class="py-8">
         <% if content_for?(:header) %>
           <header>
             <div class="max-w-5xl px-4 mx-auto sm:px-6 lg:px-8">
@@ -23,7 +23,7 @@
           </header>
         <% end %>
         <main>
-          <div class="<%= @main_width == "full" ? "w-full" : "max-w-5xl" %> px-4 py-4 mx-auto sm:px-6 lg:px-8">
+          <div class="<%= @main_width == "full" ? "w-full" : "max-w-5xl" %> px-4 py-8 mx-auto sm:px-6 lg:px-8">
             <%= render "shared/toasts" %>
             <%= yield %>
           </div>

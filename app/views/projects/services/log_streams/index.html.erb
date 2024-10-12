@@ -1,7 +1,4 @@
-<%= turbo_stream_from @service %>
 <%= turbo_stream_from @log_stream %>
-
-<% @main_width = "full" %>
 
 <% content_for :header do %>
   <%= render "projects/services/header", service: @service %>

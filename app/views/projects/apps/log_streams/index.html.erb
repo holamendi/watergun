@@ -1,8 +1,6 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @log_stream %>
 
-<% @main_width = "full" %>
-
 <% content_for :header do %>
   <%= render "projects/apps/header", app: @app %>
   <%= render "projects/apps/tabs", app: @app %>

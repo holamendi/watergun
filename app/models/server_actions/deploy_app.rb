@@ -77,6 +77,6 @@ class ServerActions::DeployApp < ServerAction
       ["#{app.name}: deployment failed", :notice]
     end
 
-    user.notify_later(message, type:)
+    Toast.append_to_user(user, message, type:)
   end
 end

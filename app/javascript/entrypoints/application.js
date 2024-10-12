@@ -31,7 +31,7 @@ import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
 
-application.debug = false
+application.debug = true
 window.Stimulus   = application
 
 application.register('notification', Notification)
