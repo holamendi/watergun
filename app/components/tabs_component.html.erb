@@ -1,7 +1,7 @@
 <div>
   <div class="block">
     <div class="border-b border-gray-200">
-      <nav class="flex -mb-px space-x-8 overflow-x-scroll" aria-label="Tabs">
+      <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Tabs">
         <% tabs.each do |tab| %>
           <%= link_to tab.title, tab.path,
               class: class_names(

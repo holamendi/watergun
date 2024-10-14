@@ -1,6 +1,6 @@
 class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   def index
-    @deployments = @app.deployments.kept.order(created_at: :desc).limit(10)
+    @deployments = @app.deployments.kept.order(created_at: :desc).limit(5)
   end
 
   def create

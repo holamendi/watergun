@@ -6,23 +6,9 @@
 <% end %>
 
 <% if @app.github_repo.present? %>
-  <div>
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Commit</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Finished</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Duration</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
-          </tr>
-        </thead>
-        <tbody id="deployments" class="bg-white divide-y divide-gray-200">
-          <%= render partial: "projects/apps/deployments/deployment", collection: @deployments %>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <ul role="list" class="divide-y divide-gray-100">
+    <%= render @deployments %>
+  </ul>
 <% else %>
   <div class="mt-8">
     <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" %>
