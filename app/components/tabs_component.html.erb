@@ -1,16 +1,7 @@
 <div>
-  <div class="sm:hidden">
-    <label for="tabs" class="sr-only">Select a tab</label>
-    <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
-    <select id="tabs" name="tabs" class="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm">
-      <% tabs.each do |tab| %>
-        <option <%= "selected" if tab.current %> value="<%= tab.path %>"><%= tab.title %></option>
-      <% end %>
-    </select>
-  </div>
-  <div class="hidden sm:block">
+  <div class="block">
     <div class="border-b border-gray-200">
-      <nav class="flex -mb-px space-x-8" aria-label="Tabs">
+      <nav class="flex -mb-px space-x-8 overflow-x-scroll" aria-label="Tabs">
         <% tabs.each do |tab| %>
           <%= link_to tab.title, tab.path,
               class: class_names(
