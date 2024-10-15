@@ -34,6 +34,7 @@ class App < ApplicationRecord
 
   after_update_commit do
     broadcast_replace_later_to self, target: dom_id(self, :header), partial: "projects/apps/header", locals: {app: self}
+    broadcast_replace_later_to project, target: dom_id(self), partial: "projects/apps/app", locals: {app: self}
   end
 
   delegate :github_integration, to: :account

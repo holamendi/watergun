@@ -36,7 +36,7 @@
   </div>
 <% end %>
 <% if @apps.any? || @services.any? %>
-  <ul role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+  <ul id="resources" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
     <% @apps.each do |app| %>
       <%= render partial: "projects/apps/app", locals: { app: app } %>
     <% end %>

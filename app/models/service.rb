@@ -24,6 +24,10 @@ class Service < ApplicationRecord
   before_validation :set_default_name, on: :create
   before_create :set_dokku_id
 
+  after_update_commit do
+    broadcast_replace_later_to project, target: dom_id(self), partial: "projects/services/service", locals: {service: self}
+  end
+
   def related_server_actions
     ServerAction.where(server_id:).where("json_extract(payload, '$.dokku_service_id') = ?", dokku_id)
   end

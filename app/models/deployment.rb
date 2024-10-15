@@ -3,8 +3,8 @@ class Deployment < ApplicationRecord
   include ServerActionable
 
   belongs_to :account, default: -> { Current.account }
-  belongs_to :app, touch: true
   belongs_to :user, default: -> { Current.user }, optional: true
+  belongs_to :app
   belongs_to :github_event, class_name: "Github::Event", optional: true
 
   store_attribute :data, :author_login, :string

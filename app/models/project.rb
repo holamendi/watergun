@@ -9,8 +9,6 @@ class Project < ApplicationRecord
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
 
-  broadcasts_refreshes
-
   broadcasts_to ->(project) { [project.account, :projects] }, inserts_by: :prepend
 
   def last_deployment
