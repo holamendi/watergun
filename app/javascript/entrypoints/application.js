@@ -27,6 +27,7 @@ const channels = import.meta.glob('./**/*_channel.js')
 // import '~/index.css'
 import { Application } from '@hotwired/stimulus'
 import Notification from '@stimulus-components/notification'
+import Dropdown from '@stimulus-components/dropdown'
 import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
@@ -35,7 +36,7 @@ application.debug = true
 window.Stimulus   = application
 
 application.register('notification', Notification)
-
+application.register('dropdown', Dropdown)
 const controllers = import.meta.glob('~/controllers/*_controller.js', { eager: true })
 registerControllers(application, controllers)
 

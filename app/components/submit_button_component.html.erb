@@ -1,0 +1,4 @@
+<%= button_tag @text,
+               class: "rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600",
+               data: { turbo_submits_with: "<span class='flex items-center gap-x-2'>#{render(SpinnerComponent.new(color: "white"))} #{@text}</span>" }
+%>

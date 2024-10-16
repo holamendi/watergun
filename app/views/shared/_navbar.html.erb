@@ -19,7 +19,11 @@
       <div class="flex items-center ml-6">
         <div class="relative ml-3" data-controller="dropdown">
           <div>
-            <button type="button" class="relative flex items-center max-w-xs text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" aria-expanded="false" aria-haspopup="true" data-action="click->dropdown#toggle">
+            <button type="button"
+                    data-action="dropdown#toggle click@window->dropdown#hide"
+                    class="relative flex items-center max-w-xs text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                    aria-expanded="false"
+                    aria-haspopup="true"
               <span class="absolute -inset-1.5"></span>
               <span class="sr-only">Open user menu</span>
               <span class="inline-block w-8 h-8 overflow-hidden bg-gray-100 rounded-full">
@@ -29,7 +33,16 @@
               </span>
             </button>
           </div>
-          <div class="absolute right-0 z-10 hidden w-48 py-1 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1" data-dropdown-target="menu">
+          <div data-dropdown-target="menu"
+               class="absolute right-0 z-10 hidden w-48 py-1 mt-2 transition origin-top-right transform bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+               data-transition-enter-from="opacity-0 scale-95"
+               data-transition-enter-to="opacity-100 scale-100"
+               data-transition-leave-from="opacity-100 scale-100"
+               data-transition-leave-to="opacity-0 scale-95"
+               role="menu"
+               aria-orientation="vertical"
+               aria-labelledby="user-menu-button"
+               tabindex="-1">
             <%= link_to "Settings", account_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
             <%= link_to "Server actions", server_actions_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
             <%= link_to "Solid Queue", "/jobs", target: :_blank, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>

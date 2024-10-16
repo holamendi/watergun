@@ -16,8 +16,6 @@
     </div>
   </div>
   <div class="w-1/4 text-right">
-    <%= button_tag type: "submit", class: "btn btn-primary no-animation btn-sm", data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
-      Save
-    <% end %>
+    <%= component "submit_button", text: "Save" %>
   </div>
 <% end %>

@@ -29,6 +29,6 @@
   </div>
   <div class="flex items-center mt-8 gap-x-6">
     <%= link_to "Cancel", project_path(app_creator.project), class: "text-sm font-semibold leading-6 text-gray-900" %>
-    <%= button_tag "Save", type: "submit", class: "rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600" %>
+    <%= component "submit_button", text: "Save" %>
   </div>
 <% end %>
