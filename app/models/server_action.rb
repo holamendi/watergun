@@ -66,6 +66,12 @@ class ServerAction < ApplicationRecord
       ActiveModel::Name.new(ServerAction)
     end
 
+    def run_now!(actionable, depends_on: nil, **)
+      action = create!(actionable:, preceding_action: depends_on, **)
+      action.run_now
+      action
+    end
+
     def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
       action.run_later(wait: 0.seconds)

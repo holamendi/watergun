@@ -3,19 +3,8 @@ class Project::Destroyer
     @project = project
   end
 
-  def destroy!
-    destroy_apps
-    destroy_services
+  def destroy
     @project.discard
-  end
-
-  private
-
-  def destroy_apps
-    @project.apps.kept.each { App::Destroyer.new(_1).destroy }
-  end
-
-  def destroy_services
-    @project.services.kept.each { Service::Destroyer.new(_1).destroy }
+    ServerActions::DestroyProject.run_later!(@project)
   end
 end

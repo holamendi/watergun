@@ -1,5 +1,6 @@
 class Project < ApplicationRecord
   include Discard::Model
+  include ServerActionable
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }

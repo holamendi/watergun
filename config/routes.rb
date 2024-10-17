@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  root "root#index"
+  root "projects#index"
 
   get "login", to: "sessions#new", as: :login
   delete "logout", to: "sessions#destroy", as: :logout

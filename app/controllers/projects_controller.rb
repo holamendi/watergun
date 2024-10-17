@@ -7,8 +7,6 @@ class ProjectsController < ApplicationController
   def show
     @apps = @project.apps.kept
     @services = @project.services.kept
-    @service = Service.new
-    Current.user.visit_project!(@project)
   end
 
   def new
@@ -43,7 +41,7 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    Project::Destroyer.new(@project).destroy!
+    Project::Destroyer.new(@project).destroy
     redirect_to projects_path, notice: "Project destroyed"
   end
 
