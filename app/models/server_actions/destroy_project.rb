@@ -22,10 +22,10 @@ class ServerActions::DestroyProject < ServerAction
   end
 
   def destroy_dokku_apps!
-    project.apps.each { ServerActions::DestroyApp.run_now!(_1) }
+    project.apps.kept.each { ServerActions::DestroyApp.run_now!(_1) }
   end
 
   def destroy_dokku_services!
-    project.services.each { ServerActions::DestroyService.run_now!(_1) }
+    project.services.kept.each { ServerActions::DestroyService.run_now!(_1) }
   end
 end
