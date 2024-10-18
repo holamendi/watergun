@@ -19,13 +19,7 @@ class ProjectsController < ApplicationController
     if @project.save
       redirect_to @project, notice: "Project created."
     else
-      render turbo_stream: turbo_stream.replace(
-        "project_form",
-        partial: "projects/form",
-        locals: {
-          project: @project
-        }
-      )
+      render :new
     end
   end
 

@@ -32,7 +32,7 @@ class Server < ApplicationRecord
     return if commands.blank?
 
     ssh_session do |ssh|
-      Array.wrap(commands).each do |command|
+      Array(commands).each do |command|
         ssh.execute(command)
       end
     end

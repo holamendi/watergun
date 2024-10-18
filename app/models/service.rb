@@ -43,13 +43,11 @@ class Service < ApplicationRecord
   private
 
   def set_default_name
-    return unless name.blank?
-    return unless service_type.present?
+    return if name.present? || service_type.blank?
 
-    self.name = service_type.titleize
-
-    while server.services.kept.exists?(name:)
+    loop do
       self.name = "#{service_type.titleize}-#{SecureRandom.hex(2)}"
+      break unless server.services.kept.exists?(name: name)
     end
   end
 

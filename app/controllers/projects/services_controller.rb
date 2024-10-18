@@ -20,7 +20,7 @@ module Projects
           ).create
         end
 
-        redirect_to project_service_path(@project, @service)
+        redirect_to project_path(@project), notice: "Service created"
       else
         render :new, status: :unprocessable_entity
       end
