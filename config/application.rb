@@ -21,7 +21,7 @@ Bundler.require(*Rails.groups)
 module Watergun
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.0
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -40,7 +40,7 @@ module Watergun
     config.generators.system_tests = nil
 
     config.mission_control.jobs.base_controller_class = "ApplicationController"
-    config.solid_queue.connects_to = {database: {writing: :solid_queue, reading: :solid_queue}}
+    config.solid_queue.connects_to = {database: {writing: :queue, reading: :queue}}
     # config.solid_queue.logger = Rails.application.logger
     #
     config.active_record.encryption.support_unencrypted_data = true

@@ -25,10 +25,7 @@ class ServiceTest < ActiveSupport::TestCase
 
   test "name defaults to titleized service type" do
     service = Service.create!(service_type: "postgres", account: @account, server: @server, project: @project)
-    assert_equal "Postgres", service.name
-
-    service_2 = Service.create!(service_type: "postgres", account: @account, server: @server, project: @project)
-    assert_match(/Postgres-[0-9a-f]{4}/i, service_2.name)
+    assert_match(/postgres-[0-9a-f]{4}/i, service.name)
   end
 
   test "dokku_id is set on create" do

@@ -20,29 +20,33 @@ development:
     <<: *default
     database: storage/primary_development.sqlite3
 
-  solid_queue:
+  queue:
     <<: *default
-    database: storage/solid_queue_development.sqlite3
-    migrations_paths: db/solid_queue_migrate
+    database: storage/queue_development.sqlite3
+    migrations_paths: db/queue_migrate
+
+  cable:
+    <<: *default
+    database: storage/cable_development.sqlite3
+    migrations_paths: db/cable_migrate
 
 test:
   primary:
     <<: *default
     database: storage/primary_test.sqlite3
 
-  solid_queue:
-    <<: *default
-    database: storage/solid_queue_test.sqlite3
-    migrations_paths: db/solid_queue_migrate
-
 production:
   primary:
     <<: *default
     database: storage/primary_production.sqlite3
 
-  solid_queue:
+  queue:
     <<: *default
-    database: storage/solid_queue_production.sqlite3
-    migrations_paths: db/solid_queue_migrate
+    database: storage/queue_production.sqlite3
+    migrations_paths: db/queue_migrate
 
+  cable:
+    <<: *default
+    database: storage/cable_production.sqlite3
+    migrations_paths: db/cable_migrate
 
