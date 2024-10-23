@@ -34,7 +34,7 @@ module Projects
 
     def update
       if @service.update(service_params)
-        redirect_to project_service_path(@project, @service), notice: "Service updated successfully."
+        redirect_to edit_project_service_path(@project, @service), notice: "Service updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -53,6 +53,10 @@ module Projects
 
     def service_params
       params.require(:service).permit(:name, :service_type)
+    end
+
+    def update_service_params
+      params.require(:service).permit(:name)
     end
   end
 end
