@@ -54,10 +54,6 @@ class App::Creator
     repo.split("/").last
   end
 
-  def generate_internal_env_name
-    "INTERNAL_#{SecureRandom.alphanumeric(4).upcase}_URL"
-  end
-
   def validate_remote_repo_exists
     errors.add(:repo, "does not exist") unless remote_repo
   end
