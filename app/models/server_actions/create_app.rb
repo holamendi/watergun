@@ -16,6 +16,7 @@ class ServerActions::CreateApp < ServerAction
   def run
     create_dokku_app!
     create_domains!
+    create_service_links!
   rescue Ssh::CommandExecutionError
     app.error!
     raise
@@ -30,6 +31,12 @@ class ServerActions::CreateApp < ServerAction
   def create_domains!
     dokku_app_hostnames.each_with_index do |hostname, index|
       app.domains.create!(hostname:, status: :active, is_default: index.zero?)
+    end
+  end
+
+  def create_service_links!
+    app.project.services.kept.each do |service|
+      ServiceLink::Creator.new(service:, app:).create
     end
   end
 

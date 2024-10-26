@@ -27,7 +27,6 @@ class ServerActions::LinkService < ServerAction
   end
 
   def run
-    unset_existing_dokku_env
     link_dokku_service!
     schedule_pull_env!
   rescue Ssh::CommandExecutionError
@@ -45,10 +44,6 @@ class ServerActions::LinkService < ServerAction
 
   def dokku_link_command_class
     "Dokku::#{service_type.camelcase}::Link".constantize
-  end
-
-  def unset_existing_dokku_env
-    Dokku::Config::Unset.call(ssh, app: dokku_app_id, variable_names: env_name)
   end
 
   def schedule_pull_env!

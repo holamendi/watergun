@@ -14,8 +14,8 @@ class Deployment < ApplicationRecord
   store_attribute :data, :commit_message, :string
   store_attribute :data, :commit_html_url, :string
 
-  str_enum :status, [:pending, :deploying, :success, :error], default: :pending
-  str_enum :source, [:web, :api_v1, :github_webhook]
+  enum :status, %w[pending deploying success error].index_by(&:itself), default: :pending
+  enum :source, %w[web api_v1 github_webhook].index_by(&:itself)
 
   attribute :source, :string, default: -> { Current.source }
 

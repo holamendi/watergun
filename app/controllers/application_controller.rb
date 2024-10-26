@@ -21,11 +21,10 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate
-    session = Session.find_by_active_token(cookies.signed[:session_token])
-    if session
+    if (session = Session.find_by_active_token(cookies.signed[:session_token]))
       Current.session = session
     else
-      redirect_to "/login", notice: "Please sign in"
+      redirect_to login_path, notice: "Please sign in"
     end
   end
 

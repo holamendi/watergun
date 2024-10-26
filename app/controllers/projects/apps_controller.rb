@@ -28,9 +28,12 @@ class Projects::AppsController < Projects::BaseController
 
   def update
     if @app.update(app_params)
-      redirect_to edit_project_app_path(@project, @app), notice: "App updated successfully."
+      render turbo_stream: [
+        append_toast("App updated"),
+        render_form
+      ]
     else
-      render :edit, status: :unprocessable_entity
+      render turbo_stream: render_form, status: :unprocessable_entity
     end
   end
 
@@ -46,7 +49,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def create_app_params
-    params.require(:app_creator).permit(:name, :repo, :branch).merge(project: @project)
+    params.require(:app_creator).permit(:name, :repo, :branch, :webhook_deploy).merge(project: @project)
   end
 
   def set_app
@@ -54,10 +57,6 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def render_form
-    turbo_stream.replace(
-      "app_form",
-      partial: "projects/apps/form",
-      locals: {project: @project, app: @app}
-    )
+    turbo_stream.replace("app_form", partial: "projects/apps/form", locals: {project: @project, app: @app})
   end
 end

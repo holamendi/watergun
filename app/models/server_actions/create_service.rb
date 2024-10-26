@@ -21,6 +21,7 @@ class ServerActions::CreateService < ServerAction
 
     create_dokku_service!
     service.data = dokku_service_info
+    link_to_project_apps!
   rescue Ssh::CommandExecutionError
     service.error!
     raise
@@ -34,6 +35,10 @@ class ServerActions::CreateService < ServerAction
 
   def dokku_service_info
     dokku_service_info_command_class.call!(ssh, service: dokku_service_id).parsed_output
+  end
+
+  def link_to_project_apps!
+    service.project.apps.kept.each { |app| ServiceLink::Creator.new(service:, app:).create }
   end
 
   def dokku_service_create_command_class

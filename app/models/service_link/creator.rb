@@ -1,10 +1,10 @@
 class ServiceLink::Creator
   attr_reader :service, :app, :env_name, :env_variable, :service_link
 
-  def initialize(service:, app:, env_name: nil)
+  def initialize(service:, app:)
     @service = service
     @app = app
-    @env_name = env_name
+    @env_name = "INTERNAL_#{service.dokku_id.underscore.upcase}_URL"
   end
 
   def create
@@ -17,6 +17,6 @@ class ServiceLink::Creator
       @service_link = ServiceLink.create!(service: @service, app: @app, env_variable: @env_variable)
     end
 
-    ServerActions::LinkService.run_later!(@service_link)
+    ServerActions::LinkService.run_now!(@service_link)
   end
 end

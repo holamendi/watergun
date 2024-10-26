@@ -7,12 +7,11 @@ class App::Creator
   attribute :name
   attribute :repo
   attribute :branch
-  attribute :webhook_deploy, default: false
+  attribute :webhook_deploy, :boolean, default: false
+
   attribute :app
 
-  validates :project, presence: true
-  validates :repo, presence: true
-  validates :branch, presence: true
+  validates :project, :repo, :branch, presence: true
   validates :webhook_deploy, inclusion: {in: [true, false]}
   validate :validate_remote_repo_exists, if: -> { repo.present? }
   validate :validate_remote_branch_exists, if: -> { branch.present? }
@@ -25,6 +24,7 @@ class App::Creator
       app.create_github_repo!(repo:, branch:, webhook_deploy:, private: remote_repo.private?)
       ServerActions::CreateApp.run_later!(app)
     end
+
     true
   end
 
@@ -47,11 +47,15 @@ class App::Creator
   end
 
   def app_name
-    name.presence || repo_name
+    name.presence || default_app_name
   end
 
-  def repo_name
+  def default_app_name
     repo.split("/").last
+  end
+
+  def generate_internal_env_name
+    "INTERNAL_#{SecureRandom.alphanumeric(4).upcase}_URL"
   end
 
   def validate_remote_repo_exists

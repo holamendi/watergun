@@ -4,7 +4,7 @@ class Service < ApplicationRecord
   include LogStreamable
   include ServerActionable
 
-  TEMPORARY_STATUSES = %w[deleting restarting stopping].freeze
+  TEMPORARY_STATUSES = %w[pending deleting restarting stopping].freeze
 
   belongs_to :account, default: -> { Current.account }
   belongs_to :server, default: -> { Current.server }
@@ -16,16 +16,17 @@ class Service < ApplicationRecord
   store_attribute :data, :dsn, :string
   store_attribute :data, :version, :string
 
-  str_enum :status, [:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
-  str_enum :service_type, [:postgres, :redis, :mongo], validate: true
+  enum :status, %w[pending active restarting stopping stopped deleting deleted error].index_by(&:itself), default: :pending
+  enum :service_type, %w[postgres redis mongo].index_by(&:itself), validate: true
 
   validates :name, presence: true
 
-  before_validation :set_default_name, on: :create
   before_create :set_dokku_id
 
   after_update_commit do
+    broadcast_replace_later_to self, target: dom_id(self, :header), partial: "projects/services/header", locals: {service: self}
     broadcast_replace_later_to project, target: dom_id(self), partial: "projects/services/service", locals: {service: self}
+    broadcast_replace_later_to self, target: dom_id(self, :form), partial: "projects/services/form", locals: {service: self}
   end
 
   def related_server_actions
@@ -42,20 +43,12 @@ class Service < ApplicationRecord
 
   private
 
-  def set_default_name
-    return if name.present? || service_type.blank?
-
-    loop do
-      self.name = "#{service_type.titleize}-#{SecureRandom.hex(2)}"
-      break unless server.services.kept.exists?(name: name)
-    end
-  end
-
   def set_dokku_id
     self.dokku_id = name.parameterize
 
-    while server.services.kept.exists?(dokku_id:)
-      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(2)}"
+    loop do
+      break unless server.services.kept.exists?(dokku_id:)
+      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(4)}"
     end
   end
 end

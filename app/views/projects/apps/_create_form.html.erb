@@ -1,4 +1,4 @@
-<%= form_with model: app_creator, url: project_apps_path(app_creator.project), method: :post, id: "github_repo_form" do |form| %>
+<%= form_with model: app_creator, url: project_apps_path(app_creator.project), method: :post do |form| %>
   <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
     <div class="sm:col-span-3">
       <%= form.label :repo, "Repository", class: "block text-sm font-medium leading-6 text-gray-900" %>

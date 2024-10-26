@@ -1,62 +1,58 @@
-module Projects
-  class ServicesController < BaseController
-    before_action :set_service, only: [:show, :edit, :update, :destroy]
+class Projects::ServicesController < Projects::BaseController
+  before_action :set_service, only: [:show, :edit, :update, :destroy]
 
-    def new
-      @service = @project.services.new
+  def new
+    @service_creator = Service::Creator.new(project: @project)
+  end
+
+  def create
+    @service_creator = Service::Creator.new(create_service_params)
+
+    if @service_creator.create
+      redirect_to project_service_path(@project, @service_creator.service), notice: "Service created"
+    else
+      render :new, status: :unprocessable_entity
     end
+  end
 
-    def create
-      @service = @project.services.new(service_params)
+  def show
+  end
 
-      if @service.save
-        ServerActions::CreateService.run_later!(@service)
+  def edit
+  end
 
-        @project.apps.kept.each do |app|
-          ServiceLink::Creator.new(
-            service: @service,
-            app: app,
-            env_name: "INTERNAL_#{SecureRandom.alphanumeric(4).upcase}_URL"
-          ).create
-        end
-
-        redirect_to project_path(@project), notice: "Service created"
-      else
-        render :new, status: :unprocessable_entity
-      end
+  def update
+    if @service.update(service_params)
+      render turbo_stream: [append_toast("Service updated"), render_form]
+    else
+      render turbo_stream: render_form, status: :unprocessable_entity
     end
+  end
 
-    def show
-    end
+  def destroy
+    Service::Destroyer.new(@service).destroy
+    redirect_to @project, notice: "Service destroyed"
+  end
 
-    def edit
-    end
+  private
 
-    def update
-      if @service.update(service_params)
-        redirect_to edit_project_service_path(@project, @service), notice: "Service updated successfully."
-      else
-        render :edit, status: :unprocessable_entity
-      end
-    end
+  def set_service
+    @service = @project.services.kept.find(params[:id])
+  end
 
-    def destroy
-      Service::Destroyer.new(@service).destroy
-      redirect_to @project, notice: "Service destroyed"
-    end
+  def create_service_params
+    params.require(:service_creator).permit(:name, :service_type).merge(project: @project)
+  end
 
-    private
+  def service_params
+    params.require(:service).permit(:name, :service_type)
+  end
 
-    def set_service
-      @service = @project.services.kept.find(params[:id])
-    end
+  def update_service_params
+    params.require(:service).permit(:name)
+  end
 
-    def service_params
-      params.require(:service).permit(:name, :service_type)
-    end
-
-    def update_service_params
-      params.require(:service).permit(:name)
-    end
+  def render_form
+    turbo_stream.replace("service_form", partial: "projects/services/form", locals: {project: @project, service: @service})
   end
 end

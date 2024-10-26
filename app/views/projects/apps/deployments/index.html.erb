@@ -6,7 +6,7 @@
 <% end %>
 
 <% if @app.github_repo.present? %>
-  <ul id="deployments" role="list" class="divide-y divide-gray-100">
+  <ul id="deployments" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
     <%= render @deployments %>
   </ul>
 <% else %>

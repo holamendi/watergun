@@ -7,7 +7,7 @@ class Container < ApplicationRecord
 
   scope :checked_within, ->(from:, to: Time.current) { joins(:checks).where(container_checks: {timestamp: from..to}).distinct }
 
-  str_enum :status, [:running, :stopped], default: :running
+  enum :status, %w[running stopped].index_by(&:itself), default: :running
 
   def dokku_process_type
     name.split(".").second_to_last

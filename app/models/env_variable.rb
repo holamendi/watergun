@@ -10,7 +10,7 @@ class EnvVariable < ApplicationRecord
 
   has_one :service_link, dependent: :destroy
 
-  str_enum :status, [:pending, :syncing, :synced, :error], default: :pending
+  enum :status, %w[pending syncing synced error].index_by(&:itself), default: :pending
 
   validates :name, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
   validates :value, presence: true

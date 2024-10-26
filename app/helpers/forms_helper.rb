@@ -6,10 +6,10 @@ module FormsHelper
   def error_messages(messages)
     return unless messages.any?
 
-    tag.div(class: "label") do
+    tag.div do
       safe_join(
         messages.map do |message|
-          tag.span(message, class: "label-text-alt text-error")
+          tag.span(message, class: "text-sm text-red-500")
         end
       )
     end

@@ -7,10 +7,10 @@ class ServerAction < ApplicationRecord
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
-  str_enum :status, %i[queued running success failure cancelled error], default: :queued
-  str_enum :source, [:web, :api_v1]
+  enum :status, %w[queued running success failure cancelled error].index_by(&:itself), default: :queued
+  enum :source, %w[web api_v1].index_by(&:itself)
 
-  attribute :source, :string, default: -> { Current.source }
+  attribute :source, :string, default: -> { Current.source.presence || :web }
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
