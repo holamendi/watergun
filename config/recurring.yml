@@ -2,9 +2,12 @@ default: &default
   fetch_container_metrics:
     class: FetchContainerMetricsJob
     schedule: every 30 seconds
-  trim_solid_cable_messages:
+  solid_cable_trimmessages:
     command: "SolidCable::TrimJob.perform_later"
     schedule: every 10 minutes
+  solid_queue_clear_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches"
+    schedule: every day at 1am
 
 development:
   <<: *default
