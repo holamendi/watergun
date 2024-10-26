@@ -6,13 +6,7 @@ module SshCommandable
 
     attr_reader :ssh_session, :result
 
-    delegate :success?,
-      :failure?,
-      :duration,
-      :started_at,
-      :finished_at,
-      :output,
-      :text_output, to: :result
+    delegate :success?, :failure?, :duration, :started_at, :finished_at, :output, :text_output, to: :result
   end
 
   class_methods do

@@ -64,8 +64,9 @@ class App < ApplicationRecord
   def set_dokku_id
     self.dokku_id = name.parameterize.dasherize
 
-    while server.apps.kept.exists?(dokku_id:)
-      self.dokku_id = "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
+    loop do
+      break unless server.apps.kept.exists?(dokku_id:)
+      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(4)}"
     end
   end
 end

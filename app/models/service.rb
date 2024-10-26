@@ -44,7 +44,7 @@ class Service < ApplicationRecord
   private
 
   def set_dokku_id
-    self.dokku_id = name.parameterize
+    self.dokku_id = name.parameterize.dasherize
 
     loop do
       break unless server.services.kept.exists?(dokku_id:)
