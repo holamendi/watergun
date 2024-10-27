@@ -39,10 +39,6 @@ class App < ApplicationRecord
 
   delegate :github_integration, to: :account
 
-  def related_server_actions
-    ServerAction.where("json_extract(payload, '$.dokku_app_id') = ?", dokku_id)
-  end
-
   def pending_restart!
     update!(pending_restart: true)
   end

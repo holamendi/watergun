@@ -15,6 +15,7 @@ module Ssh
         yield(self)
         @session.loop
       end
+
       self
     ensure
       @finished_at = Time.current

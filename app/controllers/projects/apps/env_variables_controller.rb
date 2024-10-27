@@ -8,11 +8,9 @@ module Projects
       end
 
       def index
-        @env_variables = @app.env_variables.kept
+        @env_variables = @app.env_variables.kept.editable
           .includes(service_link: :service)
-          .not_internal
-          .not_reserved
-          .sorted_by_name
+          .order(:name)
       end
 
       def create

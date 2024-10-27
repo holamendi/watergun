@@ -8,15 +8,19 @@ class ServiceLink::Creator
   end
 
   def create
-    ApplicationRecord.transaction do
-      @env_variable = @app.env_variables.kept.find_or_initialize_by(name: @env_name)
-      @env_variable.value = "temp"
-      @env_variable.internal = true
-      @env_variable.save!
+    @env_variable = @app.env_variables.kept
+      .find_or_initialize_by(name: @env_name)
+      .assign_attributes(
+        value: "temp",
+        internal: true
+      )
 
+    ApplicationRecord.transaction do
+      @env_variable.save!
       @service_link = ServiceLink.create!(service: @service, app: @app, env_variable: @env_variable)
     end
 
     ServerActions::LinkService.run_now!(@service_link)
+    true
   end
 end
