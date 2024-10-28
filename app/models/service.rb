@@ -25,8 +25,8 @@ class Service < ApplicationRecord
 
   after_update_commit do
     broadcast_replace_later_to self, target: dom_id(self, :header), partial: "projects/services/header", locals: {service: self}
-    broadcast_replace_later_to project, target: dom_id(self), partial: "projects/services/service", locals: {service: self}
     broadcast_replace_later_to self, target: dom_id(self, :form), partial: "projects/services/form", locals: {service: self}
+    broadcast_replace_later_to project, target: dom_id(self), partial: "projects/services/service", locals: {service: self}
   end
 
   def related_server_actions
