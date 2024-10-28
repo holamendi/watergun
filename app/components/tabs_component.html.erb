@@ -5,8 +5,8 @@
         <% tabs.each do |tab| %>
           <%= link_to tab.title, tab.path,
               class: class_names(
-                "px-1 py-4 text-sm font-medium whitespace-nowrap",
-                "border-teal-500 text-teal-600" => tab.current,
+                "px-1 py-4 text-sm font-medium whitespace-nowrap border-b-2",
+                "border-teal-500 text-teal-600 border-teal-500" => tab.current,
                 "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" => !tab.current
               ),
               data: { turbo_prefetch: tab.prefetch }
