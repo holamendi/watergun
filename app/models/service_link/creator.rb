@@ -8,12 +8,8 @@ class ServiceLink::Creator
   end
 
   def create
-    @env_variable = @app.env_variables.kept
-      .find_or_initialize_by(name: @env_name)
-      .assign_attributes(
-        value: "temp",
-        internal: true
-      )
+    @env_variable = @app.env_variables.kept.find_or_initialize_by(name: @env_name)
+    @env_variable.assign_attributes(value: "temp", internal: true)
 
     ApplicationRecord.transaction do
       @env_variable.save!
