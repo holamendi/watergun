@@ -1,6 +1,10 @@
 <li id="<%= dom_id(deployment) %>" class="px-4 py-5 hover:bg-gray-50 sm:px-6">
   <div class="flex items-center gap-x-3">
-    <img src="<%= deployment.author_avatar_url %>" alt="" class="flex-none w-6 h-6 bg-gray-800 rounded-full">
+    <% if deployment.author_avatar_url.present? %>
+      <img src="<%= deployment.author_avatar_url %>" alt="" class="flex-none w-6 h-6 bg-gray-800 rounded-full">
+    <% else %>
+      <div class="flex-none w-6 h-6 bg-gray-800 rounded-full"></div>
+    <% end %>
     <%= link_to deployment.short_sha, deployment.commit_html_url, class: "flex-auto text-sm font-semibold leading-6 text-gray-900 truncate hover:underline" %>
     <% if deployment.finished?%>
       <time title="<%= deployment.finished_at.to_s %>" datetime="<%= deployment.finished_at.to_s %>" class="flex-none text-sm text-gray-500">Deployed <%= time_ago_in_words(deployment.finished_at) %> ago</time>
