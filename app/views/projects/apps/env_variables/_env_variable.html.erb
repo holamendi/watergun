@@ -1,15 +1,12 @@
-<%= turbo_frame_tag env_variable do %>
-  <div class="flex flex-row px-4 py-3 space-x-4 border rounded-md group">
-    <div class="w-1/4">
-      <%= env_variable.name %>
-    </div>
-    <div class="w-2/4 overflow-auto ">
-      <span class="group-hover:hidden">*******</span>
-      <span class="hidden group-hover:inline-block"><%= env_variable.value %></span>
-    </div>
-    <div class="w-1/4 text-right">
-      <%= link_to "Edit", edit_project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "btn btn-xs btn-ghost" %>
-      <%= link_to "Delete", project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "btn btn-xs btn-ghost text-error", data: { turbo_method: :delete, turbo_confirm: "Sure? "} %>
-    </div>
-  </div>
-<% end %>
+<tr>
+  <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0">
+        <%= form.text_field :name, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm" %>
+  </td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+
+  </td>
+  <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
+    <%= link_to "Edit", edit_project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "text-indigo-600 hover:text-indigo-900" %>
+    <%= link_to "Delete", project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "text-indigo-600 hover:text-indigo-900", data: { turbo_method: :delete, turbo_confirm: "Sure?"} %>
+  </td>
+</tr>
