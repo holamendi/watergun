@@ -7,7 +7,7 @@ command_exists() {
 # constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.34.6
+DOKKU_TAG=v0.35.13
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_DOCKER_REPO="holamendi/watergun"

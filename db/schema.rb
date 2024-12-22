@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_10_17_065624) do
+ActiveRecord::Schema[8.1].define(version: 2024_12_16_065751) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -280,6 +280,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_10_17_065624) do
     t.datetime "last_synced_at"
     t.string "public_ip"
     t.string "cpu_type"
+    t.integer "ssh_port", default: 22
     t.index ["account_id"], name: "index_servers_on_account_id"
     t.index ["last_synced_at"], name: "index_servers_on_last_synced_at"
     t.index ["status"], name: "index_servers_on_status"

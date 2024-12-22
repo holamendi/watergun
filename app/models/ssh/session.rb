@@ -10,7 +10,11 @@ module Ssh
     def connect
       @started_at = Time.current
 
-      Net::SSH.start(server.public_ip, SshKey::USER, key_data: [ssh_private_key], keys_only: true, non_interactive: true) do |session|
+      Net::SSH.start(server.public_ip, SshKey::USER,
+        port: ssh_port,
+        key_data: [ssh_private_key],
+        keys_only: true,
+        non_interactive: true) do |session|
         @session = session
         yield(self)
         @session.loop
@@ -58,6 +62,10 @@ module Ssh
     end
 
     private
+
+    def ssh_port
+      server.ssh_port || 22
+    end
 
     def ssh_private_key
       server.ssh_key.private_key

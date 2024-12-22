@@ -1,9 +1,9 @@
-<tr>
+<tr id="<%= dom_id(env_variable) %>">
   <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0">
-        <%= form.text_field :name, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm" %>
+    <%= env_variable.name %>
   </td>
   <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-
+    <%= env_variable.value %>
   </td>
   <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
     <%= link_to "Edit", edit_project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "text-indigo-600 hover:text-indigo-900" %>
