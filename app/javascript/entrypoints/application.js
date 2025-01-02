@@ -32,7 +32,7 @@ import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
 
-application.debug = true
+application.debug = process.env.NODE_ENV !== 'production'
 window.Stimulus   = application
 
 application.register('notification', Notification)
@@ -42,5 +42,3 @@ registerControllers(application, controllers)
 
 
 import "chartkick/chart.js"
-
-

@@ -1,27 +1,37 @@
-
 <tr id="<%= dom_id(server_action) %>">
-  <td><%= server_action.id %></td>
-  <td><%= server_action.slug %></td>
-  <td>
+  <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0"><%= server_action.id %></td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap"><%= server_action.slug %></td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
     <% if server_action.actionable_type.present? %>
       <%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %>
     <% else %>
       destroyed
     <% end %>
   </td>
-  <td><%= server_action.user&.email %></td>
-  <td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap"><%= server_action.user&.email %></td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
     <% if server_action.finished? %>
-      <div class="tooltip" data-tip="<%= server_action.finished_at.to_s %>">
-        <%= time_ago_in_words(server_action.finished_at) %> ago
+      <div class="relative inline-block group">
+        <span><%= time_ago_in_words(server_action.finished_at) %> ago</span>
+        <span class="absolute invisible px-2 py-1 mt-1 text-xs text-white -translate-x-1/2 -translate-y-full bg-gray-900 rounded-md group-hover:visible left-1/2 whitespace-nowrap">
+          <%= server_action.finished_at.to_s %>
+        </span>
       </div>
     <% end %>
   </td>
-  <td><% if server_action.finished? %><%= server_action.duration.round(1) %>s<% end %></td>
-  <td><span class="badge <%= status_badge_class(server_action.status) %> badge-sm"><%= server_action.status %></span></td>
-  <td>
+  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
     <% if server_action.finished? %>
-      <%= link_to "logs", logs_server_action_path(server_action), class: "link", target: :_blank %>
+      <%= server_action.duration.round(1) %>s
+    <% end %>
+  </td>
+  <td class="px-3 py-4 text-sm whitespace-nowrap">
+    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium <%= status_color_class(server_action.status) %>">
+      <%= server_action.status %>
+    </span>
+  </td>
+  <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
+    <% if server_action.finished? %>
+      <%= link_to "logs", logs_server_action_path(server_action), class: "text-teal-600 hover:text-teal-900", target: :_blank %>
     <% end %>
   </td>
 </tr>

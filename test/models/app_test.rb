@@ -7,6 +7,7 @@ class AppTest < ActiveSupport::TestCase
     @project = projects(:calendar)
     @app = apps(:calendar)
   end
+
   test "account defaults to Current.account" do
     Current.set(account: @account) do
       app = App.new

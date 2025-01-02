@@ -1,12 +1,15 @@
-<tr id="<%= dom_id(env_variable) %>">
-  <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0">
-    <%= env_variable.name %>
-  </td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-    <%= env_variable.value %>
-  </td>
-  <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
-    <%= link_to "Edit", edit_project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "text-indigo-600 hover:text-indigo-900" %>
-    <%= link_to "Delete", project_app_env_variable_path(env_variable.app.project, env_variable.app, env_variable), class: "text-indigo-600 hover:text-indigo-900", data: { turbo_method: :delete, turbo_confirm: "Sure?"} %>
-  </td>
-</tr>
+<%= turbo_frame_tag env_variable, class: "py-2 sm:flex" do %>
+  <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6"><%= env_variable.name %></dt>
+  <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
+    <div class="text-gray-900"><%= env_variable.value %></div>
+    <div>
+      <%= link_to "Edit",
+        edit_project_app_env_variable_path(@project, @app, env_variable),
+        class: "font-semibold text-teal-600 hover:text-teal-500" %>
+      <%= link_to "Delete",
+        project_app_env_variable_path(@project, @app, env_variable),
+        class: "font-semibold text-red-600 hover:text-red-500 ml-4",
+        data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this environment variable?" } %>
+    </div>
+  </dd>
+<% end %>

@@ -1,21 +1,25 @@
-<%= form_with model: [@project, @app, env_variable], class: "flex flex-row px-4 py-2" do |form| %>
-  <div class="w-1/4 truncate">
-    <% if form.object.new_record?%>
-      <%= form.text_field :name, class: "input input-bordered input-sm", placeholder: "NAME", autofocus: true %>
-      <%= error_messages_for(form.object, :name) %>
-    <% else %>
-      <%= env_variable.name %>
-    <% end %>
-  </div>
-  <div class="w-2/4">
-    <div class="flex space-x-2">
+<%= form_with model: [@project, @app, env_variable] do |form| %>
+  <div class="sm:flex">
+    <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
+      <% if form.object.new_record? %>
+        <%= form.text_field :name,
+            class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm",
+            placeholder: "NAME",
+            autofocus: true %>
+        <%= error_messages_for(form.object, :name) %>
+      <% else %>
+        <%= env_variable.name %>
+      <% end %>
+    </dt>
+    <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
       <div>
-        <%= form.text_field :value, class: "input input-bordered input-sm", placeholder: "Value", autofocus: form.object.persisted? %>
+        <%= form.text_field :value,
+            class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm",
+            placeholder: "Value",
+            autofocus: form.object.persisted? %>
         <%= error_messages_for(form.object, :value) %>
       </div>
-    </div>
-  </div>
-  <div class="w-1/4 text-right">
-    <%= component "submit_button", text: "Save" %>
+      <%= component "submit_button", text: "Save" %>
+    </dd>
   </div>
 <% end %>
