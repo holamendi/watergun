@@ -1,8 +1,8 @@
-  <div class="border-b">
-    <div class="max-w-5xl mx-auto border-gray-200 lg:px-8">
-      <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Tabs">
-        <% tabs.each do |tab| %>
-          <%= link_to tab.title, tab.path,
+<div class="border-b">
+  <div class="max-w-5xl px-4 mx-auto border-gray-200 lg:px-8 sm:px-6">
+    <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Tabs">
+      <% tabs.each do |tab| %>
+        <%= link_to tab.title, tab.path,
               class: class_names(
                 "px-1 py-4 text-sm font-medium whitespace-nowrap border-b-2",
                 "border-teal-500 text-teal-600 border-teal-500" => tab.current,
@@ -10,7 +10,7 @@
               ),
               data: { turbo_prefetch: tab.prefetch }
           %>
-        <% end %>
-      </nav>
-    </div>
+      <% end %>
+    </nav>
   </div>
+</div>

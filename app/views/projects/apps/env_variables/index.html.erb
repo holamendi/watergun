@@ -8,12 +8,15 @@
 
 <div class="flex justify-between pb-6">
   <div>
-    <%= link_to "New Variable", new_project_app_env_variable_path(@project, @app), class: "btn btn-ghost link font-normal", data: { turbo_frame: "new_env_variable" } %>
+    <%= link_to "New Variable",
+      new_project_app_env_variable_path(@project, @app),
+      class: "inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600",
+      data: { turbo_frame: "new_env_variable" } %>
   </div>
 </div>
 
 <div class="flex flex-col w-full space-y-2">
-  <%= turbo_frame_tag "new_env_variable", target: "_top" %>
+  <%= turbo_frame_tag "new_env_variable" %>
 </div>
 
 <dl class="mt-6 border-t border-gray-200 divide-y divide-gray-100 space-4 text-sm/6">
