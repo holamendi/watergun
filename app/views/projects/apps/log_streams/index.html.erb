@@ -1,15 +1,12 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @log_stream %>
 
-<% content_for :header do %>
-  <%= render "projects/apps/header", app: @app %>
-<% end %>
+<%= render "projects/apps/header", app: @app %>
+<%= render "projects/apps/tabs", app: @app %>
 
-<% content_for :tabs do %>
-  <%= render "projects/apps/tabs", app: @app %>
-<% end %>
-
-<div class="bg-gray-800 rounded-md">
-  <%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_app_log_stream_path(@project, @app, @log_stream) %>
+<div class="p-2 -mt-6 bg-gray-800">
+  <%= render "shared/log_streams/log_stream",
+      log_stream: @log_stream,
+      url: project_app_log_stream_path(@project, @app, @log_stream) %>
 </div>
 

@@ -17,7 +17,16 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
 
     if @env_variable.save
       ServerActions::UpdateEnv.run_later!(@app, set: @env_variable.to_h)
-      redirect_to project_app_env_variables_path(@project, @app), notice: "Environment variable created successfully."
+
+      render turbo_stream: [
+        turbo_stream.remove_all("#new_env_variable form"),
+        turbo_stream.prepend(
+          "env_variables",
+          partial: "projects/apps/env_variables/env_variable",
+          locals: {env_variable: @env_variable}
+        ),
+        stream_toast("Environment variable created")
+      ], status: :created
     else
       render :new, status: :unprocessable_entity
     end
@@ -31,7 +40,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       ServerActions::UpdateEnv.run_later!(@app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
       render turbo_stream: [
         turbo_stream_env_variable,
-        append_toast("Environment variable updated successfully.")
+        stream_toast("Environment variable updated successfully.")
       ]
     else
       render :edit, status: :unprocessable_entity
@@ -43,7 +52,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     ServerActions::UpdateEnv.run_later!(@app, unset: [@env_variable.name])
     render turbo_stream: [
       turbo_stream.remove(@env_variable),
-      append_toast("Environment variable deleted successfully.")
+      stream_toast("Environment variable deleted successfully.")
     ]
   end
 
@@ -61,14 +70,6 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     turbo_stream.replace(
       @env_variable,
       partial: "projects/apps/env_variables/env_variable",
-      locals: {env_variable: @env_variable}
-    )
-  end
-
-  def turbo_stream_form
-    turbo_stream.replace(
-      @env_variable,
-      partial: "projects/apps/env_variables/form",
       locals: {env_variable: @env_variable}
     )
   end

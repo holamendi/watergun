@@ -2,11 +2,9 @@
 <html class="h-full">
   <head>
     <title><%= @title.presence || "Watergun" %></title>
-
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= vite_client_tag %>
     <%= vite_stylesheet_tag "application", data: { "turbo-track": "reload" } %>
     <%= vite_javascript_tag 'application' %>
@@ -14,24 +12,8 @@
   <body class="h-full">
     <div class="min-h-full">
       <%= render "shared/navbar" %>
-      <div class="py-8">
-        <% if content_for?(:header) %>
-          <header>
-            <div class="max-w-5xl px-4 mx-auto sm:px-6 lg:px-8">
-              <%= yield(:header) %>
-            </div>
-          </header>
-        <% end %>
-        <% if content_for?(:tabs) %>
-          <%= yield(:tabs) %>
-        <% end %>
-        <main>
-          <div class="<%= @main_width == "full" ? "w-full" : "max-w-5xl" %> px-4 py-8 mx-auto sm:px-6 lg:px-8">
-            <%= render "shared/toasts" %>
-            <%= yield %>
-          </div>
-        </main>
-      </div>
+      <%= render "shared/toasts" %>
+      <%= yield %>
     </div>
   </body>
 </html>

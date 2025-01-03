@@ -1,8 +1,14 @@
 <%= turbo_frame_tag env_variable, class: "py-2 sm:flex" do %>
-  <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6"><%= env_variable.name %></dt>
+  <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
+    <div class="truncate" title="<%= env_variable.name %>">
+      <%= env_variable.name %>
+    </div>
+  </dt>
   <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
-    <div class="text-gray-900"><%= env_variable.value %></div>
-    <div>
+    <div class="text-gray-900 truncate max-w-[400px]" title="<%= env_variable.value %>">
+      <%= env_variable.value %>
+    </div>
+    <div class="flex-shrink-0">
       <%= link_to "Edit",
         edit_project_app_env_variable_path(@project, @app, env_variable),
         class: "font-semibold text-teal-600 hover:text-teal-500" %>

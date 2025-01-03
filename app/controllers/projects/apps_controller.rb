@@ -29,7 +29,7 @@ class Projects::AppsController < Projects::BaseController
   def update
     if @app.update(app_params)
       render turbo_stream: [
-        append_toast("App updated"),
+        stream_toast("App updated"),
         render_form
       ]
     else

@@ -15,4 +15,8 @@ class Project < ApplicationRecord
   def last_deployment
     deployments.success.last
   end
+
+  def any_resources?
+    apps.any? || services.any?
+  end
 end

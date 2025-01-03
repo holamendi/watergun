@@ -23,7 +23,7 @@ class Projects::ServicesController < Projects::BaseController
 
   def update
     if @service.update(service_params)
-      render turbo_stream: [append_toast("Service updated"), render_form]
+      render turbo_stream: [stream_toast("Service updated"), render_form]
     else
       render turbo_stream: render_form, status: :unprocessable_entity
     end

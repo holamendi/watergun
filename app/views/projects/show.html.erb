@@ -1,77 +1,58 @@
 <%= turbo_stream_from @project %>
 <% @title = @project.name %>
 
-<% content_for :header do %>
-  <div class="md:flex md:items-center md:justify-between">
-    <div class="flex-1 min-w-0">
-      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"><%= @title %></h2>
-    </div>
-    <div class="flex flex-shrink-0 gap-2 mt-4 md:ml-4 md:mt-0">
-      <div class="flex items-center h-full">
-        <%= link_to edit_project_path(@project), class: "inline-flex items-center justify-center rounded-md bg-gray-100 p-2 text-gray-500", title: "Settings" do %>
-          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-          </svg>
-          <span class="sr-only">Settings</span>
-        <% end %>
+<%= container do %>
+  <%= page_header(@title) do %>
+    <%= link_to edit_project_path(@project), class: "inline-flex items-center justify-center rounded-md bg-gray-100 p-2 text-gray-500", title: "Settings" do %>
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+      </svg>
+      <span class="sr-only">Settings</span>
+    <% end %>
+    <% if @project.any_resources? %>
+      <div class="relative inline-block text-left">
+        <%= dropdown(
+          text: "Add new resource",
+          items: [
+            link_to("App", new_project_app_path(@project),
+              class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+              role: "menuitem",
+              tabindex: "-1",
+              id: "new-resource-menu-item-0"),
+            link_to("Service", new_project_service_path(@project),
+              class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+              role: "menuitem",
+              tabindex: "-1",
+              id: "new-resource-menu-item-1")
+          ]
+        ) %>
       </div>
-      <% if @apps.any? || @services.any? %>
-        <div class="relative inline-block text-left" data-controller="dropdown">
-          <div>
-            <button type="button"
-                    data-action="dropdown#toggle click@window->dropdown#hide"
-                    class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-                    aria-expanded="false"
-                    aria-haspopup="true">
-              Add new resource
-              <svg class="w-5 h-5 -mr-1 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-          <div data-dropdown-target="menu"
-               class="absolute right-0 z-10 w-56 mt-2 transition origin-top-right transform bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-               data-transition-enter-from="opacity-0 scale-95"
-               data-transition-enter-to="opacity-100 scale-100"
-               data-transition-leave-from="opacity-100 scale-100"
-               data-transition-leave-to="opacity-0 scale-95"
-               role="menu"
-               aria-orientation="vertical"
-               aria-labelledby="new-resource-menu-button"
-               tabindex="-1">
-            <div class="py-1" role="none">
-              <%= link_to "App", new_project_app_path(@project), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1", id: "new-resource-menu-item-0" %>
-              <%= link_to "Service", new_project_service_path(@project), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1", id: "new-resource-menu-item-1" %>
-            </div>
-          </div>
-        </div>
+    <% end %>
+  <% end %>
+
+  <% if @project.any_resources? %>
+    <ul id="resources" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+      <% @apps.each do |app| %>
+        <%= render partial: "projects/apps/app", locals: { app: app } %>
+      <% end %>
+      <% @services.each do |service| %>
+        <%= render partial: "projects/services/service", locals: { service: service } %>
+      <% end %>
+    </ul>
+    <% else %>
+    <div class="flex flex-col w-2/3 gap-4 mx-auto mt-24 sm:flex-row">
+      <%= link_to new_project_app_path(@project), class: "relative block w-full p-12 text-center border-2 border-gray-300 border-dashed rounded-lg sm:w-1/2 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" do %>
+        <svg class="w-12 h-12 mx-auto text-gray-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+        </svg>
+        <span class="block mt-2 text-sm font-semibold text-gray-900">Add Github repository</span>
+      <% end %>
+      <%= link_to new_project_service_path(@project), class: "relative block w-full p-12 text-center border-2 border-gray-300 border-dashed rounded-lg sm:w-1/2 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" do %>
+        <svg class="w-12 h-12 mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v20c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6" />
+        </svg>
+        <span class="block mt-2 text-sm font-semibold text-gray-900">Create a database</span>
       <% end %>
     </div>
-  </div>
-<% end %>
-
-<% if @apps.any? || @services.any? %>
-  <ul id="resources" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-    <% @apps.each do |app| %>
-      <%= render partial: "projects/apps/app", locals: { app: app } %>
-    <% end %>
-    <% @services.each do |service| %>
-      <%= render partial: "projects/services/service", locals: { service: service } %>
-    <% end %>
-  </ul>
-<% else %>
-  <div class="flex flex-col w-2/3 gap-4 mx-auto mt-24 sm:flex-row">
-    <%= link_to new_project_app_path(@project), class: "relative block w-full p-12 text-center border-2 border-gray-300 border-dashed rounded-lg sm:w-1/2 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" do %>
-      <svg class="w-12 h-12 mx-auto text-gray-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-      </svg>
-      <span class="block mt-2 text-sm font-semibold text-gray-900">Add Github repository</span>
-    <% end %>
-    <%= link_to new_project_service_path(@project), class: "relative block w-full p-12 text-center border-2 border-gray-300 border-dashed rounded-lg sm:w-1/2 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" do %>
-      <svg class="w-12 h-12 mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v20c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6" />
-      </svg>
-      <span class="block mt-2 text-sm font-semibold text-gray-900">Create a database</span>
-    <% end %>
-  </div>
+  <% end %>
 <% end %>

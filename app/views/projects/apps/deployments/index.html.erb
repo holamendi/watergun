@@ -1,19 +1,24 @@
 <%= turbo_stream_from @app, :deployments %>
 
-<% content_for :header do %>
-  <%= render "projects/apps/header", app: @app %>
-<% end %>
+<%= render "projects/apps/header", app: @app %>
+<%= render "projects/apps/tabs", app: @app %>
 
-<% content_for :tabs do %>
-  <%= render "projects/apps/tabs", app: @app %>
-<% end %>
-
-<% if @app.github_repo.present? %>
-  <ul id="deployments" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-    <%= render @deployments %>
-  </ul>
-<% else %>
-  <div class="mt-8">
-    <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" %>
+<%= container do %>
+  <% if @app.github_repo.present? %>
+      <div class="flex justify-between pb-6">
+    <div>
+      <%= button_to "Deploy App",
+        project_app_deployments_path(@project, @app),
+        class: "inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+      %>
+    </div>
   </div>
+    <ul id="deployments" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+      <%= render @deployments %>
+    </ul>
+  <% else %>
+    <div class="mt-8">
+      <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" %>
+    </div>
+  <% end %>
 <% end %>

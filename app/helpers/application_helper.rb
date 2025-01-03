@@ -18,4 +18,24 @@ module ApplicationHelper
     component = "#{name.to_s.camelize}Component".constantize
     render(component.new(*, **), &)
   end
+
+  def page_header(title, actions = nil, &block)
+    if block_given?
+      actions = capture(&block)
+    end
+
+    render "shared/page_header", title: title, actions: actions || ""
+  end
+
+  def container(&block)
+    content_tag :div, class: "max-w-5xl px-4 mx-auto sm:px-6 lg:px-8" do
+      yield
+    end
+  end
+
+  def full_width_container(&block)
+    content_tag :div, class: "w-full px-4 mx-auto sm:px-6 lg:px-8" do
+      yield
+    end
+  end
 end

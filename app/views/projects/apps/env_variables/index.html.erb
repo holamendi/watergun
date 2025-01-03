@@ -1,24 +1,31 @@
-<% content_for :header do %>
-  <%= render "projects/apps/header", app: @app %>
-<% end %>
+<%= render "projects/apps/header", app: @app %>
+<%= render "projects/apps/tabs", app: @app %>
 
-<% content_for :tabs do %>
-  <%= render "projects/apps/tabs", app: @app %>
-<% end %>
-
-<div class="flex justify-between pb-6">
-  <div>
-    <%= link_to "New Variable",
-      new_project_app_env_variable_path(@project, @app),
-      class: "inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600",
-      data: { turbo_frame: "new_env_variable" } %>
+<%= container do %>
+  <div class="flex justify-between pb-6">
+    <div>
+      <%= link_to "New Variable",
+        new_project_app_env_variable_path(@project, @app),
+        class: "inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600",
+        data: { turbo_frame: "new_env_variable" } %>
+    </div>
   </div>
-</div>
 
-<div class="flex flex-col w-full space-y-2">
-  <%= turbo_frame_tag "new_env_variable" %>
-</div>
+  <dl class="border-gray-200 divide-y divide-gray-100 space-4 text-sm/6">
+    <div class="py-2 sm:flex">
+      <dt class="font-bold text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
+        <div>Name</div>
+      </dt>
+      <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
+        <div class="font-bold text-gray-900">Value</div>
+        <div class="flex-shrink-0"></div>
+      </dd>
+    </div>
 
-<dl class="mt-6 border-t border-gray-200 divide-y divide-gray-100 space-4 text-sm/6">
-  <%= render @env_variables %>
-</dl>
+    <%= turbo_frame_tag EnvVariable.new %>
+
+    <div id="env_variables">
+      <%= render @env_variables %>
+    </div>
+  </dl>
+<% end %>

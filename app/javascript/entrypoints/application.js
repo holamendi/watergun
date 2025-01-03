@@ -16,6 +16,12 @@
 // Example: Load Rails libraries in Vite.
 //
 import '@hotwired/turbo-rails'
+
+Turbo.StreamActions.redirect = function () {
+  const url = this.getAttribute('url') || '/'
+  // Turbo.visit(url, { frame: '_top', action: 'advance' })
+  Turbo.visit(url)
+}
 //
 // import ActiveStorage from '@rails/activestorage'
 // ActiveStorage.start()

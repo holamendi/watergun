@@ -15,7 +15,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
     if @domain.save
       ServerActions::CreateDomain.run_later!(@domain)
       render turbo_stream: [
-        append_toast("Domain added"),
+        stream_toast("Domain added"),
         turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app})
       ]
     else
@@ -31,14 +31,14 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
     @domain.make_default!
     render turbo_stream: [
       turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app}),
-      append_toast("Domain set as default")
+      stream_toast("Domain set as default")
     ]
   end
 
   def destroy
     Domain::Destroyer.new(@domain).destroy
     render turbo_stream: [
-      append_toast("Domain deleted"),
+      stream_toast("Domain deleted"),
       turbo_stream.remove(@domain)
     ]
   end
