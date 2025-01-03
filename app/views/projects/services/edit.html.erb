@@ -1,30 +1,27 @@
 <%= turbo_stream_from @service %>
 
-<% content_for :header do %>
-  <%= render "header", service: @service %>
-<% end %>
+<%= render "projects/services/header", service: @service %>
+<%= render "projects/services/tabs", service: @service %>
 
-<% content_for :tabs do %>
-  <%= render "tabs", service: @service %>
-<% end %>
-
-<div class="space-y-10 divide-y divide-gray-900/10">
-  <div class="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-gray-900">General</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+<%= container do %>
+  <div class="space-y-10 divide-y divide-gray-900/10">
+    <div class="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+      <div>
+        <h2 class="text-base font-semibold leading-7 text-gray-900">General</h2>
+        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+      </div>
+      <div class="md:col-span-2">
+        <%= render "form", service: @service %>
+      </div>
     </div>
-    <div class="md:col-span-2">
-      <%= render "form", service: @service %>
+    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+      <div>
+        <h2 class="text-base font-semibold leading-7 text-gray-900">Delete Service</h2>
+        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+      </div>
+      <div class="md:col-span-2">
+        <%= button_to "Delete Service", project_service_path(@project, @service), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
+      </div>
     </div>
   </div>
-  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-gray-900">Delete Service</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-600"></p>
-    </div>
-    <div class="md:col-span-2">
-      <%= button_to "Delete Service", project_service_path(@project, @service), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
-    </div>
-  </div>
-</div>
+<% end %>

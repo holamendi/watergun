@@ -1,27 +1,29 @@
 <% @title = "Account Settings" %>
 
-<%= page_header(@title) %>
+<%= container do %>
+  <%= page_header(@title) %>
 
-<div class="space-y-10 divide-y divide-gray-900/10">
-  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-gray-900">Profile</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-600">Update your personal information.</p>
+  <div class="space-y-10 divide-y divide-gray-900/10">
+    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+      <div>
+        <h2 class="text-base font-semibold leading-7 text-gray-900">Profile</h2>
+        <p class="mt-1 text-sm leading-6 text-gray-600">Update your personal information.</p>
+      </div>
+
+      <div class="md:col-span-2">
+        <%= render "accounts/profiles/form", user: Current.user %>
+      </div>
     </div>
 
-    <div class="md:col-span-2">
-      <%= render "accounts/profiles/form", user: Current.user %>
+    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+      <div>
+        <h2 class="text-base font-semibold leading-7 text-gray-900">GitHub Integration</h2>
+        <p class="mt-1 text-sm leading-6 text-gray-600">Connect your GitHub account for seamless integration.</p>
+      </div>
+
+      <div class="md:col-span-2">
+        <%= render "accounts/github_integrations/settings", github_integration: Current.account.github_integration %>
+      </div>
     </div>
   </div>
-
-  <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-gray-900">GitHub Integration</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-600">Connect your GitHub account for seamless integration.</p>
-    </div>
-
-    <div class="md:col-span-2">
-      <%= render "accounts/github_integrations/settings", github_integration: Current.account.github_integration %>
-    </div>
-  </div>
-</div>
+<% end %>

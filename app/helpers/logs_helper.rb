@@ -2,14 +2,14 @@
 
 module LogsHelper
   ANSI_COLOR_CODE = {
-    0 => "black",
-    1 => "red",
-    2 => "green",
-    3 => "yellow",
-    4 => "blue",
-    5 => "purple",
-    6 => "cyan",
-    7 => "white"
+    0 => "#1e1e2e", # base
+    1 => "#f38ba8", # red
+    2 => "#a6e3a1", # green
+    3 => "#f9e2af", # yellow
+    4 => "#89b4fa", # blue
+    5 => "#cba6f7", # mauve
+    6 => "#89dceb", # sky
+    7 => "#cdd6f4"  # text
   }
 
   def ansi_to_html(data)

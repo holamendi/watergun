@@ -1,10 +1,8 @@
 <%= turbo_stream_from @log_stream %>
 
-<% content_for :header do %>
-  <%= render "projects/services/header", service: @service %>
-  <%= render "projects/services/tabs", service: @service %>
-<% end %>
+<%= render "projects/services/header", service: @service %>
+<%= render "projects/services/tabs", service: @service %>
 
-<div class="bg-gray-800 rounded-md">
+<div class="p-2 -mt-6 bg-[#303446]">
   <%= render "shared/log_streams/log_stream", log_stream: @log_stream, url: project_service_log_stream_path(@project, @service, @log_stream) %>
 </div>

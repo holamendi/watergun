@@ -1,10 +1,10 @@
 <%= turbo_stream_from @service, :metrics %>
 
-<% content_for :header do %>
-  <%= render "projects/services/header", service: @service %>
-  <%= render "projects/services/tabs", service: @service %>
-<% end %>
+<%= render "projects/services/header", service: @service %>
+<%= render "projects/services/tabs", service: @service %>
 
-<%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
-<%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
-<%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
+<%= container do %>
+  <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
+  <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
+  <%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
+<% end %>
