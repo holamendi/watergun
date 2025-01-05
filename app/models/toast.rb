@@ -3,7 +3,8 @@ class Toast
     Turbo::StreamsChannel.broadcast_append_to(
       [user, :toasts],
       target: "toasts",
-      html: ApplicationController.render(ToastComponent.new(message:, type:), layout: false)
+      partial: "shared/toast",
+      locals: {message:, type:}
     )
   end
 end

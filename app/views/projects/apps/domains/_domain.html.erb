@@ -1,7 +1,7 @@
 <tr id="<%= dom_id(domain) %>">
   <td><%= link_to domain.url, domain.url, class: "link", target: "_blank" %> <%= "(default)" if domain.is_default? %></td>
   <td>
-    <span class="<%= status_color_class(domain.status) %>"><%= domain.status %></span>
+    <%= status_badge(domain.status) %>
   </td>
   <td class="text-right">
     <div class="dropdown dropdown-bottom dropdown-end">

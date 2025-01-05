@@ -16,7 +16,7 @@
     <div class="hidden sm:flex sm:flex-col sm:items-end">
       <% if service.pending? %>
         <div class="mt-1 flex items-center gap-x-1.5">
-          <%= component "spinner" %>
+          <%= spinner %>
           <p class="text-sm leading-5 text-gray-500">Initializing</p>
         </div>
       <% elsif service.active? %>

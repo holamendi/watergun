@@ -15,7 +15,7 @@
     <div class="flex items-center justify-between">
       <%= form_with url: "https://github.com/settings/apps/new", method: :post do |form| %>
         <%= form.hidden_field :manifest, value: github_integration.app_manifest.to_json %>
-        <%= component "submit_button", text: "Create Github App" %>
+        <%= submit_button "Create Github App" %>
       <% end %>
     </div>
   <% end %>

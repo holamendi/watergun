@@ -6,5 +6,5 @@
     <%= form.text_field :hostname, class: "input input-bordered w-full", pattern: "^([a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"  %>
     <%= error_messages_for(form.object, :hostname) %>
   <% end %>
-  <%= component "submit_button", text: "Save" %>
+  <%= submit_button "Save domain" %>
 <% end %>
