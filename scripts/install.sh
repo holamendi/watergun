@@ -7,10 +7,12 @@ command_exists() {
 # constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.35.13
+DOKKU_TAG=v0.35.12
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_DOCKER_REPO="holamendi/watergun"
+WATERGUN_GIT_REPO="https://github.com/holamendi/watergun.git"
+WATERGUN_GIT_BRANCH="pre-release"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
 
 # server info
@@ -91,7 +93,7 @@ usermod -aG docker "$SSH_USER"
 echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/"$SSH_USER"
 chmod 440 /etc/sudoers.d/"$SSH_USER"
 
-# create .ssh directoryee
+# create .ssh directory
 mkdir -p "$SSH_DIR"
 chown -R "$SSH_USER:$SSH_USER" "$SSH_DIR"
 chmod 700 "$SSH_DIR"
@@ -111,13 +113,13 @@ dokku storage:ensure-directory "$DOKKU_APP" --chown false
 dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
 # sync git repo
-# dokku git:sync "$DOKKU_APP" "$WATERGUN_REPO" "$WATERGUN_BRANCH"
+dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
 
 # build app
-# dokku ps:rebuild "$DOKKU_APP"
+dokku ps:rebuild "$DOKKU_APP"
 
 # pull docker image
-dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
+# dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set up watergun account
 SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $DOMAIN $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')

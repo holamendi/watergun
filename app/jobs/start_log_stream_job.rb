@@ -16,12 +16,10 @@ class StartLogStreamJob < ApplicationJob
   private
 
   def broadcast_log(log_stream, data)
-    Turbo::StreamsChannel.broadcast_append_to(
-      log_stream,
+    Turbo::StreamsChannel.broadcast_append_to(log_stream,
       target: dom_id(log_stream),
       partial: "shared/log_streams/log",
-      locals: {log: data}
-    )
+      locals: {log: data})
   end
 
   def log_command(log_stream)

@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   private
 
   def stream_toast(message, title: nil, type: :notice)
-    turbo_stream.append("toasts", ToastComponent.new(message:, title:, type:))
+    turbo_stream.append("toasts", partial: "shared/toast", locals: {message:, title:, type:})
   end
 
   def set_source

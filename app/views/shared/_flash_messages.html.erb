@@ -2,6 +2,6 @@
 
 <div id="toasts" class="toast">
   <% flash.each do |type, message| %>
-    <%= render "shared/toast", message:, type: %>
+    <%= render "shared/toast", message:, type:, title: nil %>
   <% end %>
 </div>
