@@ -106,7 +106,16 @@ dokku apps:create "$DOKKU_APP"
 dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
 
 # set env vars
-dokku config:set "$DOKKU_APP" RAILS_ENV=production DEFAULT_URL="$DOMAIN" SECRET_KEY_BASE=$(openssl rand -hex 64) LITESTACK_DATA_PATH=storage --no-restart
+dokku config:set "$DOKKU_APP" \
+  RAILS_ENV=production \
+  DEFAULT_URL="$DOMAIN" \
+  SECRET_KEY_BASE=$(openssl rand -hex 64) \
+  ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 24) \
+  ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -hex 24) \
+  ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -hex 24) \
+  JOB_CONCURRENCY=1 \
+  JOB_POLLING_INTERVAL=0.1 \
+  --no-restart
 
 # mount persistent storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false
