@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
 
   resource :first_run, only: %i[edit update]
-  get "first-run/:signed_id", to: "first_runs#edit"
+  get "first-run/:signed_id", to: "first_runs#edit", as: :pretty_first_run
 
   resources :hooks
 
@@ -94,6 +94,10 @@ Rails.application.routes.draw do
         resources :deployments, only: %i[index show]
         resource :ping, only: :show
       end
+    end
+
+    namespace :internal do
+      resources :setups, only: :create
     end
   end
 end

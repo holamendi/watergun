@@ -89,7 +89,7 @@ fi
 # add user to docker group
 usermod -aG docker "$SSH_USER"
 
-# TODO: is there a way to install dokku plugins without sudo?
+# TODO: find a way to install dokku plugins without sudo rights
 echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/"$SSH_USER"
 chmod 440 /etc/sudoers.d/"$SSH_USER"
 
@@ -103,18 +103,19 @@ chmod 600 "$SSH_DIR/authorized_keys"
 
 # create dokku app
 dokku apps:create "$DOKKU_APP"
-dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
+dokku ps:scale "$DOKKU_APP" web=0
 
 # set env vars
 dokku config:set "$DOKKU_APP" \
-  RAILS_ENV=production \
-  DEFAULT_URL="$DOMAIN" \
-  SECRET_KEY_BASE=$(openssl rand -hex 64) \
-  ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 24) \
   ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -hex 24) \
   ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -hex 24) \
+  ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 24) \
+  ACCOUNT_SETUP_TOKEN=$(openssl rand -hex 24) \
+  DEFAULT_URL="$DOMAIN" \
   JOB_CONCURRENCY=1 \
   JOB_POLLING_INTERVAL=0.1 \
+  RAILS_ENV=production \
+  SECRET_KEY_BASE=$(openssl rand -hex 64) \
   --no-restart
 
 # mount persistent storage
@@ -140,7 +141,7 @@ echo "$PUBLIC_KEY" >> "$SSH_DIR/authorized_keys"
 
 # set app domain
 dokku domains:set "$DOKKU_APP" "$DOMAIN"
-dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
+dokku ps:scale "$DOKKU_APP" web=1 worker=1
 dokku letsencrypt:enable "$DOKKU_APP"
 
 echo "Done!"

@@ -1,4 +1,4 @@
-class App::Creator
+class App::CreateApp
   include ActiveModel::Model
   include ActiveModel::Attributes
   include Memery
