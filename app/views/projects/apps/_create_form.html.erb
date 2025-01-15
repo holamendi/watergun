@@ -1,18 +1,18 @@
-<%= form_with model: app_creator, url: project_apps_path(app_creator.project), method: :post do |form| %>
+<%= form_with model: create_app, scope: :create_app, url: project_apps_path(create_app.project), method: :post do |form| %>
   <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
     <div class="sm:col-span-3">
       <%= form.label :repo, "Repository", class: "block text-sm font-medium leading-6 text-gray-900" %>
       <div class="mt-2">
         <%= form.text_field :repo, class: "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" %>
       </div>
-      <%= error_messages_for(app_creator, :repo) %>
+      <%= error_messages_for(create_app, :repo) %>
     </div>
     <div class="sm:col-span-3">
       <%= form.label :branch, "Branch", class: "block text-sm font-medium leading-6 text-gray-900" %>
       <div class="mt-2">
         <%= form.text_field :branch, class: "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" %>
       </div>
-      <%= error_messages_for(app_creator, :branch) %>
+      <%= error_messages_for(create_app, :branch) %>
     </div>
     <div class="sm:col-span-full">
       <div class="relative flex gap-x-3">
@@ -24,11 +24,11 @@
           <p class="mt-1 text-gray-600">Automatically deploy the app when a push is made to the specified branch.</p>
         </div>
       </div>
-      <%= error_messages_for(app_creator, :webhook_deploy) %>
+      <%= error_messages_for(create_app, :webhook_deploy) %>
     </div>
   </div>
   <div class="flex items-center mt-8 gap-x-6">
-    <%= link_to "Cancel", project_path(app_creator.project), class: "text-sm font-semibold leading-6 text-gray-900" %>
+    <%= link_to "Cancel", project_path(create_app.project), class: "text-sm font-semibold leading-6 text-gray-900" %>
     <%= submit_button "Create app" %>
   </div>
 <% end %>

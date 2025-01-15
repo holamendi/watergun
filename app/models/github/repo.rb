@@ -1,5 +1,5 @@
 class Github::Repo < ApplicationRecord
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account
   belongs_to :app
 
   scope :kept, -> { joins(:app).merge(App.kept) }

@@ -16,12 +16,12 @@ class App::CreateApp
   validate :validate_remote_repo_exists, if: -> { repo.present? }
   validate :validate_remote_branch_exists, if: -> { branch.present? }
 
-  def create
+  def save
     return false unless valid?
 
     ApplicationRecord.transaction do
-      self.app = project.apps.create!(name: app_name)
-      app.create_github_repo!(repo:, branch:, webhook_deploy:, private: remote_repo.private?)
+      create_app!
+      create_github_repo!
       ServerActions::CreateApp.run_later!(app)
     end
 
@@ -30,8 +30,30 @@ class App::CreateApp
 
   private
 
+  def create_app!
+    self.app = project.apps.create!(
+      account: project.account,
+      server: project.server,
+      name: app_name
+    )
+  end
+
+  def create_github_repo!
+    app.create_github_repo!(
+      account: project.account,
+      repo:,
+      branch:,
+      webhook_deploy:,
+      private: remote_repo.private?
+    )
+  end
+
+  def account
+    project.account
+  end
+
   def github_api_client
-    Current.account.github_integration.api_client
+    account.github_integration.api_client
   end
 
   memoize def remote_repo

@@ -6,14 +6,14 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def new
-    @app_creator = App::Creator.new(project: @project)
+    @create_app = App::CreateApp.new(project: @project)
   end
 
   def create
-    @app_creator = App::Creator.new(create_app_params)
+    @create_app = App::CreateApp.new(create_app_params.merge(project: @project))
 
-    if @app_creator.create
-      redirect_to project_app_path(@project, @app_creator.app), notice: "App created"
+    if @create_app.save
+      redirect_to project_app_path(@project, @create_app.app), notice: "App created"
     else
       render :new, status: :unprocessable_entity
     end
@@ -49,7 +49,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def create_app_params
-    params.require(:app_creator).permit(:name, :repo, :branch, :webhook_deploy).merge(project: @project)
+    params.require(:create_app).permit(:name, :repo, :branch, :webhook_deploy)
   end
 
   def set_app

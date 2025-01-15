@@ -8,6 +8,8 @@ class ServerActions::CreateApp < ServerAction
   validates :dokku_app_id, presence: true
 
   before_validation on: :create do
+    self.account ||= app.account
+    self.server ||= app.server
     self.dokku_app_id ||= app.dokku_id
   end
 

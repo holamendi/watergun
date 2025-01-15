@@ -1,8 +1,21 @@
 require "test_helper"
 
 class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
+  fixtures
+
   setup do
     @setup_token = "abc123456"
+    @valid_params = {
+      server: {
+        name: "test.example.com",
+        public_ip: "127.0.0.1",
+        cpu_type: "arm64"
+      },
+      user: {
+        email: "bobby.tables@example.com"
+      }
+    }
+    @headers = {Authorization: "Bearer #{@setup_token}"}
     ENV["ACCOUNT_SETUP_TOKEN"] = @setup_token
   end
 
@@ -10,28 +23,15 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
     Account.destroy_all
     User.destroy_all
 
-    post api_internal_setups_url,
-      params: {
-        server: {
-          name: "test.example.com",
-          public_ip: "127.0.0.1",
-          cpu_type: "arm64"
-        },
-        user: {
-          email: "bobby.tables@example.com"
-        }
-      },
-      headers: {Authorization: "Bearer #{@setup_token}"}
+    assert_difference ["Account.count", "Server.count", "User.count"], 1 do
+      post api_internal_setups_url, params: @valid_params, headers: @headers
+    end
 
     assert_response :success
 
-    assert_equal 1, Account.count
-    assert_equal 1, Server.count
-    assert_equal 1, User.count
-
-    json_response = JSON.parse(response.body)
     user_signed_id = json_response["first_run_url"].split("/").last
     user = User.find_signed!(user_signed_id, purpose: :first_run)
+
     assert_equal "bobby.tables@example.com", user.email
 
     account = user.accounts.last
@@ -43,35 +43,27 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "#create returns an error if the setup token is invalid" do
-    post api_internal_setups_url, headers: {Authorization: "Bearer invalid"}
+    post api_internal_setups_url, params: @valid_params, headers: {Authorization: "Bearer invalid"}
 
     assert_response :unauthorized
-    assert_equal "Invalid setup token", JSON.parse(response.body)["error"]
+    assert_equal "Invalid setup token", json_response["error"]
   end
 
   test "#create returns an error if an account already exists" do
-    post api_internal_setups_url, headers: {Authorization: "Bearer #{@setup_token}"}
+    post api_internal_setups_url, params: @valid_params, headers: @headers
 
     assert_response :unprocessable_entity
-    assert_equal "An account already exists", JSON.parse(response.body)["error"]
+    assert_equal "An account already exists", json_response["error"]
   end
 
   test "#create returns an error if the server params are invalid" do
     Account.destroy_all
     User.destroy_all
 
-    post api_internal_setups_url,
-      params: {
-        server: {
-          name: "test.example.com", public_ip: "127.0.0.1", cpu_type: "arm64"
-        },
-        user: {
-          email: "invalid"
-        }
-      },
-      headers: {Authorization: "Bearer #{@setup_token}"}
+    params = @valid_params.merge(user: {email: "invalid"})
+    post api_internal_setups_url, params:, headers: @headers
 
     assert_response :unprocessable_entity
-    assert_equal "Validation failed: Email is invalid", JSON.parse(response.body)["error"]
+    assert_equal "Validation failed: Email is invalid", json_response["error"]
   end
 end

@@ -1,6 +1,6 @@
 class ServerAction < ApplicationRecord
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  belongs_to :account, default: -> { actionable.account }
+  belongs_to :server, default: -> { actionable.server }
   belongs_to :user, default: -> { Current.user }, optional: true
   belongs_to :actionable, polymorphic: true, optional: true
   belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
@@ -72,7 +72,7 @@ class ServerAction < ApplicationRecord
 
     def run_later!(actionable, depends_on: nil, **)
       action = create!(actionable:, preceding_action: depends_on, **)
-      action.run_later(wait: 0.seconds)
+      action.run_later
       action
     end
   end
