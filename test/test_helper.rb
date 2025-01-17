@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "mocha/minitest"
 
 VCR.configure do |config|
   config.cassette_library_dir = "test/vcr_cassettes"
@@ -20,6 +21,7 @@ module ActiveSupport
     fixtures :all
 
     include SessionTestHelper
+    include ServerActionTestHelper
 
     def json_response
       ::JSON.parse(response.body)

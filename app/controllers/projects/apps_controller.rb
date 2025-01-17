@@ -38,7 +38,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def destroy
-    App::Destroyer.new(@app).destroy
+    App::DestroyApp.new(@app).call
     redirect_to @project, notice: "App destroyed"
   end
 

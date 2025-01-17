@@ -7,7 +7,7 @@ class App::CreateAppTest < ActiveSupport::TestCase
     @server = @project.server
     @create_app = App::CreateApp.new(
       project: @project,
-      name: "Smol Roda",
+      name: "Test App",
       repo: "holamendi/smol-roda",
       branch: "main",
       webhook_deploy: true
@@ -17,28 +17,30 @@ class App::CreateAppTest < ActiveSupport::TestCase
   test "#save succeeds with valid params" do
     VCR.use_cassette("github/valid_repo_and_branch") do
       assert @create_app.save
-
-      app = @create_app.app
-      assert_predicate app, :persisted?
-      assert_equal @account, app.account
-      assert_equal @server, app.server
-      assert_equal "Smol Roda", app.name
-      assert_equal "smol-roda", app.dokku_id
-
-      github_repo = app.github_repo
-      assert_predicate github_repo, :persisted?
-      assert_equal "holamendi/smol-roda", github_repo.repo
-      assert_equal "main", github_repo.branch
-      assert_equal true, github_repo.webhook_deploy
-      assert_equal false, github_repo.private
-
-      server_action = app.server_actions.last
-      assert_equal ServerActions::CreateApp, server_action.class
-      assert_equal app, server_action.app
-      assert_equal @account, server_action.account
-      assert_equal @server, server_action.server
-      assert_equal "smol-roda", server_action.dokku_app_id
     end
+
+    app = @create_app.app
+    assert_predicate app, :persisted?
+    assert_equal @account, app.account
+    assert_equal @server, app.server
+    assert_equal "Test App", app.name
+    assert_equal "test-app", app.dokku_id
+
+    github_repo = app.github_repo
+    assert_predicate github_repo, :persisted?
+    assert_equal "holamendi/smol-roda", github_repo.repo
+    assert_equal "main", github_repo.branch
+    assert_equal true, github_repo.webhook_deploy
+    assert_equal false, github_repo.private
+
+    assert_server_action_scheduled(
+      ServerActions::CreateApp,
+      server: @server,
+      actionable: app,
+      payload: {
+        dokku_app_id: "test-app"
+      }
+    )
   end
 
   test "#save fails when the repo does not exist" do

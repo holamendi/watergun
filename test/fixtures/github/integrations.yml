@@ -3,5 +3,6 @@ watergun:
   data:
     app_id: 123
     app_slug: watergun
-    access_token: "ghs_abc123"
+    access_token: "ghs_WecVeF57RDW2RiihP35C9F9GqQ57qp0QnwEE"
+    # access_token: "ghs_abc123"
     access_token_expires_at: <%= 1.hour.from_now %>

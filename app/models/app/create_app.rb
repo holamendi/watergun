@@ -22,7 +22,7 @@ class App::CreateApp
     ApplicationRecord.transaction do
       create_app!
       create_github_repo!
-      ServerActions::CreateApp.run_later!(app)
+      ServerActions::CreateApp.run_later!(project.server, app)
     end
 
     true

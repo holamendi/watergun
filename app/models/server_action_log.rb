@@ -1,5 +1,5 @@
 class ServerActionLog < ApplicationRecord
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account, default: -> { server_action.account }
 
   attribute :ssh_commands, Ssh::Command.to_array_type
 

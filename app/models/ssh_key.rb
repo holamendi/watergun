@@ -1,8 +1,8 @@
 class SshKey < ApplicationRecord
   USER = "watergun"
 
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  belongs_to :account, default: -> { server.account }
+  belongs_to :server
 
   validates :private_key, presence: true
 

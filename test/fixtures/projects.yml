@@ -2,3 +2,8 @@ calendar:
   account: watergun
   server: x86
   name: Calendar
+
+default:
+  account: watergun
+  server: x86
+  name: Default

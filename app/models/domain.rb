@@ -2,7 +2,7 @@ class Domain < ApplicationRecord
   include Discard::Model
   include ServerActionable
 
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account, default: -> { app.account }
   belongs_to :app, touch: true
 
   enum :status, %w[pending active enabling_ssl deleting error].index_by(&:itself), default: :pending

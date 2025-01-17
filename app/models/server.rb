@@ -1,11 +1,13 @@
 class Server < ApplicationRecord
+  include SshSessionable
+
   DOKKU_BUILDERS = {
     "herokuish" => "Heroku Buildpacks",
     "dockerfile" => "Dockerfile",
     "nixpacks" => "Nixpacks"
   }
 
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account
 
   has_one :ssh_key, dependent: :destroy
 
@@ -17,26 +19,7 @@ class Server < ApplicationRecord
 
   enum :status, %w[pending active deleting deleted error].index_by(&:itself), default: :pending
 
-  after_create { create_ssh_key!(account:) }
-
-  def ssh_session(&)
-    attempts = 0
-    Ssh::Session.new(server: self).connect(&)
-  rescue Net::SSH::ConnectionTimeout
-    attempts += 1
-    retry if attempts < 4
-    raise
-  end
-
-  def execute_ssh_commands(commands)
-    return if commands.blank?
-
-    ssh_session do |ssh|
-      Array(commands).each do |command|
-        ssh.execute(command)
-      end
-    end
-  end
+  after_create :create_ssh_key!
 
   def available_dokku_builders
     return DOKKU_BUILDERS if cpu_type.include?("x86")

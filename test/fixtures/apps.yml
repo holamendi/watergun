@@ -4,3 +4,10 @@ calendar:
   server: x86
   name: Calendar
   dokku_id: calendar
+
+smol_roda:
+  account: watergun
+  project: default
+  server: x86
+  name: Smol Roda
+  dokku_id: smol-roda

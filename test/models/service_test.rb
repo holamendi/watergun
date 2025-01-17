@@ -7,27 +7,12 @@ class ServiceTest < ActiveSupport::TestCase
     @project = projects(:calendar)
     @service = services(:postgres)
   end
-  test "account defaults to Current.account" do
-    Current.set(account: @account, server: @server) do
-      service = Service.new
-      service.validate
-      assert_equal @account, service.account
-    end
-  end
-
-  test "server defaults to Current.server" do
-    Current.set(server: @server) do
-      service = Service.new
-      service.validate
-      assert_equal @server, service.server
-    end
-  end
 
   test "dokku_id is set on create" do
-    service = Service.create!(name: "Postgres DB", service_type: "postgres", account: @account, server: @server, project: @project)
+    service = Service.create!(name: "Postgres DB", service_type: "postgres", server: @server, project: @project)
     assert_equal "postgres-db", service.dokku_id
 
-    service_2 = Service.create!(name: "Postgres DB", service_type: "postgres", account: @account, server: @server, project: @project)
+    service_2 = Service.create!(name: "Postgres DB", service_type: "postgres", server: @server, project: @project)
     assert_match(/postgres-db-[0-9a-f]{4}/i, service_2.dokku_id)
   end
 end

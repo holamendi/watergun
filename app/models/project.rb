@@ -2,8 +2,8 @@ class Project < ApplicationRecord
   include Discard::Model
   include ServerActionable
 
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  belongs_to :account, default: -> { server.account }
+  belongs_to :server
   has_many :apps, dependent: :destroy
   has_many :deployments, through: :apps, source: :deployments
   has_many :services, dependent: :destroy

@@ -1,4 +1,4 @@
-class Deployment::Creator
+class Deployment::CreateDeployment
   include ActiveModel::Model
   include ActiveModel::Attributes
   include Memery
@@ -10,11 +10,11 @@ class Deployment::Creator
   validates :app, presence: true
   validate :validate_commit_sha, if: -> { commit_sha.present? }
 
-  def create!
+  def save!
     validate!
 
     deployment = app.deployments.create!(deployment_attributes)
-    ServerActions::DeployApp.run_later!(deployment)
+    ServerActions::DeployApp.run_later!(app.server, deployment)
     deployment
   end
 

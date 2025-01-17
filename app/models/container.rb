@@ -1,6 +1,6 @@
 class Container < ApplicationRecord
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  belongs_to :account, default: -> { server.account }
+  belongs_to :server
 
   belongs_to :containerizable, polymorphic: true
   has_many :checks, class_name: "ContainerCheck", dependent: :delete_all
