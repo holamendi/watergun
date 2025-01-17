@@ -20,14 +20,14 @@ class App::CreateAppTest < ActiveSupport::TestCase
     end
 
     app = @create_app.app
-    assert_predicate app, :persisted?
+    assert app.persisted?
     assert_equal @account, app.account
     assert_equal @server, app.server
     assert_equal "Test App", app.name
     assert_equal "test-app", app.dokku_id
 
     github_repo = app.github_repo
-    assert_predicate github_repo, :persisted?
+    assert github_repo.persisted?
     assert_equal "holamendi/smol-roda", github_repo.repo
     assert_equal "main", github_repo.branch
     assert_equal true, github_repo.webhook_deploy
