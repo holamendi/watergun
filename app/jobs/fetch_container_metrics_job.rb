@@ -4,43 +4,41 @@ class FetchContainerMetricsJob < ApplicationJob
   retry_on Errno::ECONNRESET, Net::SSH::Disconnect, wait: 1.second, attempts: 3
 
   def perform
-    Server.all.each { sync_containers(_1) }
+    Server.all.each { sync_containers(it) }
   end
 
   private
 
   def sync_containers(server)
-    Current.set(account: server.account, server:) do
-      stats = []
+    stats = []
 
-      server.ssh_session do |session|
-        session.execute("docker stats --no-stream --format=json").text_output.each_line do |line|
-          stats << Docker::ContainerStats.new(line)
-        end
+    server.ssh_session do |session|
+      session.execute("docker stats --no-stream --format=json").text_output.each_line do |line|
+        stats << Docker::ContainerStats.new(line)
       end
-
-      checked_at = Time.current
-      stats.uniq!
-
-      server.apps.kept.each do |app|
-        app_stats = stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }
-        save_metrics!(app_stats, app, checked_at)
-      end
-
-      server.services.kept.each do |service|
-        service_stats = stats.select { |stat| stat.name == "dokku.#{service.service_type}.#{service.dokku_id}" }
-        save_metrics!(service_stats, service, checked_at)
-      end
-
-      # stop all containers that are not in the stats
-      running_container_ids = stats.map(&:id)
-      server.containers.running.where.not(cid: running_container_ids).stop_all
     end
+
+    checked_at = Time.current
+    stats.uniq!
+
+    server.apps.kept.each do |app|
+      app_stats = stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }
+      save_metrics!(server, app_stats, app, checked_at)
+    end
+
+    server.services.kept.each do |service|
+      service_stats = stats.select { |stat| stat.name == "dokku.#{service.service_type}.#{service.dokku_id}" }
+      save_metrics!(server, service_stats, service, checked_at)
+    end
+
+    # stop all containers that are not in the stats
+    running_container_ids = stats.map(&:id)
+    server.containers.running.where.not(cid: running_container_ids).stop_all
   end
 
-  def save_metrics!(container_stats, containerizable, checked_at)
+  def save_metrics!(server, container_stats, containerizable, checked_at)
     container_stats.each do |stats|
-      container = containerizable.containers.find_or_initialize_by(cid: stats.id)
+      container = containerizable.containers.find_or_initialize_by(cid: stats.id, server:)
 
       Container.transaction do
         container.update!(metrics_attributes(stats).merge(name: stats.name, checked_at:))
