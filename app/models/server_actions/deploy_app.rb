@@ -17,9 +17,7 @@ class ServerActions::DeployApp < ServerAction
     self.sha ||= deployment.sha
   end
 
-  def concurrency_key
-    app
-  end
+  def concurrency_key = app
 
   private
 
@@ -61,11 +59,11 @@ class ServerActions::DeployApp < ServerAction
     return unless app.domains.ssl_disabled.any?
     return unless app.all_domains_resolve_to_server?
 
-    ServerActions::EnableSsl.run_later!(app)
+    ServerActions::EnableSsl.run_later!(app.server, app)
   end
 
   def schedule_pull_env!
-    ServerActions::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(app.server, app)
   end
 
   def notify_user

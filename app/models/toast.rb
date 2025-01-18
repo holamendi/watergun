@@ -4,7 +4,7 @@ class Toast
       [user, :toasts],
       target: "toasts",
       partial: "shared/toast",
-      locals: {message:, type:}
+      locals: {message:, type:, title: nil}
     )
   end
 end

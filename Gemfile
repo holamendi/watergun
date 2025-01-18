@@ -21,6 +21,7 @@ group :development do
 end
 
 group :test do
+  gem "minitest-spec-rails"
   gem "mocha"
   gem "selenium-webdriver"
   gem "vcr"

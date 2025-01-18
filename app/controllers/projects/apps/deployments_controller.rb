@@ -6,8 +6,8 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   def create
     Deployment::CreateDeployment.new(app: @app, commit_sha: params[:sha]).save!
     render turbo_stream: stream_toast("#{@app.name}: deployment scheduled")
-  rescue ActiveRecord::RecordInvalid
-    render turbo_stream: stream_toast("Invalid deployment parameters")
+  rescue ActiveModel::ValidationError
+    render turbo_stream: stream_toast("Invalid deployment parameters"), status: :unprocessable_entity
   end
 
   def logs
