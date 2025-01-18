@@ -37,10 +37,10 @@ class ServerActions::UpdateEnv < ServerAction
   end
 
   def schedule_pull_env!
-    ServerActions::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(server, app)
   end
 
   def schedule_restart!
-    ServerActions::RestartApp.run_later!(app)
+    ServerActions::RestartApp.run_later!(server, app)
   end
 end

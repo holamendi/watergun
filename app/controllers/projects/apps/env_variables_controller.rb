@@ -16,7 +16,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     @env_variable = @app.env_variables.new(env_variable_params)
 
     if @env_variable.save
-      ServerActions::UpdateEnv.run_later!(@app, set: @env_variable.to_h)
+      ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h)
 
       render turbo_stream: [
         turbo_stream.remove_all("#new_env_variable form"),
@@ -37,7 +37,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
 
   def update
     if @env_variable.update(env_variable_params)
-      ServerActions::UpdateEnv.run_later!(@app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
+      ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
       render turbo_stream: [
         turbo_stream_env_variable,
         stream_toast("Environment variable updated successfully.")
@@ -49,7 +49,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
 
   def destroy
     @env_variable.discard!
-    ServerActions::UpdateEnv.run_later!(@app, unset: [@env_variable.name])
+    ServerActions::UpdateEnv.run_later!(@app.server, @app, unset: [@env_variable.name])
     render turbo_stream: [
       turbo_stream.remove(@env_variable),
       stream_toast("Environment variable deleted successfully.")
