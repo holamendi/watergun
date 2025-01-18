@@ -23,7 +23,7 @@ class ServerAction < ApplicationRecord
     RunServerActionJob.perform_now(self)
   end
 
-  def run_later(wait: 1.second)
+  def run_later(wait: 0.seconds)
     RunServerActionJob.set(wait:).perform_later(self)
   end
 
