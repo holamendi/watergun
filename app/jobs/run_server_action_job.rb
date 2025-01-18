@@ -21,6 +21,7 @@ class RunServerActionJob < ApplicationJob
     rescue => e
       Honeybadger.notify(e, context: {server_action_id: server_action.id})
       server_action.status = :error
+      server_action.failure_message = e.message
       raise if Rails.env.development?
 
       server_action
