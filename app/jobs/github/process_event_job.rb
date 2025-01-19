@@ -29,9 +29,7 @@ class Github::ProcessEventJob < ApplicationJob
     commit_sha = @github_event.payload["after"]
 
     @account.github_repos.kept.where(repo:, branch:, webhook_deploy: true).each do |github_repo|
-      Current.set(account: @account, server: github_repo.app.server) do
-        Deployment::Creator.new(app: github_repo.app, commit_sha:).create!
-      end
+      Deployment::CreateDeployment.new(app: github_repo.app, commit_sha:).save
     end
   end
 end
