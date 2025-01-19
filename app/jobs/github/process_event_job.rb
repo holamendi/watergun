@@ -1,4 +1,4 @@
-class Github::ProcessEventJob < ApplicationJob
+noclass Github::ProcessEventJob < ApplicationJob
   queue_as :default
 
   def perform(github_event)
@@ -29,7 +29,7 @@ class Github::ProcessEventJob < ApplicationJob
     commit_sha = @github_event.payload["after"]
 
     @account.github_repos.kept.where(repo:, branch:, webhook_deploy: true).each do |github_repo|
-      Deployment::CreateDeployment.new(app: github_repo.app, commit_sha:).save
+      Deployment::CreateDeployment.new(app: github_repo.app, commit_sha:).save!
     end
   end
 end
