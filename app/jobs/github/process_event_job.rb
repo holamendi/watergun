@@ -1,4 +1,4 @@
-noclass Github::ProcessEventJob < ApplicationJob
+class Github::ProcessEventJob < ApplicationJob
   queue_as :default
 
   def perform(github_event)
