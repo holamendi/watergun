@@ -47,6 +47,8 @@ class Deployment::CreateDeployment
   end
 
   def validate_commit_sha
-    errors.add(:commit_sha, "does not exist") unless remote_commit.present?
+    return if remote_commit.present?
+
+    errors.add(:commit_sha, "does not exist")
   end
 end
