@@ -1,7 +1,7 @@
 class Projects::Apps::BuildersController < Projects::Apps::BaseController
   def update
     if @app.update(app_params)
-      ServerActions::UpdateBuilder.run_later!(@app)
+      ServerActions::UpdateBuilder.run_later!(@app.server, @app)
       render turbo_stream: stream_toast("Builder updated")
     else
       turbo_stream_errors

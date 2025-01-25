@@ -1,4 +1,4 @@
-class Service::Creator
+class Service::CreateService
   include ActiveModel::Model
   include ActiveModel::Attributes
 
@@ -9,18 +9,26 @@ class Service::Creator
 
   validates :project, :service_type, presence: true
 
-  def create
+  def save
     return false unless valid?
 
     ApplicationRecord.transaction do
-      self.service = project.services.create!(service_type:, name: service_name)
-      ServerActions::CreateService.run_later!(service)
+      create_service!
+      ServerActions::CreateService.run_later!(service.server, service)
     end
 
     true
   end
 
   private
+
+  def create_service!
+    self.service = project.services.create!(
+      server: project.server,
+      service_type:,
+      name: service_name
+    )
+  end
 
   def service_name
     name.presence || default_service_name

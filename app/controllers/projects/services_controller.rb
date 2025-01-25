@@ -2,14 +2,14 @@ class Projects::ServicesController < Projects::BaseController
   before_action :set_service, only: [:show, :edit, :update, :destroy]
 
   def new
-    @service_creator = Service::Creator.new(project: @project)
+    @create_service = Service::CreateService.new(project: @project)
   end
 
   def create
-    @service_creator = Service::Creator.new(create_service_params)
+    @create_service = Service::CreateService.new(project: @project, **create_service_params)
 
-    if @service_creator.create
-      redirect_to project_service_path(@project, @service_creator.service), notice: "Service created"
+    if @create_service.save
+      redirect_to project_service_path(@project, @create_service.service), notice: "Service created"
     else
       render :new, status: :unprocessable_entity
     end
@@ -41,11 +41,7 @@ class Projects::ServicesController < Projects::BaseController
   end
 
   def create_service_params
-    params.require(:service_creator).permit(:name, :service_type).merge(project: @project)
-  end
-
-  def service_params
-    params.require(:service).permit(:name, :service_type)
+    params.require(:create_service).permit(:name, :service_type)
   end
 
   def update_service_params

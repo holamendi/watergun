@@ -38,7 +38,7 @@ class ServerActions::CreateService < ServerAction
   end
 
   def link_to_project_apps!
-    service.project.apps.kept.each { |app| ServiceLink::Creator.new(service:, app:).create }
+    service.project.apps.kept.each { |app| ServiceLink::CreateServiceLink.new(service:, app:).create }
   end
 
   def dokku_service_create_command_class

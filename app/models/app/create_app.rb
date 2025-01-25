@@ -32,7 +32,6 @@ class App::CreateApp
 
   def create_app!
     self.app = project.apps.create!(
-      account: project.account,
       server: project.server,
       name: app_name
     )

@@ -8,8 +8,8 @@ class App < ApplicationRecord
 
   TEMPORARY_STATUSES = %w[deploying restarting scaling stopping].freeze
 
-  belongs_to :account
-  belongs_to :server
+  belongs_to :account, default: -> { project.account }
+  belongs_to :server, default: -> { project.server }
   belongs_to :project, touch: true
 
   has_many :domains, dependent: :destroy

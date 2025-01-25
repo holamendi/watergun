@@ -38,7 +38,7 @@ class ServerActions::CreateApp < ServerAction
 
   def create_service_links!
     app.project.services.kept.each do |service|
-      ServiceLink::Creator.new(service:, app:).create
+      ServiceLink::CreateServiceLink.new(service:, app:).save
     end
   end
 

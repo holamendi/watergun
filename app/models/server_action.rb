@@ -1,23 +1,26 @@
 class ServerAction < ApplicationRecord
   belongs_to :account, default: -> { server.account }
+  belongs_to :actionable, polymorphic: true, optional: true
+  belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
   belongs_to :server
   belongs_to :user, default: -> { Current.user }, optional: true
-  belongs_to :actionable, polymorphic: true, optional: true
   belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
-  enum :status, %w[queued running success failure cancelled error].index_by(&:itself), default: :queued
   enum :source, %w[web api_v1].index_by(&:itself)
+  enum :status, %w[queued running success failure cancelled error].index_by(&:itself), default: :queued
 
-  attribute :source, :string, default: -> { Current.source.presence || :web }
+  attribute :source, :string, default: -> { Current.source.presence || "web" }
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
-  broadcasts_to ->(server_action) { [server_action.account, :server_actions] }, partial: "server_actions/server_action", inserts_by: :prepend
+  broadcasts_to ->(server_action) { [server_action.account, :server_actions] },
+    partial: "server_actions/server_action",
+    inserts_by: :prepend
 
   def run_now
     RunServerActionJob.perform_now(self)
