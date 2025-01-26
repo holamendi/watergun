@@ -1,12 +1,5 @@
-calendar:
-  account: watergun
-  project: calendar
-  server: x86
-  name: Calendar
-  dokku_id: calendar
-
 smol_roda:
-  account: watergun
+  account: default
   project: default
   server: x86
   name: Smol Roda

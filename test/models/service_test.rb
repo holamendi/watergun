@@ -2,9 +2,9 @@ require "test_helper"
 
 class ServiceTest < ActiveSupport::TestCase
   setup do
-    @account = accounts(:watergun)
+    @account = accounts(:default)
     @server = servers(:x86)
-    @project = projects(:calendar)
+    @project = projects(:default)
     @service = services(:postgres)
   end
 

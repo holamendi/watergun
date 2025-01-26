@@ -2,7 +2,7 @@ require "test_helper"
 
 class AppTest < ActiveSupport::TestCase
   setup do
-    @project = projects(:calendar)
+    @project = projects(:default)
     @account = @project.account
     @server = @project.server
   end

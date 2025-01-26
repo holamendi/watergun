@@ -3,7 +3,7 @@ require "test_helper"
 class EnvVariableTest < ActiveSupport::TestCase
   describe "validations" do
     test "name must start with letter or underscore" do
-      env_variable = EnvVariable.new(name: "1var", value: "value", app: apps(:calendar))
+      env_variable = EnvVariable.new(name: "1var", value: "value", app: apps(:smol_roda))
 
       refute env_variable.valid?
       assert_includes env_variable.errors[:name], "is invalid"
@@ -18,7 +18,7 @@ class EnvVariableTest < ActiveSupport::TestCase
     end
 
     test "name can only contain letters, numbers and underscores" do
-      env_variable = EnvVariable.new(name: "1var", value: "value", app: apps(:calendar))
+      env_variable = EnvVariable.new(name: "1var", value: "value", app: apps(:smol_roda))
 
       refute env_variable.valid?
       assert_includes env_variable.errors[:name], "is invalid"

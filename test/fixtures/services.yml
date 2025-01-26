@@ -1,20 +1,20 @@
 postgres:
-  account: watergun
+  account: default
   server: x86
-  project: calendar
+  project: default
   name: Postgres Database
   service_type: postgres
 
 redis:
-  account: watergun
+  account: default
   server: x86
-  project: calendar
+  project: default
   name: Redis Database
   service_type: redis
 
 mongo:
-  account: watergun
+  account: default
   server: x86
-  project: calendar
+  project: default
   name: Mongo Database
   service_type: mongo

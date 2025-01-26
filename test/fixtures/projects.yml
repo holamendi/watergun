@@ -1,9 +1,4 @@
-calendar:
-  account: watergun
-  server: x86
-  name: Calendar
-
 default:
-  account: watergun
+  account: default
   server: x86
-  name: Default
+  name: Default Project

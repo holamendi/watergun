@@ -3,7 +3,7 @@ require "test_helper"
 class App::CreateAppTest < ActiveSupport::TestCase
   describe "#save" do
     setup do
-      @project = projects(:calendar)
+      @project = projects(:default)
       @account = @project.account
       @server = @project.server
       @create_app = App::CreateApp.new(

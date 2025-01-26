@@ -1,5 +1,5 @@
 smol_roda:
-  account: watergun
+  account: default
   app: smol_roda
   repo: holamendi/smol-roda
   branch: main
