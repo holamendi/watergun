@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy]
   def index
-    @projects = Project.kept
+    @projects = Current.account.projects.kept
   end
 
   def show
@@ -10,16 +10,16 @@ class ProjectsController < ApplicationController
   end
 
   def new
-    @project = Current.account.projects.new
+    @project = Current.account.projects.new(server: Current.server)
   end
 
   def create
-    @project = Current.account.projects.new(project_params)
+    @project = Current.account.projects.new(server: Current.server, **project_params)
 
     if @project.save
       redirect_to @project, notice: "Project created."
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -35,7 +35,7 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    Project::Destroyer.new(@project).destroy
+    Project::DestroyProject.new(@project).destroy
     redirect_to projects_path, notice: "Project destroyed"
   end
 

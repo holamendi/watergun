@@ -30,7 +30,7 @@ class Projects::ServicesController < Projects::BaseController
   end
 
   def destroy
-    Service::Destroyer.new(@service).destroy
+    Service::DestroyService.new(@service).destroy
     redirect_to @project, notice: "Service destroyed"
   end
 

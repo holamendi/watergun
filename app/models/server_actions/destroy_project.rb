@@ -11,6 +11,8 @@ class ServerActions::DestroyProject < ServerAction
     self.project_id = project.id
   end
 
+  delegate :server, to: :project
+
   private
 
   def run
@@ -22,10 +24,10 @@ class ServerActions::DestroyProject < ServerAction
   end
 
   def destroy_dokku_apps!
-    project.apps.kept.each { ServerActions::DestroyApp.run_now!(_1) }
+    project.apps.kept.each { ServerActions::DestroyApp.run_now!(server, it) }
   end
 
   def destroy_dokku_services!
-    project.services.kept.each { ServerActions::DestroyService.run_now!(_1) }
+    project.services.kept.each { ServerActions::DestroyService.run_now!(server, it) }
   end
 end

@@ -1,10 +1,11 @@
-<%= form_with(model: project, local: true, class: "space-y-4") do |form| %>
+<%= form_with(model: project, class: "space-y-4") do |form| %>
   <div class="space-y-8">
     <div class="sm:col-span-4">
       <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
       <div class="mt-2">
         <%= form.text_field :name, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm" %>
       </div>
+      <%= error_messages_for(project, :name) %>
     </div>
   </div>
   <div class="flex gap-2">

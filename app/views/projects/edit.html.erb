@@ -1,22 +1,21 @@
 <% @title = @project.name %>
 
-<div class="flex justify-center">
-  <div class="w-full max-w-lg">
-    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"><%= @title %></h2>
+<%= container do %>
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <%= page_header(@title) %>
+    </div>
   </div>
-</div>
-
-<div class="flex justify-center">
-  <div class="w-full max-w-lg">
-    <div class="space-y-10 divide-y divide-gray-900/10">
-      <div>
-        <%= render "form", project: @project %>
-      </div>
-      <div class="pt-10">
-        <%= button_to "Delete Project", project_path(@project), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <div class="space-y-10 divide-y divide-gray-900/10">
+        <div>
+          <%= render "form", project: @project %>
+        </div>
+        <div class="pt-10">
+          <%= button_to "Delete Project", project_path(@project), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-
+<% end %>
