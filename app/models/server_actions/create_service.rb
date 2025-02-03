@@ -17,7 +17,7 @@ class ServerActions::CreateService < ServerAction
   private
 
   def run
-    install_plugin! unless plugin_installed?
+    install_dokku_plugin! unless dokku_plugin_installed?
 
     create_dokku_service!
     service.data = dokku_service_info
@@ -30,34 +30,26 @@ class ServerActions::CreateService < ServerAction
   end
 
   def create_dokku_service!
-    dokku_service_create_command_class.call!(ssh, service: dokku_service_id)
+    ssh.execute!(Dokku::Services::CreateCommand.new(plugin: service_type, name: dokku_service_id))
   end
 
   def dokku_service_info
-    dokku_service_info_command_class.call!(ssh, service: dokku_service_id).parsed_output
+    ssh.execute!(Dokku::Services::InfoCommand.new(plugin: service_type, service: dokku_service_id)).parsed_output
   end
 
   def link_to_project_apps!
     service.project.apps.kept.each { |app| ServiceLink::CreateServiceLink.new(service:, app:).create }
   end
 
-  def dokku_service_create_command_class
-    "Dokku::#{service_type.camelcase}::Create".constantize
+  def dokku_plugins
+    @_dokku_plugins ||= ssh.execute!(Dokku::Plugin::ListCommand.new).parsed_output
   end
 
-  def dokku_service_info_command_class
-    "Dokku::#{service_type.camelcase}::Info".constantize
+  def dokku_plugin_installed?
+    dokku_plugins.find { |plugin| plugin.name == service_type }
   end
 
-  memoize def plugins
-    Dokku::Plugin::List.call(ssh)
-  end
-
-  def plugin_installed?
-    plugins.installed?(service_type)
-  end
-
-  def install_plugin!
-    Dokku::Plugin::Install.call!(ssh, plugin: service_type)
+  def install_dokku_plugin!
+    ssh.execute!(Dokku::Plugin::InstallCommand.new(plugin: service_type))
   end
 end

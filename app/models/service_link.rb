@@ -9,4 +9,6 @@ class ServiceLink < ApplicationRecord
   enum :status, %w[pending active deleting error].index_by(&:itself), default: :pending
 
   validates :app, uniqueness: {scope: :service, conditions: -> { undiscarded }}
+
+  delegate :server, to: :service
 end

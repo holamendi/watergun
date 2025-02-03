@@ -39,14 +39,10 @@ class ServerActions::LinkService < ServerAction
   private
 
   def link_dokku_service!
-    dokku_link_command_class.call!(ssh, service: dokku_service_id, app: dokku_app_id, env_name:)
-  end
-
-  def dokku_link_command_class
-    "Dokku::#{service_type.camelcase}::Link".constantize
+    ssh.execute!(Dokku::Services::LinkCommand.new(plugin: service_type, service: dokku_service_id, app: dokku_app_id, env_name:))
   end
 
   def schedule_pull_env!
-    ServerActions::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(server, app)
   end
 end

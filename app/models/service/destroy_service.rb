@@ -19,7 +19,7 @@ class Service::DestroyService
 
   def destroy_service_links
     @service.service_links.each do |service_link|
-      ServiceLink::Destroyer.new(service_link).destroy
+      ServiceLink::DestroyServiceLink.new(service_link).destroy
     end
   end
 end

@@ -29,16 +29,8 @@ class Service < ApplicationRecord
     broadcast_replace_later_to project, target: dom_id(self), partial: "projects/services/service", locals: {service: self}
   end
 
-  def related_server_actions
-    ServerAction.where(server_id:).where("json_extract(payload, '$.dokku_service_id') = ?", dokku_id)
-  end
-
   def temporary_status?
     status.in?(TEMPORARY_STATUSES)
-  end
-
-  def container_name
-    "dokku.#{service_type}.#{dokku_id}"
   end
 
   private
