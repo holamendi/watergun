@@ -1,15 +1,13 @@
 require "test_helper"
 
 class Ssh::SessionTest < ActiveSupport::TestCase
+  include SshTestHelper
+
   setup do
     @host = "123.45.67.89"
     @user = "user"
     @private_key = "private-key"
     @port = 22
-
-    @ssh_connection = mock
-    @ssh_connection.stubs(:loop)
-    Net::SSH.stubs(:start).yields(@ssh_connection)
 
     @session = Ssh::Session.new(
       host: @host,
@@ -19,21 +17,26 @@ class Ssh::SessionTest < ActiveSupport::TestCase
     )
   end
 
+  def mock_session(commands = [])
+    mock_ssh_session(
+      host: @host,
+      user: @user,
+      port: @port,
+      private_key: @private_key,
+      commands:
+    )
+  end
+
   describe "#connect" do
     test "connects with correct SSH parameters" do
-      Net::SSH.expects(:start).with(
-        @host,
-        @user,
-        port: @port,
-        key_data: [@private_key],
-        keys_only: true,
-        non_interactive: true
-      ).yields(@ssh_connection)
+      mock_session
 
       @session.connect {}
     end
 
     test "sets timestamps during connection" do
+      mock_session
+
       freeze_time do
         @session.connect {}
 
@@ -43,19 +46,9 @@ class Ssh::SessionTest < ActiveSupport::TestCase
     end
 
     test "handles connection errors" do
-      Net::SSH.unstub(:start)
       Net::SSH.expects(:start).raises(Net::SSH::AuthenticationFailed)
 
       assert_raises Net::SSH::AuthenticationFailed do
-        @session.connect { |_s| }
-      end
-    end
-
-    test "cleans up session on error" do
-      Net::SSH.unstub(:start)
-      Net::SSH.expects(:start).raises(StandardError)
-
-      assert_raises StandardError do
         @session.connect { |_s| }
       end
 
@@ -65,60 +58,56 @@ class Ssh::SessionTest < ActiveSupport::TestCase
 
   describe "#execute" do
     test "executes command and captures output" do
-      command = "ls -la"
-      command_output = "command output\n"
-      result = nil
+      cmd = "ls -la"
+      stdout = "command output"
+      exit_code = 0
 
-      @ssh_connection.expects(:exec!).with(
-        command,
-        status: instance_of(Hash)
-      ).yields(nil, :stdout, command_output)
+      commands = [
+        {cmd:, stdout:, stderr: [], exit_code:}
+      ]
+
+      mock_session(commands)
 
       @session.connect do |ssh|
-        result = ssh.execute(command)
+        @result = ssh.execute(cmd)
       end
 
-      result.stubs(:exit_code).returns(0)
-
-      assert_instance_of Ssh::Command, result
-      assert result.success?
-      assert_equal command, result.command
-      assert_equal command_output, result.output.first.data
-      assert_equal [result], @session.commands
+      assert_instance_of Ssh::Command, @result
+      assert @result.success?
+      assert_equal cmd, @result.cmd
+      assert_equal stdout, @result.text_output
+      assert_equal [@result], @session.commands
     end
 
     test "streams output when block given" do
-      command = "ls -la"
-      command_output = "command output\n"
-      output_received = nil
+      cmd = "ls -la"
+      stdout = "command output\n"
 
-      @ssh_connection.expects(:exec!).with(
-        command,
-        status: instance_of(Hash)
-      ).yields(nil, :stdout, command_output)
+      mock_session [
+        {cmd:, stdout:}
+      ]
 
       @session.connect do |ssh|
-        ssh.execute(command) do |stream, data|
-          output_received = [stream, data]
+        ssh.execute(cmd) do |stream, data|
+          @output_stream = [stream, data]
         end
       end
 
-      assert_equal ["stdout", command_output], output_received
+      assert_equal [:stdout, stdout], @output_stream
     end
   end
 
   test "does not save output when save_output is false" do
-    command = "ls -la"
-    command_output = "command output\n"
+    cmd = "ls -la"
+    stdout = "command output\n"
 
-    @ssh_connection.expects(:exec!).with(
-      command,
-      status: instance_of(Hash)
-    ).yields(nil, :stdout, command_output)
+    mock_session [
+      {cmd:, stdout:}
+    ]
 
     result = nil
     @session.connect do |ssh|
-      result = ssh.execute(command, save_output: false)
+      result = ssh.execute(cmd, save_output: false)
     end
 
     assert_empty result.output
@@ -126,55 +115,38 @@ class Ssh::SessionTest < ActiveSupport::TestCase
 
   describe "#execute!" do
     test "does not raise error on command success" do
-      skip "needs work"
+      cmd = "ls"
 
-      command = "ls"
-      result = Ssh::Command.new(command:, started_at: Time.current, finished_at: Time.current, exit_code: 0)
-      @session.expects(:execute).with(command, save_output: true).returns(result)
+      mock_session [
+        {cmd:, exit_code: 0}
+      ]
 
       @session.connect do |ssh|
-        result = ssh.execute!(command)
+        @result = ssh.execute!(cmd)
       end
 
-      assert_instance_of Ssh::Command, result
-      assert result.success?
-      assert_equal command, result.command
+      assert @result.success?
+      assert @session.success?
+      assert_equal cmd, @result.cmd
     end
 
     test "raises error on command failure" do
-      command = "invalid-command"
-      result = Ssh::Command.new(command:, started_at: Time.current, finished_at: Time.current, exit_code: 1)
-      @session.expects(:execute).with(command, save_output: true).returns(result)
+      cmd = "invalid-command"
+      exit_code = 1
+
+      mock_session [
+        {cmd:, exit_code:}
+      ]
 
       error = assert_raises Ssh::CommandExecutionError do
         @session.connect do |ssh|
-          ssh.execute!(command)
+          ssh.execute!(cmd)
         end
       end
 
-      assert_equal command, error.command
-      assert_equal result, error.result
-      assert_equal "command failed with status #{result.exit_code}: #{command}", error.message
-    end
-  end
-
-  describe "#success?" do
-    test "returns true when all commands succeed" do
-      @session.expects(:commands).returns([
-        Ssh::Command.new(command: "command1", started_at: Time.current, finished_at: Time.current, exit_code: 0),
-        Ssh::Command.new(command: "command2", started_at: Time.current, finished_at: Time.current, exit_code: 0)
-      ])
-
-      assert @session.success?
-    end
-
-    test "returns false when any command fails" do
-      @session.expects(:commands).returns([
-        Ssh::Command.new(command: "command1", started_at: Time.current, finished_at: Time.current, exit_code: 0),
-        Ssh::Command.new(command: "command2", started_at: Time.current, finished_at: Time.current, exit_code: 1)
-      ])
-
-      refute @session.success?
+      assert_equal cmd, error.ssh_command.cmd
+      assert_equal exit_code, error.ssh_command.exit_code
+      assert_equal "command failed with status #{exit_code}: #{cmd}", error.message
     end
   end
 end

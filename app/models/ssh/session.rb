@@ -25,13 +25,16 @@ class Ssh::Session
   end
 
   def execute(command, save_output: true)
+    raise "session not connected" unless @session
+
+    status = {}
     ssh_command = Ssh::Command.new(command)
     @commands << ssh_command
     ssh_command.start
 
-    status = {}
-    execute_command(ssh_command, status, save_output:) do |stream, data|
-      yield(stream.to_s, data) if block_given?
+    @session.exec!(ssh_command.cmd, status:) do |_channel, stream, data|
+      ssh_command.append_output(stream, data) if save_output
+      yield(stream, data) if block_given?
     end
 
     ssh_command.finish(status[:exit_code])
@@ -39,18 +42,18 @@ class Ssh::Session
   end
 
   def execute!(command, save_output: true)
-    result = execute(command, save_output:)
-    raise Ssh::CommandExecutionError.new(command, result) if result.failure?
+    ssh_command = execute(command, save_output:)
 
-    result
+    if ssh_command.failure?
+      @session.loop
+      raise Ssh::CommandExecutionError.new(ssh_command)
+    end
+
+    ssh_command
   end
 
   def success?
     commands.all?(&:success?)
-  end
-
-  def status
-    success? ? :success : :failure
   end
 
   def text_output
@@ -67,25 +70,16 @@ class Ssh::Session
       non_interactive: true
     }
   end
-
-  def execute_command(ssh_command, status, save_output: true)
-    @session.exec!(ssh_command.command_str, status:) do |_channel, stream, data|
-      ssh_command.append_output(stream, data) if save_output
-      yield(stream, data) if block_given?
-      Rails.logger.debug(data&.strip) if Rails.env.development?
-    end
-  end
 end
 
 class Ssh::CommandExecutionError < StandardError
-  attr_reader :command, :result
+  attr_reader :ssh_command
 
-  def initialize(command, result)
-    @command = command
-    @result = result
+  def initialize(ssh_command)
+    @ssh_command = ssh_command
   end
 
   def message
-    "command failed with status #{result.exit_code}: #{command}"
+    "command failed with status #{ssh_command.exit_code}: #{ssh_command.cmd}"
   end
 end

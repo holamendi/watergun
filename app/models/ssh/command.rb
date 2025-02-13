@@ -1,10 +1,10 @@
 class Ssh::Command
   OutputEntry = Data.define(:timestamp, :stream, :data)
 
-  attr_reader :command, :output, :started_at, :finished_at, :exit_code
+  attr_reader :input, :output, :started_at, :finished_at, :exit_code
 
-  def initialize(command)
-    @command = command
+  def initialize(input)
+    @input = input
     @output = []
   end
 
@@ -12,13 +12,13 @@ class Ssh::Command
     @started_at = Time.current
   end
 
-  def command_str
-    if @command.is_a?(String)
-      @command
-    elsif @command.respond_to?(:command)
-      @command.command
+  def cmd
+    @cmd ||= if @input.is_a?(String)
+      @input
+    elsif @input.respond_to?(:cmd)
+      @input.cmd
     else
-      raise "command must be a string or an object that responds to #command"
+      raise "input must be a string or an object that responds to #cmd"
     end
   end
 
@@ -54,12 +54,12 @@ class Ssh::Command
   def parsed_output
     return unless finished?
 
-    @parsed_output ||= if @command.is_a?(String)
+    @parsed_output ||= if @input.is_a?(String)
       text_output
-    elsif @command.respond_to?(:parse_output)
-      @command.parse_output(exit_code, text_output)
+    elsif @input.respond_to?(:parse_output)
+      @input.parse_output(exit_code, text_output)
     else
-      raise "command must be a string or an object that responds to #parse_output"
+      raise "input must be a string or an object that responds to #parse_output"
     end
   end
 end

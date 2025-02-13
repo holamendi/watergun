@@ -15,6 +15,7 @@ module Dokku
         return unless exit_code.zero?
 
         json = JSON.parse(text_output)
+
         AppReport.new(
           created_at: Time.zone.at(json["app-created-at"].to_i),
           deploy_source: json["app-deploy-source"],
