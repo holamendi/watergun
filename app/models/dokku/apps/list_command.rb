@@ -5,9 +5,7 @@ module Dokku
         "dokku apps"
       end
 
-      def parse_output(exit_code, text_output)
-        return unless exit_code.zero?
-
+      def parse_output(_exit_code, text_output)
         text_output.lines[1..].map(&:strip)
       end
     end
