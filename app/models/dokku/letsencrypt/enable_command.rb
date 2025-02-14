@@ -5,7 +5,7 @@ module Dokku
         @app = app
       end
 
-      def command
+      def cmd
         "dokku letsencrypt:enable #{app}"
       end
     end

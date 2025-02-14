@@ -8,7 +8,7 @@ module Dokku
         @directory = directory
       end
 
-      def command
+      def cmd
         cmd = "dokku storage:ensure_directory #{directory}"
         cmd += " --chown=#{chown}" if chown
         cmd

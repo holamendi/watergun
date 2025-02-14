@@ -7,7 +7,7 @@ module Dokku
         @force = force
       end
 
-      def command
+      def cmd
         cmd = "dokku #{@plugin}:destroy #{@name}"
         cmd += " --force" if @force
         cmd

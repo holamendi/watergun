@@ -3,7 +3,7 @@ module Dokku
     PluginData = Data.define(:name, :version, :enabled)
 
     class ListCommand
-      def command
+      def cmd
         "dokku plugin:list"
       end
 

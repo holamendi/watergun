@@ -10,7 +10,7 @@ module Dokku
         @container_directory = container_directory
       end
 
-      def command
+      def cmd
         "dokku storage:mount #{app} #{host_directory}:#{container_directory}"
       end
     end

@@ -165,7 +165,6 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.4)
-    memery (1.6.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
     minitest (5.25.4)
@@ -414,7 +413,6 @@ DEPENDENCIES
   httpx
   jwt
   lograge
-  memery
   minitest-spec-rails
   mission_control-jobs
   mocha

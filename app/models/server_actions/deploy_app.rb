@@ -40,15 +40,15 @@ class ServerActions::DeployApp < ServerAction
   end
 
   def sync_git_repo!
-    Dokku::Git::Sync.call!(ssh, app: dokku_app_id, repo:, sha:)
+    execute!(Dokku::Git::SyncCommand.new(app: dokku_app_id, repo:, sha:))
   end
 
   def rebuild_dokku_app!
-    Dokku::Ps::Rebuild.call!(ssh, app: dokku_app_id)
+    execute!(Dokku::Ps::RebuildCommand.new(app: dokku_app_id))
   end
 
   def authenticate_github_account!
-    Dokku::Git::Auth.call!(ssh, access_token: github_access_token)
+    execute!(Dokku::Git::AuthCommand.new(access_token: github_access_token))
   end
 
   def github_access_token

@@ -29,11 +29,11 @@ class ServerActions::UpdateEnv < ServerAction
   end
 
   def set_dokku_app_config!
-    Dokku::Config::Set.call!(ssh, app: dokku_app_id, env: set)
+    execute!(Dokku::Config::SetCommand.new(app: dokku_app_id, env: set))
   end
 
   def unset_dokku_app_config!
-    Dokku::Config::Unset.call!(ssh, app: dokku_app_id, variable_names: unset)
+    execute!(Dokku::Config::UnsetCommand.new(app: dokku_app_id, variable_names: unset))
   end
 
   def schedule_pull_env!

@@ -1,10 +1,10 @@
 require "test_helper"
 
 class Dokku::Apps::ReportCommandTest < ActiveSupport::TestCase
-  test "command returns the correct command" do
-    command = Dokku::Apps::ReportCommand.new(app: "smol-roda").command
+  test "cmd returns the correct command" do
+    cmd = Dokku::Apps::ReportCommand.new(app: "smol-roda").cmd
 
-    assert_equal "dokku apps:report smol-roda --format json", command
+    assert_equal "dokku apps:report smol-roda --format json", cmd
   end
 
   test "parse_output returns an AppReport instance with the correct data" do

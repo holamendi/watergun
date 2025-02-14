@@ -9,7 +9,7 @@ module Dokku
         @build_if_changes = build_if_changes
       end
 
-      def command
+      def cmd
         cmd = "dokku git:sync #{@app} #{repo_url} #{@sha || @branch}"
         cmd += " --build-if-changes" if @build_if_changes
         cmd

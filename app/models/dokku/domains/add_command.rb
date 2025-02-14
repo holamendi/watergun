@@ -6,7 +6,7 @@ module Dokku
         @domain = Array.wrap(domain)
       end
 
-      def command
+      def cmd
         "dokku domains:add #{@app} #{@domain.join(" ")}"
       end
     end

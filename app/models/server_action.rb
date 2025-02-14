@@ -18,6 +18,8 @@ class ServerAction < ApplicationRecord
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
+  delegate :execute, :execute!, to: :ssh_session
+
   broadcasts_to ->(server_action) { [server_action.account, :server_actions] },
     partial: "server_actions/server_action",
     inserts_by: :prepend

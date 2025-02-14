@@ -1,7 +1,6 @@
 class App::CreateApp
   include ActiveModel::Model
   include ActiveModel::Attributes
-  include Memery
 
   attribute :project
   attribute :name
@@ -55,14 +54,14 @@ class App::CreateApp
     account.github_integration.api_client
   end
 
-  memoize def remote_repo
-    github_api_client.repo(repo)
+  def remote_repo
+    @remote_repo ||= github_api_client.repo(repo)
   rescue Octokit::NotFound, Octokit::InvalidRepository
     nil
   end
 
-  memoize def remote_branch
-    github_api_client.branch(repo, branch)
+  def remote_branch
+    @remote_branch ||= github_api_client.branch(repo, branch)
   rescue Octokit::NotFound, Octokit::InvalidRepository
     nil
   end

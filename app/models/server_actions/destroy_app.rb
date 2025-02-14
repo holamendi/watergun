@@ -24,6 +24,6 @@ class ServerActions::DestroyApp < ServerAction
   end
 
   def destroy_dokku_app!
-    Dokku::Apps::Destroy.call!(ssh, app: dokku_app_id)
+    execute!(Dokku::Apps::DestroyCommand.new(app: dokku_app_id))
   end
 end

@@ -27,7 +27,7 @@ class ServerActions::CreateApp < ServerAction
   end
 
   def create_dokku_app!
-    ssh.execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
+    execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
   end
 
   def create_domains!
@@ -43,6 +43,6 @@ class ServerActions::CreateApp < ServerAction
   end
 
   def dokku_app_hostnames
-    ssh.execute!(Dokku::Domains::ReportCommand.new(app: dokku_app_id)).parsed_output.domains_app_vhosts
+    execute!(Dokku::Domains::ReportCommand.new(app: dokku_app_id)).parsed_output.domains_app_vhosts
   end
 end

@@ -10,12 +10,10 @@ class FetchContainerMetricsJob < ApplicationJob
   private
 
   def sync_containers(server)
-    stats = []
+    stats = nil
 
-    server.ssh_session do |session|
-      session.execute("docker stats --no-stream --format=json").text_output.each_line do |line|
-        stats << Docker::ContainerStats.new(line)
-      end
+    server.ssh_session do |ssh|
+      stats = ssh.execute!(Docker::StatsCommand.new).parsed_output
     end
 
     checked_at = Time.current

@@ -6,7 +6,7 @@ module Dokku
         @domain = Array(domain)
       end
 
-      def command
+      def cmd
         "dokku domains:remove #{@app} #{@domain.join(" ")}"
       end
     end

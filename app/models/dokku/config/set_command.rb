@@ -7,7 +7,7 @@ module Dokku
         @restart = restart
       end
 
-      def command
+      def cmd
         cmd = "dokku config:set #{@app} #{base64_encoded_variables} --encoded"
         cmd += " --no-restart" unless @restart
         cmd

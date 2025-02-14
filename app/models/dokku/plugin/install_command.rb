@@ -20,7 +20,7 @@ module Dokku
         @repo = PLUGIN_GITHUB_REPOS.fetch(plugin)
       end
 
-      def command
+      def cmd
         "sudo dokku plugin:install #{@repo} #{@plugin}"
       end
     end

@@ -56,6 +56,10 @@ class Ssh::Session
     commands.all?(&:success?)
   end
 
+  def status
+    success? ? :success : :failure
+  end
+
   def text_output
     @text_output ||= commands.map(&:text_output).join("\n")
   end

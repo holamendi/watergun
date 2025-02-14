@@ -13,13 +13,15 @@ class RunServerActionJob < ApplicationJob
 
     server_action.create_log!(ssh_commands: session.commands)
     server_action.status = session.status
-    server_action
   rescue => e
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
-    server_action.failure_message = e.message
+    server_action.failure_message = e.detailed_message
     raise if Rails.env.development?
 
+    server_action
+  else
+    server_action.failure_message = nil
     server_action
   ensure
     server_action.finished_at = Time.current

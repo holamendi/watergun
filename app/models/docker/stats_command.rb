@@ -1,5 +1,5 @@
 class Docker::StatsCommand
-  def command
+  def cmd
     "docker stats --format=json --no-stream"
   end
 

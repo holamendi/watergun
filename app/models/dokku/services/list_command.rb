@@ -5,7 +5,7 @@ module Dokku
         @plugin = plugin
       end
 
-      def command
+      def cmd
         "dokku #{@plugin}:list"
       end
 

@@ -1,5 +1,4 @@
 class ApplicationRecord < ActiveRecord::Base
-  include Memery
   include ActionView::RecordIdentifier
 
   primary_abstract_class

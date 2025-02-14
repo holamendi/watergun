@@ -7,7 +7,7 @@ module Dokku
         @restart = restart
       end
 
-      def command
+      def cmd
         cmd = "dokku config:unset #{@app} #{@variable_names.join(" ")}"
         cmd += " --no-restart" unless @restart
         cmd

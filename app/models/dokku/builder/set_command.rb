@@ -6,7 +6,7 @@ module Dokku
         @builder = builder
       end
 
-      def command
+      def cmd
         "dokku builder:set #{@app} selected #{@builder}"
       end
     end

@@ -9,7 +9,7 @@ module Dokku
         @app = app
       end
 
-      def command
+      def cmd
         cmd = "dokku redis:unlink #{service} #{app}"
         cmd += " --no-restart" unless restart
         cmd

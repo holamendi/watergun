@@ -1,7 +1,7 @@
 module Dokku
   module Apps
     class ListCommand
-      def command
+      def cmd
         "dokku apps"
       end
 

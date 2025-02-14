@@ -35,8 +35,8 @@ class ServerActions::PullEnv < ServerAction
     out_of_sync_env_variables.destroy_all
   end
 
-  memoize def dokku_config_export
-    Dokku::Config::Export.call!(ssh, app: dokku_app_id).parsed_output
+  def dokku_config_export
+    @dokku_config_export ||= execute!(Dokku::Config::ExportCommand.new(app: dokku_app_id)).parsed_output
   end
 
   def out_of_sync_env_variables

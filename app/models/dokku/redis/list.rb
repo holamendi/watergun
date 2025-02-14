@@ -5,7 +5,7 @@ module Dokku
         @ssh_session = ssh_session
       end
 
-      def command
+      def cmd
         "dokku redis:list"
       end
 

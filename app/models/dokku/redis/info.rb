@@ -8,7 +8,7 @@ module Dokku
         @service = service
       end
 
-      def command
+      def cmd
         "dokku redis:info #{service}"
       end
 

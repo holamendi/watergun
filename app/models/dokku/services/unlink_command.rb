@@ -8,7 +8,7 @@ module Dokku
         @restart = restart
       end
 
-      def command
+      def cmd
         cmd = "dokku #{@plugin}:unlink #{@service} #{@app}"
         cmd += " --no-restart" unless @restart
         cmd

@@ -6,7 +6,7 @@ module Dokku
         @name = name
       end
 
-      def command
+      def cmd
         "dokku #{@plugin}:create #{@name}"
       end
     end

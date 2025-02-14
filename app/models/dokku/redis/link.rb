@@ -13,7 +13,7 @@ module Dokku
         @restart = restart
       end
 
-      def command
+      def cmd
         cmd = "dokku redis:link #{service} #{app}"
         cmd += " --alias #{env_name}" if env_name.present?
         cmd += " --no-restart" unless restart

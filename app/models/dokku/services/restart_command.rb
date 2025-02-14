@@ -6,7 +6,7 @@ module Dokku
         @service = service
       end
 
-      def command
+      def cmd
         "dokku #{@plugin}:restart #{@service}"
       end
     end

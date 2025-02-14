@@ -6,7 +6,7 @@ module Dokku
         @host = host
       end
 
-      def command
+      def cmd
         "dokku git:auth #{@host} u #{@access_token}"
       end
     end
