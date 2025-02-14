@@ -47,8 +47,14 @@ class Ssh::Command
     @output.map(&:data).join
   end
 
-  def json_output
-    @output.map(&:to_h)
+  def as_json
+    {
+      cmd:,
+      exit_code:,
+      started_at:,
+      finished_at:,
+      output:
+    }
   end
 
   def parsed_output

@@ -2,7 +2,7 @@ module Dokku
   module Apps
     class ListCommand
       def cmd
-        "dokku apps"
+        "dokku apps:list"
       end
 
       def parse_output(_exit_code, text_output)

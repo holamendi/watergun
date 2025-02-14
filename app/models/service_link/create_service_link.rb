@@ -20,7 +20,7 @@ class ServiceLink::CreateServiceLink
       )
     end
 
-    ServerActions::LinkService.run_now!(@service.server, @service_link)
+    ServerActions::LinkService.run_later!(@service.server, @service_link)
     true
   end
 end

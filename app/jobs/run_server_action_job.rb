@@ -10,14 +10,13 @@ class RunServerActionJob < ApplicationJob
       server_action.with(ssh_session:) { server_action.send(:run) }
     rescue Ssh::CommandExecutionError
     end
-
     server_action.create_log!(ssh_commands: session.commands)
     server_action.status = session.status
   rescue => e
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
     server_action.failure_message = e.detailed_message
-    raise if Rails.env.development?
+    raise if Rails.env.local?
 
     server_action
   else

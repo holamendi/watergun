@@ -11,13 +11,13 @@ class ServerActionsController < ApplicationController
     @server_action = Current.server.actions.find(params[:id])
 
     log = if @server_action.log.present?
-      @server_action.log.to_s
+      JSON.pretty_generate(@server_action.log.ssh_commands)
     elsif @server_action.failure_message.present?
       @server_action.failure_message
     else
       "No logs available"
     end
 
-    render plain: log
+    render json: log
   end
 end

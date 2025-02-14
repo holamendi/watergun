@@ -1,0 +1,5 @@
+=====> smol-roda domains information
+       Domains app enabled:           true
+       Domains app vhosts:            smol-roda.local.watergun.dev
+       Domains global enabled:        true
+       Domains global vhosts:         local.watergun.dev
