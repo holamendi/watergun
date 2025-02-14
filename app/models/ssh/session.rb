@@ -12,7 +12,7 @@ class Ssh::Session
   def connect
     @started_at = Time.current
 
-    Net::SSH.start(host, user, connection_options) do |session|
+    Net::SSH.start(host, user, **connection_options) do |session|
       @session = session
       yield(self)
       @session.loop

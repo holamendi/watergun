@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Destroy < Dokku::Command
+    class Destroy
       attr_reader :service
 
       def initialize(ssh_session, service:)

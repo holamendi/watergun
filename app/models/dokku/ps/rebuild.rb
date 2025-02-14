@@ -1,6 +1,6 @@
 module Dokku
   module Ps
-    class Rebuild < Dokku::Command
+    class Rebuild
       attr_reader :app
 
       def initialize(ssh_session, app:)

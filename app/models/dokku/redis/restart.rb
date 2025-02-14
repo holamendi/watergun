@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Restart < Dokku::Command
+    class Restart
       attr_reader :service
 
       def initialize(ssh_session, service:)

@@ -1,6 +1,6 @@
 module Dokku
   module Ps
-    class Restart < Dokku::Command
+    class Restart
       attr_reader :app
 
       def initialize(ssh_session, app:)

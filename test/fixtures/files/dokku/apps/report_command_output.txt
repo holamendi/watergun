@@ -1,0 +1,1 @@
+{"app-created-at":"1736235685","app-deploy-source":"git-sync","app-deploy-source-metadata":"https://github.com/holamendi/smol-roda.git#8e743fa0bedda6a8fea91f85d542a7e02810beac","app-dir":"/home/dokku/smol-roda","app-locked":"false"}

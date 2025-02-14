@@ -8,12 +8,8 @@ module SshTestHelper
   #   private_key_data: "abc-123",
   #   commands: [
   #     {
-  #       cmd: "ls -la",
-  #       stdout: [
-  #         "total 24",
-  #         "drwxr-xr-x 6 root root 4096 Feb 10 12:00 dokku",
-  #         "drwxr-xr-x 3 root root 4096 Feb 10 12:00 git"
-  #       ],
+  #       cmd: "ls",
+  #       stdout: "output 1\noutput 2\n",
   #       exit_code: 0
   #     }
   #   ]
@@ -41,7 +37,7 @@ module SshTestHelper
 
     Net::SSH.expects(:start)
       .with(host, user,
-        port:,
+        port: port,
         key_data: [private_key],
         keys_only: true,
         non_interactive: true)

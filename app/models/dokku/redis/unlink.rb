@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Unlink < Dokku::Command
+    class Unlink
       attr_reader :app, :service, :restart
 
       def initialize(ssh_session, service:, app:, restart: false)

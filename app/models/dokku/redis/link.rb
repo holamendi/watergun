@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Link < Dokku::Command
+    class Link
       DEFAULT_ENV_NAME = "REDIS_URL"
 
       attr_reader :service, :app, :env_name, :restart
