@@ -9,16 +9,18 @@ class App::CreateApp
   attribute :webhook_deploy, :boolean, default: false
 
   attribute :app
+  attribute :create_app_server_action
 
   validates :project, :repo, :branch, presence: true
   validates :webhook_deploy, inclusion: {in: [true, false]}
+
   validate :validate_remote_repo_exists, if: -> { repo.present? }
   validate :validate_remote_branch_exists, if: -> { branch.present? }
 
   def save
     return false unless valid?
 
-    ApplicationRecord.transaction do
+    App.transaction do
       create_app!
       create_github_repo!
       ServerActions::CreateApp.run_later!(project.server, app)

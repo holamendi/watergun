@@ -12,7 +12,7 @@ module Dokku
 
         text_output.split("\n").map(&:strip).map do |line|
           name, version, enabled = line.split(" ")
-          PluginData.new(name:, version:, enabled: enabled == "enabled")
+          PluginData.new(name:, version:, enabled: (enabled == "enabled"))
         end
       end
     end

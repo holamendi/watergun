@@ -1,0 +1,7 @@
+amd:
+  account: default
+  server: amd
+  private_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    ...
+    -----END OPENSSH PRIVATE KEY-----

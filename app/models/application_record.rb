@@ -3,5 +3,5 @@ class ApplicationRecord < ActiveRecord::Base
 
   primary_abstract_class
 
-  scope :recent, ->(column_name = :created_at) { order(column_name => :desc) }
+  scope :recent, ->(column_name = :id) { order(column_name => :desc) }
 end

@@ -1,6 +1,6 @@
 smol_roda:
   account: default
   project: default
-  server: x86
+  server: amd
   name: Smol Roda
   dokku_id: smol-roda

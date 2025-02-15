@@ -36,13 +36,13 @@ class ServerActions::CreateApp < ServerAction
     end
   end
 
-  def create_service_links!
-    app.project.services.kept.each do |service|
-      ServiceLink::CreateServiceLink.new(service:, app:).save
-    end
-  end
-
   def dokku_app_hostnames
     execute!(Dokku::Domains::ReportCommand.new(app: dokku_app_id)).parsed_output.domains_app_vhosts
+  end
+
+  def create_service_links!
+    app.project.services.kept.each do |service|
+      ServiceLink::CreateServiceLink.new(service:, app:).save!
+    end
   end
 end

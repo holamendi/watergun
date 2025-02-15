@@ -3,7 +3,7 @@ require "test_helper"
 class ServiceTest < ActiveSupport::TestCase
   setup do
     @account = accounts(:default)
-    @server = servers(:x86)
+    @server = servers(:amd)
     @project = projects(:default)
     @service = services(:postgres)
   end

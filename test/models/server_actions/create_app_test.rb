@@ -6,10 +6,9 @@ class ServerActions::CreateAppTest < ActiveSupport::TestCase
   def setup
     @app = apps(:smol_roda)
     @server = @app.server
-    @server.create_ssh_key!
-  end
+    @project = @app.project
+    @app.pending!
 
-  test "creates a dokku app" do
     mock_ssh_session(
       host: @server.public_ip,
       user: SshKey::USER,
@@ -25,10 +24,42 @@ class ServerActions::CreateAppTest < ActiveSupport::TestCase
         }
       ]
     )
+  end
 
-    action = ServerActions::CreateApp.run_now!(@app.server, @app)
+  test "creates a dokku app and links it to existing project services" do
+    assert_difference(
+      -> { @app.domains.count } => 1,
+      -> { @app.services.count } => @project.services.count
+    ) do
+      @server_action = ServerActions::CreateApp.run_now!(@app.server, @app)
+    end
 
-    assert action.persisted?
-    assert action.success?
+    # creates dokku app
+    assert @server_action.success?
+    assert @app.active?
+
+    # creates default domain
+    domain = @app.domains.first
+    assert_equal "smol-roda.local.watergun.dev", domain.hostname
+    assert domain.active?
+    assert domain.is_default?
+
+    # creates service links for existing project services
+    assert_equal @project.services, @app.services
+
+    # schedules server actions to link services
+    @app.service_links.each do |service_link|
+      assert_server_action_scheduled(
+        ServerActions::LinkService,
+        server: @server,
+        actionable: service_link,
+        payload: {
+          dokku_app_id: @app.dokku_id,
+          dokku_service_id: service_link.service.dokku_id,
+          service_type: service_link.service.service_type,
+          env_name: service_link.env_variable.name
+        }
+      )
+    end
   end
 end
