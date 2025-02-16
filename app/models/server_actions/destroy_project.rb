@@ -11,23 +11,27 @@ class ServerActions::DestroyProject < ServerAction
     self.project_id = project.id
   end
 
-  delegate :server, to: :project
-
   private
 
   def run
     destroy_dokku_apps!
     destroy_dokku_services!
   rescue Ssh::CommandExecutionError
-  ensure
+  else
     project.destroy!
   end
 
   def destroy_dokku_apps!
-    project.apps.kept.each { ServerActions::DestroyApp.run_now!(server, it) }
+    project.apps.each do |app|
+      ssh.execute(Dokku::Apps::DestroyCommand.new(app: app.dokku_id))
+      app.destroy!
+    end
   end
 
   def destroy_dokku_services!
-    project.services.kept.each { ServerActions::DestroyService.run_now!(server, it) }
+    project.services.kept.each do |service|
+      ssh.execute(Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.name))
+      service.destroy!
+    end
   end
 end

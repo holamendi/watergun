@@ -35,14 +35,16 @@ class ServerActions::UnlinkService < ServerAction
   end
 
   def unlink_dokku_service!
-    dokku_command_class.call!(ssh, service: dokku_service_id, app: dokku_app_id)
-  end
-
-  def dokku_command_class
-    "Dokku::#{service_type.camelcase}::Unlink".constantize
+    ssh.execute!(
+      Dokku::Services::UnlinkCommand.new(
+        plugin: service_type,
+        service: dokku_service_id,
+        app: dokku_app_id
+      )
+    )
   end
 
   def schedule_pull_env!
-    ServerActions::PullEnv.run_later!(app)
+    ServerActions::PullEnv.run_later!(server, app)
   end
 end

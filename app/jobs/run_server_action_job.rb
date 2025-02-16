@@ -19,7 +19,14 @@ class RunServerActionJob < ApplicationJob
   rescue => e
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
-    server_action.failure_message = e.message
+    server_action.failure_message = <<~ERROR
+      Error: #{e.class}
+      Message: #{e.message}
+
+      Backtrace:
+      #{e.backtrace.first(10).map { |line| "  #{line}" }.join("\n")}
+      #{(e.backtrace.size > 10) ? "\n  ... and #{e.backtrace.size - 10} more lines" : ""}
+    ERROR
     raise if Rails.env.local?
 
     server_action

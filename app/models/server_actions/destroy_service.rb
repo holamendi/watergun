@@ -26,10 +26,6 @@ class ServerActions::DestroyService < ServerAction
   end
 
   def destroy_dokku_service!
-    dokku_command_class.call!(ssh, service: dokku_service_id)
-  end
-
-  def dokku_command_class
-    "Dokku::#{service_type.camelcase}::Destroy".constantize
+    ssh.execute!(Dokku::Services::DestroyCommand.new(plugin: service_type, name: dokku_service_id))
   end
 end
