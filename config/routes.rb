@@ -63,6 +63,7 @@ Rails.application.routes.draw do
 
   resources :server_actions, only: :index do
     get :logs, on: :member
+    post :retry, on: :member
   end
 
   # Account settings

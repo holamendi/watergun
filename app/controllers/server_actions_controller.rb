@@ -3,8 +3,10 @@ class ServerActionsController < ApplicationController
     @server_actions = Current.server.actions.recent.includes(:user).limit(200)
   end
 
-  def update
+  def retry
     @server_action = Current.server.actions.find(params[:id])
+    @server_action.run_later
+    render json: {status: :ok}
   end
 
   def logs
