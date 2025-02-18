@@ -26,7 +26,7 @@ class ServerActions::EnableSsl < ServerAction
   end
 
   def enable_ssl!
-    Dokku::Letsencrypt::Enable.call!(ssh, app: dokku_app_id)
+    ssh.execute!(Dokku::Letsencrypt::EnableCommand.new(app: dokku_app_id))
   end
 
   def update_domains

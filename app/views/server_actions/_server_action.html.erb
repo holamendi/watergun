@@ -31,7 +31,6 @@
     <% if server_action.finished? %>
       <%= link_to "logs", logs_server_action_path(server_action), class: "text-teal-600 hover:text-teal-900", target: :_blank %>
     <% end %>
-          <%= button_to "retry", retry_server_action_path(server_action), class: "ml-4 inline-block text-teal-600 hover:text-teal-900" %>
-
+    <%= button_to "retry", retry_server_action_path(server_action), class: "ml-4 inline-block text-teal-600 hover:text-teal-900" %>
   </td>
 </tr>

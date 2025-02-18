@@ -1,5 +1,5 @@
-class ServerActions::UpdateBuilder < ServerAction
-  SLUG = "apps.update_builder"
+class ServerActions::SetAppBuilder < ServerAction
+  SLUG = "apps.set_builder"
 
   actionable App
 
@@ -20,6 +20,6 @@ class ServerActions::UpdateBuilder < ServerAction
   end
 
   def set_dokku_app_builder!
-    Dokku::Builder::Set.call!(ssh, app: dokku_app_id, builder:)
+    ssh.execute!(Dokku::Builder::SetCommand.new(app: dokku_app_id, builder:))
   end
 end
