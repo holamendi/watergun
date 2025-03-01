@@ -4,7 +4,7 @@ class FetchContainerMetricsJob < ApplicationJob
   retry_on Errno::ECONNRESET, Net::SSH::Disconnect, wait: 1.second, attempts: 3
 
   def perform
-    Server.all.each { sync_containers(it) }
+    Server.all.each { |server| sync_containers(server) }
   end
 
   private
@@ -29,7 +29,7 @@ class FetchContainerMetricsJob < ApplicationJob
       save_metrics!(server, service_stats, service, checked_at)
     end
 
-    # stop all containers that are not in the stats
+    # stop all containers that are not in stats
     running_container_ids = stats.map(&:id)
     server.containers.running.where.not(cid: running_container_ids).stop_all
   end

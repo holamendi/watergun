@@ -15,14 +15,14 @@ export default class extends Controller {
     this.crsfToken = document
       .querySelector("meta[name='csrf-token']")
       .getAttribute("content");
-    this.observeAutoScroll();
+    //this.observeAutoScroll();
     this.observeOverlay();
     this.startLogStream();
     this.startPing();
   }
 
   disconnect() {
-    this.disconectAutoScroll();
+    //this.disconectAutoScroll();
     this.disconectOverlay();
     this.stopPing();
     this.stopLogStream();

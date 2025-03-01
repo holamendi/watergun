@@ -1,6 +1,4 @@
 class Ssh::Command
-  OutputEntry = Data.define(:timestamp, :stream, :data)
-
   attr_reader :input, :output, :started_at, :finished_at, :exit_code
 
   def initialize(input)
@@ -23,7 +21,7 @@ class Ssh::Command
   end
 
   def append_output(stream, data)
-    @output << OutputEntry.new(timestamp: Time.current, stream: stream.to_s, data:)
+    @output << Ssh::Log.new(timestamp: Time.current, stream: stream.to_s, data:)
   end
 
   def finish(exit_code)

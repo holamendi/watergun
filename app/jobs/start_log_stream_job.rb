@@ -10,8 +10,8 @@ class StartLogStreamJob < ApplicationJob
       buffer = Ssh::StreamBuffer.new(interval: 1)
       buffer.start { |logs| broadcast_log(log_stream, logs) }
 
-      ssh.execute(log_command(log_stream), save_output: false) do |_stream, data|
-        buffer.write(data)
+      ssh.execute(log_command(log_stream), save_output: false) do |stream, data|
+        buffer.write(Ssh::Log.new(stream:, data:))
       end
     ensure
       buffer&.stop { |logs| broadcast_log(log_stream, logs) }
@@ -21,10 +21,12 @@ class StartLogStreamJob < ApplicationJob
   private
 
   def broadcast_log(log_stream, logs)
-    Turbo::StreamsChannel.broadcast_append_to(log_stream,
+    Turbo::StreamsChannel.broadcast_append_to(
+      log_stream,
       target: dom_id(log_stream),
       partial: "shared/log_streams/log",
-      locals: {log: logs.join})
+      locals: {logs:}
+    )
   end
 
   def log_command(log_stream)
