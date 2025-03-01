@@ -4,23 +4,11 @@ class Ssh::StreamBuffer
     @mutex = Mutex.new
     @interval = interval
     @running = true
-    @first_write = true
     @block = nil
   end
 
   def write(data)
-    @mutex.synchronize do
-      @buffer << data
-
-      # If this is the first write, flush immediately
-      if @first_write && @block
-        @first_write = false
-        # Schedule an immediate flush in a separate thread to avoid blocking
-        Thread.new do
-          flush { |data| @block.call(data) if data }
-        end
-      end
-    end
+    @mutex.synchronize { @buffer << data }
   end
 
   def start(&block)
@@ -31,7 +19,6 @@ class Ssh::StreamBuffer
   def stop
     @running = false
     @timer&.kill
-    # Flush any remaining data
     flush { |data| @block.call(data) } if @block && block_given?
   end
 
