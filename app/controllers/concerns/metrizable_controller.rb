@@ -12,10 +12,10 @@ module MetrizableController
   end
 
   def cpu_chart
-    data = containers.checked_within(from: 1.hour.ago).map do |container|
+    data = containers.checked_within(from: 10.days.ago).map do |container|
       {
         name: container.name,
-        data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average(:cpu_percentage)
+        data: container.checks.where(timestamp: 10.days.ago..).group_by_minute(:timestamp).average(:cpu_percentage)
       }
     end
 
@@ -23,11 +23,11 @@ module MetrizableController
   end
 
   def memory_chart
-    memory_limit_bytes = containers.checked_within(from: 1.hour.ago).maximum(:memory_limit_bytes) || 0
-    data = containers.checked_within(from: 1.hour.ago).map do |container|
+    memory_limit_bytes = containers.checked_within(from: 10.days.ago).maximum(:memory_limit_bytes) || 0
+    data = containers.checked_within(from: 10.days.ago).map do |container|
       {
         name: container.name,
-        data: container.checks.where(timestamp: 1.hour.ago..).group_by_minute(:timestamp).average("ROUND(memory_used_bytes / 1048576.0, 2)")
+        data: container.checks.where(timestamp: 10.days.ago..).group_by_minute(:timestamp).average("ROUND(memory_used_bytes / 1048576.0, 2)")
       }
     end
 
