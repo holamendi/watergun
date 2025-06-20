@@ -1,5 +1,5 @@
-<li id="<%= dom_id(project) %>" class="relative flex justify-between px-4 py-5 gap-x-6 hover:bg-gray-50 sm:px-6">
-  <div class="flex min-w-0 gap-x-4">
+<li id="<%= dom_id(project) %>" class="flex relative gap-x-6 justify-between px-4 py-5 hover:bg-gray-50 sm:px-6">
+  <div class="flex gap-x-4 min-w-0">
     <div class="flex-auto min-w-0">
       <p class="font-semibold leading-6 text-gray-900">
         <%= link_to project_path(project) do %>
@@ -8,16 +8,24 @@
         <% end %>
       </p>
       <p class="flex mt-1 text-sm leading-5 text-gray-500">
-        <%= pluralize project.apps.kept.size, "app" %> • <%= pluralize project.services.kept.size, "service" %>
+        <% app_count = project.apps.kept.size %>
+        <% service_count = project.services.kept.size %>
+
+        <% if app_count.positive? %>
+          <%= pluralize app_count, "app" %>
+        <% end %>
+        <% if service_count.positive? %>
+          • <%= pluralize service_count, "service" %>
+        <% end %>
       </p>
     </div>
   </div>
-  <div class="flex items-center shrink-0 gap-x-4">
+  <div class="flex gap-x-4 items-center shrink-0">
     <div class="hidden sm:flex sm:flex-col sm:items-end">
       <% if project.last_deployment %>
-        <div class="mt-1 flex items-center gap-x-1.5">
+        <div class="flex gap-x-1.5 items-center mt-1">
           <div class="flex-none p-1 rounded-full bg-emerald-500/20">
-            <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+            <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
           </div>
           <p class="text-sm leading-5 text-gray-500">Deployed <%= time_ago_in_words(project.last_deployment.finished_at) %> ago</p>
         </div>
