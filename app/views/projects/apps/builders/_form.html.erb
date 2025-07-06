@@ -1,0 +1,14 @@
+<%= form_with model: app, url: project_app_builder_path(app.project, app), id: "builder_form" do |form| %>
+  <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+    <div class="sm:col-span-6">
+      <%= form.label :builder, class: "block text-sm font-medium leading-6 text-gray-900" %>
+      <div class="mt-2">
+        <%= form.select :builder, App.builders, {}, class: "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" %>
+        <%= error_messages_for(form.object, :builder) %>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center mt-6 gap-x-6">
+    <%= submit_button "Save builder" %>
+  </div>
+<% end %>

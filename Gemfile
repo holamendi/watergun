@@ -2,18 +2,37 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "rails", github: "rails/rails", branch: "7-2-stable"
-gem "propshaft"
-gem "sqlite3"
-gem "puma", ">= 5.0"
+gem "alba"
 gem "bcrypt", "~> 3.1.7"
-gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
-
-group :development, :test do
-  gem "debug", platforms: %i[mri windows]
-  gem "standard"
-end
+gem "bytesize"
+gem "chartkick"
+gem "discard"
+gem "dotenv"
+gem "ed25519"
+gem "faraday-retry"
+gem "groupdate", github: "ankane/groupdate", branch: "master"
+gem "honeybadger"
+gem "httpx"
+gem "jwt"
+gem "lograge"
+gem "mission_control-jobs"
+gem "net-ssh"
+gem "octokit"
+gem "pagy", "~> 8.3"
+gem "propshaft"
+gem "puma", ">= 5.0"
+gem "rack-mini-profiler"
+gem "rails", "~> 8.0"
+gem "solid_cable"
+gem "solid_queue", "~> 1.1.5"
+gem "sqlite3", "~> 2.1.0"
+gem "sshkey"
+gem "store_attribute"
+gem "store_model"
+gem "turbo-rails"
+gem "tzinfo-data", platforms: %i[windows jruby]
+gem "vite_rails"
 
 group :development do
   gem "web-console"
@@ -21,34 +40,14 @@ group :development do
 end
 
 group :test do
-  gem "capybara"
+  gem "minitest-spec-rails"
   gem "mocha"
   gem "selenium-webdriver"
+  gem "vcr"
+  gem "webmock"
 end
 
-gem "activerecord-enhancedsqlite3-adapter"
-gem "alba"
-gem "chartkick"
-gem "discard"
-gem "dotenv"
-gem "faraday-retry"
-gem "groupdate"
-gem "honeybadger"
-gem "httpx"
-gem "litestack", github: "holamendi/litestack", branch: "fix-litecable-closed-statements"
-gem "lograge"
-gem "memery"
-gem "mission_control-jobs"
-gem "net-ssh"
-gem "octokit"
-gem "oj"
-gem "pagy", "~> 8.3"
-gem "plain_apm", "~> 0.10.1"
-gem "solid_queue", github: "basecamp/solid_queue", branch: "main"
-gem "sshkey"
-gem "store_attribute"
-gem "store_model"
-gem "str_enum"
-gem "turbo-rails"
-gem "vite_rails"
-gem "yabeda-honeybadger_insights"
+group :development, :test do
+  gem "debug", platforms: %i[mri windows]
+  gem "standard"
+end

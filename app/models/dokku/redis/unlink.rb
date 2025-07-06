@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Unlink < Dokku::Command
+    class Unlink
       attr_reader :app, :service, :restart
 
       def initialize(ssh_session, service:, app:, restart: false)
@@ -9,7 +9,7 @@ module Dokku
         @app = app
       end
 
-      def command
+      def cmd
         cmd = "dokku redis:unlink #{service} #{app}"
         cmd += " --no-restart" unless restart
         cmd

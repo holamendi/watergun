@@ -1,55 +1,55 @@
-module Projects
-  module Apps
-    class DomainsController < BaseController
-      before_action :set_domain, only: %i[destroy make_default]
+class Projects::Apps::DomainsController < Projects::Apps::BaseController
+  before_action :set_domain, only: %i[destroy make_default]
 
-      def index
-        @domains = current_app.domains.kept
-      end
+  def index
+    @domains = @app.domains.kept
+  end
 
-      def new
-        @domain = current_app.domains.new
-      end
+  def new
+    @domain = @app.domains.new
+  end
 
-      def create
-        @domain = current_app.domains.new(domain_params)
+  def create
+    @domain = @app.domains.new(domain_params)
 
-        if @domain.save
-          ServerAction::CreateDomain.run_later!(@domain)
-          redirect_to project_app_domains_path(current_project, current_app), notice: "Domain added successfully."
-        else
-          render turbo_stream: turbo_stream.replace(
-            "domain_form",
-            partial: "projects/apps/domains/form",
-            locals: {
-              project: current_project,
-              app: current_app,
-              domain: @domain
-            }
-          )
-        end
-      end
-
-      def make_default
-        @domain.make_default!
-        redirect_to project_app_domains_path(current_project, current_app), notice: "Domain set as default."
-      end
-
-      def destroy
-        @domain.discard
-        ServerAction::DestroyDomain.run_later!(@domain)
-        redirect_to project_app_domains_path(current_project, current_app), notice: "Domain removed successfully."
-      end
-
-      private
-
-      def set_domain
-        @domain = current_app.domains.kept.find(params[:id])
-      end
-
-      def domain_params
-        params.require(:domain).permit(:hostname)
-      end
+    if @domain.save
+      ServerActions::CreateDomain.run_later!(@domain)
+      render turbo_stream: [
+        stream_toast("Domain added"),
+        turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app})
+      ]
+    else
+      render turbo_stream: turbo_stream.replace(
+        "domain_form",
+        partial: "projects/apps/domains/form",
+        locals: {domain: @domain}
+      )
     end
+  end
+
+  def make_default
+    @domain.make_default!
+    render turbo_stream: [
+      turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app}),
+      stream_toast("Domain set as default")
+    ]
+  end
+
+  def destroy
+    Domain::Destroyer.new(@domain).destroy
+    render turbo_stream: [
+      stream_toast("Domain deleted"),
+      turbo_stream.remove(@domain)
+    ]
+  end
+
+  private
+
+  def set_domain
+    @domain = @app.domains.kept.find(params[:id])
+  end
+
+  def domain_params
+    params.require(:domain).permit(:hostname)
   end
 end

@@ -1,42 +1,18 @@
 class ApplicationController < ActionController::Base
+  include Authentication
   include Pagy::Backend
 
-  before_action :authenticate!
-
-  helper_method :current_user, :current_account, :current_membership, :current_session, :current_server
-
-  def current_account
-    Current.account
-  end
-
-  def current_membership
-    Current.membership
-  end
-
-  def current_session
-    Current.session
-  end
-
-  def current_user
-    Current.user
-  end
-
-  def current_server
-    Current.server
-  end
+  before_action :authenticate
+  before_action :set_source
 
   private
 
-  def sign_in(user)
-    session = user.sessions.create!
-    cookies.encrypted[:session_token] = {value: session.token, expires: session.expires_at}
-    Current.session = session
+  def stream_toast(message, title: nil, type: :notice)
+    turbo_stream.append("toasts", partial: "shared/toast", locals: {message:, title:, type:})
   end
 
-  def authenticate!
-    return if (Current.session = Session.find_by_active_token(cookies.encrypted[:session_token]))
-
-    redirect_to "/login", notice: "Please sign in"
+  def set_source
+    Current.source = :web
   end
 
   def not_found!

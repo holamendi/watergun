@@ -7,10 +7,12 @@ command_exists() {
 # constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.34.6
+DOKKU_TAG=v0.35.12
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_DOCKER_REPO="holamendi/watergun"
+WATERGUN_GIT_REPO="https://github.com/holamendi/watergun.git"
+WATERGUN_GIT_BRANCH="pre-release"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
 
 # server info
@@ -74,6 +76,7 @@ if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
   exit 1
 fi
 
+# set up letsencrypt
 dokku letsencrypt:set --global email "$EMAIL"
 dokku letsencrypt:cron-job --add
 
@@ -86,11 +89,11 @@ fi
 # add user to docker group
 usermod -aG docker "$SSH_USER"
 
-# TODO: is there a way to install dokku plugins without sudo?
+# TODO: find a way to install dokku plugins without sudo rights
 echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/"$SSH_USER"
 chmod 440 /etc/sudoers.d/"$SSH_USER"
 
-# create .ssh directoryee
+# create .ssh directory
 mkdir -p "$SSH_DIR"
 chown -R "$SSH_USER:$SSH_USER" "$SSH_DIR"
 chmod 700 "$SSH_DIR"
@@ -100,23 +103,33 @@ chmod 600 "$SSH_DIR/authorized_keys"
 
 # create dokku app
 dokku apps:create "$DOKKU_APP"
-dokku ps:scale "$DOKKU_APP" web=0 solid_queue=0
+dokku ps:scale "$DOKKU_APP" web=0
 
 # set env vars
-dokku config:set "$DOKKU_APP" RAILS_ENV=production SECRET_KEY_BASE=$(openssl rand -hex 64) LITESTACK_DATA_PATH=storage --no-restart
+dokku config:set "$DOKKU_APP" \
+  ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -hex 24) \
+  ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -hex 24) \
+  ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 24) \
+  ACCOUNT_SETUP_TOKEN=$(openssl rand -hex 24) \
+  DEFAULT_URL="$DOMAIN" \
+  JOB_CONCURRENCY=1 \
+  JOB_POLLING_INTERVAL=0.1 \
+  RAILS_ENV=production \
+  SECRET_KEY_BASE=$(openssl rand -hex 64) \
+  --no-restart
 
 # mount persistent storage
 dokku storage:ensure-directory "$DOKKU_APP" --chown false
 dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
 # sync git repo
-# dokku git:sync "$DOKKU_APP" "$WATERGUN_REPO" "$WATERGUN_BRANCH"
+dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
 
 # build app
-# dokku ps:rebuild "$DOKKU_APP"
+dokku ps:rebuild "$DOKKU_APP"
 
 # pull docker image
-dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
+# dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set up watergun account
 SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $DOMAIN $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
@@ -128,7 +141,7 @@ echo "$PUBLIC_KEY" >> "$SSH_DIR/authorized_keys"
 
 # set app domain
 dokku domains:set "$DOKKU_APP" "$DOMAIN"
-dokku ps:scale "$DOKKU_APP" web=1 solid_queue=1
+dokku ps:scale "$DOKKU_APP" web=1 worker=1
 dokku letsencrypt:enable "$DOKKU_APP"
 
 echo "Done!"

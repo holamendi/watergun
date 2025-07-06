@@ -15,7 +15,13 @@
 
 // Example: Load Rails libraries in Vite.
 //
-import "@hotwired/turbo-rails"
+import '@hotwired/turbo-rails'
+
+Turbo.StreamActions.redirect = function () {
+  const url = this.getAttribute('url') || '/'
+  // Turbo.visit(url, { frame: '_top', action: 'advance' })
+  Turbo.visit(url)
+}
 //
 // import ActiveStorage from '@rails/activestorage'
 // ActiveStorage.start()
@@ -26,16 +32,19 @@ const channels = import.meta.glob('./**/*_channel.js')
 // Example: Import a stylesheet in app/frontend/index.css
 // import '~/index.css'
 import { Application } from '@hotwired/stimulus'
+import Notification from '@stimulus-components/notification'
+import Dropdown from '@stimulus-components/dropdown'
 import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
 
-application.debug = false
+application.debug = process.env.NODE_ENV !== 'production'
 window.Stimulus   = application
 
+application.register('notification', Notification)
+application.register('dropdown', Dropdown)
 const controllers = import.meta.glob('~/controllers/*_controller.js', { eager: true })
 registerControllers(application, controllers)
 
+
 import "chartkick/chart.js"
-
-

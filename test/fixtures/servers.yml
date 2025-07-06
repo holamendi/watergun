@@ -1,0 +1,11 @@
+amd:
+  name: amd
+  account: default
+  public_ip: 127.0.0.1
+  cpu_type: x86_64
+
+arm:
+  name: arm
+  account: default
+  public_ip: 127.0.0.1
+  cpu_type: arm64

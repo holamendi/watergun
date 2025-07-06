@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="light">
+<html class="h-full">
   <head>
-    <title>Watergun</title>
+    <title><%= @title.presence || "Watergun" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -9,10 +9,10 @@
     <%= vite_stylesheet_tag "application", data: { "turbo-track": "reload" } %>
     <%= vite_javascript_tag 'application' %>
   </head>
-  <body class="h-full font-mono bg-base-100">
-    <%= render "shared/navbar" %>
-    <div class="px-4 pt-6 mx-auto max-w-7xl">
-      <%= render "shared/flash_messages" %>
+  <body class="h-full">
+    <div class="min-h-full">
+      <%= render "shared/navbar" %>
+      <%= render "shared/toasts" %>
       <%= yield %>
     </div>
   </body>

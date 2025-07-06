@@ -1,76 +1,28 @@
-module Docker
-  class ContainerStats
-    include Memery
+class Docker::ContainerStats
+  attr_reader :cpu_perc, :id, :mem_perc, :mem_usage, :mem_usage_bytes, :name, :net_io, :net_io_bytes, :block_io, :block_io_bytes
 
-    UNIT_MULTIPLIERS = {
-      "b" => 1,
-      "k" => 1024,
-      "kib" => 1024,
-      "kb" => 1000,
-      "m" => 1024**2,
-      "mib" => 1024**2,
-      "mb" => 1000**2,
-      "g" => 1024**3,
-      "gib" => 1024**3,
-      "gb" => 1000**3,
-      "t" => 1024**4,
-      "tib" => 1024**4,
-      "tb" => 1000**4
-    }
+  def initialize(json)
+    json = JSON.parse(json).transform_keys(&:underscore)
 
-    def initialize(json)
-      @json = JSON.parse(json)
-    end
+    @block_io = json["block_io"]
+    @block_io_bytes = parse_size_string(json["block_io"])
+    @cpu_perc = json["cpu_perc"].to_f.round(2)
+    @mem_perc = json["mem_perc"].to_f.round(2)
+    @mem_usage = json["mem_usage"]
+    @mem_usage_bytes = parse_size_string(json["mem_usage"])
+    @id = json["id"]
+    @name = json["name"]
+    @net_io = json["net_io"]
+    @net_io_bytes = parse_size_string(json["net_io"])
+  end
 
-    def block_io
-      @json["BlockIO"]
-    end
+  private
 
-    memoize def block_io_bytes
-      size_string_to_bytes(block_io)
-    end
-
-    def cpu_perc
-      @json["CPUPerc"].to_f.round(2)
-    end
-
-    def id
-      @json["ID"]
-    end
-
-    def mem_perc
-      @json["MemPerc"].to_f.round(2)
-    end
-
-    def mem_usage
-      @json["MemUsage"]
-    end
-
-    memoize def mem_usage_bytes
-      size_string_to_bytes(mem_usage)
-    end
-
-    def name
-      @json["Name"]
-    end
-
-    def net_io
-      @json["NetIO"]
-    end
-
-    memoize def net_io_bytes
-      size_string_to_bytes(net_io)
-    end
-
-    private
-
-    def size_string_to_bytes(string)
-      string.split(" / ").map do |value|
-        size = value.to_f
-        unit = value.delete(size.to_s)
-
-        (size * UNIT_MULTIPLIERS[unit.downcase]).ceil
-      end
+  def parse_size_string(string)
+    string.split(" / ").map do |value|
+      ByteSize.new(value).to_bytes
+    rescue
+      0
     end
   end
 end

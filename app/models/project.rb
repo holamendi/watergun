@@ -1,16 +1,20 @@
 class Project < ApplicationRecord
-  include Broadcast
   include Discard::Model
 
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  belongs_to :account, default: -> { server.account }
+  belongs_to :server
+
   has_many :apps, dependent: :destroy
+  has_many :deployments, through: :apps, source: :deployments
   has_many :services, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
 
-  after_discard do
-    apps.discard_all
-    services.discard_all
+  def last_deployment
+    deployments.success.last
+  end
+
+  def any_resources?
+    apps.any? || services.any?
   end
 end

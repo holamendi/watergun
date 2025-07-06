@@ -4,20 +4,14 @@ module.exports = {
     './public/*.html',
     './app/helpers/**/*.rb',
     './app/javascript/**/*.js',
+    './app/components/**/*',
     './app/views/**/*',
   ],
-  theme: {
-    extend: {},
-  },
   plugins: [
     require('@tailwindcss/typography'),
     require('@tailwindcss/forms'),
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/container-queries'),
-    require("daisyui")
   ],
-  daisyui: {
-    themes: ['light', 'dark', 'sunset', 'dim', 'nord']
-  }
 }
 

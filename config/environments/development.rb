@@ -30,11 +30,11 @@ Rails.application.configure do
   else
     config.action_controller.perform_caching = false
 
-    config.cache_store = :litecache
+    config.cache_store = :null_store
   end
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -74,4 +74,12 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.hosts = nil
+
+  # for local tunneling
+  config.action_controller.forgery_protection_origin_check = false
+
+  config.action_mailer.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
+  config.action_controller.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
 end
+
+Rails.application.routes.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}

@@ -1,11 +1,11 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :api_token,
-    :app,
     :membership,
     :account,
     :project,
     :server,
     :session,
+    :source,
     :user
 
   def session=(session)

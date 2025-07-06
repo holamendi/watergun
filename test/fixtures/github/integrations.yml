@@ -1,0 +1,7 @@
+default:
+  account: default
+  data:
+    app_id: 123
+    app_slug: default
+    access_token: "ghs_abc123"
+    access_token_expires_at: <%= 1.hour.from_now %>

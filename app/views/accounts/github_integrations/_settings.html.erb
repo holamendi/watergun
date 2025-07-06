@@ -1,0 +1,22 @@
+<div>
+  <% if github_integration&.app_registered? %>
+    <% if github_integration&.app_installed? %>
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-900">Connected to GitHub</p>
+          <p class="text-sm text-gray-500">Account: <%= github_integration.installation_account_login %></p>
+        </div>
+        <%= button_to "Disconnect", github_installation_path, method: :delete, class: "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" %>
+      </div>
+    <% else %>
+      <%= link_to "Connect GitHub", "#{github_integration.app_url}/installations/new", class: "rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600" %>
+    <% end %>
+  <% else %>
+    <div class="flex items-center justify-between">
+      <%= form_with url: "https://github.com/settings/apps/new", method: :post do |form| %>
+        <%= form.hidden_field :manifest, value: github_integration.app_manifest.to_json %>
+        <%= submit_button "Create Github App" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

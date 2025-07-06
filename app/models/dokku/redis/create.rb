@@ -1,6 +1,6 @@
 module Dokku
   module Redis
-    class Create < Dokku::Command
+    class Create
       attr_reader :service
 
       def initialize(ssh_session, service:)
@@ -8,7 +8,7 @@ module Dokku
         @service = service
       end
 
-      def command
+      def cmd
         "dokku redis:create #{service}"
       end
     end

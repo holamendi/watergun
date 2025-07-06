@@ -1,34 +1,25 @@
 class ProjectsController < ApplicationController
+  before_action :set_project, only: [:show, :edit, :update, :destroy]
   def index
-    @projects = Project.kept
+    @projects = Current.account.projects.kept
   end
 
   def show
-    @project = current_account.projects.kept.find(params[:id])
-    @app = App.new
-    @app.build_github_repo
     @apps = @project.apps.kept
     @services = @project.services.kept
-    @service = Service.new
   end
 
   def new
-    @project = current_account.projects.new
+    @project = Current.account.projects.new(server: Current.server)
   end
 
   def create
-    @project = current_account.projects.new(project_params)
+    @project = Current.account.projects.new(server: Current.server, **project_params)
 
     if @project.save
-      redirect_to projects_path, notice: "Project was successfully created."
+      redirect_to @project, notice: "Project created."
     else
-      render turbo_stream: turbo_stream.replace(
-        "project_form",
-        partial: "projects/form",
-        locals: {
-          project: @project
-        }
-      )
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -37,22 +28,21 @@ class ProjectsController < ApplicationController
 
   def update
     if @project.update(project_params)
-      redirect_to project_path(@project), notice: "Project was successfully updated."
+      redirect_to project_path(@project), notice: "Project updated"
     else
       render :edit
     end
   end
 
   def destroy
-    @project.discard
-
-    redirect_to projects_path, notice: "Project was successfully destroyed."
+    Project::DestroyProject.new(@project).destroy
+    redirect_to projects_path, notice: "Project destroyed"
   end
 
   private
 
   def set_project
-    @project = current_account.projects.kept.find(params[:id])
+    @project = Current.account.projects.kept.find(params[:id])
   end
 
   def project_params

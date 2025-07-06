@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-ARG RUBY_VERSION=3.3.4
-FROM registry.docker.com/library/ruby:${RUBY_VERSION}-slim as base
+ARG RUBY_VERSION=3.4.4
+FROM registry.docker.com/library/ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /app
 
@@ -10,10 +10,10 @@ ENV RAILS_ENV=production \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT=development
 
-FROM base as build
+FROM base AS build
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
-    build-essential curl git node-gyp pkg-config python-is-python3 libjemalloc2 && \
+    build-essential curl git node-gyp libyaml-dev pkg-config python-is-python3 libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
 ARG NODE_VERSION=20.3.1

@@ -1,4 +1,5 @@
-<%= link_to "back to project", project_path(@service.project) %>
-<%= render "header", service: @service %>
+<%= turbo_stream_from @service %>
 
-<%= debug @service.data %>
+<%= render "header", service: @service %>
+<%= render "tabs", service: @service %>
+

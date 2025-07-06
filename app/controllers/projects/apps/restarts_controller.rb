@@ -1,10 +1,6 @@
-module Projects
-  module Apps
-    class RestartsController < BaseController
-      def create
-        ServerAction::RestartApp.run_later!(current_app)
-        redirect_to project_app_path(current_project, current_app), notice: "App restart scheduled successfully."
-      end
-    end
+class Projects::Apps::RestartsController < Projects::Apps::BaseController
+  def create
+    ServerActions::RestartApp.run_later!(@app)
+    render turbo_stream: stream_toast("Restart scheduled")
   end
 end

@@ -1,0 +1,10 @@
+<%= turbo_frame_tag :cpu_chart do %>
+  <div class="w-full p-4 mb-6 border border-gray-200 rounded-xl">
+    <div class="mb-4">
+      CPU Usage
+    </div>
+    <div class="mb-6">
+      <%= line_chart data, id: "cpu-chart", suffix: "%", max: 100 %>
+    </div>
+  </div>
+<% end %>

@@ -1,5 +1,3 @@
-module Api
-  class ApplicationResource
-    include Alba::Resource
-  end
+class Api::ApplicationResource
+  include Alba::Resource
 end

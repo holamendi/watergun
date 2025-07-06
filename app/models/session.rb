@@ -13,7 +13,7 @@ class Session < ApplicationRecord
   validates :token, presence: true, uniqueness: true
 
   def active?
-    expires_at > Time.current
+    expires_at.future?
   end
 
   def expired?

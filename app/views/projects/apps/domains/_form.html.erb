@@ -1,4 +1,4 @@
-<%= form_with model: [domain.project, domain.app, domain], class: "space-y-4", id: "domain_form" do |form| %>
+<%= form_with model: [domain.project, domain.app, domain], class: "space-y-4", id: "domain_form", data: {turbo_frame: "domain_form"} do |form| %>
   <%= form.label :hostname, class: "form-control" do %>
     <div class="label">
       <span class="label-text">Hostname</span>
@@ -6,9 +6,5 @@
     <%= form.text_field :hostname, class: "input input-bordered w-full", pattern: "^([a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"  %>
     <%= error_messages_for(form.object, :hostname) %>
   <% end %>
-  <%= button_tag type: "submit",
-                 class: "btn btn-primary no-animation",
-                 data: { turbo_submits_with: "<span class='loading loading-spinner'></span>Save" } do %>
-    Save
-  <% end %>
+  <%= submit_button "Save domain" %>
 <% end %>

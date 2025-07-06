@@ -1,0 +1,3 @@
+bobby:
+  email: bobby.tables@example.com
+  password_digest: <%= BCrypt::Password.create("abc123456") %>

@@ -1,0 +1,5 @@
+smol_roda:
+  account: default
+  app: smol_roda
+  repo: holamendi/smol-roda
+  branch: main

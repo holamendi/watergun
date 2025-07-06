@@ -1,0 +1,23 @@
+postgres:
+  account: default
+  server: amd
+  project: default
+  name: Postgres Database
+  service_type: postgres
+  dokku_id: postgres
+
+redis:
+  account: default
+  server: amd
+  project: default
+  name: Redis Database
+  service_type: redis
+  dokku_id: redis
+
+mongo:
+  account: default
+  server: amd
+  project: default
+  name: Mongo Database
+  service_type: mongo
+  dokku_id: mongo

@@ -1,0 +1,21 @@
+<% breadcrumbs = [] %>
+<% breadcrumbs << [@project.name, project_path(@project)] if @project&.persisted? %>
+<% breadcrumbs << [@app.name, project_app_path(@project, @app)] if @app&.persisted? %>
+<% breadcrumbs << [@service.name, project_service_path(@project, @service)] if @service&.persisted? %>
+
+<nav class="flex" aria-label="Breadcrumb">
+  <ol role="list" class="flex items-center space-x-4">
+    <% breadcrumbs.each_with_index do |(title, url), index| %>
+      <li>
+        <div class="flex items-center">
+          <span class="mr-4 text-sm font-medium text-gray-400">/</span>
+          <% if url.nil? %>
+            <span class="text-sm font-medium text-gray-500"><%= title %></span>
+          <% else %>
+            <%= link_to title, url, class: "text-gray-400 text-sm font-medium hover:text-gray-500" %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ol>
+</nav>

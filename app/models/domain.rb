@@ -1,12 +1,11 @@
 class Domain < ApplicationRecord
-  include Broadcast
   include Discard::Model
   include ServerActionable
 
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account, default: -> { app.account }
   belongs_to :app, touch: true
 
-  str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
+  enum :status, %w[pending active enabling_ssl deleting error].index_by(&:itself), default: :pending
 
   scope :default, -> { where(is_default: true) }
   scope :ssl_enabled, -> { where(ssl_enabled: true) }
@@ -17,9 +16,17 @@ class Domain < ApplicationRecord
 
   delegate :project, to: :app
 
+  after_update_commit do
+    broadcast_replace_later_to [app, :domains], target: dom_id(self), partial: "projects/apps/domains/domain", locals: {domain: self}
+  end
+
+  after_destroy_commit do
+    broadcast_remove_to [app, :domains], target: dom_id(self)
+  end
+
   def make_default!
     transaction do
-      app.domains.update_all(is_default: false)
+      app.domains.update(is_default: false)
       update!(is_default: true)
     end
   end

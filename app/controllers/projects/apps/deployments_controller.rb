@@ -1,42 +1,17 @@
-module Projects
-  module Apps
-    class DeploymentsController < BaseController
-      def create
-        commit = if params[:sha].present?
-          github_repo.remote_commit(params[:sha])
-        else
-          github_repo.remote_branch.commit
-        end
+class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
+  def index
+    @deployments = @app.deployments.kept.order(created_at: :desc).limit(5)
+  end
 
-        if commit.present?
-          deployment = current_app.deployments.create!(
-            sha: commit.sha,
-            author_login: commit.author.login,
-            author_url: commit.author.html_url,
-            author_avatar_url: commit.author.avatar_url,
-            author_date: commit.commit.author.date,
-            commit_message: commit.commit.message,
-            commit_html_url: commit.html_url
-          )
-          ServerAction::DeployApp.run_later!(deployment)
-          flash[:notice] = "Deployment scheduled"
-          redirect_to project_app_path(current_project, current_app)
-        else
-          flash.now[:alert] = deployment.errors.full_messages.to_sentence
-          render :new, status: :unprocessable_entity
-        end
-      end
+  def create
+    Deployment::CreateDeployment.new(app: @app, commit_sha: params[:sha]).save!
+    render turbo_stream: stream_toast("#{@app.name}: deployment scheduled")
+  rescue ActiveModel::ValidationError
+    render turbo_stream: stream_toast("Invalid deployment parameters"), status: :unprocessable_entity
+  end
 
-      def logs
-        @deployment = current_app.deployments.kept.finished.find(params[:id])
-        render plain: @deployment.server_action.log.to_s
-      end
-
-      private
-
-      def github_repo
-        current_app.github_repo
-      end
-    end
+  def logs
+    @deployment = @app.deployments.kept.finished.find(params[:id])
+    render plain: @deployment.server_action.log.to_s
   end
 end

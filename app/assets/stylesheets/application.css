@@ -3,18 +3,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.field_with_errors > input {
-  @apply input-error;
-}
-
-.btn {
-  @apply font-normal rounded-md btn-sm no-animation;
-}
-
-.input {
-  @apply px-2 rounded-md input-sm;
-}
-
-.modal-box {
-  @apply p-4 rounded-lg;
+input[type="submit"] {
+  cursor: pointer;
 }

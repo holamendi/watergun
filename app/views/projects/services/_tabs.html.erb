@@ -1,0 +1,12 @@
+<div class="py-6">
+  <div class="border-b">
+    <div class="max-w-5xl px-4 mx-auto border-gray-200 lg:px-8 sm:px-6">
+      <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Tabs">
+        <%= tab_link "Metrics", project_service_metrics_path(service.project, service), controller_name == "metrics" %>
+        <%= tab_link "Logs", project_service_log_streams_path(service.project, service), controller_name == "log_streams", data: { turbo_prefetch: false } %>
+        <%= tab_link "Settings", edit_project_service_path(service.project, service), controller_name == "services" && action_name.in?(%w[edit update]) %>
+      </nav>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,80 @@
+class ServerActions::DeployApp < ServerAction
+  SLUG = "apps.deploy"
+
+  actionable Deployment
+
+  store_attribute :payload, :dokku_app_id, :string
+  store_attribute :payload, :repo, :string
+  store_attribute :payload, :sha, :string
+
+  validates :dokku_app_id, presence: true
+
+  delegate :app, :account, to: :deployment, allow_nil: true
+
+  before_validation on: :create do
+    self.dokku_app_id ||= app.dokku_id
+    self.repo ||= deployment.repo
+    self.sha ||= deployment.sha
+  end
+
+  def concurrency_key = app
+
+  private
+
+  def run
+    deployment.deploying!
+    app.deploying!
+    authenticate_github_account!
+    sync_git_repo!
+    rebuild_dokku_app!
+    schedule_enable_ssl!
+  rescue
+    deployment.error!
+    raise
+  else
+    deployment.success!
+  ensure
+    app.active!
+    notify_user
+    schedule_pull_env!
+  end
+
+  def sync_git_repo!
+    execute!(Dokku::Git::SyncCommand.new(app: dokku_app_id, repo:, sha:))
+  end
+
+  def rebuild_dokku_app!
+    execute!(Dokku::Ps::RebuildCommand.new(app: dokku_app_id))
+  end
+
+  def authenticate_github_account!
+    execute!(Dokku::Git::AuthCommand.new(access_token: github_access_token))
+  end
+
+  def github_access_token
+    account.github_integration.access_token
+  end
+
+  def schedule_enable_ssl!
+    return unless app.domains.ssl_disabled.any?
+    return unless app.all_domains_resolve_to_server?
+
+    ServerActions::EnableSsl.run_later!(app.server, app)
+  end
+
+  def schedule_pull_env!
+    ServerActions::PullEnv.run_later!(app.server, app)
+  end
+
+  def notify_user
+    return unless user
+
+    message, type = if deployment.success?
+      ["#{app.name}: deployment finished", :success]
+    else
+      ["#{app.name}: deployment failed", :notice]
+    end
+
+    Toast.append_to_user(user, message, type:)
+  end
+end

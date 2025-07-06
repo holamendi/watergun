@@ -1,11 +1,14 @@
 class ServiceLink < ApplicationRecord
   include Discard::Model
 
-  belongs_to :account, default: -> { Current.account }
+  belongs_to :account, default: -> { service.account }
   belongs_to :app, touch: true
   belongs_to :service, touch: true
+  belongs_to :env_variable
 
-  str_enum :status, [:pending, :active, :deleting, :deleted, :error], default: :pending
+  enum :status, %w[pending active deleting error].index_by(&:itself), default: :pending
 
   validates :app, uniqueness: {scope: :service, conditions: -> { undiscarded }}
+
+  delegate :server, to: :service
 end

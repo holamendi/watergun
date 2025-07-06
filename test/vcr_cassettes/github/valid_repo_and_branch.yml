@@ -1,0 +1,164 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.github.com/repos/holamendi/smol-roda
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 9.1.0
+      Content-Type:
+      - application/json
+      Authorization:
+      - token <ACCESS_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 13 Aug 2024 16:23:20 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - private, max-age=60, s-maxage=60
+      Vary:
+      - Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With
+      Etag:
+      - W/"fa2b429c70e3430c256acac0200f2b2c7c31bebed8b83d80bdc33afeb5355d1e"
+      Last-Modified:
+      - Mon, 12 Aug 2024 15:15:39 GMT
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Accepted-Github-Permissions:
+      - metadata=read
+      X-Github-Api-Version-Selected:
+      - '2022-11-28'
+      X-Ratelimit-Limit:
+      - '6950'
+      X-Ratelimit-Remaining:
+      - '6942'
+      X-Ratelimit-Reset:
+      - '1723567487'
+      X-Ratelimit-Used:
+      - '8'
+      X-Ratelimit-Resource:
+      - core
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
+        X-GitHub-Request-Id, Deprecation, Sunset
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - '0'
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      Transfer-Encoding:
+      - chunked
+      Server:
+      - github.com
+      X-Github-Request-Id:
+      - F608:DFB2D:324050C:32D05E9:66BB8877
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":461529483,"node_id":"R_kgDOG4Jhiw","name":"smol-roda","full_name":"holamendi/smol-roda","private":false,"owner":{"login":"holamendi","id":451059,"node_id":"MDQ6VXNlcjQ1MTA1OQ==","avatar_url":"https://avatars.githubusercontent.com/u/451059?v=4","gravatar_id":"","url":"https://api.github.com/users/holamendi","html_url":"https://github.com/holamendi","followers_url":"https://api.github.com/users/holamendi/followers","following_url":"https://api.github.com/users/holamendi/following{/other_user}","gists_url":"https://api.github.com/users/holamendi/gists{/gist_id}","starred_url":"https://api.github.com/users/holamendi/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/holamendi/subscriptions","organizations_url":"https://api.github.com/users/holamendi/orgs","repos_url":"https://api.github.com/users/holamendi/repos","events_url":"https://api.github.com/users/holamendi/events{/privacy}","received_events_url":"https://api.github.com/users/holamendi/received_events","type":"User","site_admin":false},"html_url":"https://github.com/holamendi/smol-roda","description":null,"fork":false,"url":"https://api.github.com/repos/holamendi/smol-roda","forks_url":"https://api.github.com/repos/holamendi/smol-roda/forks","keys_url":"https://api.github.com/repos/holamendi/smol-roda/keys{/key_id}","collaborators_url":"https://api.github.com/repos/holamendi/smol-roda/collaborators{/collaborator}","teams_url":"https://api.github.com/repos/holamendi/smol-roda/teams","hooks_url":"https://api.github.com/repos/holamendi/smol-roda/hooks","issue_events_url":"https://api.github.com/repos/holamendi/smol-roda/issues/events{/number}","events_url":"https://api.github.com/repos/holamendi/smol-roda/events","assignees_url":"https://api.github.com/repos/holamendi/smol-roda/assignees{/user}","branches_url":"https://api.github.com/repos/holamendi/smol-roda/branches{/branch}","tags_url":"https://api.github.com/repos/holamendi/smol-roda/tags","blobs_url":"https://api.github.com/repos/holamendi/smol-roda/git/blobs{/sha}","git_tags_url":"https://api.github.com/repos/holamendi/smol-roda/git/tags{/sha}","git_refs_url":"https://api.github.com/repos/holamendi/smol-roda/git/refs{/sha}","trees_url":"https://api.github.com/repos/holamendi/smol-roda/git/trees{/sha}","statuses_url":"https://api.github.com/repos/holamendi/smol-roda/statuses/{sha}","languages_url":"https://api.github.com/repos/holamendi/smol-roda/languages","stargazers_url":"https://api.github.com/repos/holamendi/smol-roda/stargazers","contributors_url":"https://api.github.com/repos/holamendi/smol-roda/contributors","subscribers_url":"https://api.github.com/repos/holamendi/smol-roda/subscribers","subscription_url":"https://api.github.com/repos/holamendi/smol-roda/subscription","commits_url":"https://api.github.com/repos/holamendi/smol-roda/commits{/sha}","git_commits_url":"https://api.github.com/repos/holamendi/smol-roda/git/commits{/sha}","comments_url":"https://api.github.com/repos/holamendi/smol-roda/comments{/number}","issue_comment_url":"https://api.github.com/repos/holamendi/smol-roda/issues/comments{/number}","contents_url":"https://api.github.com/repos/holamendi/smol-roda/contents/{+path}","compare_url":"https://api.github.com/repos/holamendi/smol-roda/compare/{base}...{head}","merges_url":"https://api.github.com/repos/holamendi/smol-roda/merges","archive_url":"https://api.github.com/repos/holamendi/smol-roda/{archive_format}{/ref}","downloads_url":"https://api.github.com/repos/holamendi/smol-roda/downloads","issues_url":"https://api.github.com/repos/holamendi/smol-roda/issues{/number}","pulls_url":"https://api.github.com/repos/holamendi/smol-roda/pulls{/number}","milestones_url":"https://api.github.com/repos/holamendi/smol-roda/milestones{/number}","notifications_url":"https://api.github.com/repos/holamendi/smol-roda/notifications{?since,all,participating}","labels_url":"https://api.github.com/repos/holamendi/smol-roda/labels{/name}","releases_url":"https://api.github.com/repos/holamendi/smol-roda/releases{/id}","deployments_url":"https://api.github.com/repos/holamendi/smol-roda/deployments","created_at":"2022-02-20T15:28:10Z","updated_at":"2024-08-12T15:15:39Z","pushed_at":"2024-08-12T15:15:36Z","git_url":"git://github.com/holamendi/smol-roda.git","ssh_url":"git@github.com:holamendi/smol-roda.git","clone_url":"https://github.com/holamendi/smol-roda.git","svn_url":"https://github.com/holamendi/smol-roda","homepage":null,"size":30,"stargazers_count":1,"watchers_count":1,"language":"Ruby","has_issues":true,"has_projects":true,"has_downloads":true,"has_wiki":true,"has_pages":false,"has_discussions":false,"forks_count":0,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":0,"license":null,"allow_forking":true,"is_template":false,"web_commit_signoff_required":false,"topics":[],"visibility":"public","forks":0,"open_issues":0,"watchers":1,"default_branch":"main","permissions":{"admin":false,"maintain":false,"push":false,"triage":false,"pull":false},"temp_clone_token":"","network_count":0,"subscribers_count":3}'
+  recorded_at: Tue, 13 Aug 2024 16:23:20 GMT
+- request:
+    method: get
+    uri: https://api.github.com/repos/holamendi/smol-roda/branches/main
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 9.1.0
+      Content-Type:
+      - application/json
+      Authorization:
+      - token <ACCESS_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 13 Aug 2024 16:23:20 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - private, max-age=60, s-maxage=60
+      Vary:
+      - Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With
+      Etag:
+      - W/"e15c82e824168433e8de09e57b2ea9aaa44055604b2b1af92248fa2a573cfa7b"
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Accepted-Github-Permissions:
+      - contents=read
+      X-Github-Api-Version-Selected:
+      - '2022-11-28'
+      X-Ratelimit-Limit:
+      - '6950'
+      X-Ratelimit-Remaining:
+      - '6941'
+      X-Ratelimit-Reset:
+      - '1723567487'
+      X-Ratelimit-Used:
+      - '9'
+      X-Ratelimit-Resource:
+      - core
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
+        X-GitHub-Request-Id, Deprecation, Sunset
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - '0'
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      Transfer-Encoding:
+      - chunked
+      Server:
+      - github.com
+      X-Github-Request-Id:
+      - F609:363592:13EF310:1420DE5:66BB8878
+    body:
+      encoding: ASCII-8BIT
+      string: '{"name":"main","commit":{"sha":"ebe2f9068bbc81e55c19ce2f86b30a1344db8f3f","node_id":"C_kwDOG4Jhi9oAKGViZTJmOTA2OGJiYzgxZTU1YzE5Y2UyZjg2YjMwYTEzNDRkYjhmM2Y","commit":{"author":{"name":"Pablo","email":"hola@mendi.cl","date":"2024-08-12T15:15:35Z"},"committer":{"name":"GitHub","email":"noreply@github.com","date":"2024-08-12T15:15:35Z"},"message":"Update
+        README.md","tree":{"sha":"a0594a7cc64e3b9847a4e869b4ccee780d84c6c1","url":"https://api.github.com/repos/holamendi/smol-roda/git/trees/a0594a7cc64e3b9847a4e869b4ccee780d84c6c1"},"url":"https://api.github.com/repos/holamendi/smol-roda/git/commits/ebe2f9068bbc81e55c19ce2f86b30a1344db8f3f","comment_count":0,"verification":{"verified":true,"reason":"valid","signature":"-----BEGIN
+        PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJmuicXCRC1aQ7uu5UhlAAA5fUQAIImxpx3dY4dKni6yOjs01ym\nvRXC9/0dOZ0uliOX5zwbz8pEkUrWXhnTh88ATxearfNOhMiZpbGLEHxY+17tjQhh\nGpkdrJ0O2d1n2UZgPsZklVb3Dy/dSBbe0kbzQ0KrBVd03DU53wv+KSUXvCQeLKVb\nCg4XI/tuu9kJdQm6a+VgvpjYjaGvJs8Xen5uobG8gGXVGM+uI15cUavNDUZ+D1q8\nsSQVqr9u9nNRjjSqIXl2YPR9T5pVYmUL1VduVRUqvrqaEwBcO+tEZyCFVRejErqM\ngc7t91FIkIX2wMzKowaGOdDpLVS155z6yilOxNpZpvJGH+r4bTMS1QaJsWmEbiXt\nduaJNScPf/kcHbVqZT6Um4L6i7gNweoGCfNjetsfx3G+21L8O63i3LWBsgW5HURB\niMTzR+Ak5nOSvi3nLjLLdUrex6rWM80AfFLero/tzWBpC6Pk8md1/IymoxyRQoFZ\n/83c3SiBv6ztrTYJ6r5v3IcqfyBnx1aRUcuveJFKbP1MENoL70Z73UO2t8jLu0Tx\nTFWtdZEFN5OvlMpzrb52CklEaqQPRuj0EDtNh2GfosLswMMFK/DwkQxVYQRfGvza\nXhPHhC7ovo1pTlMovBZWZXzymD2l9sqr9Sxu1+DNvzplELPp5EHJ6qRXDbcrCYGu\nhkW5JXcmexUm+1NPqfp3\n=QphK\n-----END
+        PGP SIGNATURE-----\n","payload":"tree a0594a7cc64e3b9847a4e869b4ccee780d84c6c1\nparent
+        7dd2622f9bfee100836f8bb6b60dc15f162a5e5f\nauthor Pablo <hola@mendi.cl> 1723475735
+        +0200\ncommitter GitHub <noreply@github.com> 1723475735 +0200\n\nUpdate README.md"}},"url":"https://api.github.com/repos/holamendi/smol-roda/commits/ebe2f9068bbc81e55c19ce2f86b30a1344db8f3f","html_url":"https://github.com/holamendi/smol-roda/commit/ebe2f9068bbc81e55c19ce2f86b30a1344db8f3f","comments_url":"https://api.github.com/repos/holamendi/smol-roda/commits/ebe2f9068bbc81e55c19ce2f86b30a1344db8f3f/comments","author":{"login":"holamendi","id":451059,"node_id":"MDQ6VXNlcjQ1MTA1OQ==","avatar_url":"https://avatars.githubusercontent.com/u/451059?v=4","gravatar_id":"","url":"https://api.github.com/users/holamendi","html_url":"https://github.com/holamendi","followers_url":"https://api.github.com/users/holamendi/followers","following_url":"https://api.github.com/users/holamendi/following{/other_user}","gists_url":"https://api.github.com/users/holamendi/gists{/gist_id}","starred_url":"https://api.github.com/users/holamendi/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/holamendi/subscriptions","organizations_url":"https://api.github.com/users/holamendi/orgs","repos_url":"https://api.github.com/users/holamendi/repos","events_url":"https://api.github.com/users/holamendi/events{/privacy}","received_events_url":"https://api.github.com/users/holamendi/received_events","type":"User","site_admin":false},"committer":{"login":"web-flow","id":19864447,"node_id":"MDQ6VXNlcjE5ODY0NDQ3","avatar_url":"https://avatars.githubusercontent.com/u/19864447?v=4","gravatar_id":"","url":"https://api.github.com/users/web-flow","html_url":"https://github.com/web-flow","followers_url":"https://api.github.com/users/web-flow/followers","following_url":"https://api.github.com/users/web-flow/following{/other_user}","gists_url":"https://api.github.com/users/web-flow/gists{/gist_id}","starred_url":"https://api.github.com/users/web-flow/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/web-flow/subscriptions","organizations_url":"https://api.github.com/users/web-flow/orgs","repos_url":"https://api.github.com/users/web-flow/repos","events_url":"https://api.github.com/users/web-flow/events{/privacy}","received_events_url":"https://api.github.com/users/web-flow/received_events","type":"User","site_admin":false},"parents":[{"sha":"7dd2622f9bfee100836f8bb6b60dc15f162a5e5f","url":"https://api.github.com/repos/holamendi/smol-roda/commits/7dd2622f9bfee100836f8bb6b60dc15f162a5e5f","html_url":"https://github.com/holamendi/smol-roda/commit/7dd2622f9bfee100836f8bb6b60dc15f162a5e5f"}]},"_links":{"self":"https://api.github.com/repos/holamendi/smol-roda/branches/main","html":"https://github.com/holamendi/smol-roda/tree/main"},"protected":false,"protection":{"enabled":false,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}},"protection_url":"https://api.github.com/repos/holamendi/smol-roda/branches/main/protection"}'
+  recorded_at: Tue, 13 Aug 2024 16:23:20 GMT
+recorded_with: VCR 6.2.0

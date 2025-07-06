@@ -1,0 +1,76 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.github.com/repos/holamendi/smol-roda/commits/invalid
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 9.2.0
+      Content-Type:
+      - application/json
+      Authorization:
+      - token <ACCESS_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      Date:
+      - Sat, 18 Jan 2025 05:52:44 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '141'
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Accepted-Github-Permissions:
+      - contents=read
+      X-Github-Api-Version-Selected:
+      - '2022-11-28'
+      X-Ratelimit-Limit:
+      - '7100'
+      X-Ratelimit-Remaining:
+      - '7097'
+      X-Ratelimit-Reset:
+      - '1737182281'
+      X-Ratelimit-Used:
+      - '3'
+      X-Ratelimit-Resource:
+      - core
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
+        X-GitHub-Request-Id, Deprecation, Sunset
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - '0'
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      Vary:
+      - Accept-Encoding, Accept, X-Requested-With
+      Server:
+      - github.com
+      X-Github-Request-Id:
+      - DF2C:2ECD73:9EE4C1:A3F3E4:678B41AC
+    body:
+      encoding: UTF-8
+      string: '{"message":"No commit found for SHA: invalid","documentation_url":"https://docs.github.com/rest/commits/commits#get-a-commit","status":"422"}'
+  recorded_at: Sat, 18 Jan 2025 05:52:44 GMT
+recorded_with: VCR 6.3.1

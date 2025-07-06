@@ -1,11 +1,11 @@
 module Dokku
   module Redis
-    class List < Dokku::Command
+    class List
       def initialize(ssh_session)
         @ssh_session = ssh_session
       end
 
-      def command
+      def cmd
         "dokku redis:list"
       end
 

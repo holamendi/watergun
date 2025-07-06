@@ -3,6 +3,7 @@ class Account < ApplicationRecord
   has_many :apps, dependent: :destroy
   has_many :deployments, dependent: :destroy
   has_many :domains, dependent: :destroy
+  has_many :github_repos, class_name: "Github::Repo", dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :servers, dependent: :destroy
@@ -11,7 +12,9 @@ class Account < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :users, through: :memberships
 
-  has_one :github_access_token, dependent: :destroy
+  has_one :github_integration, class_name: "Github::Integration", dependent: :destroy
 
   validates :name, presence: true
+
+  after_create :create_github_integration!
 end

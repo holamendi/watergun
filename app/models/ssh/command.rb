@@ -1,39 +1,69 @@
-module Ssh
-  class Command
-    include StoreModel::Model
+class Ssh::Command
+  attr_reader :input, :output, :started_at, :finished_at, :exit_code
 
-    attribute :command, :string
-    attribute :finished_at, :datetime
-    attribute :exit_code, :integer
-    attribute :output, OutputEntry.to_array_type, default: -> { [] }
-    attribute :started_at, :datetime
+  def initialize(input)
+    @input = input
+    @output = []
+  end
 
-    validates :command, presence: true
+  def start
+    @started_at = Time.current
+  end
 
-    def append_output(stream, data)
-      output << OutputEntry.new(timestamp: Time.current, stream: stream.to_s, data:)
+  def cmd
+    @cmd ||= if @input.is_a?(String)
+      @input
+    elsif @input.respond_to?(:cmd)
+      @input.cmd
+    else
+      raise "input must be a string or an object that responds to #cmd"
     end
+  end
 
-    def to_s
-      str = "[#{started_at}][command.execute] #{command}\n"
-      str << output.map { |entry| "[#{entry.timestamp}][command.#{entry.stream}] #{entry.data}" }.join
-      str << "[#{finished_at}][command.finish] #{command} (exit code: #{exit_code})"
-    end
+  def append_output(stream, data)
+    @output << Ssh::Log.new(timestamp: Time.current, stream: stream.to_s, data:)
+  end
 
-    def text_output(timestamp: true, stream: true)
-      output.map(&:data).join
-    end
+  def finish(exit_code)
+    @finished_at = Time.current
+    @exit_code = exit_code
+  end
 
-    def success?
-      exit_code.zero?
-    end
+  def success?
+    exit_code&.zero?
+  end
 
-    def failure?
-      !success?
-    end
+  def failure?
+    !success?
+  end
 
-    def duration
-      finished_at - started_at
+  def finished?
+    @finished_at.present?
+  end
+
+  def text_output
+    @output.map(&:data).join
+  end
+
+  def as_json
+    {
+      cmd:,
+      exit_code:,
+      started_at:,
+      finished_at:,
+      output:
+    }
+  end
+
+  def parsed_output
+    return unless finished?
+
+    @parsed_output ||= if @input.is_a?(String)
+      text_output
+    elsif @input.respond_to?(:parse_output)
+      @input.parse_output(exit_code, text_output)
+    else
+      raise "input must be a string or an object that responds to #parse_output"
     end
   end
 end

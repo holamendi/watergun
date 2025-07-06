@@ -1,0 +1,14 @@
+<% @title = "New Project" %>
+
+<%= container do %>
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <%= page_header(@title) %>
+    </div>
+  </div>
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <%= render "form", project: @project %>
+    </div>
+  </div>
+<% end %>

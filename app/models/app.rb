@@ -1,32 +1,43 @@
 class App < ApplicationRecord
-  include Broadcast
   include Discard::Model
   include Containerizable
+  include LogStreamable
   include ServerActionable
 
-  belongs_to :account, default: -> { Current.account }
-  belongs_to :server, default: -> { Current.server }
+  has_secure_token :deploy_token, length: 32
+
+  TEMPORARY_STATUSES = %w[deploying restarting scaling stopping].freeze
+
+  belongs_to :account, default: -> { project.account }
+  belongs_to :server, default: -> { project.server }
   belongs_to :project, touch: true
-  has_many :domains, dependent: :delete_all
+
+  has_many :domains, dependent: :destroy
   has_one :default_domain, -> { default }, class_name: "Domain"
-  has_many :deployments, dependent: :delete_all
+
+  has_many :deployments, dependent: :destroy
   has_one :deployment, -> { success.recent }
+
   has_many :env_variables, dependent: :destroy
-  has_one :github_repo, dependent: :destroy
+
+  has_one :github_repo, class_name: "Github::Repo", dependent: :destroy
+
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 
-  str_enum :status, [:pending, :active, :deploying, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
-
-  validates :name, presence: true, uniqueness: {scope: :project_id, conditions: -> { undiscarded }}
+  enum :builder, %w[herokuish dockerfile nixpacks].index_by(&:itself), default: :herokuish
+  enum :status, %w[pending active deploying restarting scaling stopping stopped deleting deleted error].index_by(&:itself), default: :pending
 
   scope :deployed, -> { where.not(deployed_at: nil) }
 
-  accepts_nested_attributes_for :github_repo
+  before_create :set_dokku_id
 
-  before_create do
-    self.dokku_id ||= "#{name.parameterize.dasherize}-#{SecureRandom.hex(2)}"
+  after_update_commit do
+    broadcast_replace_later_to self, target: dom_id(self, :header), partial: "projects/apps/header", locals: {app: self}
+    broadcast_replace_later_to project, target: dom_id(self), partial: "projects/apps/app", locals: {app: self}
   end
+
+  delegate :github_integration, to: :account
 
   def pending_restart!
     update!(pending_restart: true)
@@ -38,5 +49,20 @@ class App < ApplicationRecord
 
   def all_domains_resolve_to_server?
     domains.kept.all?(&:resolves_to_server?)
+  end
+
+  def temporary_status?
+    status.in?(TEMPORARY_STATUSES)
+  end
+
+  private
+
+  def set_dokku_id
+    self.dokku_id = name.parameterize.dasherize
+
+    loop do
+      break unless server.apps.kept.exists?(dokku_id:)
+      self.dokku_id = "#{name.parameterize}-#{SecureRandom.hex(4)}"
+    end
   end
 end

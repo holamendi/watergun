@@ -1,0 +1,43 @@
+name: Rails Tests
+
+on:
+  push:
+    branches: [ pre-release ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: ${{ secrets.ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY }}
+      ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: ${{ secrets.ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY }}
+      ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: ${{ secrets.ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.4.4
+        bundler-cache: true
+
+    - name: Set up node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22.2.0' # Adjust this to your preferred Node.js version
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev
+        bundle install --jobs 4 --retry 3
+        yarn install
+
+    - name: Set up database
+      run: |
+        bundle exec rails db:create
+        bundle exec rails db:schema:load
+
+    - name: Run tests
+      run: bundle exec rails test

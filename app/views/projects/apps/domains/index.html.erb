@@ -1,7 +1,7 @@
-<%= turbo_stream_from current_app %>
-<%= turbo_stream_from current_app, :domains %>
+<%= turbo_stream_from @app %>
+<%= turbo_stream_from @app, :domains %>
 
-<%= render "projects/apps/header", app: current_app %>
+<%= render "projects/apps/header", app: @app %>
 
 <div class="flex justify-between">
   <h1 class="text-2xl font-bold">Domains</h1>
@@ -26,5 +26,5 @@
 </div>
 
 <%= render "shared/modal", id: "domain_modal", title: "New Domain" do %>
-  <%= render "projects/apps/domains/form", domain: current_app.domains.new %>
+  <%= render "projects/apps/domains/form", domain: @app.domains.new %>
 <% end %>
