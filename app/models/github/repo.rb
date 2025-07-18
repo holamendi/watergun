@@ -6,7 +6,7 @@ class Github::Repo < ApplicationRecord
 
   validates :repo, :branch, presence: true
 
-  delegate :github_integration, to: :account
+  delegate :github_app, to: :account
 
   def web_url
     "https://github.com/#{repo}/tree/#{branch}"

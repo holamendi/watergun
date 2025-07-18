@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  app_id: 1
+  client_id: MyString
+  app_slug: MyString
+  app_url: MyString
+  pem: MyText
+  webhook_secret: MyString
+  permissions: 
+  events: 
+
+two:
+  account: two
+  app_id: 1
+  client_id: MyString
+  app_slug: MyString
+  app_url: MyString
+  pem: MyText
+  webhook_secret: MyString
+  permissions: 
+  events: 

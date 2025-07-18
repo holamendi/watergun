@@ -1,6 +1,6 @@
 class Github::Event < ApplicationRecord
-  belongs_to :account, default: -> { github_integration.account }
-  belongs_to :github_integration, class_name: "Github::Integration", inverse_of: :github_events
+  belongs_to :account, default: -> { github_installation.account }
+  belongs_to :github_installation, class_name: "Github::Installation", inverse_of: :github_events
 
   scope :processed, -> { where.not(processed_at: nil) }
 

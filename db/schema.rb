@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_16_065751) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_18_063147) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -160,26 +160,45 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_16_065751) do
     t.index ["discarded_at"], name: "index_env_variables_on_discarded_at"
   end
 
+  create_table "github_apps", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "github_id"
+    t.string "client_id"
+    t.string "slug"
+    t.string "url"
+    t.text "pem"
+    t.string "webhook_secret"
+    t.json "permissions"
+    t.json "events"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_github_apps_on_account_id"
+  end
+
   create_table "github_events", force: :cascade do |t|
     t.integer "account_id", null: false
     t.json "headers"
     t.json "payload"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "github_integration_id", null: false
+    t.integer "github_installation_id", null: false
     t.datetime "processed_at"
     t.index ["account_id"], name: "index_github_events_on_account_id"
-    t.index ["github_integration_id"], name: "index_github_events_on_github_integration_id"
+    t.index ["github_installation_id"], name: "index_github_events_on_github_installation_id"
   end
 
-  create_table "github_integrations", force: :cascade do |t|
+  create_table "github_installations", force: :cascade do |t|
+    t.integer "github_app_id", null: false
     t.integer "account_id", null: false
+    t.integer "installation_id"
+    t.string "account_login"
+    t.string "access_token"
+    t.datetime "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.json "data"
     t.string "token"
-    t.index ["account_id"], name: "index_github_integrations_on_account_id"
-    t.index ["token"], name: "index_github_integrations_on_token", unique: true
+    t.index ["account_id"], name: "index_github_installations_on_account_id"
+    t.index ["github_app_id"], name: "index_github_installations_on_github_app_id"
   end
 
   create_table "github_repos", force: :cascade do |t|
@@ -373,9 +392,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_16_065751) do
   add_foreign_key "domains", "apps"
   add_foreign_key "env_variables", "accounts"
   add_foreign_key "env_variables", "apps"
+  add_foreign_key "github_apps", "accounts"
   add_foreign_key "github_events", "accounts"
-  add_foreign_key "github_events", "github_integrations"
-  add_foreign_key "github_integrations", "accounts"
+  add_foreign_key "github_events", "github_installations"
+  add_foreign_key "github_events", "github_integrations", column: "github_installation_id"
+  add_foreign_key "github_installations", "accounts"
+  add_foreign_key "github_installations", "github_apps"
   add_foreign_key "github_repos", "accounts"
   add_foreign_key "github_repos", "apps"
   add_foreign_key "log_streams", "accounts"

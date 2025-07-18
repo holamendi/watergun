@@ -42,7 +42,7 @@ class Deployment::CreateDeployment
   end
 
   def github_api_client
-    app.github_integration.api_client
+    app.github_app.installations.first&.api_client
   end
 
   def validate_commit_sha

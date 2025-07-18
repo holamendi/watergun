@@ -52,7 +52,7 @@ class ServerActions::DeployApp < ServerAction
   end
 
   def github_access_token
-    account.github_integration.access_token
+    account.github_app.installations.first&.access_token
   end
 
   def schedule_enable_ssl!

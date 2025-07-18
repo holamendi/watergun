@@ -9,7 +9,7 @@
 <% end %>
 
 <div class="max-w-screen-sm mx-auto">
-  <% if Current.account.github_integration.app_installed? %>
+  <% if Current.account.github_app&.installations&.any?(&:installed?) %>
     <%= render "projects/apps/create_form", create_app: @create_app %>
   <% else %>
     <%= button_to "Connect Github account", github_installation_path, class: "btn btn-primary rounded-full", data: { turbo: false } %>

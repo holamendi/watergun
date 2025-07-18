@@ -53,7 +53,7 @@ class App::CreateApp
   end
 
   def github_api_client
-    account.github_integration.api_client
+    account.github_app.installations.first&.api_client
   end
 
   def remote_repo

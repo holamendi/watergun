@@ -5,19 +5,24 @@ class Github::RegistrationsController < ApplicationController
     if response.status == 201
       json = JSON.parse(response.body)
 
-      github_integration.update!(
-        app_id: json["id"],
-        app_slug: json["slug"],
-        app_url: json["html_url"],
+      github_app.update!(
+        github_id: json["id"],
+        slug: json["slug"],
+        url: json["html_url"],
         client_id: json["client_id"],
         pem: json["pem"],
         webhook_secret: json["webhook_secret"],
-        installation_id: json["installation_id"],
         permissions: json["permissions"],
         events: json["events"]
       )
 
-      redirect_to "#{github_integration.app_url}/installations/new", allow_other_host: true
+      # Create installation record
+      github_app.installations.create!(
+        account: Current.account,
+        installation_id: json["installation_id"]
+      )
+
+      redirect_to "#{github_app.url}/installations/new", allow_other_host: true
     else
       flash[:error] = "Invalid manifest code"
       redirect_to account_path
@@ -26,7 +31,7 @@ class Github::RegistrationsController < ApplicationController
 
   private
 
-  def github_integration
-    Current.account.github_integration
+  def github_app
+    Current.account.github_app
   end
 end

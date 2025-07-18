@@ -37,7 +37,7 @@ class App < ApplicationRecord
     broadcast_replace_later_to project, target: dom_id(self), partial: "projects/apps/app", locals: {app: self}
   end
 
-  delegate :github_integration, to: :account
+  delegate :github_app, to: :account
 
   def pending_restart!
     update!(pending_restart: true)
