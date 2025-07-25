@@ -30,6 +30,9 @@ RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
+COPY package*.json ./
+RUN npm install
+
 COPY . .
 
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \

@@ -32,7 +32,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsqlite3-dev
           bundle install --jobs 4 --retry 3
-          npm ci
+          npm install
 
       - name: Set up database
         run: |
