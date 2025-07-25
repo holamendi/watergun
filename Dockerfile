@@ -35,7 +35,9 @@ RUN npm install
 
 COPY . .
 
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
+RUN rm -rf node_modules package-lock.json && \
+    npm install && \
+    SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
     bundle exec bootsnap precompile app/ lib/
 
 FROM base
