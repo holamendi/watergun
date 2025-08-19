@@ -5,7 +5,7 @@ class Api::Internal::SetupsController < ActionController::API
     end
 
     if Account.any?
-      return render json: {error: "An account already exists"}, status: :unprocessable_entity
+      return render json: {error: "An account already exists"}, status: :unprocessable_content
     end
 
     begin
@@ -15,7 +15,7 @@ class Api::Internal::SetupsController < ActionController::API
         create_user!
       end
     rescue => e
-      return render json: {error: e.message}, status: :unprocessable_entity
+      return render json: {error: e.message}, status: :unprocessable_content
     end
 
     render json: {

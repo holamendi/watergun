@@ -28,7 +28,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
         stream_toast("Environment variable created")
       ], status: :created
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -43,7 +43,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
         stream_toast("Environment variable updated successfully.")
       ]
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

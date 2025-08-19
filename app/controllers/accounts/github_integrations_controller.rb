@@ -5,7 +5,7 @@ class Accounts::GithubIntegrationsController < ApplicationController
     if @github_integration.save
       render turbo_stream: [stream_toast("Github account connected"), render_form]
     else
-      render turbo_stream: render_form, status: :unprocessable_entity
+      render turbo_stream: render_form, status: :unprocessable_content
     end
   end
 

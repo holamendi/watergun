@@ -16,7 +16,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "create with invalid credentials does not create a session" do
     assert_no_difference "Session.count" do
       post session_url, params: {session: {email: "bobby.tables@example.com", password: "wrong_password"}}
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
     end
   end
 

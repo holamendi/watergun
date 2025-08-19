@@ -11,7 +11,7 @@ class Projects::ServicesController < Projects::BaseController
     if @create_service.save
       redirect_to project_service_path(@project, @create_service.service), notice: "Service created"
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -25,7 +25,7 @@ class Projects::ServicesController < Projects::BaseController
     if @service.update(update_service_params)
       render turbo_stream: [stream_toast("Service updated"), render_form]
     else
-      render turbo_stream: render_form, status: :unprocessable_entity
+      render turbo_stream: render_form, status: :unprocessable_content
     end
   end
 

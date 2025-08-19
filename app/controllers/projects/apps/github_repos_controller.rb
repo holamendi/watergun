@@ -15,7 +15,7 @@ class Projects::Apps::GithubReposController < Projects::Apps::BaseController
     if @github_repo.update(update_github_repo_params)
       render turbo_stream: stream_toast("Settings updated")
     else
-      render turbo_stream: render_form, status: :unprocessable_entity
+      render turbo_stream: render_form, status: :unprocessable_content
     end
   end
 

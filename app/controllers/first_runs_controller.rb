@@ -12,7 +12,7 @@ class FirstRunsController < ApplicationController
       sign_in(@user)
       redirect_to root_path, notice: "Account created"
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

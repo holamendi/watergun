@@ -15,7 +15,7 @@ class Projects::AppsController < Projects::BaseController
     if @create_app.save
       redirect_to project_app_path(@project, @create_app.app), notice: "App created"
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -33,7 +33,7 @@ class Projects::AppsController < Projects::BaseController
         render_form
       ]
     else
-      render turbo_stream: render_form, status: :unprocessable_entity
+      render turbo_stream: render_form, status: :unprocessable_content
     end
   end
 

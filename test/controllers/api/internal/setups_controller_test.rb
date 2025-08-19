@@ -51,7 +51,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
     test "returns an error if an account already exists" do
       post api_internal_setups_url, params: @valid_params, headers: @headers
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
       assert_equal "An account already exists", json_response["error"]
     end
 
@@ -62,7 +62,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       params = @valid_params.merge(user: {email: "invalid"})
       post api_internal_setups_url, params:, headers: @headers
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
       assert_equal "Validation failed: Email is invalid", json_response["error"]
     end
   end

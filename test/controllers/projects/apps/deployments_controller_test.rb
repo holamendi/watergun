@@ -82,7 +82,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
         end
       end
 
-      assert_turbo_stream action: "append", target: "toasts", status: :unprocessable_entity do
+      assert_turbo_stream action: "append", target: "toasts", status: :unprocessable_content do
         assert_select "p", text: "Invalid deployment parameters"
       end
     end

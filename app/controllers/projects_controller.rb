@@ -19,7 +19,7 @@ class ProjectsController < ApplicationController
     if @project.save
       redirect_to @project, notice: "Project created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

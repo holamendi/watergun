@@ -22,7 +22,7 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
     deployment = Deployment::Creator.new(app: @app, commit_sha: params[:sha]).create!
     render json: Api::V1::DeploymentResource.new(deployment), status: :created
   rescue ActiveModel::ValidationError => e
-    render json: {errors: e.model.errors.messages}, status: :unprocessable_entity
+    render json: {errors: e.model.errors.messages}, status: :unprocessable_content
   end
 
   private

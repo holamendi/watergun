@@ -27,7 +27,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
         post projects_url, params: {project: {name: ""}}
       end
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
     end
 
     test "does not create a project when the name exists" do
@@ -37,7 +37,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
         post projects_url, params: {project: {name: project.name}}
       end
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
     end
   end
 end
