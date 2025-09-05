@@ -45,7 +45,7 @@ class Ssh::Command
     @output.map(&:data).join
   end
 
-  def as_json
+  def as_json(_options = {})
     {
       cmd:,
       exit_code:,
