@@ -32,7 +32,7 @@ class Deployment < ApplicationRecord
     broadcast_replace_later_to(
       [app, :deployments],
       partial: "projects/apps/deployments/deployment",
-      target: "deployments",
+      target: dom_id(self),
       locals: {deployment: self}
     )
   }
