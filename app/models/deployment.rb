@@ -28,10 +28,14 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  broadcasts_to ->(deployment) { [deployment.app, :deployments] },
-    partial: "projects/apps/deployments/deployment",
-    target: "deployments",
-    inserts_by: :prepend
+  after_update_commit -> {
+    broadcast_replace_later_to(
+      [app, :deployments],
+      partial: "projects/apps/deployments/deployment",
+      target: "deployments",
+      locals: {deployment: self}
+    )
+  }
 
   def short_sha
     sha&.first(7)

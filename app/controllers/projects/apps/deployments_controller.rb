@@ -8,7 +8,7 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
 
     render turbo_stream: [
       stream_toast("#{@app.name}: deployment scheduled"),
-      append_deployment
+      prepend_deployment
     ]
   rescue ActiveModel::ValidationError
     render turbo_stream: stream_toast("Invalid deployment parameters"), status: :unprocessable_content
@@ -22,7 +22,7 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   private
 
   def append_deployment
-    turbo_stream.append(
+    turbo_stream.prepend(
       "deployments",
       partial: "projects/apps/deployments/deployment",
       locals: {deployment: @deployment}
