@@ -21,7 +21,7 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
 
   private
 
-  def append_deployment
+  def prepend_deployment
     turbo_stream.prepend(
       "deployments",
       partial: "projects/apps/deployments/deployment",
