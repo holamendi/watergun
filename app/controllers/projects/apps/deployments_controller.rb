@@ -4,8 +4,12 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   end
 
   def create
-    Deployment::CreateDeployment.new(app: @app, commit_sha: params[:sha]).save!
-    render turbo_stream: stream_toast("#{@app.name}: deployment scheduled")
+    @deployment = Deployment::CreateDeployment.new(app: @app, commit_sha: params[:sha]).save!
+
+    render turbo_stream: [
+      stream_toast("#{@app.name}: deployment scheduled"),
+      append_deployment
+    ]
   rescue ActiveModel::ValidationError
     render turbo_stream: stream_toast("Invalid deployment parameters"), status: :unprocessable_content
   end
@@ -13,5 +17,15 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
   def logs
     @deployment = @app.deployments.kept.finished.find(params[:id])
     render plain: @deployment.server_action.log.to_s
+  end
+
+  private
+
+  def append_deployment
+    turbo_stream.append(
+      "deployments",
+      partial: "projects/apps/deployments/deployment",
+      locals: {deployment: @deployment}
+    )
   end
 end

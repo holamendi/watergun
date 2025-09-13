@@ -7,10 +7,9 @@
   <% if @app.github_repo.present? %>
       <div class="flex justify-between pb-6">
     <div>
-      <%= button_to "Deploy App",
-        project_app_deployments_path(@project, @app),
-        class: "inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-      %>
+      <%= form_with url: project_app_deployments_path(@project, @app) do |f| %>
+        <%= submit_button "Deploy" %>
+      <% end %>
     </div>
   </div>
     <ul id="deployments" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
