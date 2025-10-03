@@ -8,10 +8,11 @@ default: &default
   solid_queue_clear_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches"
     schedule: every day at 1am
+  trim_container_checks:
+    command: "ContainerCheck.trim_in_batches"
 
 development:
   <<: *default
 
 production:
   <<: *default
-
