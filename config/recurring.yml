@@ -10,6 +10,7 @@ default: &default
     schedule: every day at 1am
   trim_container_checks:
     command: "ContainerCheck.trim_in_batches"
+    schedule: every 6 hours
 
 development:
   <<: *default
