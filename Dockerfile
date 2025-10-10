@@ -16,7 +16,7 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     build-essential curl git node-gyp libyaml-dev pkg-config python-is-python3 libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
-ARG NODE_VERSION=20.3.1
+ARG NODE_VERSION=24.2.0
 ENV PATH=/usr/local/node/bin:$PATH
 ENV LD_PRELOAD="libjemalloc.so.2" \
     MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
