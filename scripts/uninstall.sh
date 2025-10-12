@@ -17,6 +17,6 @@ dokku apps:destroy watergun --force
 rm -rf "$DOKKU_APP_STORAGE_PATH"
 
 # delete user
-deluser --force "$SSH_USER"
+deluser --remove-home "$SSH_USER"
 
 

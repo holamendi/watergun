@@ -71,9 +71,11 @@ fi
 dokku domains:set-global "$DOMAIN"
 
 # install letsencrypt plugin
-if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
-  echo "error: failed to install dokku-letsencrypt plugin"
-  exit 1
+if ! dokku plugin:list | grep -q "letsencrypt"; then
+  if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
+    echo "error: failed to install dokku-letsencrypt plugin"
+    exit 1
+  fi
 fi
 
 # set up letsencrypt
@@ -123,13 +125,13 @@ dokku storage:ensure-directory "$DOKKU_APP" --chown false
 dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
 # sync git repo
-# dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
+dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
 
 # build app
-# dokku ps:rebuild "$DOKKU_APP"
+dokku ps:rebuild "$DOKKU_APP"
 
 # pull docker image
-dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
+# dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set app domain
 dokku domains:set "$DOKKU_APP" "$DOMAIN"
@@ -160,4 +162,4 @@ if [ -z "$FIRST_RUN_URL" ] || [ "$FIRST_RUN_URL" = "null" ]; then
 fi
 
 echo "Done!"
-echo "Visit $FIRST_RUN_URL to set your password."
+echo "Visit $FIRST_RUN_URL to set up your account."
