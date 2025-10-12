@@ -123,13 +123,13 @@ dokku storage:ensure-directory "$DOKKU_APP" --chown false
 dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 
 # sync git repo
-dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
+# dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
 
 # build app
-dokku ps:rebuild "$DOKKU_APP"
+# dokku ps:rebuild "$DOKKU_APP"
 
 # pull docker image
-# dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
+dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set up watergun account
 SETUP_TOKEN=$(dokku config:get $DOKKU_APP ACCOUNT_SETUP_TOKEN)
