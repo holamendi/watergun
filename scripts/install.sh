@@ -131,6 +131,11 @@ dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
 # pull docker image
 dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
+# set app domain
+dokku domains:set "$DOKKU_APP" "$DOMAIN"
+dokku ps:scale "$DOKKU_APP" web=1 worker=1
+dokku letsencrypt:enable "$DOKKU_APP"
+
 # set up watergun account
 SETUP_TOKEN=$(dokku config:get $DOKKU_APP ACCOUNT_SETUP_TOKEN)
 SETUP_RESPONSE=$(curl -s -X POST "https://$DOMAIN/api/internal/setups" \
@@ -153,11 +158,6 @@ if [ -z "$FIRST_RUN_URL" ] || [ "$FIRST_RUN_URL" = "null" ]; then
   echo "Response: $SETUP_RESPONSE"
   exit 1
 fi
-
-# set app domain
-dokku domains:set "$DOKKU_APP" "$DOMAIN"
-dokku ps:scale "$DOKKU_APP" web=1 worker=1
-dokku letsencrypt:enable "$DOKKU_APP"
 
 echo "Done!"
 echo "Visit $FIRST_RUN_URL to set your password."
