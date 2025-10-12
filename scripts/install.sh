@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# curl -sSL https://raw.githubusercontent.com/holamendi/watergun/refs/heads/main/scripts/install.sh | bash -s <domain> <email>
+
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
@@ -12,7 +14,7 @@ DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_DOCKER_REPO="holamendi/watergun"
 WATERGUN_GIT_REPO="https://github.com/holamendi/watergun.git"
-WATERGUN_GIT_BRANCH="pre-release"
+WATERGUN_GIT_BRANCH="main"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
 
 # server info
