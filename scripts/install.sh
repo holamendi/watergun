@@ -7,7 +7,7 @@ command_exists() {
 # constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.35.12
+DOKKU_TAG=v0.36.7
 DOKKU_APP="watergun"
 DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
 WATERGUN_DOCKER_REPO="holamendi/watergun"
@@ -132,12 +132,27 @@ dokku ps:rebuild "$DOKKU_APP"
 # dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set up watergun account
-SETUP_RESPONSE=$(dokku run $DOKKU_APP bundle exec rake account:setup $HOSTNAME $PUBLIC_IP $CPU_TYPE $DOMAIN $EMAIL | grep ACCOUNT_DATA | sed 's/ACCOUNT_DATA://')
-PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
-TOKEN=$(echo $SETUP_RESPONSE | jq -r '.token')
+SETUP_TOKEN=$(dokku config:get $DOKKU_APP ACCOUNT_SETUP_TOKEN)
+SETUP_RESPONSE=$(curl -s -X POST "https://$DOMAIN/api/internal/setups" \
+  -H "Authorization: Bearer $SETUP_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"server\":{\"name\":\"$HOSTNAME\",\"public_ip\":\"$PUBLIC_IP\",\"cpu_type\":\"$CPU_TYPE\"},\"user\":{\"email\":\"$EMAIL\"}}")
 
-# add public key to ssh user
-echo "$PUBLIC_KEY" >> "$SSH_DIR/authorized_keys"
+if [ $? -ne 0 ]; then
+  echo "error: failed to set up watergun account"
+  exit 1
+fi
+
+FIRST_RUN_URL=$(echo $SETUP_RESPONSE | jq -r '.first_run_url')
+PUBLIC_KEY=$(echo $SETUP_RESPONSE | jq -r '.public_key')
+
+echo "$PUBLIC_KEY" > "$SSH_DIR/authorized_keys"
+
+if [ -z "$FIRST_RUN_URL" ] || [ "$FIRST_RUN_URL" = "null" ]; then
+  echo "error: invalid response from setup API"
+  echo "Response: $SETUP_RESPONSE"
+  exit 1
+fi
 
 # set app domain
 dokku domains:set "$DOKKU_APP" "$DOMAIN"
@@ -145,4 +160,4 @@ dokku ps:scale "$DOKKU_APP" web=1 worker=1
 dokku letsencrypt:enable "$DOKKU_APP"
 
 echo "Done!"
-echo "Visit https://$DOMAIN/first-run/$TOKEN to set your password."
+echo "Visit $FIRST_RUN_URL to set your password."
