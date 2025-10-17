@@ -7,7 +7,7 @@ class StartLogStreamJob < ApplicationJob
     log_stream.server.ssh_session do |ssh|
       log_stream.touch(:streaming_at)
 
-      buffer = Ssh::StreamBuffer.new(interval: 1)
+      buffer = Ssh::StreamBuffer.new(interval: 0.1)
       buffer.start { |logs| broadcast_log(log_stream, logs) }
 
       ssh.execute(log_command(log_stream), save_output: false) do |stream, data|
@@ -31,6 +31,7 @@ class StartLogStreamJob < ApplicationJob
 
   def log_command(log_stream)
     streamable = log_stream.log_streamable
+
     command = case streamable
     when App
       "dokku logs #{streamable.dokku_id}"

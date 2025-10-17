@@ -16,6 +16,7 @@ module LogStreamableController
 
   def update
     stop_active_log_streams
+
     StartLogStreamJob.perform_later(@log_stream)
     head :ok
   end
