@@ -10,6 +10,8 @@ class FetchContainerMetricsJob < ApplicationJob
   private
 
   def sync_containers(server)
+    return unless server.apps.kept.any? || server.services.kept.any?
+
     stats = nil
 
     server.ssh_session do |ssh|

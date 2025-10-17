@@ -5,7 +5,7 @@ class Domain < ApplicationRecord
   belongs_to :account, default: -> { app.account }
   belongs_to :app, touch: true
 
-  enum :status, %w[pending active enabling_ssl deleting error].index_by(&:itself), default: :pending
+  enum :status, Enum[:pending, :active, :enabling_ssl, :deleting, :error], default: :pending
 
   scope :default, -> { where(is_default: true) }
   scope :ssl_enabled, -> { where(ssl_enabled: true) }

@@ -11,7 +11,7 @@ class EnvVariable < ApplicationRecord
 
   has_one :service_link, dependent: :destroy
 
-  enum :status, %w[pending syncing synced error].index_by(&:itself), default: :pending
+  enum :status, Enum[:pending, :syncing, :synced, :error], default: :pending
 
   scope :external, -> { where(internal: false) }
   scope :editable, -> { external.where.not("name LIKE ?", "#{RESERVED_PREFIX}%") }

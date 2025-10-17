@@ -16,8 +16,8 @@ class Service < ApplicationRecord
   store_attribute :data, :dsn, :string
   store_attribute :data, :version, :string
 
-  enum :status, %w[pending active restarting stopping stopped deleting deleted error].index_by(&:itself), default: :pending
-  enum :service_type, %w[postgres redis mongo].index_by(&:itself), validate: true
+  enum :status, Enum[:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
+  enum :service_type, Enum[:postgres, :redis, :mongo], validate: true
 
   validates :name, presence: true
 

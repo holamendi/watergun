@@ -15,7 +15,8 @@ class Server < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :services, dependent: :destroy
 
-  enum :status, %w[pending active deleting deleted error].index_by(&:itself), default: :pending
+  enum :status, Enum[:pending, :active, :deleted, :error], default: :pending
+  enum :cpu_type, Enum[:x86, :arm64], default: :x86
 
   after_create :create_ssh_key!
 
@@ -27,6 +28,7 @@ class Server < ApplicationRecord
 
   def ssh_session(&)
     connection_attempts = 0
+
     Ssh::Session.new(
       host: public_ip,
       user: SshKey::USER,

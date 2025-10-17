@@ -8,8 +8,8 @@ class ServerAction < ApplicationRecord
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
-  enum :source, %w[web api_v1].index_by(&:itself)
-  enum :status, %w[queued running success failure cancelled error].index_by(&:itself), default: :queued
+  enum :source, Enum[:web, :api_v1]
+  enum :status, Enum[:queued, :running, :success, :failure, :cancelled, :error], default: :queued
 
   attribute :source, :string, default: -> { Current.source.presence || "web" }
 

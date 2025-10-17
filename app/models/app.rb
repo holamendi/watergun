@@ -25,8 +25,8 @@ class App < ApplicationRecord
   has_many :service_links, dependent: :destroy
   has_many :services, through: :service_links
 
-  enum :builder, %w[herokuish dockerfile nixpacks].index_by(&:itself), default: :herokuish
-  enum :status, %w[pending active deploying restarting scaling stopping stopped deleting deleted error].index_by(&:itself), default: :pending
+  enum :builder, Enum[:herokuish, :dockerfile, :nixpacks], default: :herokuish
+  enum :status, Enum[:pending, :active, :deploying, :restarting, :scaling, :stopping, :deleted, :error], default: :pending
 
   scope :deployed, -> { where.not(deployed_at: nil) }
 
