@@ -1,10 +1,10 @@
 class Service < ApplicationRecord
-  include Containerizable
-  include Discard::Model
-  include LogStreamable
   include ServerActionable
+  include LogStreamable
+  include Discard::Model
+  include Containerizable
 
-  TEMPORARY_STATUSES = %w[pending deleting restarting stopping].freeze
+  TEMPORARY_STATUSES = %i[pending deleting restarting stopping].freeze
 
   belongs_to :account, default: -> { server.account }
   belongs_to :server
@@ -17,7 +17,7 @@ class Service < ApplicationRecord
   store_attribute :data, :version, :string
 
   enum :status, Enum[:pending, :active, :restarting, :stopping, :stopped, :deleting, :deleted, :error], default: :pending
-  enum :service_type, Enum[:postgres, :redis, :mongo], validate: true
+  enum :service_type, Enum[*Dokku::Plugin::InstallCommand::PLUGINS.keys], validate: true
 
   validates :name, presence: true
 
@@ -30,7 +30,7 @@ class Service < ApplicationRecord
   end
 
   def temporary_status?
-    status.in?(TEMPORARY_STATUSES)
+    status.to_sym.in?(TEMPORARY_STATUSES)
   end
 
   private
