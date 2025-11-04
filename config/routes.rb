@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     resources :log_streams, path: :logs, only: %i[index create show update destroy]
   end
 
-  concern :metrizable do
+  concern :metrics do
     resource :metrics, only: :show do
       get :stats
       get :cpu_chart
@@ -45,7 +45,7 @@ Rails.application.routes.draw do
           resources :restarts, only: :create
 
           concerns :log_streamable
-          concerns :metrizable
+          concerns :metrics
         end
       end
 
@@ -53,7 +53,7 @@ Rails.application.routes.draw do
         scope module: :services do
           resources :restarts, only: :create
           concerns :log_streamable
-          concerns :metrizable
+          concerns :metrics
         end
       end
 
@@ -66,29 +66,21 @@ Rails.application.routes.draw do
     post :retry, on: :member
   end
 
-  # Account settings
   resource :account, controller: "accounts/settings" do
     scope module: :accounts do
       resource :profile, only: :update
       resources :api_tokens, only: %i[index create destroy]
-      resource :github_integrations, only: %i[create destroy]
     end
   end
 
-  # Github events
   namespace :github do
-    resource :installation, only: %i[create destroy] do
+    get "app_registrations/callback", to: "app_registrations#callback", as: :app_registrations_callback
+    resources :installations, only: [:destroy] do
       get :callback, on: :collection
     end
-
-    resource :registration, only: [] do
-      get :callback, on: :collection
-    end
-
-    post ":token/events", to: "events#create", as: :events
+    resources :events, only: %i[create]
   end
 
-  # API
   namespace :api do
     namespace :v1 do
       resources :apps, only: %i[index show] do

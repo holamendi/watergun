@@ -12,9 +12,12 @@ class Account < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :users, through: :memberships
 
-  has_one :github_integration, class_name: "Github::Integration", dependent: :destroy
+  has_one :github_app, class_name: "Github::App", dependent: :destroy
+  has_one :github_installation, class_name: "Github::Installation", dependent: :destroy
 
   validates :name, presence: true
 
-  after_create :create_github_integration!
+  def github_app_manifest
+    @github_app_manifest ||= Github::AppManifest.new(account: self)
+  end
 end

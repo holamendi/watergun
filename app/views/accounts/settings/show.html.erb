@@ -22,7 +22,10 @@
       </div>
 
       <div class="md:col-span-2">
-        <%= render "accounts/github_integrations/settings", github_integration: Current.account.github_integration || Current.account.build_github_integration %>
+        <%= render "accounts/github/settings",
+                   github_app: Current.account.github_app,
+                   github_app_manifest: Current.account.github_app_manifest,
+                   github_installation: Current.account.github_installation %>
       </div>
     </div>
   </div>
