@@ -3,6 +3,8 @@ class Github::ProcessEventJob < ApplicationJob
 
   def perform(github_event)
     @github_event = github_event
+    return if @github_event.processed?
+
     @github_integration = github_event.github_integration
     @account = github_event.account
 

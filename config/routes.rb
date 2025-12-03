@@ -78,6 +78,7 @@ Rails.application.routes.draw do
     resources :installations, only: [:destroy] do
       get :callback, on: :collection
     end
+
     resources :events, only: %i[create]
   end
 

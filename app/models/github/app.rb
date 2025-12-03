@@ -1,7 +1,7 @@
 class Github::App < ApplicationRecord
   belongs_to :account
 
-  has_many :github_installations, class_name: "Github::Installation", foreign_key: :github_app_id, dependent: :destroy
+  has_many :installations, class_name: "Github::Installation", foreign_key: :github_app_id, dependent: :destroy
 
   def new_installation_url
     "#{html_url}/installations/new"
@@ -24,6 +24,6 @@ class Github::App < ApplicationRecord
   end
 
   def private_key
-    OpenSSL::PKey::RSA.new(pem)
+    @private_key ||= OpenSSL::PKey::RSA.new(private_key_pem)
   end
 end

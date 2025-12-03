@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_04_073612) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_14_064224) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -181,13 +181,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_073612) do
   create_table "github_events", force: :cascade do |t|
     t.integer "account_id", null: false
     t.datetime "created_at", null: false
-    t.integer "github_integration_id", null: false
+    t.integer "github_installation_id", null: false
     t.json "headers"
     t.json "payload"
     t.datetime "processed_at"
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_github_events_on_account_id"
-    t.index ["github_integration_id"], name: "index_github_events_on_github_integration_id"
+    t.index ["github_installation_id"], name: "index_github_events_on_github_installation_id"
   end
 
   create_table "github_installations", force: :cascade do |t|
@@ -394,7 +394,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_073612) do
   add_foreign_key "env_variables", "apps"
   add_foreign_key "github_apps", "accounts"
   add_foreign_key "github_events", "accounts"
-  add_foreign_key "github_events", "github_integrations"
   add_foreign_key "github_installations", "accounts"
   add_foreign_key "github_installations", "github_apps"
   add_foreign_key "github_repos", "accounts"
