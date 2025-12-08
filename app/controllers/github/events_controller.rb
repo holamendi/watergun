@@ -1,11 +1,11 @@
 class Github::EventsController < ApplicationController
-  skip_before_action :verify_authenticity_token
   skip_before_action :authenticate
+  skip_before_action :verify_authenticity_token
 
   def create
-    validate_signature!
+    verify_signature!
 
-    create_and_process_event! if valid_request?
+    create_and_process_event!
   ensure
     head :ok
   end
@@ -13,11 +13,11 @@ class Github::EventsController < ApplicationController
   private
 
   def installation
-    @installation ||= Github::Installation.find_by!(installation_id: event_payload.dig("installation", "id"))
+    @installation ||= github_app.installations.first
   end
 
   def github_app
-    @github_app ||= installation.github_app
+    @github_app ||= Github::App.find_by(app_id: github_app_id)
   end
 
   def event_payload
@@ -32,10 +32,10 @@ class Github::EventsController < ApplicationController
     request.headers["HTTP_X_HUB_SIGNATURE_256"]
   end
 
-  def valid_request?(webhook_secret)
+  def verify_signature!
     signature = "sha256=" + OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest.new("SHA256"),
-      @github_app.webhook_secret,
+      github_app.webhook_secret,
       request.body.read
     )
 
@@ -43,8 +43,7 @@ class Github::EventsController < ApplicationController
   end
 
   def create_and_process_event!
-    event = @installation.events.create!(
-      account: @github_integration.account,
+    event = installation.events.create!(
       headers: request.headers.to_h.slice(
         "HTTP_X_GITHUB_HOOK_ID",
         "HTTP_X_GITHUB_EVENT",

@@ -24,6 +24,6 @@ class Github::App < ApplicationRecord
   end
 
   def private_key
-    @private_key ||= OpenSSL::PKey::RSA.new(private_key_pem)
+    @private_key ||= OpenSSL::PKey::RSA.new(pem)
   end
 end

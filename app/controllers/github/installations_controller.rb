@@ -16,7 +16,7 @@ class Github::InstallationsController < ApplicationController
   end
 
   def destroy
-    github_installation = github_app.github_installations.find(params[:id])
+    github_installation = github_app.installations.find(params[:id])
     github_app.api_client.delete_installation(github_installation.installation_id)
     github_installation.destroy
     redirect_to account_path, notice: "Github App uninstalled"
