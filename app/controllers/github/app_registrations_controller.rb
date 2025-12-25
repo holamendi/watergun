@@ -1,9 +1,12 @@
 class Github::AppRegistrationsController < ApplicationController
   def callback
-    verify_state_param
-    conversion_response = HTTPX.post("https://api.github.com/app-manifests/#{params[:code]}/conversions")
+    unless valid_state?
+      return redirect_to root_path, alert: "Invalid state parameter"
+    end
 
-    if conversion_response.status == 201
+    conversion_response = HTTP.post("https://api.github.com/app-manifests/#{params[:code]}/conversions")
+
+    if conversion_response.code == 201
       github_app = create_github_app!(conversion_response)
       redirect_to github_app.new_installation_url, allow_other_host: true
     else
@@ -14,12 +17,8 @@ class Github::AppRegistrationsController < ApplicationController
 
   private
 
-  def verify_state_param
-    account_from_state = Account.find_signed!(params[:state], purpose: :github_app_registration)
-    return if Current.account == account_from_state
-
-    flash[:error] = "Invalid state"
-    redirect_to account_path
+  def valid_state?
+    Current.account = Account.find_signed!(params[:state], purpose: :github_app_registration)
   end
 
   def create_github_app!(conversion_response)

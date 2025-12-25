@@ -1,0 +1,30 @@
+push_event:
+  account: default
+  installation: default
+  headers:
+    HTTP_X_GITHUB_EVENT: "push"
+    HTTP_X_GITHUB_DELIVERY: "12345-67890-abcdef"
+    HTTP_X_GITHUB_HOOK_ID: "123456789"
+    HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_ID: "123456"
+    HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_TYPE: "integration"
+  payload:
+    ref: "refs/heads/main"
+    after: "abc123def456"
+    repository:
+      full_name: "holamendi/smol-roda"
+
+processed_event:
+  account: default
+  installation: default
+  headers:
+    HTTP_X_GITHUB_EVENT: "push"
+    HTTP_X_GITHUB_DELIVERY: "def456-ghi789-jklmno"
+    HTTP_X_GITHUB_HOOK_ID: "123456789"
+    HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_ID: "123456"
+    HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_TYPE: "integration"
+  payload:
+    ref: "refs/heads/main"
+    after: "def456ghi789"
+    repository:
+      full_name: "holamendi/smol-roda"
+  processed_at: <%= 1.hour.ago %>

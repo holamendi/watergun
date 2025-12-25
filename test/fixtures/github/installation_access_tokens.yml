@@ -1,11 +1,11 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+valid:
+  account: default
+  installation: default
+  token: "ghs_test_token_valid_1234567890"
+  expires_at: <%= 1.hour.from_now %>
 
-# one:
-#   github/installation: one
-#   token: MyString
-#   expires_at: 2025-12-08 10:25:55
-
-# two:
-#   github/installation: two
-#   token: MyString
-#   expires_at: 2025-12-08 10:25:55
+expired:
+  account: default
+  installation: expired_token
+  token: "ghs_test_token_expired_1234567890"
+  expires_at: <%= 1.hour.ago %>

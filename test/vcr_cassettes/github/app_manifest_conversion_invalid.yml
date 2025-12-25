@@ -1,0 +1,21 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.github.com/app-manifests/invalid_code/conversions
+    body:
+      encoding: UTF-8
+      string: ''
+    headers: {}
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"message":"Not Found"}'
+  recorded_at: Tue, 24 Dec 2024 12:00:00 GMT
+recorded_with: VCR 6.0.0

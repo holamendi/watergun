@@ -39,7 +39,9 @@ class Github::EventsController < ApplicationController
       request.body.read
     )
 
-    Rack::Utils.secure_compare(signature, request.headers["HTTP_X_HUB_SIGNATURE_256"])
+    return if Rack::Utils.secure_compare(signature, request.headers["HTTP_X_HUB_SIGNATURE_256"])
+
+    raise ActionController::BadRequest, "Invalid signature"
   end
 
   def create_and_process_event!

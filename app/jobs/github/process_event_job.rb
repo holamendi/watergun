@@ -14,7 +14,9 @@ class Github::ProcessEventJob < ApplicationJob
     when "installation.created"
       # No-op for now
     when "installation.deleted"
+      github_event.update_column(:processed_at, Time.current)
       @github_installation.destroy
+      return
     end
 
     github_event.touch(:processed_at)

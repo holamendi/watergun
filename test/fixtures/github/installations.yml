@@ -1,13 +1,11 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+default:
+  account: default
+  github_app: default
+  installation_id: 987654321
+  login: "holamendi"
 
-# one:
-#   account: one
-#   github/app: one
-#   installation_id: 1
-#   account_login: MyString
-
-# two:
-#   account: two
-#   github/app: two
-#   installation_id: 1
-#   account_login: MyString
+expired_token:
+  account: default
+  github_app: default
+  installation_id: 987654322
+  login: "testuser"
