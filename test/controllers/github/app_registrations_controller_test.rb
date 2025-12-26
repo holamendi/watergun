@@ -13,10 +13,24 @@ class Github::AppRegistrationsControllerTest < ActionDispatch::IntegrationTest
     state = @account.signed_id(purpose: :github_app_registration)
     code = "test_manifest_code_123"
 
-    VCR.use_cassette("github/app_manifest_conversion") do
-      assert_difference -> { Github::App.count }, 1 do
-        get github_app_registrations_callback_url, params: {code: code, state: state}
-      end
+    response_body = {
+      id: 123456,
+      name: "Watergun Test App",
+      slug: "watergun-test-app",
+      html_url: "https://github.com/apps/watergun-test-app",
+      client_id: "Iv1.1234567890abcdef",
+      client_secret: "test_client_secret_1234567890",
+      pem: OpenSSL::PKey::RSA.new(2048).to_pem,
+      webhook_secret: "test_webhook_secret_abc123",
+      permissions: {checks: "read", contents: "read"},
+      events: ["check_suite", "push"]
+    }
+
+    stub_request(:post, "https://api.github.com/app-manifests/#{code}/conversions")
+      .to_return(status: 201, body: response_body.to_json, headers: {"Content-Type" => "application/json"})
+
+    assert_difference -> { Github::App.count }, 1 do
+      get github_app_registrations_callback_url, params: {code: code, state: state}
     end
 
     github_app = @account.reload.github_app
@@ -34,10 +48,11 @@ class Github::AppRegistrationsControllerTest < ActionDispatch::IntegrationTest
     state = @account.signed_id(purpose: :github_app_registration)
     code = "invalid_code"
 
-    VCR.use_cassette("github/app_manifest_conversion_invalid") do
-      assert_no_difference -> { Github::App.count } do
-        get github_app_registrations_callback_url, params: {code: code, state: state}
-      end
+    stub_request(:post, "https://api.github.com/app-manifests/#{code}/conversions")
+      .to_return(status: 404, body: {message: "Not Found"}.to_json, headers: {"Content-Type" => "application/json"})
+
+    assert_no_difference -> { Github::App.count } do
+      get github_app_registrations_callback_url, params: {code: code, state: state}
     end
 
     assert_redirected_to account_path
@@ -58,7 +73,8 @@ class Github::AppRegistrationsControllerTest < ActionDispatch::IntegrationTest
     state = other_account.signed_id(purpose: :github_app_registration)
     code = "test_code"
 
-    # No HTTP stub needed - should redirect before making any API calls
+    stub_request(:post, "https://api.github.com/app-manifests/#{code}/conversions")
+      .to_return(status: 404, body: {message: "Not Found"}.to_json, headers: {"Content-Type" => "application/json"})
 
     get github_app_registrations_callback_url, params: {code: code, state: state}
 
