@@ -1,0 +1,43 @@
+default:
+  account: default
+  app_id: 123456
+  name: "Watergun Test App"
+  slug: "watergun-test-app"
+  html_url: "https://github.com/apps/watergun-test-app"
+  client_id: "Iv1.1234567890abcdef"
+  client_secret: "test_client_secret_1234567890"
+  pem: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEA2ILxSU9liOPIr++ePyNOLpcdgehV2kk41zNSvN9Ptyv+SM7T
+    yd5RtFtM/DwNMmKD+PQekN2H1sJFQv0cQwG9f49fptdc6KX2lNuBH0+AcCtOE7u8
+    y97bHBvpqM+bXw+6HhzYEBwdlsJvwu/yTnfmTaIWoYEOjFWvq72+86nWe1a1Y/jx
+    Y2jEyxeYGERk14PAt+LMMk7IFk4/1O9KCaE2CBoF8Qou9KJmHFCFpXg3Lmy2/LdQ
+    CBnBE/rsFZWqepvJ4hvNOmXbIo98u4JjFVRJ+1beTkfVXMR4ZbjBZn8X4/JWcoQE
+    1rnzJUXrQRy8heHglf2k3OumebOfEnHSRdSQIwIDAQABAoIBADP6y97j1uaUeTvz
+    9TQHT9/Tm9vyYZo0dhcEVVrO6h55y2TDcwlF/KumN8dey3RLPo/oW+Y/qTsgDOzW
+    Q5C6vDoBu98cWUvpfFekk01nEtjbLLWEHwF7EXOgJ+rFXPHnnrFYD29esKPfLmHI
+    pY29L2d4AKLpjwqWD8TVmyB4p+uYJminFxdKVN/TvFTqN2Jm7irDHInt3CS3oFHy
+    NcLNzyRnZZ4sF65T/kTbJ+OjbFUtTj+NDQ62nVA80015f2QJCaJM0kQHupMvE/42
+    rcC/SaUflvZDoiI7r9yBuNSc8KIlk29ZNuPlAO0wUbBghJ6iTeGPx7fEsoOSuPou
+    S0kR2pECgYEA94G0/7MIJe1Gy8Bx24j9DHLHEkz7TCMIMnafzXzRKAMIwO9Y0rVF
+    N6Yj0IS5FKaRShyD4PjXJS087T5JjRytrBCdX3Vc+HLT0TF3DVi/Ypl3rVM0Qfzj
+    R5uXHf4/Qbpn19ahR02JsLztBV8UagI7MWwcS35fKF8qIxnAD30AwKcCgYEA3/Dz
+    FXpWExmuXgS8gFC73e1sDHfJYQeM6N1G3jBnPbivWnVIe6zepwMeeZj22HUm5a/C
+    PxDDLZLREm0BYvJ5ChOkbW4u0YXCxwPukbgS9hWLCfdsFKl9hBdj97cqPdpM3mUC
+    0mi/MtmR1Jej8x4sWrB5r2pBvcgwLs1UPyqgiCUCgYEAkQOABujgd0hEWJDSpOvo
+    R2jgVkqgWgWUgeyayIy/BxBwCoqxohLvESHYjg2VWxIUwjVe12s0suWEcwQxl+ob
+    n1rEue9Ln423qTOwKzO6PozoX7cGQTtn9sakjcAvU9VhjkaEjABUEic/QAxrK4lP
+    IS/UjC7olgDb8WDe9LQqwrUCgYB46+aWpmRsE+XvpqcSsoV/JIC/ir8Wwbj41OM7
+    fu+AiIVHVyU4gvQHQsvl5Q8FetzyEaHV4/tAVJLIXEvvXfa11j1nSaPGR3ARfrIH
+    xVmXv7JAQ3X9AjhgZzD3xdPtaj8vp2OKsjzr/Eeef/Nrh9NzdO+AJOQy0jISU5U2
+    NpJQcQKBgBNl8Q0rR5K3UXHSUi2Z3nuG+8/ko8zVNpLLthu0VLB4SWzZKq68BvdV
+    +lWYn+YdvgdjCpTK9hCkYGU1lcytEmSm+JpxAgWuBfR2D5GPtpbLbqAW56PoTH3g
+    Im14GrUkC2mSu2s84dNz4aei/GM0mWdXVbl/vyNtUarBLdfOzeyl
+    -----END RSA PRIVATE KEY-----
+  webhook_secret: "test_webhook_secret_abc123"
+  permissions:
+    checks: "read"
+    contents: "read"
+  events:
+    - "check_suite"
+    - "push"

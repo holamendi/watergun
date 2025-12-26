@@ -1,0 +1,11 @@
+valid:
+  account: default
+  installation: default
+  token: "ghs_test_token_valid_1234567890"
+  expires_at: <%= 1.hour.from_now %>
+
+expired:
+  account: default
+  installation: expired_token
+  token: "ghs_test_token_expired_1234567890"
+  expires_at: <%= 1.hour.ago %>

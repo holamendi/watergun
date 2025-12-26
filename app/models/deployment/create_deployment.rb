@@ -12,7 +12,7 @@ class Deployment::CreateDeployment
   def save!
     validate!
 
-    deployment = app.deployments.create!(deployment_attributes)
+    deployment = app.deployments.create!(github_event:, **deployment_attributes)
     ServerActions::DeployApp.run_later!(app.server, deployment)
     deployment
   end
@@ -42,7 +42,7 @@ class Deployment::CreateDeployment
   end
 
   def github_api_client
-    app.github_integration.api_client
+    @github_api_client ||= app.account.github_installation.api_client
   end
 
   def validate_commit_sha

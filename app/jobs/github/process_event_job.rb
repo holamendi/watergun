@@ -3,19 +3,20 @@ class Github::ProcessEventJob < ApplicationJob
 
   def perform(github_event)
     @github_event = github_event
-    @github_integration = github_event.github_integration
+    return if @github_event.processed?
+
+    @github_installation = @github_event.installation
     @account = github_event.account
 
     case github_event.slug
     when "push"
       create_deployments!
     when "installation.created"
-      @github_integration.install!(
-        installation_id: @github_event.payload.dig("installation", "id"),
-        account_login: @github_event.payload.dig("installation", "account", "login")
-      )
+      # No-op for now
     when "installation.deleted"
-      @github_integration.uninstall!
+      github_event.update_column(:processed_at, Time.current)
+      @github_installation.destroy
+      return
     end
 
     github_event.touch(:processed_at)
@@ -28,7 +29,7 @@ class Github::ProcessEventJob < ApplicationJob
     branch = @github_event.payload["ref"].split("/").last
     commit_sha = @github_event.payload["after"]
 
-    @account.github_repos.kept.where(repo:, branch:, webhook_deploy: true).each do |github_repo|
+    @account.github_repos.where(repo:, branch:, webhook_deploy: true).each do |github_repo|
       Deployment::CreateDeployment.new(app: github_repo.app, commit_sha:).save!
     end
   end
