@@ -17,15 +17,15 @@ class Github::EventsController < ApplicationController
   end
 
   def github_app
-    @github_app ||= Github::App.find_by(app_id: github_app_id)
+    @github_app ||= if (account_id = params[:id].presence)
+      Github::App.find_by!(account_id:)
+    else
+      Github::App.find_by!(account_id: nil)
+    end
   end
 
   def event_payload
     @event_payload ||= JSON.parse(request.body.read)
-  end
-
-  def github_app_id
-    request.headers["HTTP_X_GITHUB_HOOK_INSTALLATION_TARGET_ID"]
   end
 
   def event_signature

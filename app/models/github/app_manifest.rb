@@ -31,7 +31,9 @@ class Github::AppManifest
       setup_url: callback_github_installations_url,
       default_permissions: DEFAULT_PERMISSIONS,
       default_events: DEFAULT_EVENTS,
-      hook_attributes: {url: github_events_url}
+      hook_attributes: {
+        url: github_events_url(id: @account.id)
+      }
     }.to_json
   end
 

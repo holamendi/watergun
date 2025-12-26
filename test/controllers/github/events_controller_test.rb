@@ -2,6 +2,7 @@ require "test_helper"
 
 class Github::EventsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @account = accounts(:default)
     @github_app = github_apps(:default)
     @installation = github_installations(:default)
     @webhook_secret = @github_app.webhook_secret
@@ -18,7 +19,7 @@ class Github::EventsControllerTest < ActionDispatch::IntegrationTest
     signature = generate_github_webhook_signature(payload_json, @webhook_secret)
 
     assert_difference -> { Github::Event.count }, 1 do
-      post github_events_url,
+      post github_events_url(id: @account.id),
         params: payload_json,
         headers: github_webhook_headers("push", @github_app.app_id, signature).merge({
           "Content-Type" => "application/json"
@@ -44,7 +45,7 @@ class Github::EventsControllerTest < ActionDispatch::IntegrationTest
     signature = generate_github_webhook_signature(payload_json, @webhook_secret)
 
     assert_enqueued_with(job: Github::ProcessEventJob) do
-      post github_events_url,
+      post github_events_url(id: @account.id),
         params: payload_json,
         headers: github_webhook_headers("push", @github_app.app_id, signature).merge({
           "Content-Type" => "application/json"
@@ -57,7 +58,7 @@ class Github::EventsControllerTest < ActionDispatch::IntegrationTest
     invalid_signature = "sha256=invalid_signature_abc123"
 
     assert_no_difference -> { Github::Event.count } do
-      post github_events_url,
+      post github_events_url(id: @account.id),
         params: payload_json,
         headers: github_webhook_headers("push", @github_app.app_id, invalid_signature).merge({
           "Content-Type" => "application/json"
@@ -77,7 +78,7 @@ class Github::EventsControllerTest < ActionDispatch::IntegrationTest
     signature = generate_github_webhook_signature(payload_json, @webhook_secret)
 
     assert_difference -> { Github::Event.count }, 1 do
-      post github_events_url,
+      post github_events_url(id: @account.id),
         params: payload_json,
         headers: github_webhook_headers("installation", @github_app.app_id, signature).merge({
           "Content-Type" => "application/json"
