@@ -1,6 +1,7 @@
 class Github::EventsController < ApplicationController
+  skip_forgery_protection
+
   skip_before_action :authenticate
-  skip_before_action :verify_authenticity_token
 
   def create
     verify_signature!
