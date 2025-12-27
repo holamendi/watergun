@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ankane/groupdate.git
-  revision: e82664ff8f1174a1bd190fd381ee76757880f982
+  revision: 520f223b1b9393c6fae99de92cdf9cf0a6da2597
   branch: master
   specs:
     groupdate (6.7.0)
@@ -155,9 +155,7 @@ GEM
       net-http (~> 0.5)
     faraday-retry (2.4.0)
       faraday (~> 2.0)
-    ffi (1.17.2-aarch64-linux-gnu)
-    ffi (1.17.2-arm64-darwin)
-    ffi (1.17.2-x86_64-linux-gnu)
+    ffi (1.17.2)
     ffi-compiler (1.3.2)
       ffi (>= 1.15.5)
       rake
@@ -215,7 +213,7 @@ GEM
     marcel (1.1.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (6.0.0)
+    minitest (6.0.1)
       prism (~> 1.5)
     minitest-spec-rails (7.4.1)
       minitest (>= 5.0)
@@ -247,11 +245,8 @@ GEM
       net-protocol
     net-ssh (7.3.0)
     nio4r (2.7.5)
-    nokogiri (1.18.10-aarch64-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.18.10-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.18.10-x86_64-linux-gnu)
+    nokogiri (1.18.10)
+      mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     octokit (10.0.0)
       faraday (>= 1, < 3)
@@ -424,6 +419,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-24
+  arm64-darwin-25
   x86_64-linux
 
 DEPENDENCIES
@@ -469,7 +465,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 3.4.4p34
+   ruby 4.0.0p0
 
 BUNDLED WITH
    2.5.22
