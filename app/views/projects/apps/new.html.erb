@@ -8,7 +8,7 @@
   </div>
   <div class="flex justify-center">
     <div class="w-full max-w-lg">
-      <% if Current.account.github_integration.app_installed? %>
+      <% if Current.account.github_installation.present? %>
         <%= render "projects/apps/create_form", create_app: @create_app %>
       <% else %>
         <%= button_to "Connect Github account", github_installation_path, class: "btn btn-primary rounded-full", data: { turbo: false } %>
