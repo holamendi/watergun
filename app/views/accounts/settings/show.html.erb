@@ -3,8 +3,8 @@
 <%= container do %>
   <%= page_header(@title) %>
 
-  <div class="space-y-10 divide-y divide-base-300">
-    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+  <div class="divide-y divide-base-300">
+    <div class="grid grid-cols-1 pb-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
         <h2 class="text-base font-semibold leading-7">Profile</h2>
         <p class="mt-1 text-sm leading-6 text-base-content/60">Update your personal information.</p>
@@ -15,7 +15,18 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
+      <div>
+        <h2 class="text-base font-semibold leading-7">Appearance</h2>
+        <p class="mt-1 text-sm leading-6 text-base-content/60">Customize how Watergun looks for you.</p>
+      </div>
+
+      <div class="md:col-span-2">
+        <%= render "accounts/themes/form", user: Current.user %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
         <h2 class="text-base font-semibold leading-7">GitHub Integration</h2>
         <p class="mt-1 text-sm leading-6 text-base-content/60">Connect your GitHub account for seamless integration.</p>

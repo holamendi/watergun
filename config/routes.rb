@@ -69,6 +69,7 @@ Rails.application.routes.draw do
   resource :account, controller: "accounts/settings" do
     scope module: :accounts do
       resource :profile, only: :update
+      resource :theme, only: :update
       resources :api_tokens, only: %i[index create destroy]
     end
   end
