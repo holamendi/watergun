@@ -32,7 +32,7 @@ module UiHelper
       yellow: "badge-warning"
     }
 
-    content_tag :span, text, class: "badge #{color_classes[color]}"
+    content_tag :span, text, class: "badge badge-sm #{color_classes[color]}"
   end
 
   def status_badge(status)
@@ -62,10 +62,10 @@ module UiHelper
 
   def submit_button(text)
     button_tag text,
-      class: "btn btn-primary",
+      class: "btn btn-primary btn-sm",
       data: {
         turbo_submits_with: tag.span(class: "flex items-center gap-2") do
-          concat tag.span(class: "loading loading-spinner loading-sm")
+          concat tag.span(class: "loading loading-spinner loading-xs")
           concat text
         end
       }

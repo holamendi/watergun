@@ -4,7 +4,7 @@
 <% breadcrumbs << [@service.name, project_service_path(@project, @service)] if @service&.persisted? %>
 
 <% if breadcrumbs.any? %>
-  <div class="breadcrumbs text-sm">
+  <div class="breadcrumbs text-sm font-mono">
     <ul>
       <% breadcrumbs.each do |(title, url)| %>
         <li>
