@@ -1,15 +1,11 @@
 <%= form_with(model: project, class: "space-y-4") do |form| %>
-  <div class="space-y-8">
-    <div class="sm:col-span-4">
-      <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-      <div class="mt-2">
-        <%= form.text_field :name, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm" %>
-      </div>
-      <%= error_messages_for(project, :name) %>
-    </div>
-  </div>
-  <div class="flex gap-2">
-    <%= link_to "Cancel", projects_path, class: "rounded-md border border-transparent py-2 px-4 text-sm font-medium text-gray-700 focus:ring-teal-500 focus:ring-offset-2" %>
-    <%= submit_button "Save project" %>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Project name</legend>
+    <%= form.text_field :name, class: "input w-full", placeholder: "my-awesome-project", autofocus: true %>
+    <%= error_messages_for(project, :name) %>
+  </fieldset>
+  <div class="flex justify-end gap-2 pt-2">
+    <%= link_to "Cancel", projects_path, class: "btn btn-ghost" %>
+    <%= submit_button "Create project" %>
   </div>
 <% end %>

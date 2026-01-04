@@ -9,7 +9,7 @@ module FormsHelper
     tag.div do
       safe_join(
         messages.map do |message|
-          tag.span(message, class: "text-sm text-red-500")
+          tag.span(message, class: "text-sm text-error")
         end
       )
     end

@@ -1,30 +1,15 @@
-<div class="relative inline-block text-left" data-controller="dropdown">
-  <div>
-    <button type="button"
-            data-action="dropdown#toggle click@window->dropdown#hide"
-            class="<%= button_classes || "inline-flex w-full justify-center gap-x-1.5 rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600" %>"
-            aria-expanded="false"
-            aria-haspopup="true">
-      <%= text %>
-      <svg class="w-5 h-5 -mr-1 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-      </svg>
-    </button>
+<div class="dropdown dropdown-end">
+  <div tabindex="0"
+       role="button"
+       class="<%= button_classes || "btn btn-primary" %>">
+    <%= text %>
+    <svg class="w-5 h-5 -mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+    </svg>
   </div>
-  <div data-dropdown-target="menu"
-       class="absolute right-0 z-10 w-56 mt-2 transition origin-top-right transform bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-       data-transition-enter-from="opacity-0 scale-95"
-       data-transition-enter-to="opacity-100 scale-100"
-       data-transition-leave-from="opacity-100 scale-100"
-       data-transition-leave-to="opacity-0 scale-95"
-       role="menu"
-       aria-orientation="vertical"
-       aria-labelledby="new-resource-menu-button"
-       tabindex="-1">
-    <div class="py-1" role="none">
-      <% items.each do |item| %>
-        <%= item %>
-      <% end %>
-    </div>
-  </div>
+  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-56 p-2 shadow-lg">
+    <% items.each do |item| %>
+      <li><%= item %></li>
+    <% end %>
+  </ul>
 </div>

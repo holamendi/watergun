@@ -31,48 +31,42 @@ class UiHelperTest < ActionView::TestCase
     result = badge("Test Badge", color: :blue)
     assert_match(/span/, result)
     assert_match(/Test Badge/, result)
-    assert_match(/bg-blue-400\/10/, result)
-    assert_match(/text-blue-400/, result)
-    assert_match(/ring-blue-400\/30/, result)
+    assert_match(/badge/, result)
+    assert_match(/badge-info/, result)
   end
 
-  test "badge uses gray as default color" do
+  test "badge uses neutral as default color" do
     result = badge("Test Badge")
-    assert_match(/bg-gray-400\/10/, result)
-    assert_match(/text-gray-400/, result)
-    assert_match(/ring-gray-400\/20/, result)
+    assert_match(/badge/, result)
+    assert_match(/badge-neutral/, result)
   end
 
   test "status_badge maps status to correct color" do
     {
-      "deploying" => :blue,
-      "error" => :red,
-      "pending" => :yellow,
-      "success" => :green
-    }.each do |status, color|
+      "deploying" => "badge-info",
+      "error" => "badge-error",
+      "pending" => "badge-warning",
+      "success" => "badge-success"
+    }.each do |status, badge_class|
       result = status_badge(status)
       assert_match(/#{status.humanize}/, result)
-      color_class = case color
-      when :blue then "bg-blue-400"
-      when :red then "bg-red-400"
-      when :yellow then "bg-yellow-400"
-      when :green then "bg-green-500"
-      end
-      assert_match(/#{color_class}/, result)
+      assert_match(/#{badge_class}/, result)
     end
   end
 
-  test "spinner generates svg with correct attributes" do
-    svg = spinner(size: "4", color: "red-500")
-    assert_match(/svg/, svg)
-    assert_match(/size-4/, svg)
-    assert_match(/text-red-500/, svg)
+  test "spinner generates span with loading classes" do
+    span = spinner(size: "4", color: "white")
+    assert_match(/span/, span)
+    assert_match(/loading/, span)
+    assert_match(/loading-spinner/, span)
+    assert_match(/loading-xs/, span)
   end
 
   test "submit_button generates button with correct attributes" do
     button = submit_button "Save"
     assert_match(/button/, button)
     assert_match(/Save/, button)
+    assert_match(/btn btn-primary/, button)
     assert_match(/data-turbo-submits-with/, button)
   end
 end

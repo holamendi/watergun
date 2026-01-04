@@ -1,10 +1,10 @@
 <%= form_with model: [env_variable.project, env_variable.app, env_variable], class: "w-full" do |form| %>
   <div class="sm:flex">
-    <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
+    <dt class="font-medium sm:w-64 sm:flex-none sm:pr-6">
       <% if form.object.new_record? %>
         <div class="relative">
           <%= form.text_field :name,
-              class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm",
+              class: "input input-sm w-full",
               placeholder: "NAME",
               autofocus: true %>
           <%= error_messages_for(form.object, :name) %>
@@ -18,14 +18,14 @@
     <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
       <div class="flex-grow max-w-[400px]">
         <%= form.text_field :value,
-            class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm",
+            class: "input input-sm w-full",
             placeholder: "Value",
             autofocus: form.object.persisted? %>
         <%= error_messages_for(form.object, :value) %>
       </div>
-      <div class="flex-shrink-0">
+      <div class="flex-shrink-0 flex gap-2">
         <%= submit_button "Save variables" %>
-        <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "rounded-md border border-transparent py-2 px-4 text-sm font-medium text-gray-700 focus:ring-teal-500 focus:ring-offset-2" %>
+        <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "btn btn-ghost btn-sm" %>
       </div>
     </dd>
   </div>

@@ -4,38 +4,34 @@
 <%= render "tabs", app: @app %>
 
 <%= container do %>
-  <div class="space-y-10 divide-y divide-gray-900/10">
-    <div class="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+  <div class="divide-y divide-base-300">
+    <div class="grid grid-cols-1 gap-x-8 gap-y-8 pb-10 md:grid-cols-3">
       <div>
-        <h2 class="text-base font-semibold leading-7 text-gray-900">General</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+        <h2 class="text-base font-semibold leading-7">General</h2>
       </div>
       <div class="md:col-span-2">
         <%= render "form", app: @app %>
       </div>
     </div>
-    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
-        <h2 class="text-base font-semibold leading-7 text-gray-900">Github Repository</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+        <h2 class="text-base font-semibold leading-7">Github Repository</h2>
       </div>
       <div class="md:col-span-2">
         <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
       </div>
     </div>
-    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
-        <h2 class="text-base font-semibold leading-7 text-gray-900">Builder</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+        <h2 class="text-base font-semibold leading-7">Builder</h2>
       </div>
       <div class="md:col-span-2">
         <%= render "projects/apps/builders/form", app: @app %>
       </div>
     </div>
-    <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
-        <h2 class="text-base font-semibold leading-7 text-gray-900">Domains</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+        <h2 class="text-base font-semibold leading-7">Domains</h2>
       </div>
       <div class="md:col-span-2">
         <%= render "projects/apps/domains/domains", app: @app %>
@@ -43,12 +39,11 @@
     </div>
     <div class="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
       <div>
-        <h2 class="text-base font-semibold leading-7 text-gray-900">Delete App</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600"></p>
+        <h2 class="text-base font-semibold leading-7">Delete App</h2>
       </div>
       <div class="md:col-span-2">
-        <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-400", data: { turbo_confirm: "Sure?"} %>
+        <%= button_to "Delete App", project_app_path(@project, @app), method: :delete, class: "btn btn-error", data: { turbo_confirm: "Sure?"} %>
       </div>
     </div>
-</div>
+  </div>
 <% end %>
