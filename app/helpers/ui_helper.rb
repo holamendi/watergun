@@ -19,19 +19,20 @@ module UiHelper
     render "shared/page_header", title: title, actions: actions.presence || ""
   end
 
-  def badge(text, color: :gray)
+  def badge(text, color: :neutral)
     color_classes = {
-      blue: "bg-blue-400/10 text-blue-400 ring-blue-400/30",
-      gray: "bg-gray-400/10 text-gray-400 ring-gray-400/20",
-      green: "bg-green-500/10 text-green-400 ring-green-500/20",
-      indigo: "bg-indigo-400/10 text-indigo-400 ring-indigo-400/30",
-      pink: "bg-pink-400/10 text-pink-400 ring-pink-400/20",
-      purple: "bg-purple-400/10 text-purple-400 ring-purple-400/30",
-      red: "bg-red-400/10 text-red-400 ring-red-400/20",
-      yellow: "bg-yellow-400/10 text-yellow-500 ring-yellow-400/20"
+      blue: "badge-info",
+      gray: "badge-neutral",
+      neutral: "badge-neutral",
+      green: "badge-success",
+      indigo: "badge-primary",
+      pink: "badge-secondary",
+      purple: "badge-accent",
+      red: "badge-error",
+      yellow: "badge-warning"
     }
 
-    content_tag :span, text, class: "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset #{color_classes[color]}"
+    content_tag :span, text, class: "badge #{color_classes[color]}"
   end
 
   def status_badge(status)
@@ -46,35 +47,25 @@ module UiHelper
     badge(status.humanize, color: status_mapping[status])
   end
 
-  def spinner(size: "5", color: "gray-500")
-    tag.svg(
-      class: "size-#{size} text-#{color} animate-spin",
-      xmlns: "http://www.w3.org/2000/svg",
-      fill: "none",
-      viewBox: "0 0 24 24"
-    ) do
-      concat tag.circle(
-        class: "opacity-25",
-        cx: "12",
-        cy: "12",
-        r: "10",
-        stroke: "currentColor",
-        "stroke-width": "4"
-      )
-      concat tag.path(
-        class: "opacity-75",
-        fill: "currentColor",
-        d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      )
+  def spinner(size: "md", color: nil)
+    size_class = case size.to_s
+    when "3", "4", "xs" then "loading-xs"
+    when "5", "sm" then "loading-sm"
+    when "6", "md" then "loading-md"
+    else "loading-lg"
     end
+
+    color_class = color == "white" ? "text-white" : ""
+
+    tag.span(class: "loading loading-spinner #{size_class} #{color_class}".strip)
   end
 
   def submit_button(text)
     button_tag text,
-      class: "rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600",
+      class: "btn btn-primary",
       data: {
-        turbo_submits_with: tag.span(class: "flex items-center gap-x-2") do
-          concat spinner(color: "white")
+        turbo_submits_with: tag.span(class: "flex items-center gap-2") do
+          concat tag.span(class: "loading loading-spinner loading-sm")
           concat text
         end
       }

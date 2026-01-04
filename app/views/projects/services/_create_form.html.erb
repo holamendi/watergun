@@ -1,14 +1,14 @@
 <%= form_with model: create_service, scope: :create_service, url: project_services_path(create_service.project), method: :post, id: "service_form" do |form| %>
-  <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+  <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
     <div class="sm:col-span-6">
-      <%= form.label :service_type, class: "block text-sm font-medium leading-6 text-gray-900" %>
-      <div class="mt-2">
-        <%= form.select :service_type, Service.service_types.keys.map { |key| [key.titleize, key] }, {}, class: "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" %>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Service Type</legend>
+        <%= form.select :service_type, Service.service_types.keys.map { |key| [key.titleize, key] }, {}, class: "select w-full" %>
         <%= error_messages_for create_service, :service_type %>
-      </div>
+      </fieldset>
     </div>
     <div class="flex items-center mt-8 gap-x-6">
-      <%= link_to "Cancel", project_path(create_service.project), class: "text-sm font-semibold leading-6 text-gray-900" %>
+      <%= link_to "Cancel", project_path(create_service.project), class: "btn btn-ghost" %>
       <%= submit_button "Save" %>
     </div>
   </div>

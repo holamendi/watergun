@@ -12,12 +12,12 @@
       <% end %>
     </div>
   </div>
-    <ul id="deployments" role="list" class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+    <ul id="deployments" role="list" class="card bg-base-100 shadow-sm divide-y divide-base-200">
       <%= render @deployments %>
     </ul>
   <% else %>
     <div class="mt-8">
-      <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" %>
+      <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "btn btn-primary" %>
     </div>
   <% end %>
 <% end %>

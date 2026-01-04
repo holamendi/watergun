@@ -2,13 +2,14 @@
 
 <%= container do %>
   <div class="flex justify-center">
-    <div class="w-full max-w-lg">
-      <%= page_header(@title) %>
-    </div>
-  </div>
-  <div class="flex justify-center">
-    <div class="w-full max-w-lg">
-      <%= render "form", project: @project %>
+    <div class="w-full max-w-md">
+      <div class="card bg-base-200 border border-base-300">
+        <div class="card-body">
+          <h2 class="card-title text-xl">Create a new project</h2>
+          <p class="text-base-content/60 text-sm mb-4">Projects group apps and services that are deployed together on a server.</p>
+          <%= render "form", project: @project %>
+        </div>
+      </div>
     </div>
   </div>
 <% end %>

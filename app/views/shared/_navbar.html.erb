@@ -1,48 +1,29 @@
-<nav class="mb-6 bg-white border-b border-gray-200">
+<nav class="bg-base-200 border-b border-base-300 mb-6">
   <%= container do %>
     <div class="flex justify-between h-12">
-      <div class="flex">
-        <div class="flex items-center flex-shrink-0">
-          <%= link_to projects_path, class: "pr-4" do %>
-            <svg class="w-auto h-4 fill-teal-600" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
-              <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
-            </svg>
-          <% end %>
-          <%= render "shared/breadcrumbs" %>
-        </div>
+      <div class="flex items-center">
+        <%= link_to projects_path, class: "pr-4" do %>
+          <svg class="w-auto h-4 fill-primary" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
+            <path d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
+          </svg>
+        <% end %>
+        <%= render "shared/breadcrumbs" %>
       </div>
-      <div class="flex items-center ml-6">
-        <div class="relative ml-3" data-controller="dropdown">
-          <div>
-            <button type="button"
-                    data-action="dropdown#toggle click@window->dropdown#hide"
-                    class="relative flex items-center max-w-xs text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-              <span class="absolute -inset-1.5"></span>
-              <span class="sr-only">Open user menu</span>
-              <span class="inline-block w-8 h-8 overflow-hidden bg-gray-100 rounded-full">
-                <svg class="w-full h-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </span>
-            </button>
+      <div class="flex items-center">
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+            <div class="w-8 rounded-full bg-base-300">
+              <svg class="w-full h-full text-base-content/30" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
           </div>
-          <div data-dropdown-target="menu"
-               class="absolute right-0 z-10 hidden w-48 py-1 mt-2 transition origin-top-right transform bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-               data-transition-enter-from="opacity-0 scale-95"
-               data-transition-enter-to="opacity-100 scale-100"
-               data-transition-leave-from="opacity-100 scale-100"
-               data-transition-leave-to="opacity-0 scale-95"
-               role="menu"
-               aria-orientation="vertical"
-               aria-labelledby="user-menu-button"
-               tabindex="-1">
-            <%= link_to "Settings", account_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
-            <%= link_to "Server actions", server_actions_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
-            <%= link_to "Solid Queue", "/jobs", target: :_blank, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
-            <%= link_to "Sign out", logout_path, data: { turbo_method: :delete }, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", role: "menuitem", tabindex: "-1" %>
-          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-10 w-48 p-2 shadow-lg">
+            <li><%= link_to "Settings", account_path %></li>
+            <li><%= link_to "Server actions", server_actions_path %></li>
+            <li><%= link_to "Solid Queue", "/jobs", target: :_blank %></li>
+            <li><%= link_to "Sign out", logout_path, data: { turbo_method: :delete } %></li>
+          </ul>
         </div>
       </div>
     </div>
