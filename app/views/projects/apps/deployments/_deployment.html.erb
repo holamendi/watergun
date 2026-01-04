@@ -1,15 +1,15 @@
-<li id="<%= dom_id(deployment) %>" class="px-4 py-5 hover:bg-base-200 sm:px-6">
+<li id="<%= dom_id(deployment) %>" class="px-3 py-3 hover:bg-base-200 sm:px-4">
   <div class="flex items-center gap-x-3">
     <% if deployment.author_avatar_url.present? %>
-      <img src="<%= deployment.author_avatar_url %>" alt="" class="flex-none w-6 h-6 bg-neutral rounded-full">
+      <img src="<%= deployment.author_avatar_url %>" alt="" class="flex-none w-5 h-5 bg-neutral rounded-full">
     <% else %>
-      <div class="flex-none w-6 h-6 bg-neutral rounded-full"></div>
+      <div class="flex-none w-5 h-5 bg-neutral rounded-full"></div>
     <% end %>
-    <%= link_to deployment.short_sha, deployment.commit_html_url, class: "flex-auto text-sm font-semibold leading-6 truncate hover:underline" %>
+    <%= link_to deployment.short_sha, deployment.commit_html_url, class: "flex-auto text-sm font-mono font-medium leading-5 truncate hover:underline" %>
     <%= status_badge(deployment.status) %>
     <% if deployment.finished?%>
-      <time title="<%= deployment.finished_at.to_s %>" datetime="<%= deployment.finished_at.to_s %>" class="flex-none text-sm text-base-content/60">Deployed <%= time_ago_in_words(deployment.finished_at) %> ago</time>
+      <time title="<%= deployment.finished_at.to_s %>" datetime="<%= deployment.finished_at.to_s %>" class="flex-none text-xs text-base-content/60">Deployed <%= time_ago_in_words(deployment.finished_at) %> ago</time>
     <% end %>
   </div>
-  <p class="mt-3 text-sm text-base-content/60 truncate"><%= deployment.commit_message.lines.first %></p>
+  <p class="mt-2 text-xs text-base-content/60 truncate"><%= deployment.commit_message.lines.first %></p>
 </li>
