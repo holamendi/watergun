@@ -5,29 +5,26 @@
 <%= container do %>
   <%= page_header(@title) %>
 
-  <div class="flow-root">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Slug</th>
-              <th>Actionable</th>
-              <th>User</th>
-              <th>Finished</th>
-              <th>Duration</th>
-              <th>Status</th>
-              <th>
-                <span class="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="server_actions">
-            <%= render @server_actions %>
-          </tbody>
-        </table>
-      </div>
+  <div class="card bg-base-100 shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="table table-sm">
+        <thead>
+          <tr class="text-xs uppercase text-base-content/60">
+            <th>Action</th>
+            <th>Target</th>
+            <th>User</th>
+            <th>Completed</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="server_actions">
+          <%= render @server_actions %>
+        </tbody>
+      </table>
     </div>
   </div>
+
+  <%= render "shared/pagination", pagy: @pagy %>
 <% end %>

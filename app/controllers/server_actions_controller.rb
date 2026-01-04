@@ -1,6 +1,6 @@
 class ServerActionsController < ApplicationController
   def index
-    @server_actions = Current.server.actions.recent.includes(:user).limit(200)
+    @pagy, @server_actions = pagy(Current.server.actions.recent.includes(:user), limit: 25)
   end
 
   def retry
