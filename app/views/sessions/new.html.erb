@@ -1,26 +1,43 @@
-<div class="flex flex-col justify-center min-h-full px-6 py-12 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <svg class="w-auto h-10 mx-auto fill-primary" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
-      <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
-    </svg>
-  </div>
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <%= form_with scope: :session, url: session_path, class: "space-y-6" do |form| %>
-      <label class="form-control w-full">
-        <div class="label">
-          <span class="label-text">Email</span>
-        </div>
-        <%= form.email_field :email, class: "input input-bordered w-full", required: true, autocomplete: "email" %>
-      </label>
-      <label class="form-control w-full">
-        <div class="label">
-          <span class="label-text">Password</span>
-        </div>
-        <%= form.password_field :password, class: "input input-bordered w-full", required: true, autocomplete: "current-password" %>
-      </label>
-      <div>
-        <button type="submit" class="btn btn-primary w-full">Sign in</button>
+<div class="hero min-h-screen bg-base-300">
+  <div class="card bg-base-100 w-full max-w-md shadow-2xl">
+    <div class="card-body gap-6">
+      <div class="flex flex-col items-center gap-3">
+        <svg class="w-auto h-12 fill-primary" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
+          <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
+        </svg>
+        <p class="text-base-content/60 text-sm">Sign in to your watergun account</p>
       </div>
-    <% end %>
+
+      <%= form_with scope: :session, url: session_path, class: "space-y-4" do |form| %>
+        <fieldset class="fieldset">
+          <label class="fieldset-label" for="session_email">Email address</label>
+          <label class="input input-bordered w-full flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+            </svg>
+            <%= form.email_field :email, class: "grow bg-transparent border-0 focus:outline-none focus:ring-0", placeholder: "you@example.com", required: true, autocomplete: "email", autofocus: true %>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <label class="fieldset-label" for="session_password">Password</label>
+          <label class="input input-bordered w-full flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <%= form.password_field :password, class: "grow bg-transparent border-0 focus:outline-none focus:ring-0", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
+          </label>
+        </fieldset>
+
+        <div class="pt-2">
+          <button type="submit" class="btn btn-primary w-full">
+            Sign in
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>
