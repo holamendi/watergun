@@ -1,36 +1,55 @@
-<tr id="<%= dom_id(server_action) %>">
-  <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0"><%= server_action.id %></td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap"><%= server_action.slug %></td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+<tr id="<%= dom_id(server_action) %>" class="hover">
+  <td>
+    <div class="flex items-center gap-2">
+      <span class="font-mono text-xs text-base-content/50">#<%= server_action.id %></span>
+      <span class="font-medium"><%= server_action.slug %></span>
+    </div>
+  </td>
+  <td>
     <% if server_action.actionable_type.present? %>
-      <%= "#{server_action.actionable_type.downcase}:#{server_action.actionable_id}" %>
+      <span class="badge badge-ghost badge-sm font-mono">
+        <%= "#{server_action.actionable_type.underscore.split('/').last}:#{server_action.actionable_id}" %>
+      </span>
     <% else %>
-      destroyed
+      <span class="text-base-content/40 italic text-sm">destroyed</span>
     <% end %>
   </td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap"><%= server_action.user&.email %></td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+  <td>
+    <span class="text-sm"><%= server_action.user&.email || "—" %></span>
+  </td>
+  <td>
     <% if server_action.finished? %>
-      <div class="relative inline-block group">
-        <span><%= time_ago_in_words(server_action.finished_at) %> ago</span>
-        <span class="absolute invisible px-2 py-1 mt-1 text-xs text-white -translate-x-1/2 -translate-y-full bg-gray-900 rounded-md group-hover:visible left-1/2 whitespace-nowrap">
-          <%= server_action.finished_at.to_s %>
-        </span>
+      <div class="tooltip" data-tip="<%= server_action.finished_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+        <span class="text-sm"><%= time_ago_in_words(server_action.finished_at) %> ago</span>
       </div>
+    <% else %>
+      <span class="text-base-content/40">—</span>
     <% end %>
   </td>
-  <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+  <td>
     <% if server_action.finished? %>
-      <%= server_action.duration.round(1) %>s
+      <span class="font-mono text-sm"><%= server_action.duration.round(1) %>s</span>
+    <% else %>
+      <span class="text-base-content/40">—</span>
     <% end %>
   </td>
-  <td class="px-3 py-4 text-sm whitespace-nowrap">
+  <td>
     <%= status_badge(server_action.status) %>
   </td>
-  <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
-    <% if server_action.finished? %>
-      <%= link_to "logs", logs_server_action_path(server_action), class: "text-teal-600 hover:text-teal-900", target: :_blank %>
-    <% end %>
-    <%= button_to "retry", retry_server_action_path(server_action), class: "ml-4 inline-block text-teal-600 hover:text-teal-900" %>
+  <td class="text-right">
+    <div class="flex items-center justify-end gap-1">
+      <% if server_action.finished? %>
+        <%= link_to logs_server_action_path(server_action), class: "btn btn-ghost btn-xs", target: :_blank, title: "View logs" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        <% end %>
+      <% end %>
+      <%= button_to retry_server_action_path(server_action), class: "btn btn-ghost btn-xs", title: "Retry action" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      <% end %>
+    </div>
   </td>
 </tr>
