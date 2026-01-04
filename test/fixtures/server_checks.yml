@@ -1,0 +1,25 @@
+recent:
+  account: default
+  server: amd
+  cpu_usage: 25.5
+  memory_usage: 60.0
+  memory_used_bytes: 1073741824
+  memory_total_bytes: 2147483648
+  disk_usage: 45.0
+  disk_used_bytes: 10737418240
+  disk_total_bytes: 21474836480
+  load_average: 1.25
+  timestamp: <%= 1.hour.ago %>
+
+old:
+  account: default
+  server: amd
+  cpu_usage: 30.0
+  memory_usage: 55.0
+  memory_used_bytes: 1073741824
+  memory_total_bytes: 2147483648
+  disk_usage: 44.0
+  disk_used_bytes: 10737418240
+  disk_total_bytes: 21474836480
+  load_average: 0.85
+  timestamp: <%= 2.days.ago %>

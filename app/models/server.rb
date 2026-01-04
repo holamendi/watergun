@@ -10,6 +10,7 @@ class Server < ApplicationRecord
   has_one :ssh_key, dependent: :destroy
 
   has_many :apps, dependent: :destroy
+  has_many :checks, class_name: "ServerCheck", dependent: :delete_all
   has_many :containers, dependent: :destroy
   has_many :actions, class_name: "ServerAction", dependent: :destroy
   has_many :projects, dependent: :destroy
