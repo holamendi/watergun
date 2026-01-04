@@ -83,7 +83,10 @@ Recurring jobs configured in `config/recurring.yml`.
 
 - Vite with Stimulus.js controllers in `app/javascript/`
 - Turbo for real-time updates and broadcasts
-- TailwindCSS for styling
+- DaisyUI 5 component library on Tailwind CSS 4 for styling
+  - Docs: https://daisyui.com/llms.txt
+  - Use semantic color names (`primary`, `success`, `error`) for theme consistency
+  - Components use class naming: component (`btn`), parts (`card-body`), modifiers (colors/sizes)
 
 ### Multi-Database Setup
 
