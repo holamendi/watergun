@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_08_092555) do
+ActiveRecord::Schema[8.2].define(version: 2025_12_29_051602) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -300,6 +300,26 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_08_092555) do
     t.index ["user_id"], name: "index_server_actions_on_user_id"
   end
 
+  create_table "server_checks", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.float "cpu_usage", null: false
+    t.datetime "created_at", null: false
+    t.bigint "disk_total_bytes"
+    t.float "disk_usage"
+    t.bigint "disk_used_bytes"
+    t.float "load_average"
+    t.bigint "memory_total_bytes"
+    t.float "memory_usage", null: false
+    t.bigint "memory_used_bytes"
+    t.integer "server_id", null: false
+    t.datetime "timestamp", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_server_checks_on_account_id"
+    t.index ["server_id", "timestamp"], name: "index_server_checks_on_server_id_and_timestamp"
+    t.index ["server_id"], name: "index_server_checks_on_server_id"
+    t.index ["timestamp"], name: "index_server_checks_on_timestamp"
+  end
+
   create_table "servers", force: :cascade do |t|
     t.integer "account_id", null: false
     t.string "cpu_type"
@@ -423,6 +443,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_08_092555) do
   add_foreign_key "server_actions", "server_actions", column: "preceding_server_action_id"
   add_foreign_key "server_actions", "servers"
   add_foreign_key "server_actions", "users"
+  add_foreign_key "server_checks", "accounts"
+  add_foreign_key "server_checks", "servers"
   add_foreign_key "servers", "accounts"
   add_foreign_key "service_links", "accounts"
   add_foreign_key "service_links", "apps"

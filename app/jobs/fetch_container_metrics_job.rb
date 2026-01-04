@@ -13,13 +13,17 @@ class FetchContainerMetricsJob < ApplicationJob
     return unless server.apps.kept.any? || server.services.kept.any?
 
     stats = nil
+    server_stats = nil
 
     server.ssh_session do |ssh|
       stats = ssh.execute!(Docker::StatsCommand.new).parsed_output
+      server_stats = ssh.execute(System::MetricsCommand.new).parsed_output
     end
 
     checked_at = Time.current
     stats.uniq!
+
+    save_server_check!(server, server_stats, checked_at) if server_stats
 
     server.apps.kept.each do |app|
       app_stats = stats.select { |stat| stat.name.start_with?("#{app.dokku_id}.") }
@@ -58,5 +62,19 @@ class FetchContainerMetricsJob < ApplicationJob
       memory_used_bytes: container_stats.mem_usage_bytes.first,
       memory_limit_bytes: container_stats.mem_usage_bytes.last
     }
+  end
+
+  def save_server_check!(server, stats, checked_at)
+    server.checks.create!(
+      cpu_usage: stats.cpu_usage,
+      memory_usage: stats.memory_usage,
+      memory_used_bytes: stats.memory_used_bytes,
+      memory_total_bytes: stats.memory_total_bytes,
+      disk_usage: stats.disk_usage,
+      disk_used_bytes: stats.disk_used_bytes,
+      disk_total_bytes: stats.disk_total_bytes,
+      load_average: stats.load_average,
+      timestamp: checked_at
+    )
   end
 end
