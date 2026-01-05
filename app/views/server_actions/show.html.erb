@@ -1,0 +1,158 @@
+<%= turbo_stream_from @server_action %>
+
+<% @title = @server_action.slug %>
+
+<%= container do %>
+  <div class="mb-6">
+    <%= link_to server_actions_path, class: "text-sm text-base-content/60 hover:text-base-content inline-flex items-center gap-1" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Activity
+    <% end %>
+  </div>
+
+  <div class="mb-8">
+    <h1 class="font-mono text-2xl font-bold"><%= @server_action.slug %></h1>
+    <p class="text-sm text-base-content/60 mt-1">
+      Action #<%= @server_action.id %>
+    </p>
+  </div>
+
+  <% if @server_action.failure_message.present? %>
+    <div class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span><%= @server_action.failure_message %></span>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-200 mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-base-content/60">Status</span>
+          <div class="mt-1"><%= status_badge(@server_action.status) %></div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Source</span>
+          <div class="mt-1 font-mono"><%= @server_action.source %></div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Server</span>
+          <div class="mt-1"><%= @server_action.server.name %></div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Target</span>
+          <div class="mt-1">
+            <% if @server_action.actionable_type.present? %>
+              <span class="font-mono">
+                <%= "#{@server_action.actionable_type.underscore.split('/').last}:#{@server_action.actionable_id}" %>
+              </span>
+            <% else %>
+              <span class="text-base-content/40 italic">destroyed</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">User</span>
+          <div class="mt-1"><%= @server_action.user&.email || "—" %></div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Duration</span>
+          <div class="mt-1">
+            <% if @server_action.finished? %>
+              <span class="font-mono"><%= @server_action.duration.round(2) %>s</span>
+            <% else %>
+              <span class="text-base-content/40">—</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Created</span>
+          <div class="mt-1">
+            <div class="tooltip" data-tip="<%= @server_action.created_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+              <%= time_ago_in_words(@server_action.created_at) %> ago
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Started</span>
+          <div class="mt-1">
+            <% if @server_action.running_at %>
+              <div class="tooltip" data-tip="<%= @server_action.running_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+                <%= time_ago_in_words(@server_action.running_at) %> ago
+              </div>
+            <% else %>
+              <span class="text-base-content/40">—</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Finished</span>
+          <div class="mt-1">
+            <% if @server_action.finished_at %>
+              <div class="tooltip" data-tip="<%= @server_action.finished_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+                <%= time_ago_in_words(@server_action.finished_at) %> ago
+              </div>
+            <% else %>
+              <span class="text-base-content/40">—</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Payload</h2>
+      <pre class="p-4 overflow-auto font-mono text-sm rounded-lg bg-base-300 max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
+    </div>
+  </div>
+
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Logs</h2>
+      <% if @server_action.queued? || @server_action.running? %>
+        <div class="p-4 rounded-lg bg-base-300 text-base-content/60 text-center">
+          <span class="loading loading-dots loading-sm"></span>
+          <p class="text-sm mt-2">Waiting for action to complete...</p>
+        </div>
+      <% elsif @server_action.log.present? && @server_action.log.ssh_commands.any? %>
+        <div class="space-y-4">
+          <% @server_action.log.ssh_commands.each do |command| %>
+            <div class="rounded-lg bg-base-300 overflow-hidden">
+              <div class="px-4 py-2 bg-base-100 border-b border-base-300 flex items-center justify-between">
+                <code class="text-sm font-mono text-primary"><%= command["cmd"] %></code>
+                <% if command["exit_code"] && command["exit_code"] != 0 %>
+                  <span class="badge badge-error badge-sm">exit <%= command["exit_code"] %></span>
+                <% end %>
+              </div>
+              <% output_text = command["output"]&.map { |o| o["data"] }&.join %>
+              <% if output_text.present? %>
+                <pre class="p-4 overflow-auto font-mono text-xs max-h-64 whitespace-pre-wrap"><%= output_text %></pre>
+              <% else %>
+                <div class="p-4 text-base-content/40 text-sm italic">No output</div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-4 rounded-lg bg-base-300 text-base-content/60 text-center text-sm">
+          No logs available
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

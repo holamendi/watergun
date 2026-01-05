@@ -61,10 +61,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :server_actions, only: :index do
-    get :logs, on: :member
-    post :retry, on: :member
-  end
+  resources :server_actions, only: [:index, :show]
 
   resource :account, controller: "accounts/settings" do
     scope module: :accounts do

@@ -38,9 +38,13 @@ module UiHelper
   def status_badge(status)
     status_mapping = {
       "active" => :green,
+      "cancelled" => :neutral,
       "deploying" => :blue,
       "error" => :red,
+      "failure" => :red,
       "pending" => :yellow,
+      "queued" => :yellow,
+      "running" => :blue,
       "success" => :green
     }
 

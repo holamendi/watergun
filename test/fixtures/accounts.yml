@@ -1,2 +1,5 @@
 default:
   name: Default
+
+other:
+  name: Other Account

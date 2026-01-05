@@ -9,3 +9,9 @@ arm:
   account: default
   public_ip: 127.0.0.1
   cpu_type: arm64
+
+other_server:
+  name: other-server
+  account: other
+  public_ip: 127.0.0.1
+  cpu_type: x86_64
