@@ -12,6 +12,9 @@ Watergun is a Rails 8 application that manages Dokku-based deployments. It provi
 # Start development server (uses overmind with Procfile.dev)
 bin/dev
 
+# Restart development server (kills and restarts bin/dev)
+bin/dev-restart
+
 # Run all tests
 bin/rails test
 
@@ -36,6 +39,13 @@ bundle exec rake solid_queue:start
 # Vite asset compilation (handled by bin/dev, but can run standalone)
 bin/vite dev
 ```
+
+## Local Development
+
+- **URL**: http://localhost:3000
+- **Dev user**: hola@mendi.cl
+- **Password**: abc123
+- **Ruby version**: Managed by [mise](https://mise.jdx.dev/) (see `.mise.toml`)
 
 ## Architecture
 
@@ -91,6 +101,71 @@ Recurring jobs configured in `config/recurring.yml`.
 ### Multi-Database Setup
 
 Three SQLite databases (primary, queue, cable) per environment. Migrations for queue/cable have separate paths in `db/queue_migrate` and `db/cable_migrate`.
+
+## Code Style
+
+Prefer vanilla Rails patterns over external dependencies.
+
+- **Linting**: StandardRB (run `bundle exec standardrb --fix` to auto-fix)
+- **Soft deletes**: Use `Discard::Model` with `.kept` scope for filtering
+- **Multi-tenant defaults**: Use `belongs_to :account, default: -> { parent.account }`
+- **Current context**: Use `Current.account`, `Current.user` for request context
+- **Store attributes**: Use `store_attribute :payload, :field_name, :type` for JSON column fields
+- **Enums**: Use custom `Enum[:pending, :active, :error]` syntax
+- **Broadcasts**: Use `after_update_commit` with `broadcast_replace_later_to`
+
+### Service Objects
+
+Located in `app/models/<model>/` (e.g., `App::CreateApp`). Used for complex operations with validations:
+
+```ruby
+class App::CreateApp
+  include ActiveModel::Model
+  include ActiveModel::Attributes
+
+  attribute :project
+  attribute :name
+
+  validates :project, presence: true
+
+  def save
+    return false unless valid?
+    Model.transaction do
+      # create records, schedule server actions
+    end
+    true
+  end
+end
+```
+
+### Server Actions
+
+Located in `app/models/server_actions/`. Each action executes commands on the target server via SSH (Dokku commands or any shell command):
+
+```ruby
+class ServerActions::CreateApp < ServerAction
+  SLUG = "apps.create"
+  actionable App
+
+  store_attribute :payload, :dokku_app_id, :string
+
+  private
+
+  def run
+    execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
+    app.active!
+  rescue Ssh::CommandExecutionError
+    app.error!
+    raise
+  end
+end
+```
+
+Key patterns:
+- Define `SLUG` constant for identification
+- Use `actionable` macro for polymorphic target
+- Implement private `run` method with operation logic
+- Use `execute!` with Dokku command objects
 
 ## Testing
 
