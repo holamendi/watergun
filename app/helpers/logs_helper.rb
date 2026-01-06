@@ -16,10 +16,10 @@ module LogsHelper
     data.gsub!(/\033\[1m/, "<b>")
     data.gsub!(/\033\[0m/, "</b></span>")
 
-    data.gsub!(/\033\[[\d\;]{2,}m.*?<\/b><\/span>/) { |data|
+    data.gsub!(/\033\[[\d;]{2,}m.*?<\/b><\/span>/) { |data|
       span = "<span style='"
       content = ""
-      /\033\[([\d\;]{2,})m(.*?)<\/b><\/span>/.match(data) { |m|
+      /\033\[([\d;]{2,})m(.*?)<\/b><\/span>/.match(data) { |m|
         content = m[2]
         m[1].split(";").each do |code|
           if (match = /(\d)(\d)/.match(code))

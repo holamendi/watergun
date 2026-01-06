@@ -1,0 +1,17 @@
+# Domain fixtures for domain_test_app
+# Note: Don't add domains for smol_roda as CreateAppTest expects to create them
+domain_test_default:
+  account: default
+  app: domain_test_app
+  hostname: domain-test-app.local.watergun.dev
+  is_default: true
+  ssl_enabled: false
+  status: active
+
+domain_test_secondary:
+  account: default
+  app: domain_test_app
+  hostname: example.com
+  is_default: false
+  ssl_enabled: false
+  status: active

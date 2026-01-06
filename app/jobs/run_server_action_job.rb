@@ -25,7 +25,7 @@ class RunServerActionJob < ApplicationJob
 
       Backtrace:
       #{e.backtrace.first(10).map { |line| "  #{line}" }.join("\n")}
-      #{(e.backtrace.size > 10) ? "\n  ... and #{e.backtrace.size - 10} more lines" : ""}
+      #{"\n  ... and #{e.backtrace.size - 10} more lines" if e.backtrace.size > 10}
     ERROR
     raise if Rails.env.local?
 

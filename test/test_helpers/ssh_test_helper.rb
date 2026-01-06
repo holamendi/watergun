@@ -33,7 +33,7 @@ module SshTestHelper
       )
     end
 
-    session.expects(:loop)
+    session.expects(:loop).at_least_once
 
     Net::SSH.expects(:start)
       .with(host, user,

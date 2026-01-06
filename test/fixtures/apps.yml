@@ -4,3 +4,11 @@ smol_roda:
   server: amd
   name: Smol Roda
   dokku_id: smol-roda
+
+domain_test_app:
+  account: default
+  project: default
+  server: amd
+  name: Domain Test App
+  dokku_id: domain-test-app
+  status: active

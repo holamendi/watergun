@@ -33,13 +33,13 @@ class ServerActions::CreateDomain < ServerAction
   private
 
   def add_dokku_domain!
-    Dokku::Domains::Add.call!(ssh, app: dokku_app_id, domain: hostname)
+    execute!(Dokku::Domains::AddCommand.new(app: dokku_app_id, domain: hostname))
   end
 
   def schedule_enable_ssl!
     return unless app.deployed?
     return unless app.all_domains_resolve_to_server?
 
-    ServerActions::EnableSsl.run_later!(domain.app)
+    ServerActions::EnableSsl.run_later!(server, app)
   end
 end
