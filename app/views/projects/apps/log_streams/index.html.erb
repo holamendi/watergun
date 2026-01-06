@@ -1,9 +1,7 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @log_stream %>
 
-<%= render "projects/apps/header", app: @app %>
-
-<div class="p-2 -mt-6 bg-[#303446]">
+<div class="h-full bg-[#303446]">
   <%= render "shared/log_streams/log_stream",
       log_stream: @log_stream,
       url: project_app_log_stream_path(@project, @app, @log_stream) %>

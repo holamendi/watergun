@@ -1,14 +1,10 @@
 <% @title = "New Service" %>
 
-<%= container do %>
+<div class="p-6">
   <div class="flex justify-center">
     <div class="w-full max-w-lg">
       <%= page_header(@title) %>
-    </div>
-  </div>
-  <div class="flex justify-center">
-    <div class="w-full max-w-lg">
       <%= render "create_form", create_service: @create_service %>
     </div>
   </div>
-<% end %>
+</div>

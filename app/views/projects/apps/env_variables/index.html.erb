@@ -1,6 +1,4 @@
-<%= render "projects/apps/header", app: @app %>
-
-<%= container do %>
+<div class="p-6">
   <div class="flex justify-between pb-6">
     <div>
       <%= link_to "New Variable",
@@ -27,4 +25,4 @@
       <%= render @env_variables %>
     </div>
   </dl>
-<% end %>
+</div>

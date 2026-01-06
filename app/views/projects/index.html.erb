@@ -2,12 +2,12 @@
 
 <% @title = "Projects" %>
 
-<%= container do %>
+<div class="p-6">
   <%= page_header(@title) do %>
-    <%= link_to "New project", new_project_path, class: "btn btn-primary" %>
+    <%= link_to "New project", new_project_path, class: "btn btn-primary btn-sm" %>
   <% end %>
 
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
     <%= render @projects %>
   </div>
-<% end %>
+</div>

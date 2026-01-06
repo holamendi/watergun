@@ -1,9 +1,7 @@
 <%= turbo_stream_from @service, :metrics %>
 
-<%= render "projects/services/header", service: @service %>
-
-<%= container do %>
+<div class="p-6">
   <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
   <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
   <%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
-<% end %>
+</div>

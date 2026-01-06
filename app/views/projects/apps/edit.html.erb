@@ -1,9 +1,7 @@
 <%= turbo_stream_from @app %>
 
-<%= render "header", app: @app %>
-
-<%= container do %>
-  <div class="space-y-6 py-6">
+<div class="p-6">
+  <div class="space-y-6">
     <div class="card bg-base-200">
       <div class="card-body">
         <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
@@ -75,4 +73,4 @@
       </div>
     </div>
   </div>
-<% end %>
+</div>
