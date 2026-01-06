@@ -21,10 +21,10 @@
   </nav>
 
   <%# Main content %>
-  <main class="flex-1 overflow-y-auto bg-base-100">
+  <main class="flex-1 overflow-y-auto bg-base-100 pb-16 md:pb-0">
     <%= yield %>
   </main>
-
-  <%# Mobile bottom nav %>
-  <%= render "layouts/mobile_nav" %>
 </div>
+
+<%# Mobile bottom nav - outside flex container for proper fixed positioning %>
+<%= render "layouts/mobile_nav" %>
