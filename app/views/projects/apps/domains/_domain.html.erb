@@ -1,23 +1,35 @@
 <tr id="<%= dom_id(domain) %>">
-  <td><%= link_to domain.url, domain.url, class: "link", target: "_blank" %> <%= "(default)" if domain.is_default? %></td>
+  <td>
+    <%= link_to domain.hostname, domain.url, class: "link", target: "_blank" %>
+    <% if domain.is_default? %>
+      <span class="badge badge-sm badge-neutral">default</span>
+    <% end %>
+  </td>
   <td>
     <%= status_badge(domain.status) %>
   </td>
+  <td>
+    <% if domain.ssl_enabled? %>
+      <span class="badge badge-sm badge-success">Enabled</span>
+    <% else %>
+      <span class="badge badge-sm badge-neutral">Disabled</span>
+    <% end %>
+  </td>
   <td class="text-right">
-    <div class="dropdown dropdown-bottom dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-6">
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-square">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
         </svg>
       </div>
-      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm">
         <% unless domain.is_default? %>
           <li>
             <%= link_to "Set as default", make_default_project_app_domain_path(domain.app.project_id, domain.app_id, domain), data: { turbo_method: :patch } %>
           </li>
         <% end %>
         <li>
-          <%= link_to "Delete", project_app_domain_path(domain.app.project_id, domain.app_id, domain), class: "text-red-500", data: { turbo_method: :delete, turbo_confirm: "Sure? "} %>
+          <%= link_to "Delete", project_app_domain_path(domain.app.project_id, domain.app_id, domain), class: "text-error", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
         </li>
       </ul>
     </div>

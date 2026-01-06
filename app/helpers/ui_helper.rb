@@ -1,20 +1,14 @@
 module UiHelper
   def container(&block)
-    content_tag :div, class: "max-w-5xl px-4 mx-auto sm:px-6 lg:px-8" do
-      yield
-    end
+    content_tag :div, class: "max-w-5xl px-4 mx-auto sm:px-6 lg:px-8", &block
   end
 
   def full_width_container(&block)
-    content_tag :div, class: "w-full px-4 mx-auto sm:px-6 lg:px-8" do
-      yield
-    end
+    content_tag :div, class: "w-full px-4 mx-auto sm:px-6 lg:px-8", &block
   end
 
   def page_header(title, actions = nil, &block)
-    if block_given?
-      actions = capture(&block)
-    end
+    actions = capture(&block) if block_given?
 
     render "shared/page_header", title: title, actions: actions.presence || ""
   end
@@ -39,7 +33,9 @@ module UiHelper
     status_mapping = {
       "active" => :green,
       "cancelled" => :neutral,
+      "deleting" => :yellow,
       "deploying" => :blue,
+      "enabling_ssl" => :blue,
       "error" => :red,
       "failure" => :red,
       "pending" => :yellow,
@@ -59,7 +55,7 @@ module UiHelper
     else "loading-lg"
     end
 
-    color_class = color == "white" ? "text-white" : ""
+    color_class = (color == "white") ? "text-white" : ""
 
     tag.span(class: "loading loading-spinner #{size_class} #{color_class}".strip)
   end

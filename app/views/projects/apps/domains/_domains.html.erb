@@ -1,18 +1,33 @@
 <%= turbo_stream_from app, :domains %>
-<div id="domains">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Domain</th>
-        <th>Status</th>
-        <th>Role</th>
-        <th>
-          <span class="sr-only">Edit</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= render partial: "projects/apps/domains/domain", collection: app.domains.kept %>
-    </tbody>
-  </table>
+
+<div id="domains" class="space-y-4">
+  <div class="flex justify-end">
+    <button onclick="domain_modal_<%= app.id %>.showModal()" class="btn btn-sm btn-ghost">
+      Add Domain
+    </button>
+  </div>
+
+  <% if app.domains.kept.any? %>
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Status</th>
+            <th>SSL</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "projects/apps/domains/domain", collection: app.domains.kept %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-base-content/60">No domains configured</p>
+  <% end %>
 </div>
+
+<%= render "shared/modal", id: "domain_modal_#{app.id}", title: "Add Domain" do %>
+  <%= render "projects/apps/domains/form", domain: app.domains.new %>
+<% end %>

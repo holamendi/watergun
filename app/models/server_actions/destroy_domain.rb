@@ -31,6 +31,6 @@ class ServerActions::DestroyDomain < ServerAction
   private
 
   def remove_dokku_domain!
-    Dokku::Domains::Remove.call!(ssh, app: dokku_app_id, domain: hostname)
+    execute!(Dokku::Domains::RemoveCommand.new(app: dokku_app_id, domain: hostname))
   end
 end
