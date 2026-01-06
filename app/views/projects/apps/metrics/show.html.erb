@@ -1,7 +1,6 @@
 <%= turbo_stream_from @app, :metrics %>
 
 <%= render "projects/apps/header", app: @app %>
-<%= render "projects/apps/tabs", app: @app %>
 
 <%= container do %>
   <%= turbo_frame_tag :stats, src: stats_project_app_metrics_path(@project, @app) %>

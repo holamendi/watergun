@@ -1,7 +1,6 @@
 <%= turbo_stream_from @app, :deployments %>
 
 <%= render "projects/apps/header", app: @app %>
-<%= render "projects/apps/tabs", app: @app %>
 
 <%= container do %>
   <% if @app.github_repo.present? %>
