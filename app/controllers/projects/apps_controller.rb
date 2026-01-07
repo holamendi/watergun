@@ -53,7 +53,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def set_app
-    @app = @project.apps.kept.find(params[:id])
+    @app = @project.apps.kept.includes(:services, :server, :github_repo, :default_domain).find(params[:id])
   end
 
   def render_form

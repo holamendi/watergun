@@ -5,6 +5,7 @@ postgres:
   name: Postgres Database
   service_type: postgres
   dokku_id: postgres
+  status: pending
 
 redis:
   account: default
@@ -13,6 +14,7 @@ redis:
   name: Redis Database
   service_type: redis
   dokku_id: redis
+  status: active
 
 mongo:
   account: default
@@ -21,3 +23,4 @@ mongo:
   name: Mongo Database
   service_type: mongo
   dokku_id: mongo
+  status: active

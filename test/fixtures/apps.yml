@@ -4,6 +4,7 @@ smol_roda:
   server: amd
   name: Smol Roda
   dokku_id: smol-roda
+  status: pending
 
 domain_test_app:
   account: default

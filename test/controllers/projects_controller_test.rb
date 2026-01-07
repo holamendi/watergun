@@ -4,8 +4,62 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @account = accounts(:default)
     @server = @account.servers.first
+    @project = projects(:default)
 
     sign_in users(:bobby)
+  end
+
+  describe "#show" do
+    test "renders the sidebar with project context" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select ".font-semibold", text: @project.name
+    end
+
+    test "renders the sidebar with server name" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "body", /on #{@project.server.name}/
+    end
+
+    test "renders back link to projects" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{projects_path}']", text: /Projects/
+    end
+
+    test "lists apps in sidebar with status badges" do
+      app = apps(:smol_roda)
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{project_app_deployments_path(@project, app)}']", text: /#{app.name}/
+    end
+
+    test "lists services in sidebar with status badges" do
+      service = services(:postgres)
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{project_service_metrics_path(@project, service)}']", text: /#{service.name}/
+    end
+
+    test "shows add app action" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{new_project_app_path(@project)}']", text: /Add App/
+    end
+
+    test "shows add service action" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{new_project_service_path(@project)}']", text: /Add Service/
+    end
   end
 
   describe "#create" do

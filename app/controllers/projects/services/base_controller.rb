@@ -4,6 +4,6 @@ class Projects::Services::BaseController < Projects::BaseController
   private
 
   def set_service
-    @service = @project.services.kept.find(params[:service_id])
+    @service = @project.services.kept.includes(:linked_apps, :server).find(params[:service_id])
   end
 end
