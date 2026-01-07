@@ -1,6 +1,6 @@
 <%= turbo_stream_from @log_stream %>
 
-<div class="h-full bg-[#303446]">
+<div class="h-[calc(100vh-4rem)] md:h-screen bg-[#303446]">
   <%= render "shared/log_streams/log_stream",
               log_stream: @log_stream,
               url: project_service_log_stream_path(@project, @service, @log_stream) %>
