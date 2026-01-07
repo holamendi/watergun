@@ -1,0 +1,32 @@
+<div data-controller="sidebar">
+  <div class="flex h-screen">
+    <%# Sidebar: icon rail + context panel %>
+    <nav data-sidebar-target="sidebar" class="hidden md:flex flex-shrink-0 h-full">
+      <%= render "layouts/icon_rail" %>
+      <div data-sidebar-target="panel" class="w-56 bg-base-200 border-r border-base-300 overflow-y-auto">
+        <%= render "layouts/context_panel" %>
+      </div>
+    </nav>
+
+    <%# Mobile overlay %>
+    <div data-sidebar-target="overlay" data-action="click->sidebar#closeMobile"
+         class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+
+    <%# Mobile sidebar (slides in from left) %>
+    <nav data-sidebar-target="mobileSidebar"
+         class="fixed inset-y-0 left-0 z-50 flex -translate-x-full md:hidden">
+      <%= render "layouts/icon_rail" %>
+      <div class="w-56 bg-base-200 overflow-y-auto">
+        <%= render "layouts/context_panel" %>
+      </div>
+    </nav>
+
+    <%# Main content %>
+    <main class="flex-1 overflow-y-auto bg-base-100 pb-16 md:pb-0">
+      <%= yield %>
+    </main>
+  </div>
+
+  <%# Mobile bottom nav - outside flex container for proper fixed positioning %>
+  <%= render "layouts/mobile_nav" %>
+</div>

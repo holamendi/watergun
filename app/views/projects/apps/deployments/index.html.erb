@@ -1,17 +1,14 @@
 <%= turbo_stream_from @app, :deployments %>
 
-<%= render "projects/apps/header", app: @app %>
-<%= render "projects/apps/tabs", app: @app %>
-
-<%= container do %>
+<div class="p-6">
   <% if @app.github_repo.present? %>
-      <div class="flex justify-between pb-6">
-    <div>
-      <%= form_with url: project_app_deployments_path(@project, @app) do |f| %>
-        <%= submit_button "Deploy" %>
-      <% end %>
+    <div class="flex justify-between pb-6">
+      <div>
+        <%= form_with url: project_app_deployments_path(@project, @app) do |f| %>
+          <%= submit_button "Deploy" %>
+        <% end %>
+      </div>
     </div>
-  </div>
     <ul id="deployments" role="list" class="card bg-base-100 shadow-sm divide-y divide-base-200">
       <%= render @deployments %>
     </ul>
@@ -20,4 +17,4 @@
       <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "btn btn-primary" %>
     </div>
   <% end %>
-<% end %>
+</div>

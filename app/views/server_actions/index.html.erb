@@ -2,7 +2,7 @@
 
 <% @title = "Activity" %>
 
-<%= container do %>
+<div class="p-6">
   <%= page_header(@title) %>
 
   <div class="card bg-base-100 shadow-sm">
@@ -26,4 +26,4 @@
   </div>
 
   <%= render "shared/pagination", pagy: @pagy %>
-<% end %>
+</div>
