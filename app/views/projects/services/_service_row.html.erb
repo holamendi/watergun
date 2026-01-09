@@ -8,7 +8,7 @@
         <span class="badge badge-sm badge-ghost"><%= service.service_type.to_s.titleize %></span>
       </div>
 
-      <% linked_apps = service.linked_apps.kept %>
+      <% linked_apps = service.linked_apps.select(&:kept?) %>
       <% if linked_apps.any? %>
         <div class="text-sm text-base-content/60 mt-1">
           Linked to: <%= linked_apps.map(&:name).join(", ") %>

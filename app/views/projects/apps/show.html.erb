@@ -54,7 +54,7 @@
   </div>
 
   <%# Process cards %>
-  <% running_containers = @app.containers.running %>
+  <% running_containers = @app.containers.select(&:running?) %>
   <% if running_containers.any? %>
     <div class="flex flex-wrap gap-3 mb-6">
       <% running_containers.group_by(&:dokku_process_type).each do |process_type, containers| %>
@@ -122,12 +122,11 @@
   <% end %>
 
   <%# Linked Services %>
-  <% linked_services = @app.services.kept %>
-  <% if linked_services.any? %>
+  <% if @linked_services.any? %>
     <section class="mt-8">
       <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Linked Services</h2>
       <div class="card bg-base-200 divide-y divide-base-300">
-        <% linked_services.each do |service| %>
+        <% @linked_services.each do |service| %>
           <div class="p-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <%= status_dot(service.status) %>

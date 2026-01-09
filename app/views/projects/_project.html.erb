@@ -3,8 +3,8 @@
     <h2 class="card-title text-base font-mono"><%= project.name %></h2>
 
     <div class="flex items-center gap-3 text-sm text-base-content/60">
-      <% app_count = project.apps.kept.size %>
-      <% service_count = project.services.kept.size %>
+      <% app_count = project.apps.count(&:kept?) %>
+      <% service_count = project.services.count(&:kept?) %>
 
       <% if app_count.positive? %>
         <span class="flex items-center gap-1">

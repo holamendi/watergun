@@ -28,7 +28,7 @@ Full UI rethink with devtools aesthetic. Simple, quick actions prominent, advanc
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Logo    Projects ▼    Activity    [Search]           Settings  │  <- Top bar
+│  Logo    [Project ▼]    Activity                      ⚙  👤  ≡  │  <- Top bar
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │                        Main Content                             │
@@ -36,6 +36,8 @@ Full UI rethink with devtools aesthetic. Simple, quick actions prominent, advanc
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+Note: Search (Cmd+K) deferred to Phase 4.
 
 **Key change:** Replace two-level sidebar with simpler top navigation.
 - Cleaner, more horizontal space for content
@@ -60,62 +62,56 @@ Full UI rethink with devtools aesthetic. Simple, quick actions prominent, advanc
 
 ## Implementation Phases
 
-### Phase 1: Foundation (Complete)
+### Phase 1: Foundation & Core Pages (Complete)
 - [x] Analysis complete
 - [x] Create new layout structure (top nav replaces sidebar)
-- [x] Top navigation component
-- [x] Project index (dashboard) with cards
-- [x] Project detail with app/service rows
-- [x] App detail page with tabs and process cards
-- [x] Service detail page with tabs
-- [x] Tests updated
+- [x] Top navigation with project selector dropdown
+- [x] Project index (dashboard) with cards grid
+- [x] Project detail with app/service rows + quick actions
+- [x] App detail page with tabs, process cards, linked services
+- [x] Service detail page with tabs, linked apps
+- [x] Removed old sidebar files (icon rail, context panel, mobile nav)
+- [x] Tests updated for new UI structure
+- [x] Moved queries from views to controllers (eager loading)
 
-### Phase 2: Project Management
-- [ ] Projects index (dashboard grid)
-- [ ] Project show (resources list)
+### Phase 2: Forms
 - [ ] Project new/edit forms
-
-### Phase 3: App Management
-- [ ] App detail page with tabs
-- [ ] Deployments list
 - [ ] App creation form
-- [ ] Quick actions (deploy, restart)
-
-### Phase 4: Service Management
-- [ ] Service detail page
 - [ ] Service creation form
-- [ ] Service linking UI
 
-### Phase 5: Supporting Pages
+### Phase 3: Supporting Pages
 - [ ] Environment variables editor
 - [ ] Domains management
-- [ ] Logs viewer
-- [ ] Metrics display
+- [ ] Logs viewer improvements
+- [ ] Metrics display improvements
 
-### Phase 6: Settings & Polish
-- [ ] Account settings
-- [ ] Theme refinement
-- [ ] Mobile responsiveness
+### Phase 4: Settings & Polish
+- [ ] Account settings page
+- [ ] Mobile responsiveness audit
 - [ ] Empty states
+- [ ] Cmd+K search feature
 
 ---
 
 ## Component Library (Helpers/Partials)
 
 ### Helpers (app/helpers/ui_helper.rb)
-- `page_header(title, &actions)` - existing, keep
-- `status_dot(status)` - existing, keep
-- `status_badge(status)` - existing, keep
-- `quick_action_button(text, path, icon:, variant:)` - NEW
-- `stat_card(label, value, icon:)` - NEW
-- `empty_state(title, description, &action)` - NEW
+- `page_header(title, &actions)` - existing
+- `status_dot(status)` - existing
+- `status_badge(status)` - existing
 
-### Partials (app/views/shared/)
-- `_top_nav.html.erb` - NEW
-- `_resource_card.html.erb` - NEW
-- `_action_dropdown.html.erb` - existing as dropdown
-- `_tabs.html.erb` - NEW
-- `_form_section.html.erb` - NEW
+### Partials Created
+- `app/views/layouts/_top_nav.html.erb` - Top navigation with project dropdown
+- `app/views/projects/_project.html.erb` - Project card for dashboard
+- `app/views/projects/apps/_app_row.html.erb` - App row with quick actions
+- `app/views/projects/services/_service_row.html.erb` - Service row
+- `app/views/projects/apps/deployments/_deployment_row.html.erb` - Deployment row
+
+### Partials Removed
+- `app/views/layouts/_sidebar.html.erb`
+- `app/views/layouts/_icon_rail.html.erb`
+- `app/views/layouts/_context_panel.html.erb`
+- `app/views/layouts/_mobile_nav.html.erb`
 
 ---
 
@@ -264,6 +260,19 @@ Project
   - Created service show page with tabs, linked apps
   - Updated tests for new UI structure
   - All tests passing (159 tests, 0 failures)
+- Commit: `7ea55c7` - UI Redesign Phase 1
+
+### Session 2
+- Fixed navbar layout (items were wrapping to second row)
+- Added project selector dropdown to top nav
+- Removed "New Project" link from dropdown (deferred)
+- Moved queries from views to controllers:
+  - Added `@nav_projects` in ApplicationController
+  - Eager loading in ProjectsController (apps, services, containers, linked_apps)
+  - Added `@linked_services` and `@linked_apps` instance variables
+  - Updated views to use in-memory filtering (`.select(&:kept?)`, `.select(&:running?)`)
+- Moved work to `ui-redesign` branch
+- All tests passing (159 tests, 0 failures)
 
 ---
 

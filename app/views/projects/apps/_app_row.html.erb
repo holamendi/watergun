@@ -20,7 +20,7 @@
       </div>
 
       <%# Process indicators %>
-      <% running_containers = app.containers.running %>
+      <% running_containers = app.containers.select(&:running?) %>
       <% if running_containers.any? %>
         <div class="flex items-center gap-3 mt-2">
           <% running_containers.group_by(&:dokku_process_type).each do |process_type, containers| %>

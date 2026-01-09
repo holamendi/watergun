@@ -49,12 +49,11 @@
   </div>
 
   <%# Linked Apps %>
-  <% linked_apps = @service.linked_apps.kept %>
-  <% if linked_apps.any? %>
+  <% if @linked_apps.any? %>
     <section class="mb-8">
       <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Linked Apps</h2>
       <div class="card bg-base-200 divide-y divide-base-300">
-        <% linked_apps.each do |app| %>
+        <% @linked_apps.each do |app| %>
           <div class="p-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <%= status_dot(app.status) %>
