@@ -47,6 +47,27 @@ module UiHelper
     badge(status.humanize, color: status_mapping[status])
   end
 
+  def status_dot(status, size: :sm)
+    color_class = case status.to_s
+    when "active", "success" then "status-success"
+    when "error", "failure" then "status-error"
+    when "pending", "queued", "deleting" then "status-warning"
+    when "deploying", "enabling_ssl", "running" then "status-info"
+    else "status-neutral"
+    end
+
+    animate_class = case status.to_s
+    when "deploying", "enabling_ssl", "running", "pending", "queued", "deleting"
+      "animate-pulse"
+    else
+      ""
+    end
+
+    size_class = "status-#{size}"
+
+    tag.span(class: "status #{size_class} #{color_class} #{animate_class}".squish)
+  end
+
   def spinner(size: "md", color: nil)
     size_class = case size.to_s
     when "3", "4", "xs" then "loading-xs"

@@ -10,18 +10,11 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
   end
 
   describe "#show" do
-    test "renders the sidebar with project context" do
+    test "renders the project name" do
       get project_path(@project)
 
       assert_response :success
-      assert_select ".font-semibold", text: @project.name
-    end
-
-    test "renders the sidebar with server name" do
-      get project_path(@project)
-
-      assert_response :success
-      assert_select "body", /on #{@project.server.name}/
+      assert_select "h1", text: @project.name
     end
 
     test "renders back link to projects" do
@@ -31,7 +24,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href='#{projects_path}']", text: /Projects/
     end
 
-    test "lists apps in sidebar with status badges" do
+    test "lists apps with links" do
       app = apps(:smol_roda)
       get project_path(@project)
 
@@ -39,7 +32,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href='#{project_app_deployments_path(@project, app)}']", text: /#{app.name}/
     end
 
-    test "lists services in sidebar with status badges" do
+    test "lists services with links" do
       service = services(:postgres)
       get project_path(@project)
 
@@ -51,14 +44,14 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_app_path(@project)}']", text: /Add App/
+      assert_select "a[href='#{new_project_app_path(@project)}']", text: /App/
     end
 
     test "shows add service action" do
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_service_path(@project)}']", text: /Add Service/
+      assert_select "a[href='#{new_project_service_path(@project)}']", text: /Service/
     end
   end
 

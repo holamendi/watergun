@@ -40,8 +40,3 @@
 input[type="submit"] {
   cursor: pointer;
 }
-
-/* Prevent sidebar flash on page load */
-.sidebar-collapsed [data-sidebar-target="panel"] {
-  display: none;
-}

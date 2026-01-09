@@ -1,26 +1,34 @@
-<%= link_to project_path(project), id: dom_id(project), class: "card card-compact bg-base-200 border border-base-300 hover:border-primary transition-colors" do %>
-  <div class="card-body">
+<%= link_to project_path(project), id: dom_id(project), class: "card bg-base-200 hover:bg-base-300/50 transition-colors" do %>
+  <div class="card-body p-4">
     <h2 class="card-title text-base font-mono"><%= project.name %></h2>
-    <p class="text-xs text-base-content/60">
+
+    <div class="flex items-center gap-3 text-sm text-base-content/60">
       <% app_count = project.apps.kept.size %>
       <% service_count = project.services.kept.size %>
-      <% if app_count.positive? || service_count.positive? %>
-        <% parts = [] %>
-        <% parts << pluralize(app_count, "app") if app_count.positive? %>
-        <% parts << pluralize(service_count, "service") if service_count.positive? %>
-        <%= parts.join(" • ") %>
-      <% else %>
-        No resources
+
+      <% if app_count.positive? %>
+        <span class="flex items-center gap-1">
+          <span class="status status-success status-sm"></span>
+          <%= pluralize(app_count, "app") %>
+        </span>
       <% end %>
-    </p>
-    <div class="card-actions justify-end mt-1">
-      <% if project.last_deployment %>
-        <div class="badge badge-success badge-sm">
-          Deployed <%= time_ago_in_words(project.last_deployment.finished_at) %> ago
-        </div>
-      <% else %>
-        <div class="badge badge-ghost badge-sm">Not deployed</div>
+
+      <% if service_count.positive? %>
+        <span class="flex items-center gap-1">
+          <span class="status status-info status-sm"></span>
+          <%= pluralize(service_count, "service") %>
+        </span>
+      <% end %>
+
+      <% if app_count.zero? && service_count.zero? %>
+        <span class="text-base-content/40">No resources</span>
       <% end %>
     </div>
+
+    <% if project.last_deployment %>
+      <div class="text-xs text-base-content/50 mt-1">
+        Last deploy <%= time_ago_in_words(project.last_deployment.finished_at) %> ago
+      </div>
+    <% end %>
   </div>
 <% end %>

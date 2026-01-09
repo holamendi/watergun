@@ -1,0 +1,76 @@
+<div id="<%= dom_id(app) %>" class="p-4">
+  <div class="flex items-start justify-between gap-4">
+    <%# Left: App info %>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <%= status_dot(app.status) %>
+        <%= link_to app.name, project_app_deployments_path(app.project, app), class: "font-semibold font-mono hover:text-primary" %>
+      </div>
+
+      <div class="flex items-center gap-2 mt-1 text-sm text-base-content/60">
+        <% if app.github_repo.present? %>
+          <span><%= app.github_repo.branch %></span>
+          <span>·</span>
+        <% end %>
+        <% if app.deployed? %>
+          <span><%= time_ago_in_words(app.deployed_at) %> ago</span>
+        <% else %>
+          <span>Not deployed</span>
+        <% end %>
+      </div>
+
+      <%# Process indicators %>
+      <% running_containers = app.containers.running %>
+      <% if running_containers.any? %>
+        <div class="flex items-center gap-3 mt-2">
+          <% running_containers.group_by(&:dokku_process_type).each do |process_type, containers| %>
+            <span class="inline-flex items-center gap-1 text-xs text-base-content/50">
+              <span class="status status-success status-xs"></span>
+              <%= process_type %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Right: Actions %>
+    <div class="flex items-center gap-2">
+      <% if app.github_repo.present? && !app.temporary_status? %>
+        <%= button_to project_app_deployments_path(app.project, app),
+            class: "btn btn-primary btn-sm",
+            form: { data: { turbo_stream: true } } do %>
+          Deploy
+        <% end %>
+      <% end %>
+
+      <%= link_to project_app_log_streams_path(app.project, app),
+          class: "btn btn-ghost btn-sm",
+          data: { turbo_prefetch: false } do %>
+        Logs
+      <% end %>
+
+      <%# Overflow menu %>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-square">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
+          <li><%= link_to "Deployments", project_app_deployments_path(app.project, app) %></li>
+          <li><%= link_to "Metrics", project_app_metrics_path(app.project, app) %></li>
+          <li><%= link_to "Variables", project_app_env_variables_path(app.project, app) %></li>
+          <li><%= link_to "Domains", project_app_domains_path(app.project, app) %></li>
+          <% if app.deployed? && !app.temporary_status? %>
+            <li class="border-t border-base-300 mt-1 pt-1">
+              <%= button_to "Restart", project_app_restarts_path(app.project, app),
+                  class: "text-left",
+                  form: { data: { turbo_stream: true } } %>
+            </li>
+          <% end %>
+          <li><%= link_to "Settings", edit_project_app_path(app.project, app) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

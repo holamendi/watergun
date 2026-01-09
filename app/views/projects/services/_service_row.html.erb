@@ -1,0 +1,48 @@
+<div id="<%= dom_id(service) %>" class="p-4">
+  <div class="flex items-start justify-between gap-4">
+    <%# Left: Service info %>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <%= status_dot(service.status) %>
+        <%= link_to service.name, project_service_metrics_path(service.project, service), class: "font-semibold font-mono hover:text-primary" %>
+        <span class="badge badge-sm badge-ghost"><%= service.service_type.to_s.titleize %></span>
+      </div>
+
+      <% linked_apps = service.linked_apps.kept %>
+      <% if linked_apps.any? %>
+        <div class="text-sm text-base-content/60 mt-1">
+          Linked to: <%= linked_apps.map(&:name).join(", ") %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Right: Actions %>
+    <div class="flex items-center gap-2">
+      <%= link_to project_service_log_streams_path(service.project, service),
+          class: "btn btn-ghost btn-sm",
+          data: { turbo_prefetch: false } do %>
+        Logs
+      <% end %>
+
+      <%# Overflow menu %>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-square">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
+          <li><%= link_to "Metrics", project_service_metrics_path(service.project, service) %></li>
+          <% if service.active? && !service.temporary_status? %>
+            <li class="border-t border-base-300 mt-1 pt-1">
+              <%= button_to "Restart", project_service_restarts_path(service.project, service),
+                  class: "text-left",
+                  form: { data: { turbo_stream: true } } %>
+            </li>
+          <% end %>
+          <li><%= link_to "Settings", edit_project_service_path(service.project, service) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

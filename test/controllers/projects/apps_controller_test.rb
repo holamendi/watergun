@@ -11,36 +11,23 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
   end
 
   describe "#show" do
-    test "renders the sidebar with app context" do
+    test "renders the app name" do
       get project_app_path(@project, @app)
 
       assert_response :success
-
-      # App header with name and status badge
-      assert_select "[data-sidebar-target='panel']" do
-        assert_select ".font-semibold", text: @app.name
-      end
+      assert_select "h1", text: @app.name
     end
 
-    test "renders the sidebar with server name" do
-      get project_app_path(@project, @app)
-
-      assert_response :success
-      assert_select "body", /on #{@app.server.name}/
-    end
-
-    test "renders navigation links without counter badges" do
+    test "renders navigation tabs" do
       get project_app_path(@project, @app)
 
       assert_response :success
 
-      # Navigation links should exist
       assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
       assert_select "a[href='#{project_app_metrics_path(@project, @app)}']"
       assert_select "a[href='#{project_app_log_streams_path(@project, @app)}']"
       assert_select "a[href='#{project_app_env_variables_path(@project, @app)}']"
       assert_select "a[href='#{project_app_domains_path(@project, @app)}']"
-      assert_select "a[href='#{edit_project_app_path(@project, @app)}']"
     end
 
     test "renders back link to project" do
@@ -52,15 +39,15 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
   end
 
   describe "#edit" do
-    test "renders the sidebar with app context" do
+    test "renders the edit form" do
       get edit_project_app_path(@project, @app)
 
       assert_response :success
-      assert_select ".font-semibold", text: @app.name
+      assert_select "input[name='app[name]'][value='#{@app.name}']"
     end
   end
 
-  describe "sidebar with deployed app" do
+  describe "deployed app" do
     setup do
       @app.update!(status: :active, deployed_at: 1.hour.ago)
     end
@@ -69,10 +56,10 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
       get project_app_path(@project, @app)
 
       assert_response :success
-      assert_select "body", /Deployed.*ago/
+      assert_select "body", /deployed.*ago/i
     end
 
-    test "shows restart quick action" do
+    test "shows restart action" do
       get project_app_path(@project, @app)
 
       assert_response :success
@@ -80,20 +67,20 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  describe "sidebar with github repo" do
+  describe "app with github repo" do
     setup do
       @app = apps(:smol_roda)
       # smol_roda has a github_repo fixture
     end
 
-    test "shows deploy quick action when github repo is connected" do
+    test "shows deploy action when github repo is connected" do
       get project_app_path(@project, @app)
 
       assert_response :success
       assert_select "form[action='#{project_app_deployments_path(@project, @app)}']"
     end
 
-    test "shows github repo in links section" do
+    test "shows github repo link" do
       get project_app_path(@project, @app)
 
       assert_response :success
@@ -101,7 +88,7 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  describe "sidebar with linked services" do
+  describe "app with linked services" do
     setup do
       @service = services(:postgres)
       @service.update!(status: :active)
