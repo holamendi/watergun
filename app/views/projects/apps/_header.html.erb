@@ -1,0 +1,68 @@
+<%= turbo_stream_from app %>
+<% @title = app.name %>
+
+<%# Header %>
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div>
+    <%= link_to project_path(app.project), class: "text-sm text-base-content/60 hover:text-base-content inline-flex items-center gap-1 mb-1" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      <%= app.project.name %>
+    <% end %>
+    <div class="flex items-center gap-2">
+      <h1 class="text-2xl font-semibold font-mono"><%= app.name %></h1>
+      <%= status_dot(app.status) %>
+    </div>
+    <div class="text-sm text-base-content/60 mt-1">
+      <% if app.github_repo.present? %>
+        <%= app.github_repo.branch %> branch
+        <% if app.deployed? %>
+          · deployed <%= time_ago_in_words(app.deployed_at) %> ago
+        <% end %>
+      <% elsif app.deployed? %>
+        Deployed <%= time_ago_in_words(app.deployed_at) %> ago
+      <% else %>
+        Not deployed
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <% if app.github_repo.present? && !app.temporary_status? %>
+      <%= button_to project_app_deployments_path(app.project, app),
+          class: "btn btn-primary btn-sm",
+          form: { data: { turbo_stream: true } } do %>
+        Deploy
+      <% end %>
+    <% end %>
+    <% if app.deployed? && !app.temporary_status? %>
+      <%= button_to project_app_restarts_path(app.project, app),
+          class: "btn btn-ghost btn-sm",
+          form: { data: { turbo_stream: true } } do %>
+        Restart
+      <% end %>
+    <% end %>
+    <%= link_to edit_project_app_path(app.project, app), class: "btn btn-ghost btn-sm btn-square", title: "Settings" do %>
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+    <% end %>
+  </div>
+</div>
+
+<%# Tabs %>
+<div class="tabs tabs-border mb-6 overflow-x-auto">
+  <%= link_to "Deployments", project_app_deployments_path(app.project, app),
+      class: "tab #{active_tab == :deployments ? 'tab-active' : ''}" %>
+  <%= link_to "Logs", project_app_log_streams_path(app.project, app),
+      class: "tab #{active_tab == :logs ? 'tab-active' : ''}",
+      data: { turbo_prefetch: false } %>
+  <%= link_to "Variables", project_app_env_variables_path(app.project, app),
+      class: "tab #{active_tab == :variables ? 'tab-active' : ''}" %>
+  <%= link_to "Domains", project_app_domains_path(app.project, app),
+      class: "tab #{active_tab == :domains ? 'tab-active' : ''}" %>
+  <%= link_to "Metrics", project_app_metrics_path(app.project, app),
+      class: "tab #{active_tab == :metrics ? 'tab-active' : ''}" %>
+</div>

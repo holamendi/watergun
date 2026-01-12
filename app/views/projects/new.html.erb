@@ -1,15 +1,24 @@
 <% @title = "New Project" %>
 
-<div class="p-6">
-  <div class="flex justify-center">
-    <div class="w-full max-w-md">
-      <div class="card bg-base-200 border border-base-300">
-        <div class="card-body">
-          <h2 class="card-title text-xl">Create a new project</h2>
-          <p class="text-base-content/60 text-sm mb-4">Projects group apps and services that are deployed together on a server.</p>
-          <%= render "form", project: @project %>
-        </div>
-      </div>
-    </div>
+<div class="px-4 sm:px-6 lg:px-8 max-w-lg mx-auto py-12">
+  <div class="text-center mb-8">
+    <h1 class="text-2xl font-semibold">Create a project</h1>
+    <p class="text-base-content/60 mt-2">A project groups your apps and services together.</p>
   </div>
+
+  <%= form_with(model: @project, class: "space-y-6") do |form| %>
+    <div>
+      <%= form.text_field :name,
+          class: "input input-lg w-full font-mono text-center",
+          placeholder: "my-project",
+          autofocus: true,
+          autocomplete: "off" %>
+      <%= error_messages_for(@project, :name) %>
+    </div>
+
+    <div class="flex justify-center gap-3">
+      <%= link_to "Cancel", projects_path, class: "btn btn-ghost" %>
+      <%= form.submit "Create Project", class: "btn btn-primary" %>
+    </div>
+  <% end %>
 </div>

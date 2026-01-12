@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html class="h-full" data-theme="<%= Current.user&.theme || 'watergun' %>">
   <head>
-    <script>
-      (function() {
-        var expanded = localStorage.getItem('sidebar-expanded');
-        if (expanded === 'false') {
-          document.documentElement.classList.add('sidebar-collapsed');
-        }
-      })();
-    </script>
     <title><%= @title.presence || "Watergun" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -21,10 +13,15 @@
     <%= vite_stylesheet_tag "application", data: { "turbo-track": "reload" } %>
     <%= vite_javascript_tag 'application' %>
   </head>
-  <body class="h-full">
+  <body class="h-full bg-base-100">
     <%= render "shared/toasts" %>
-    <%= render "layouts/sidebar" do %>
-      <%= yield %>
-    <% end %>
+
+    <div class="min-h-full">
+      <%= render "layouts/top_nav" %>
+
+      <main class="py-6">
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>

@@ -11,35 +11,27 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
   end
 
   describe "#show" do
-    test "renders the sidebar with service context" do
+    test "renders the service name" do
       get project_service_path(@project, @service)
 
       assert_response :success
-      assert_select ".font-semibold", text: @service.name
+      assert_select "h1", text: @service.name
     end
 
-    test "renders the sidebar with service type" do
+    test "renders the service type" do
       get project_service_path(@project, @service)
 
       assert_response :success
       assert_select "body", /#{@service.service_type.to_s.titleize}/
     end
 
-    test "renders the sidebar with server name" do
-      get project_service_path(@project, @service)
-
-      assert_response :success
-      assert_select "body", /on #{@service.server.name}/
-    end
-
-    test "renders navigation links" do
+    test "renders navigation tabs" do
       get project_service_path(@project, @service)
 
       assert_response :success
 
       assert_select "a[href='#{project_service_metrics_path(@project, @service)}']"
       assert_select "a[href='#{project_service_log_streams_path(@project, @service)}']"
-      assert_select "a[href='#{edit_project_service_path(@project, @service)}']"
     end
 
     test "renders back link to project" do
@@ -48,23 +40,30 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "a[href='#{project_path(@project)}']", text: /#{@project.name}/
     end
-  end
 
-  describe "#edit" do
-    test "renders the sidebar with service context" do
-      get edit_project_service_path(@project, @service)
+    test "renders settings link" do
+      get project_service_path(@project, @service)
 
       assert_response :success
-      assert_select ".font-semibold", text: @service.name
+      assert_select "a[href='#{edit_project_service_path(@project, @service)}']"
     end
   end
 
-  describe "sidebar with active service" do
+  describe "#edit" do
+    test "renders the edit form" do
+      get edit_project_service_path(@project, @service)
+
+      assert_response :success
+      assert_select "input[name='service[name]'][value='#{@service.name}']"
+    end
+  end
+
+  describe "active service" do
     setup do
       @service.update!(status: :active)
     end
 
-    test "shows restart quick action" do
+    test "shows restart action" do
       get project_service_path(@project, @service)
 
       assert_response :success
@@ -72,12 +71,12 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  describe "sidebar with pending service" do
+  describe "pending service" do
     setup do
       @service.update!(status: :pending)
     end
 
-    test "does not show restart quick action" do
+    test "does not show restart action" do
       get project_service_path(@project, @service)
 
       assert_response :success
@@ -85,7 +84,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  describe "sidebar with linked apps" do
+  describe "service with linked apps" do
     setup do
       @app = apps(:smol_roda)
       @service.update!(status: :active)

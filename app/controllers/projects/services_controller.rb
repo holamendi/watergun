@@ -16,6 +16,7 @@ class Projects::ServicesController < Projects::BaseController
   end
 
   def show
+    @linked_apps = @service.linked_apps.kept
   end
 
   def edit

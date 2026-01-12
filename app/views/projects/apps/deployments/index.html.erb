@@ -1,20 +1,39 @@
 <%= turbo_stream_from @app, :deployments %>
 
-<div class="p-6">
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+  <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
+
   <% if @app.github_repo.present? %>
-    <div class="flex justify-between pb-6">
-      <div>
-        <%= form_with url: project_app_deployments_path(@project, @app) do |f| %>
-          <%= submit_button "Deploy" %>
-        <% end %>
-      </div>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-medium">Deployments</h2>
+      <%= form_with url: project_app_deployments_path(@project, @app), class: "inline" do |f| %>
+        <%= submit_button "Deploy" %>
+      <% end %>
     </div>
-    <ul id="deployments" role="list" class="card bg-base-100 shadow-sm divide-y divide-base-200">
-      <%= render @deployments %>
-    </ul>
+
+    <% if @deployments.any? %>
+      <div id="deployments" class="card bg-base-200 divide-y divide-base-300">
+        <%= render @deployments %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium">No deployments yet</h3>
+        <p class="mt-1 text-sm text-base-content/60">Deploy your app to get started.</p>
+      </div>
+    <% end %>
   <% else %>
-    <div class="mt-8">
-      <%= link_to "Connect to Github repo", new_app_github_repo_path(@app), class: "btn btn-primary" %>
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium">Connect a GitHub repository</h3>
+      <p class="mt-1 text-sm text-base-content/60">Link a repository to enable deployments.</p>
+      <div class="mt-6">
+        <%= link_to "Connect Repository", new_app_github_repo_path(@app), class: "btn btn-primary" %>
+      </div>
     </div>
   <% end %>
 </div>

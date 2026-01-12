@@ -1,6 +1,8 @@
 <%= turbo_stream_from @app, :metrics %>
 
-<div class="p-6">
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+  <%= render "projects/apps/header", app: @app, active_tab: :metrics %>
+
   <%= turbo_frame_tag :stats, src: stats_project_app_metrics_path(@project, @app) %>
   <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_app_metrics_path(@project, @app) %>
   <%= turbo_frame_tag :memory_chart, src: memory_chart_project_app_metrics_path(@project, @app) %>

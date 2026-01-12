@@ -1,32 +1,25 @@
-<%= form_with model: [env_variable.project, env_variable.app, env_variable], class: "w-full" do |form| %>
-  <div class="sm:flex">
-    <dt class="font-medium sm:w-64 sm:flex-none sm:pr-6">
-      <% if form.object.new_record? %>
-        <div class="relative">
-          <%= form.text_field :name,
-              class: "input input-sm w-full",
-              placeholder: "NAME",
-              autofocus: true %>
-          <%= error_messages_for(form.object, :name) %>
-        </div>
-      <% else %>
-        <div class="block w-full truncate" title="<%= env_variable.name %>">
-          <%= env_variable.name %>
-        </div>
-      <% end %>
-    </dt>
-    <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
-      <div class="flex-grow max-w-[400px]">
-        <%= form.text_field :value,
-            class: "input input-sm w-full",
-            placeholder: "Value",
-            autofocus: form.object.persisted? %>
-        <%= error_messages_for(form.object, :value) %>
-      </div>
-      <div class="flex-shrink-0 flex gap-2">
-        <%= submit_button "Save variables" %>
-        <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "btn btn-ghost btn-sm" %>
-      </div>
-    </dd>
+<%= form_with model: [env_variable.project, env_variable.app, env_variable], class: "card bg-base-200 p-4" do |form| %>
+  <div class="flex flex-col sm:flex-row gap-4">
+    <fieldset class="fieldset flex-1">
+      <legend class="fieldset-legend">Name</legend>
+      <%= form.text_field :name,
+          class: "input w-full font-mono",
+          placeholder: "MY_VARIABLE",
+          readonly: form.object.persisted?,
+          autofocus: form.object.new_record? %>
+      <%= error_messages_for(form.object, :name) %>
+    </fieldset>
+    <fieldset class="fieldset flex-1">
+      <legend class="fieldset-legend">Value</legend>
+      <%= form.text_field :value,
+          class: "input w-full font-mono",
+          placeholder: "value",
+          autofocus: form.object.persisted? %>
+      <%= error_messages_for(form.object, :value) %>
+    </fieldset>
+    <div class="flex items-end gap-2">
+      <%= form.submit "Save", class: "btn btn-primary" %>
+      <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "btn btn-ghost" %>
+    </div>
   </div>
 <% end %>

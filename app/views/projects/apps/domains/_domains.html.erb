@@ -7,24 +7,13 @@
     </button>
   </div>
 
-  <% if app.domains.kept.any? %>
-    <div class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Domain</th>
-            <th>Status</th>
-            <th>SSL</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <%= render partial: "projects/apps/domains/domain", collection: app.domains.kept %>
-        </tbody>
-      </table>
+  <% domains = app.domains.select(&:kept?) %>
+  <% if domains.any? %>
+    <div class="card bg-base-200 divide-y divide-base-300">
+      <%= render partial: "projects/apps/domains/domain", collection: domains %>
     </div>
   <% else %>
-    <p class="text-base-content/60">No domains configured</p>
+    <p class="text-base-content/60 text-sm">No domains configured</p>
   <% end %>
 </div>
 

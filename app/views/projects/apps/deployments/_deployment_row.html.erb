@@ -1,0 +1,23 @@
+<div id="<%= dom_id(deployment) %>" class="p-4">
+  <div class="flex items-center gap-3">
+    <%= status_dot(deployment.status) %>
+
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-sm font-medium"><%= deployment.short_sha %></span>
+        <% if deployment.finished? %>
+          <span class="text-xs text-base-content/60"><%= time_ago_in_words(deployment.finished_at) %> ago</span>
+        <% elsif deployment.running? || deployment.pending? %>
+          <span class="text-xs text-base-content/60">In progress...</span>
+        <% end %>
+      </div>
+      <% if deployment.commit_message.present? %>
+        <p class="text-sm text-base-content/60 truncate mt-0.5"><%= deployment.commit_message.lines.first %></p>
+      <% end %>
+    </div>
+
+    <% if deployment.author_avatar_url.present? %>
+      <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_name %>" class="w-6 h-6 rounded-full" title="<%= deployment.author_name %>">
+    <% end %>
+  </div>
+</div>

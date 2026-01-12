@@ -95,6 +95,7 @@ Recurring jobs configured in `config/recurring.yml`.
 - Turbo for real-time updates and broadcasts
 - DaisyUI 5 component library on Tailwind CSS 4 for styling
   - Docs: https://daisyui.com/llms.txt
+  - **Always check DaisyUI docs before implementing custom CSS or JS components** - most UI patterns (collapse, tooltip, status indicators, menus) already exist
   - Use semantic color names (`primary`, `success`, `error`) for theme consistency
   - Components use class naming: component (`btn`), parts (`card-body`), modifiers (colors/sizes)
 

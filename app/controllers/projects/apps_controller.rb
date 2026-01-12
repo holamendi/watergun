@@ -21,6 +21,7 @@ class Projects::AppsController < Projects::BaseController
 
   def show
     @deployments = @app.deployments.kept.recent.limit(5)
+    @linked_services = @app.services.kept
   end
 
   def edit
@@ -53,7 +54,7 @@ class Projects::AppsController < Projects::BaseController
   end
 
   def set_app
-    @app = @project.apps.kept.includes(:services, :server, :github_repo, :default_domain).find(params[:id])
+    @app = @project.apps.kept.includes(:services, :server, :github_repo, :default_domain, :containers).find(params[:id])
   end
 
   def render_form
