@@ -1,43 +1,43 @@
-<% @title = "Account Settings" %>
+<% @title = "Settings" %>
 
-<div class="p-6">
-  <%= page_header(@title) %>
+<div class="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold">Settings</h1>
+    <p class="text-base-content/60 mt-1">Manage your account and preferences.</p>
+  </div>
 
-  <div class="divide-y divide-base-300">
-    <div class="grid grid-cols-1 pb-10 gap-x-8 gap-y-8 md:grid-cols-3">
-      <div>
-        <h2 class="text-base font-semibold leading-7">Profile</h2>
-        <p class="mt-1 text-sm leading-6 text-base-content/60">Update your personal information.</p>
+  <div class="space-y-8">
+    <section class="card bg-base-200 p-6">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-medium">Profile</h2>
+          <p class="text-sm text-base-content/60">Update your personal information.</p>
+        </div>
       </div>
+      <%= render "accounts/profiles/form", user: Current.user %>
+    </section>
 
-      <div class="md:col-span-2">
-        <%= render "accounts/profiles/form", user: Current.user %>
+    <section class="card bg-base-200 p-6">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-medium">Appearance</h2>
+          <p class="text-sm text-base-content/60">Customize how Watergun looks for you.</p>
+        </div>
       </div>
-    </div>
+      <%= render "accounts/themes/form", user: Current.user %>
+    </section>
 
-    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
-      <div>
-        <h2 class="text-base font-semibold leading-7">Appearance</h2>
-        <p class="mt-1 text-sm leading-6 text-base-content/60">Customize how Watergun looks for you.</p>
+    <section class="card bg-base-200 p-6">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-medium">GitHub Integration</h2>
+          <p class="text-sm text-base-content/60">Connect your GitHub account for seamless deployments.</p>
+        </div>
       </div>
-
-      <div class="md:col-span-2">
-        <%= render "accounts/themes/form", user: Current.user %>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 py-10 gap-x-8 gap-y-8 md:grid-cols-3">
-      <div>
-        <h2 class="text-base font-semibold leading-7">GitHub Integration</h2>
-        <p class="mt-1 text-sm leading-6 text-base-content/60">Connect your GitHub account for seamless integration.</p>
-      </div>
-
-      <div class="md:col-span-2">
-        <%= render "accounts/github/settings",
-                   github_app: Current.account.github_app,
-                   github_app_manifest: Current.account.github_app_manifest,
-                   github_installation: Current.account.github_installation %>
-      </div>
-    </div>
+      <%= render "accounts/github/settings",
+                 github_app: Current.account.github_app,
+                 github_app_manifest: Current.account.github_app_manifest,
+                 github_installation: Current.account.github_installation %>
+    </section>
   </div>
 </div>

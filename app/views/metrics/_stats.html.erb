@@ -1,24 +1,22 @@
 <%= turbo_frame_tag :stats do %>
-  <div class="mb-6">
-    <dl class="stats shadow w-full">
-      <div class="stat">
-        <div class="stat-title">Running Containers</div>
-        <div class="stat-value text-primary"><%= containers.size %></div>
-        <div class="stat-desc">
-          <% containers.map(&:dokku_process_type).tally.each do |process_type, count| %>
-            <span class="badge badge-neutral mr-2 mb-2"><%= process_type %>: <%= count %></span>
-          <% end %>
-        </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="card bg-base-200 p-4">
+      <div class="text-sm text-base-content/60">Running Containers</div>
+      <div class="text-2xl font-semibold text-primary mt-1"><%= containers.size %></div>
+      <div class="flex flex-wrap gap-1 mt-2">
+        <% containers.map(&:dokku_process_type).tally.each do |process_type, count| %>
+          <span class="badge badge-sm badge-ghost font-mono"><%= process_type %>: <%= count %></span>
+        <% end %>
       </div>
-      <div class="stat">
-        <div class="stat-title">Total CPU Usage</div>
-        <div class="stat-value text-primary"><%= total_cpu_usage %>%</div>
-      </div>
-      <div class="stat">
-        <div class="stat-title">Total Memory Usage</div>
-        <div class="stat-value text-primary"><%= memory_usage_percentage %>%</div>
-        <div class="stat-desc"><%= memory_usage_megabytes.to_s %> / <%= memory_usage_limit_megabytes.to_s %> MB</div>
-      </div>
-    </dl>
+    </div>
+    <div class="card bg-base-200 p-4">
+      <div class="text-sm text-base-content/60">Total CPU Usage</div>
+      <div class="text-2xl font-semibold text-primary mt-1"><%= total_cpu_usage %>%</div>
+    </div>
+    <div class="card bg-base-200 p-4">
+      <div class="text-sm text-base-content/60">Total Memory Usage</div>
+      <div class="text-2xl font-semibold text-primary mt-1"><%= memory_usage_percentage %>%</div>
+      <div class="text-sm text-base-content/60 mt-1"><%= memory_usage_megabytes %> / <%= memory_usage_limit_megabytes %> MB</div>
+    </div>
   </div>
 <% end %>

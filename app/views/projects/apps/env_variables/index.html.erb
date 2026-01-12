@@ -1,28 +1,30 @@
-<div class="p-6">
-  <div class="flex justify-between pb-6">
-    <div>
-      <%= link_to "New Variable",
-        new_project_app_env_variable_path(@project, @app),
-        class: "btn btn-primary",
-        data: { turbo_frame: "new_env_variable" } %>
-    </div>
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+  <%= render "projects/apps/header", app: @app, active_tab: :variables %>
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-medium">Environment Variables</h2>
+    <%= link_to new_project_app_env_variable_path(@project, @app),
+        class: "btn btn-primary btn-sm",
+        data: { turbo_frame: "new_env_variable" } do %>
+      Add Variable
+    <% end %>
   </div>
 
-  <dl class="divide-y divide-base-200 space-4 text-sm/6">
-    <div class="py-2 sm:flex">
-      <dt class="font-bold sm:w-64 sm:flex-none sm:pr-6">
-        <div>Name</div>
-      </dt>
-      <dd class="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
-        <div class="font-bold">Value</div>
-        <div class="flex-shrink-0"></div>
-      </dd>
-    </div>
+  <%= turbo_frame_tag EnvVariable.new, class: "block mb-4" %>
 
-    <%= turbo_frame_tag EnvVariable.new %>
-
-    <div id="env_variables">
-      <%= render @env_variables %>
+  <% if @env_variables.any? %>
+    <div class="card bg-base-200 divide-y divide-base-300">
+      <div id="env_variables">
+        <%= render @env_variables %>
+      </div>
     </div>
-  </dl>
+  <% else %>
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium">No environment variables</h3>
+      <p class="mt-1 text-sm text-base-content/60">Add variables to configure your app.</p>
+    </div>
+  <% end %>
 </div>

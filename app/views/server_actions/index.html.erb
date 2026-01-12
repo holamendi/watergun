@@ -2,28 +2,41 @@
 
 <% @title = "Activity" %>
 
-<div class="p-6">
-  <%= page_header(@title) %>
-
-  <div class="card bg-base-100 shadow-sm">
-    <div class="overflow-x-auto">
-      <table class="table table-sm">
-        <thead>
-          <tr class="text-xs uppercase text-base-content/60">
-            <th>Action</th>
-            <th>Target</th>
-            <th>User</th>
-            <th>Completed</th>
-            <th>Duration</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="server_actions">
-          <%= render @server_actions %>
-        </tbody>
-      </table>
-    </div>
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold">Activity</h1>
+    <p class="text-base-content/60 mt-1">Recent server actions and deployments.</p>
   </div>
 
-  <%= render "shared/pagination", pagy: @pagy %>
+  <% if @server_actions.any? %>
+    <div class="card bg-base-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table table-sm">
+          <thead>
+            <tr class="text-xs uppercase text-base-content/60 bg-base-300/50">
+              <th>Action</th>
+              <th>Target</th>
+              <th>User</th>
+              <th>Completed</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="server_actions">
+            <%= render @server_actions %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% else %>
+    <div class="text-center py-16">
+      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium">No activity yet</h3>
+      <p class="mt-1 text-sm text-base-content/60">Server actions will appear here as they run.</p>
+    </div>
+  <% end %>
 </div>

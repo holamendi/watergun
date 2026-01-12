@@ -74,22 +74,24 @@ Note: Search (Cmd+K) deferred to Phase 4.
 - [x] Tests updated for new UI structure
 - [x] Moved queries from views to controllers (eager loading)
 
-### Phase 2: Forms
-- [ ] Project new/edit forms
-- [ ] App creation form
-- [ ] Service creation form
+### Phase 2: Forms (Complete)
+- [x] Project new/edit forms
+- [x] App new/edit forms (including create form, settings sections)
+- [x] Service new/edit forms (including create form)
 
-### Phase 3: Supporting Pages
-- [ ] Environment variables editor
-- [ ] Domains management
-- [ ] Logs viewer improvements
-- [ ] Metrics display improvements
+### Phase 3: Supporting Pages (Complete)
+- [x] Environment variables editor (redesigned with card layout, icon buttons)
+- [x] Domains management (card-based list with status badges, dropdown actions)
+- [x] Logs viewer improvements (added header with tabs, terminal-style display)
+- [x] Metrics display improvements (card-based stats, consistent chart styling)
+- [x] Created shared header partials for apps and services (consistent tabs navigation)
+- [x] All tab pages now include full app/service context with actions
 
-### Phase 4: Settings & Polish
-- [ ] Account settings page
-- [ ] Mobile responsiveness audit
-- [ ] Empty states
-- [ ] Cmd+K search feature
+### Phase 4: Settings & Polish (Complete)
+- [x] Account settings page (card-based sections, consistent styling)
+- [x] Mobile responsiveness audit (tabs overflow, header stacking)
+- [x] Empty states (activity page, consistency check)
+- [ ] Cmd+K search feature (deferred to future phase)
 
 ---
 
@@ -104,7 +106,9 @@ Note: Search (Cmd+K) deferred to Phase 4.
 - `app/views/layouts/_top_nav.html.erb` - Top navigation with project dropdown
 - `app/views/projects/_project.html.erb` - Project card for dashboard
 - `app/views/projects/apps/_app_row.html.erb` - App row with quick actions
+- `app/views/projects/apps/_header.html.erb` - App header with tabs navigation
 - `app/views/projects/services/_service_row.html.erb` - Service row
+- `app/views/projects/services/_header.html.erb` - Service header with tabs navigation
 - `app/views/projects/apps/deployments/_deployment_row.html.erb` - Deployment row
 
 ### Partials Removed
@@ -272,6 +276,35 @@ Project
   - Added `@linked_services` and `@linked_apps` instance variables
   - Updated views to use in-memory filtering (`.select(&:kept?)`, `.select(&:running?)`)
 - Moved work to `ui-redesign` branch
+- All tests passing (159 tests, 0 failures)
+- Commit: `0fa4919` - Add project selector dropdown and move queries to controllers
+- Implemented Phase 2: Forms
+  - Updated project new/edit pages with consistent layout
+  - Updated app new/edit pages (create form, settings with sections)
+  - Updated service new/edit pages (create form, settings)
+  - All forms now use consistent back links, card styling, fieldset patterns
+- All tests passing (159 tests, 0 failures)
+
+### Session 3
+- Implemented Phase 3: Supporting Pages
+  - Created shared header partials for apps (`_header.html.erb`) and services
+  - Header partials include: back link, title, status, metadata, actions, tabs
+  - Updated environment variables page with card layout, icon action buttons
+  - Updated domains page with card-based list, status badges, SSL indicator
+  - Updated logs viewer with header context, terminal-style display
+  - Updated metrics pages with card-based stats, consistent chart styling
+  - Updated deployments index with header and empty state
+  - All tab pages now have consistent navigation and app/service context
+- All tests passing (159 tests, 0 failures)
+
+### Session 4
+- Implemented Phase 4: Settings & Polish
+  - Updated account settings page with card-based sections
+  - Updated activity page with consistent styling and empty state
+  - Added mobile responsiveness improvements:
+    - Tabs now have `overflow-x-auto` for horizontal scroll on mobile
+    - Headers stack vertically on small screens (`flex-col sm:flex-row`)
+  - Cmd+K search feature deferred to future phase
 - All tests passing (159 tests, 0 failures)
 
 ---

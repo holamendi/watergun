@@ -1,17 +1,39 @@
-<% @title = @project.name %>
+<% @title = "#{@project.name} · Settings" %>
 
-<div class="p-6">
-  <div class="flex justify-center">
-    <div class="w-full max-w-lg">
-      <%= page_header("Settings") %>
-      <div class="space-y-10 divide-y divide-base-300">
-        <div>
-          <%= render "form", project: @project %>
+<div class="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+  <div class="mb-8">
+    <%= link_to project_path(@project), class: "text-sm text-base-content/60 hover:text-base-content inline-flex items-center gap-1" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      <%= @project.name %>
+    <% end %>
+    <h1 class="text-2xl font-semibold mt-1">Settings</h1>
+  </div>
+
+  <div class="space-y-12">
+    <section>
+      <%= form_with(model: @project) do |form| %>
+        <div class="flex gap-4 items-end">
+          <fieldset class="fieldset flex-1">
+            <legend class="fieldset-legend">Project name</legend>
+            <%= form.text_field :name, class: "input w-full font-mono", autocomplete: "off" %>
+            <%= error_messages_for(@project, :name) %>
+          </fieldset>
+          <%= form.submit "Save", class: "btn btn-primary" %>
         </div>
-        <div class="pt-10">
-          <%= button_to "Delete Project", project_path(@project), method: :delete, class: "btn btn-error", data: { turbo_confirm: "Sure?"} %>
-        </div>
-      </div>
-    </div>
+      <% end %>
+    </section>
+
+    <section class="pt-8 border-t border-base-300">
+      <h2 class="text-lg font-medium text-error">Danger zone</h2>
+      <p class="text-sm text-base-content/60 mt-2">
+        Deleting this project will permanently remove all apps, services, and deployment history.
+      </p>
+      <%= button_to "Delete project", project_path(@project),
+          method: :delete,
+          class: "btn btn-error btn-outline mt-4",
+          data: { turbo_confirm: "Delete #{@project.name}? This cannot be undone." } %>
+    </section>
   </div>
 </div>
