@@ -14,7 +14,7 @@
           </div>
           <% if container.cpu_percentage.present? %>
             <div class="text-xs text-base-content/60">
-              <%= number_to_percentage(container.cpu_percentage, precision: 0) %> CPU · <%= number_to_human_size(container.memory_usage || 0) %>
+              <%= number_to_percentage(container.cpu_percentage, precision: 0) %> CPU · <%= number_to_human_size(container.memory_used_bytes || 0) %>
             </div>
           <% end %>
         </div>
