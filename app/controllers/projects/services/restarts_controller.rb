@@ -1,6 +1,6 @@
 class Projects::Services::RestartsController < Projects::Services::BaseController
   def create
-    ServerActions::RestartApp.run_later!(@service)
-    Notification.stream_later_to(Current.user, "#{@service.name}: restart scheduled")
+    ServerActions::RestartService.run_later!(@service.server, @service)
+    render turbo_stream: stream_toast("Restart scheduled")
   end
 end

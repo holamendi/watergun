@@ -26,10 +26,6 @@ class ServerActions::RestartService < ServerAction
   end
 
   def restart_dokku_service!
-    dokku_command_class.call!(ssh, service: dokku_service_id)
-  end
-
-  def dokku_command_class
-    "Dokku::#{service_type.camelcase}::Restart".constantize
+    execute!(Dokku::Services::RestartCommand.new(plugin: service_type, service: dokku_service_id))
   end
 end

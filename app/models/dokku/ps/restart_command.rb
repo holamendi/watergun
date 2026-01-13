@@ -6,7 +6,7 @@ module Dokku
       end
 
       def cmd
-        "dokku ps:restart #{app}"
+        "dokku ps:restart #{@app}"
       end
     end
   end
