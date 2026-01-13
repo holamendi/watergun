@@ -23,9 +23,16 @@ class ServerActions::RestartService < ServerAction
     raise
   else
     service.active!
+    notify_user
   end
 
   def restart_dokku_service!
     execute!(Dokku::Services::RestartCommand.new(plugin: service_type, service: dokku_service_id))
+  end
+
+  def notify_user
+    return unless user
+
+    Toast.append_to_user(user, "#{service.name}: restart finished")
   end
 end

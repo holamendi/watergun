@@ -22,4 +22,13 @@ class ServerActions::RestartServiceTest < ActiveSupport::TestCase
     assert server_action.success?
     assert @service.active?
   end
+
+  test "notifies user when restart completes" do
+    user = users(:bobby)
+    Current.user = user
+
+    Toast.expects(:append_to_user).with(user, "#{@service.name}: restart finished")
+
+    ServerActions::RestartService.run_now!(@server, @service)
+  end
 end
