@@ -28,6 +28,6 @@ class ServerActions::RestartApp < ServerAction
   def notify_user
     return unless user
 
-    user.notify_later("#{app.name}: restart finished")
+    Toast.append_to_user(user, "#{app.name}: restart finished")
   end
 end
