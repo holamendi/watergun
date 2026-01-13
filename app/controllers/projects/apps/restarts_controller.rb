@@ -1,6 +1,6 @@
 class Projects::Apps::RestartsController < Projects::Apps::BaseController
   def create
-    ServerActions::RestartApp.run_later!(@app)
+    ServerActions::RestartApp.run_later!(@app.server, @app)
     render turbo_stream: stream_toast("Restart scheduled")
   end
 end

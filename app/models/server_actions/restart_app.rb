@@ -22,10 +22,12 @@ class ServerActions::RestartApp < ServerAction
   end
 
   def restart_dokku_app!
-    Dokku::Ps::Restart.call!(ssh, app: dokku_app_id)
+    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id))
   end
 
   def notify_user
+    return unless user
+
     user.notify_later("#{app.name}: restart finished")
   end
 end
