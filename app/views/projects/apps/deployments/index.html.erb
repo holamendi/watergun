@@ -4,15 +4,8 @@
   <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
 
   <% if @app.github_repo.present? %>
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-medium">Deployments</h2>
-      <%= form_with url: project_app_deployments_path(@project, @app), class: "inline" do |f| %>
-        <%= submit_button "Deploy" %>
-      <% end %>
-    </div>
-
     <% if @deployments.any? %>
-      <div id="deployments" class="card bg-base-200 divide-y divide-base-300">
+      <div id="deployments" class="space-y-px">
         <%= render @deployments %>
       </div>
     <% else %>
@@ -21,7 +14,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
         </svg>
         <h3 class="mt-4 text-lg font-medium">No deployments yet</h3>
-        <p class="mt-1 text-sm text-base-content/60">Deploy your app to get started.</p>
+        <p class="mt-1 text-sm text-base-content/60">Click Deploy above to get started.</p>
       </div>
     <% end %>
   <% else %>

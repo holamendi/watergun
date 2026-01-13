@@ -1,15 +1,37 @@
-<li id="<%= dom_id(deployment) %>" class="px-3 py-3 hover:bg-base-200 sm:px-4">
-  <div class="flex items-center gap-x-3">
+<div id="<%= dom_id(deployment) %>" class="bg-base-200 first:rounded-t-box last:rounded-b-box p-4 hover:bg-base-300/50 transition-colors">
+  <div class="flex items-start gap-4">
+    <%# Author avatar %>
     <% if deployment.author_avatar_url.present? %>
-      <img src="<%= deployment.author_avatar_url %>" alt="" class="flex-none w-5 h-5 bg-neutral rounded-full">
-    <% else %>
-      <div class="flex-none w-5 h-5 bg-neutral rounded-full"></div>
+      <div class="flex-shrink-0">
+        <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_login %>" class="w-8 h-8 rounded-full" title="<%= deployment.author_login %>">
+      </div>
     <% end %>
-    <%= link_to deployment.short_sha, deployment.commit_html_url, class: "flex-auto text-sm font-mono font-medium leading-5 truncate hover:underline" %>
-    <%= status_badge(deployment.status) %>
-    <% if deployment.finished?%>
-      <time title="<%= deployment.finished_at.to_s %>" datetime="<%= deployment.finished_at.to_s %>" class="flex-none text-xs text-base-content/60">Deployed <%= time_ago_in_words(deployment.finished_at) %> ago</time>
-    <% end %>
+
+    <%# Main content %>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <%= link_to deployment.commit_html_url, target: "_blank", rel: "noopener noreferrer", class: "font-mono text-sm font-semibold hover:underline" do %>
+            <%= deployment.short_sha %>
+          <% end %>
+          <%= status_badge(deployment.status) %>
+        </div>
+        <span class="text-xs text-base-content/50 flex-shrink-0">
+          <% if deployment.finished? %>
+            <time title="<%= deployment.finished_at %>" datetime="<%= deployment.finished_at.iso8601 %>">
+              <%= time_ago_in_words(deployment.finished_at) %> ago
+            </time>
+          <% elsif deployment.deploying? || deployment.pending? %>
+            <span class="inline-flex items-center gap-1">
+              <span class="loading loading-spinner loading-xs"></span>
+              In progress
+            </span>
+          <% end %>
+        </span>
+      </div>
+      <% if deployment.commit_message.present? %>
+        <p class="text-sm text-base-content/70 mt-1 truncate"><%= deployment.commit_message.lines.first.strip %></p>
+      <% end %>
+    </div>
   </div>
-  <p class="mt-2 text-xs text-base-content/60 truncate"><%= deployment.commit_message.lines.first %></p>
-</li>
+</div>
