@@ -12,9 +12,9 @@
             <span class="status status-success status-sm"></span>
             <span class="font-mono text-sm font-medium"><%= process_type %></span>
           </div>
-          <% if container.cpu_percent.present? %>
+          <% if container.cpu_percentage.present? %>
             <div class="text-xs text-base-content/60">
-              <%= number_to_percentage(container.cpu_percent, precision: 0) %> CPU · <%= number_to_human_size(container.memory_usage || 0) %>
+              <%= number_to_percentage(container.cpu_percentage, precision: 0) %> CPU · <%= number_to_human_size(container.memory_usage || 0) %>
             </div>
           <% end %>
         </div>
