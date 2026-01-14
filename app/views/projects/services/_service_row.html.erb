@@ -4,7 +4,7 @@
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2">
         <%= status_dot(service.status) %>
-        <%= link_to service.name, project_service_metrics_path(service.project, service), class: "font-semibold font-mono hover:text-primary" %>
+        <%= link_to service.name, project_service_path(service.project, service), class: "font-semibold font-mono hover:text-primary" %>
         <span class="badge badge-sm badge-ghost"><%= service.service_type.to_s.titleize %></span>
       </div>
 
@@ -32,7 +32,7 @@
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
-          <li><%= link_to "Metrics", project_service_metrics_path(service.project, service) %></li>
+          <li><%= link_to "Overview", project_service_path(service.project, service) %></li>
           <% if service.active? && !service.temporary_status? %>
             <li class="border-t border-base-300 mt-1 pt-1">
               <%= button_to "Restart", project_service_restarts_path(service.project, service),

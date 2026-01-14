@@ -101,7 +101,7 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "body", /Linked Services/
-      assert_select "a[href='#{project_service_metrics_path(@project, @service)}']"
+      assert_select "a[href='#{project_service_path(@project, @service)}']"
     end
   end
 end

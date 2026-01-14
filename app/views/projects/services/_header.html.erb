@@ -42,9 +42,11 @@
 
 <%# Tabs %>
 <div class="tabs tabs-border mb-6 overflow-x-auto">
+  <%= link_to "Overview", project_service_path(service.project, service),
+      class: class_names("tab", "tab-active": active_tab == :overview) %>
   <%= link_to "Metrics", project_service_metrics_path(service.project, service),
-      class: "tab #{active_tab == :metrics ? 'tab-active' : ''}" %>
+      class: class_names("tab", "tab-active": active_tab == :metrics) %>
   <%= link_to "Logs", project_service_log_streams_path(service.project, service),
-      class: "tab #{active_tab == :logs ? 'tab-active' : ''}",
+      class: class_names("tab", "tab-active": active_tab == :logs),
       data: { turbo_prefetch: false } %>
 </div>

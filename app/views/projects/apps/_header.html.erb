@@ -55,15 +55,17 @@
 
 <%# Tabs %>
 <div class="tabs tabs-border mb-6 overflow-x-auto">
+  <%= link_to "Overview", project_app_path(app.project, app),
+      class: class_names("tab", "tab-active": active_tab == :overview) %>
   <%= link_to "Deployments", project_app_deployments_path(app.project, app),
-      class: "tab #{active_tab == :deployments ? 'tab-active' : ''}" %>
+      class: class_names("tab", "tab-active": active_tab == :deployments) %>
   <%= link_to "Logs", project_app_log_streams_path(app.project, app),
-      class: "tab #{active_tab == :logs ? 'tab-active' : ''}",
+      class: class_names("tab", "tab-active": active_tab == :logs),
       data: { turbo_prefetch: false } %>
   <%= link_to "Variables", project_app_env_variables_path(app.project, app),
-      class: "tab #{active_tab == :variables ? 'tab-active' : ''}" %>
+      class: class_names("tab", "tab-active": active_tab == :variables) %>
   <%= link_to "Domains", project_app_domains_path(app.project, app),
-      class: "tab #{active_tab == :domains ? 'tab-active' : ''}" %>
+      class: class_names("tab", "tab-active": active_tab == :domains) %>
   <%= link_to "Metrics", project_app_metrics_path(app.project, app),
-      class: "tab #{active_tab == :metrics ? 'tab-active' : ''}" %>
+      class: class_names("tab", "tab-active": active_tab == :metrics) %>
 </div>

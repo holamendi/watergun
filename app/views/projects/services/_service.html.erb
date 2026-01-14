@@ -2,7 +2,7 @@
   <div class="flex min-w-0 gap-x-4">
     <div class="flex-auto min-w-0">
       <p class="text-sm font-semibold leading-6">
-        <%= link_to project_service_metrics_path(service.project, service) do %>
+        <%= link_to project_service_path(service.project, service) do %>
           <span class="absolute inset-x-0 bottom-0 -top-px"></span>
           <%= service.name %>
         <% end %>

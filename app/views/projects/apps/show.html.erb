@@ -1,5 +1,5 @@
 <div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-  <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
+  <%= render "projects/apps/header", app: @app, active_tab: :overview %>
 
   <%# Process cards %>
   <% running_containers = @app.containers.select(&:running?) %>
@@ -64,7 +64,7 @@
           <div class="p-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <%= status_dot(service.status) %>
-              <%= link_to service.name, project_service_metrics_path(@project, service), class: "font-mono hover:text-primary" %>
+              <%= link_to service.name, project_service_path(@project, service), class: "font-mono hover:text-primary" %>
               <span class="badge badge-sm badge-ghost"><%= service.service_type.to_s.titleize %></span>
             </div>
           </div>
