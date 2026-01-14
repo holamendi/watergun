@@ -7,7 +7,7 @@
         <span class="font-mono text-sm font-medium"><%= deployment.short_sha %></span>
         <% if deployment.finished? %>
           <span class="text-xs text-base-content/60"><%= time_ago_in_words(deployment.finished_at) %> ago</span>
-        <% elsif deployment.running? || deployment.pending? %>
+        <% elsif deployment.deploying? || deployment.pending? %>
           <span class="text-xs text-base-content/60">In progress...</span>
         <% end %>
       </div>

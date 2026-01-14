@@ -4,7 +4,7 @@
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2">
         <%= status_dot(app.status) %>
-        <%= link_to app.name, project_app_deployments_path(app.project, app), class: "font-semibold font-mono hover:text-primary" %>
+        <%= link_to app.name, project_app_path(app.project, app), class: "font-semibold font-mono hover:text-primary" %>
       </div>
 
       <div class="flex items-center gap-2 mt-1 text-sm text-base-content/60">
@@ -57,6 +57,7 @@
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
+          <li><%= link_to "Overview", project_app_path(app.project, app) %></li>
           <li><%= link_to "Deployments", project_app_deployments_path(app.project, app) %></li>
           <li><%= link_to "Metrics", project_app_metrics_path(app.project, app) %></li>
           <li><%= link_to "Variables", project_app_env_variables_path(app.project, app) %></li>

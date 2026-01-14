@@ -23,6 +23,7 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
 
+      assert_select "a[href='#{project_app_path(@project, @app)}']"
       assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
       assert_select "a[href='#{project_app_metrics_path(@project, @app)}']"
       assert_select "a[href='#{project_app_log_streams_path(@project, @app)}']"

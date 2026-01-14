@@ -1,8 +1,16 @@
 <%= turbo_frame_tag :memory_chart do %>
   <div class="card bg-base-200 p-4 mb-6">
     <h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-4">Memory Usage</h3>
-    <div class="h-48">
-      <%= line_chart data, id: "memory-chart", suffix: " MiB", max: max %>
+    <div class="h-72">
+      <%= line_chart data,
+        id: "memory-chart",
+        suffix: " MiB",
+        max: max,
+        library: {
+          maintainAspectRatio: false,
+          layout: { padding: { bottom: 16 } },
+          plugins: { legend: { position: "top", align: "end" } }
+        } %>
     </div>
   </div>
 <% end %>
