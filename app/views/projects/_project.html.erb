@@ -1,34 +1,28 @@
-<%= link_to project_path(project), id: dom_id(project), class: "card bg-base-200 hover:bg-base-300/50 transition-colors" do %>
-  <div class="card-body p-4">
-    <h2 class="card-title text-base font-mono"><%= project.name %></h2>
+<%= link_to project_path(project), id: dom_id(project), class: "card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-base-content/20 hover:scale-[1.02] transition-all duration-200" do %>
+  <div class="card-body p-6">
+    <h2 class="card-title text-lg font-semibold mb-3"><%= project.name %></h2>
 
-    <div class="flex items-center gap-3 text-sm text-base-content/60">
-      <% app_count = project.apps.count(&:kept?) %>
-      <% service_count = project.services.count(&:kept?) %>
+    <div class="flex items-center gap-4 text-sm">
+      <% app_count = project.apps.kept.size %>
+      <% service_count = project.services.kept.size %>
 
       <% if app_count.positive? %>
-        <span class="flex items-center gap-1">
+        <span class="flex items-center gap-1.5">
           <span class="status status-success status-sm"></span>
-          <%= pluralize(app_count, "app") %>
+          <span class="text-base-content/70 font-medium"><%= pluralize(app_count, "app") %></span>
         </span>
       <% end %>
 
       <% if service_count.positive? %>
-        <span class="flex items-center gap-1">
+        <span class="flex items-center gap-1.5">
           <span class="status status-info status-sm"></span>
-          <%= pluralize(service_count, "service") %>
+          <span class="text-base-content/70 font-medium"><%= pluralize(service_count, "service") %></span>
         </span>
       <% end %>
 
       <% if app_count.zero? && service_count.zero? %>
-        <span class="text-base-content/40">No resources</span>
+        <span class="text-base-content/40">Empty project</span>
       <% end %>
     </div>
-
-    <% if project.last_deployment %>
-      <div class="text-xs text-base-content/50 mt-1">
-        Last deploy <%= time_ago_in_words(project.last_deployment.finished_at) %> ago
-      </div>
-    <% end %>
   </div>
 <% end %>
