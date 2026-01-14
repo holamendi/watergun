@@ -41,7 +41,7 @@
     <% if @apps.any? %>
       <section class="mb-8">
         <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Apps</h2>
-        <div class="card bg-base-200 divide-y divide-base-300">
+        <div class="card bg-base-100 border border-base-300 shadow-sm divide-y divide-base-300">
           <% @apps.each do |app| %>
             <%= render "projects/apps/app_row", app: app %>
           <% end %>
@@ -53,7 +53,7 @@
     <% if @services.any? %>
       <section>
         <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Services</h2>
-        <div class="card bg-base-200 divide-y divide-base-300">
+        <div class="card bg-base-100 border border-base-300 shadow-sm divide-y divide-base-300">
           <% @services.each do |service| %>
             <%= render "projects/services/service_row", service: service %>
           <% end %>
