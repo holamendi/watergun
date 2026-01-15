@@ -9,12 +9,26 @@ class RunServerActionJob < ApplicationJob
 
     server_action.running!
 
+    # Set up periodic log persistence if configured
+    if server_action.persist_logs_interval
+      server_action.create_log!(ssh_commands: [])
+      setup_log_persistence(server_action)
+    end
+
     session = server_action.server.ssh_session do |ssh_session|
       server_action.with(ssh_session:) { server_action.send(:run) }
     rescue Ssh::CommandExecutionError
+    ensure
+      stop_log_persistence
     end
 
-    server_action.create_log!(ssh_commands: session.commands)
+    # Final save of logs
+    if server_action.log.present?
+      server_action.log.update!(ssh_commands: session.commands)
+      server_action.on_logs_persisted(commands: session.commands)
+    else
+      server_action.create_log!(ssh_commands: session.commands)
+    end
     server_action.status = session.status
   rescue => e
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
@@ -34,7 +48,48 @@ class RunServerActionJob < ApplicationJob
     server_action.failure_message = nil
     server_action
   ensure
+    stop_log_persistence
     server_action.finished_at = Time.current
     server_action.save!
+  end
+
+  private
+
+  def setup_log_persistence(server_action)
+    @persisting_action = server_action
+    @persist_timer_running = true
+
+    @persist_timer = Thread.new do
+      while @persist_timer_running
+        sleep server_action.persist_logs_interval
+        persist_logs if @persist_timer_running
+      end
+    end
+  end
+
+  def stop_log_persistence
+    return unless @persist_timer
+
+    @persist_timer_running = false
+    @persist_timer.kill
+    @persist_timer = nil
+
+    # Final persist
+    persist_logs
+  end
+
+  def persist_logs
+    return unless @persisting_action
+
+    session = @persisting_action.ssh_session
+    return unless session
+
+    # Save current state to DB
+    @persisting_action.log&.update!(ssh_commands: session.commands)
+
+    # Notify the action
+    @persisting_action.on_logs_persisted(commands: session.commands)
+  rescue => e
+    Rails.logger.error("Failed to persist logs: #{e.message}")
   end
 end

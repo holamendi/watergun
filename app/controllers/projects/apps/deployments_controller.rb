@@ -3,6 +3,10 @@ class Projects::Apps::DeploymentsController < Projects::Apps::BaseController
     @deployments = @app.deployments.kept.order(created_at: :desc).limit(5)
   end
 
+  def show
+    @deployment = @app.deployments.kept.find(params[:id])
+  end
+
   def create
     @deployment = Deployment::CreateDeployment.new(app: @app, commit_sha: params[:sha]).save!
 

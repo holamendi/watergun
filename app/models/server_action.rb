@@ -15,10 +15,19 @@ class ServerAction < ApplicationRecord
 
   scope :queued_or_running, -> { where(status: %i[queued running]) }
 
+  class_attribute :persist_logs_interval, default: nil
+
   attr_accessor :ssh_session
   alias_method :ssh, :ssh_session
 
   delegate :execute, :execute!, to: :ssh_session
+
+  # Called after logs are persisted to DB (when persist_logs_interval is set)
+  # Subclasses can override to handle persisted data (e.g., broadcast updates)
+  # @param commands [Array<Ssh::Command>] current state of all commands
+  def on_logs_persisted(commands:)
+    # Default: do nothing
+  end
 
   broadcasts_to ->(server_action) { [server_action.account, :server_actions] },
     partial: "server_actions/server_action",

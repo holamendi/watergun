@@ -1,7 +1,11 @@
 class ServerActions::DeployApp < ServerAction
+  include ActionView::RecordIdentifier
+
   SLUG = "apps.deploy"
 
   actionable Deployment
+
+  self.persist_logs_interval = 1.second
 
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :repo, :string
@@ -10,6 +14,16 @@ class ServerActions::DeployApp < ServerAction
   validates :dokku_app_id, presence: true
 
   delegate :app, :account, to: :deployment, allow_nil: true
+
+  def on_logs_persisted(commands:)
+    current_text = commands.map(&:text_output).join
+    new_text = current_text[(@last_broadcast_length || 0)..]
+    @last_broadcast_length = current_text.length
+
+    return if new_text.blank?
+
+    broadcast_log_chunk(new_text)
+  end
 
   before_validation on: :create do
     self.dokku_app_id ||= app.dokku_id
@@ -76,5 +90,14 @@ class ServerActions::DeployApp < ServerAction
     end
 
     Toast.append_to_user(user, message, type:)
+  end
+
+  def broadcast_log_chunk(content)
+    Turbo::StreamsChannel.broadcast_append_to(
+      deployment,
+      target: dom_id(deployment, :logs),
+      partial: "projects/apps/deployments/log_chunk",
+      locals: {content:}
+    )
   end
 end
