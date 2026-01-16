@@ -1,19 +1,58 @@
 require "test_helper"
 
 class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTest
-  describe "#create" do
-    setup do
-      @github_repo = github_repos(:smol_roda)
-      @app = @github_repo.app
-      @account = @app.account
-      @project = @app.project
-      @server = @app.server
-      @user = @account.users.first
+  setup do
+    @github_repo = github_repos(:smol_roda)
+    @app = @github_repo.app
+    @account = @app.account
+    @project = @app.project
+    @server = @app.server
+    @user = @account.users.first
+
+    sign_in @user
+  end
+
+  describe "#index" do
+    test "renders deployments with links to show page" do
+      deployment = deployments(:success_deployment)
+
+      get project_app_deployments_path(@project, @app)
+
+      assert_response :success
+      assert_select "a[href='#{project_app_deployment_path(@project, @app, deployment)}']"
+    end
+  end
+
+  describe "#show" do
+    test "renders completed deployment with info card, logs section, and navigation" do
+      deployment = deployments(:success_deployment)
+
+      get project_app_deployment_path(@project, @app, deployment)
+
+      assert_response :success
+      assert_select "##{dom_id(deployment, :info)}"
+      assert_select "##{dom_id(deployment, :logs)}"
+      assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
+      assert_select "a[href='#{project_app_path(@project, @app)}']"
+      assert_select "body", /#{deployment.short_sha}/
+      assert_select "body", /Completed in/
     end
 
-    test "creates a deployment with the last commit when no sha is provided" do
-      sign_in @user
+    test "renders in-progress deployment with spinner and turbo subscription" do
+      deployment = deployments(:deploying_deployment)
 
+      get project_app_deployment_path(@project, @app, deployment)
+
+      assert_response :success
+      assert_select ".loading-spinner"
+      assert_select "body", /Deploying/
+      assert_select "turbo-cable-stream-source[signed-stream-name]"
+    end
+  end
+
+  describe "#create" do
+
+    test "creates a deployment with the last commit when no sha is provided" do
       VCR.use_cassette("github/valid_commit") do
         assert_difference -> { @app.deployments.count }, 1 do
           post project_app_deployments_url(project_id: @project.id, app_id: @app.id)
@@ -43,7 +82,6 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
 
     test "creates a deployment with the provided sha" do
       sha = "714b020"
-      sign_in @user
 
       VCR.use_cassette("github/valid_commit_with_sha_714b020") do
         assert_difference -> { @app.deployments.count }, 1 do
@@ -74,7 +112,6 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
 
     test "fails when the sha is not found" do
       sha = "invalid"
-      sign_in @user
 
       VCR.use_cassette("github/invalid_commit") do
         assert_no_difference -> { @app.deployments.count } do
