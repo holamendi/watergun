@@ -26,8 +26,7 @@
 
     <div id="<%= dom_id(@deployment, :logs) %>"
          class="p-4 bg-[#1e1e2e] text-[#cdd6f4] font-mono text-xs overflow-auto max-h-[600px] min-h-[200px]"
-         data-controller="deployment-logs"
-         data-deployment-logs-target="container">
+         data-controller="deployment-logs">
 
       <% server_action = @deployment.server_action %>
       <% if server_action&.log&.ssh_commands.present? %>
@@ -57,8 +56,6 @@
           <p>No logs available for this deployment.</p>
         </div>
       <% end %>
-
-      <div data-deployment-logs-target="scrollAnchor"></div>
     </div>
   </div>
 </div>

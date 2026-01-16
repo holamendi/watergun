@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["container", "scrollAnchor", "placeholder"];
+  static targets = ["placeholder"];
 
   connect() {
     this.autoScroll = true;
@@ -54,10 +54,6 @@ export default class extends Controller {
   };
 
   scrollToBottom() {
-    if (this.hasScrollAnchorTarget) {
-      this.scrollAnchorTarget.scrollIntoView({ behavior: "smooth" });
-    } else {
-      this.element.scrollTop = this.element.scrollHeight;
-    }
+    this.element.scrollTop = this.element.scrollHeight;
   }
 }
