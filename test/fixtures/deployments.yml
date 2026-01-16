@@ -1,0 +1,29 @@
+success_deployment:
+  account: default
+  app: smol_roda
+  sha: 789abcdef012
+  repo: holamendi/smol-roda
+  status: success
+  source: web
+  started_at: <%= 10.minutes.ago %>
+  finished_at: <%= 5.minutes.ago %>
+
+deploying_deployment:
+  account: default
+  app: smol_roda
+  sha: def456789abc
+  repo: holamendi/smol-roda
+  status: deploying
+  source: web
+  started_at: <%= 5.minutes.ago %>
+
+pending_deployment:
+  account: default
+  app: smol_roda
+  sha: abc123def456
+  repo: holamendi/smol-roda
+  status: pending
+  source: web
+  data:
+    commit_html_url: "https://github.com/holamendi/smol-roda/commit/abc123def456"
+    commit_message: "Test commit message"

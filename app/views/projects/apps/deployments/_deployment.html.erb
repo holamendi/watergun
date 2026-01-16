@@ -1,4 +1,4 @@
-<div id="<%= dom_id(deployment) %>" class="bg-base-200 first:rounded-t-box last:rounded-b-box p-4 hover:bg-base-300/50 transition-colors">
+<div id="<%= dom_id(deployment) %>" class="relative bg-base-200 first:rounded-t-box last:rounded-b-box p-4 hover:bg-base-300/50 transition-colors">
   <div class="flex items-start gap-4">
     <%# Author avatar %>
     <% if deployment.author_avatar_url.present? %>
@@ -11,7 +11,7 @@
     <div class="flex-1 min-w-0">
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 min-w-0">
-          <%= link_to deployment.commit_html_url, target: "_blank", rel: "noopener noreferrer", class: "font-mono text-sm font-semibold hover:underline" do %>
+          <%= link_to deployment.commit_html_url, target: "_blank", rel: "noopener noreferrer", class: "relative z-10 font-mono text-sm font-semibold hover:underline" do %>
             <%= deployment.short_sha %>
           <% end %>
           <%= status_badge(deployment.status) %>
@@ -34,4 +34,9 @@
       <% end %>
     </div>
   </div>
+
+  <%# Stretched link for navigation to deployment show page %>
+  <%= link_to project_app_deployment_path(deployment.app.project, deployment.app, deployment),
+      class: "absolute inset-0 z-0",
+      aria: { label: "View deployment #{deployment.short_sha}" } do %><% end %>
 </div>

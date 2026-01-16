@@ -1,7 +1,11 @@
 class ServerActions::DeployApp < ServerAction
+  include ActionView::RecordIdentifier
+
   SLUG = "apps.deploy"
 
   actionable Deployment
+
+  self.persist_logs_interval = 1.second
 
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :repo, :string
@@ -10,6 +14,16 @@ class ServerActions::DeployApp < ServerAction
   validates :dokku_app_id, presence: true
 
   delegate :app, :account, to: :deployment, allow_nil: true
+
+  def on_logs_persisted(commands:)
+    current_text = commands.map(&:text_output).join
+    new_text = current_text[(@last_broadcast_length || 0)..]
+    @last_broadcast_length = current_text.length
+
+    return if new_text.blank?
+
+    broadcast_log_chunk(new_text)
+  end
 
   before_validation on: :create do
     self.dokku_app_id ||= app.dokku_id
@@ -24,6 +38,7 @@ class ServerActions::DeployApp < ServerAction
   def run
     deployment.deploying!
     app.deploying!
+    broadcast_deployment_update
     authenticate_github_account!
     sync_git_repo!
     rebuild_dokku_app!
@@ -35,6 +50,7 @@ class ServerActions::DeployApp < ServerAction
     deployment.success!
   ensure
     app.active!
+    broadcast_deployment_update
     notify_user
     schedule_pull_env!
   end
@@ -76,5 +92,32 @@ class ServerActions::DeployApp < ServerAction
     end
 
     Toast.append_to_user(user, message, type:)
+  end
+
+  def broadcast_log_chunk(content)
+    Turbo::StreamsChannel.broadcast_append_to(
+      deployment,
+      target: dom_id(deployment, :logs),
+      partial: "projects/apps/deployments/log_chunk",
+      locals: {content:}
+    )
+  end
+
+  def broadcast_deployment_update
+    # Update deployment row on index page
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [app, :deployments],
+      target: dom_id(deployment),
+      partial: "projects/apps/deployments/deployment",
+      locals: {deployment:}
+    )
+
+    # Update show page info card
+    Turbo::StreamsChannel.broadcast_replace_to(
+      deployment,
+      target: dom_id(deployment, :info),
+      partial: "projects/apps/deployments/deployment_info",
+      locals: {deployment:}
+    )
   end
 end

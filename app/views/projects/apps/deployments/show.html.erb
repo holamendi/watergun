@@ -1,0 +1,61 @@
+<%= turbo_stream_from @deployment %>
+
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+  <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
+
+  <%# Back to deployments list %>
+  <div class="mb-4">
+    <%= link_to project_app_deployments_path(@project, @app), class: "text-sm text-primary hover:underline inline-flex items-center gap-1" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      All deployments
+    <% end %>
+  </div>
+
+  <%# Deployment info card - broadcasts here when status changes %>
+  <div id="<%= dom_id(@deployment, :info) %>">
+    <%= render "projects/apps/deployments/deployment_info", deployment: @deployment %>
+  </div>
+
+  <%# Build logs %>
+  <div class="card bg-base-300 overflow-hidden">
+    <div class="px-4 py-3 border-b border-base-content/10">
+      <h2 class="text-sm font-medium">Build Logs</h2>
+    </div>
+
+    <div id="<%= dom_id(@deployment, :logs) %>"
+         class="p-4 bg-[#1e1e2e] text-[#cdd6f4] font-mono text-xs overflow-auto max-h-[600px] min-h-[200px]"
+         data-controller="auto-scroll">
+
+      <% server_action = @deployment.server_action %>
+      <% if server_action&.log&.ssh_commands.present? %>
+        <% server_action.log.ssh_commands.each do |cmd| %>
+          <div class="mb-4">
+            <div class="text-[#89b4fa] mb-1">$ <%= cmd["cmd"] %></div>
+            <% output_text = cmd["output"]&.map { |o| o["data"] }&.join %>
+            <% if output_text.present? %>
+              <pre class="whitespace-pre-wrap break-words"><%= ansi_to_html(output_text) %></pre>
+            <% end %>
+            <% if cmd["exit_code"] && cmd["exit_code"] != 0 %>
+              <div class="text-[#f38ba8] mt-1">Exit code: <%= cmd["exit_code"] %></div>
+            <% end %>
+          </div>
+        <% end %>
+      <% elsif @deployment.deploying? || @deployment.pending? %>
+        <div class="flex flex-col items-center justify-center py-12 text-base-content/40" data-auto-scroll-target="placeholder">
+          <span class="loading loading-spinner loading-md mb-2"></span>
+          <p>Waiting for logs...</p>
+        </div>
+      <% elsif @deployment.error? && server_action&.failure_message.present? %>
+        <div class="text-[#f38ba8]">
+          <pre class="whitespace-pre-wrap"><%= server_action.failure_message %></pre>
+        </div>
+      <% else %>
+        <div class="flex items-center justify-center py-12 text-base-content/40">
+          <p>No logs available for this deployment.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

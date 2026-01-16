@@ -28,15 +28,6 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  after_update_commit -> {
-    broadcast_replace_later_to(
-      [app, :deployments],
-      partial: "projects/apps/deployments/deployment",
-      target: dom_id(self),
-      locals: {deployment: self}
-    )
-  }
-
   def short_sha
     sha&.first(7)
   end
