@@ -38,6 +38,7 @@ class ServerActions::DeployApp < ServerAction
   def run
     deployment.deploying!
     app.deploying!
+    broadcast_deployment_update
     authenticate_github_account!
     sync_git_repo!
     rebuild_dokku_app!
@@ -49,6 +50,7 @@ class ServerActions::DeployApp < ServerAction
     deployment.success!
   ensure
     app.active!
+    broadcast_deployment_update
     notify_user
     schedule_pull_env!
   end
@@ -98,6 +100,24 @@ class ServerActions::DeployApp < ServerAction
       target: dom_id(deployment, :logs),
       partial: "projects/apps/deployments/log_chunk",
       locals: {content:}
+    )
+  end
+
+  def broadcast_deployment_update
+    # Update deployment row on index page
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [app, :deployments],
+      target: dom_id(deployment),
+      partial: "projects/apps/deployments/deployment",
+      locals: {deployment:}
+    )
+
+    # Update show page info card
+    Turbo::StreamsChannel.broadcast_replace_to(
+      deployment,
+      target: dom_id(deployment, :info),
+      partial: "projects/apps/deployments/deployment_info",
+      locals: {deployment:}
     )
   end
 end

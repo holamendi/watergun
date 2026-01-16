@@ -26,7 +26,7 @@
 
     <div id="<%= dom_id(@deployment, :logs) %>"
          class="p-4 bg-[#1e1e2e] text-[#cdd6f4] font-mono text-xs overflow-auto max-h-[600px] min-h-[200px]"
-         data-controller="deployment-logs">
+         data-controller="auto-scroll">
 
       <% server_action = @deployment.server_action %>
       <% if server_action&.log&.ssh_commands.present? %>
@@ -43,7 +43,7 @@
           </div>
         <% end %>
       <% elsif @deployment.deploying? || @deployment.pending? %>
-        <div class="flex flex-col items-center justify-center py-12 text-base-content/40" data-deployment-logs-target="placeholder">
+        <div class="flex flex-col items-center justify-center py-12 text-base-content/40" data-auto-scroll-target="placeholder">
           <span class="loading loading-spinner loading-md mb-2"></span>
           <p>Waiting for logs...</p>
         </div>

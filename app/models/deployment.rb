@@ -28,22 +28,6 @@ class Deployment < ApplicationRecord
     self.repo ||= github_repo.repo
   end
 
-  after_update_commit -> {
-    # Update deployment row on index page
-    broadcast_replace_later_to(
-      [app, :deployments],
-      partial: "projects/apps/deployments/deployment",
-      target: dom_id(self),
-      locals: {deployment: self}
-    )
-
-    # Update show page info card
-    broadcast_replace_later_to self,
-      target: dom_id(self, :info),
-      partial: "projects/apps/deployments/deployment_info",
-      locals: {deployment: self}
-  }
-
   def short_sha
     sha&.first(7)
   end
