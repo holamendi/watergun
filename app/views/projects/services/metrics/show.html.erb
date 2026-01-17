@@ -1,9 +1,11 @@
 <%= turbo_stream_from @service, :metrics %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
   <%= render "projects/services/header", service: @service, active_tab: :metrics %>
 
-  <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
-  <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
-  <%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
+  <div class="py-6 space-y-6">
+    <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
+    <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
+    <%= turbo_frame_tag :memory_chart, src: memory_chart_project_service_metrics_path(@project, @service) %>
+  </div>
 </div>

@@ -1,7 +1,7 @@
 <%= turbo_stream_from @service %>
 <%= turbo_stream_from @log_stream %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
   <%= render "projects/services/header", service: @service, active_tab: :logs %>
 </div>
 

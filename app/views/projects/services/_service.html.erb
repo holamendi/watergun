@@ -3,32 +3,34 @@
     <div class="flex items-center gap-3">
       <%= status_dot(service.status) %>
       <div>
-        <%= link_to service.name, project_service_path(service.project, service), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
+        <%= link_to service.name, project_service_path(service.project, service), class: "font-mono text-sm font-medium text-text-primary hover:text-accent transition-colors" %>
         <p class="text-xxs text-text-muted mt-0.5"><%= service.service_type.to_s.titleize %></p>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
       <%= link_to "Logs", project_service_log_streams_path(service.project, service),
-          class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs" %>
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" aria-label="Actions menu" class="p-1.5 text-text-muted hover:text-text-primary hover:bg-elevated rounded-lg cursor-pointer">
+          class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs transition-colors" %>
+      <div class="relative" data-controller="dropdown">
+        <button type="button" data-action="dropdown#toggle" aria-label="Actions menu" class="p-1.5 text-text-muted hover:text-text-primary hover:bg-elevated rounded-lg cursor-pointer transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
           </svg>
+        </button>
+        <div data-dropdown-target="menu" class="hidden absolute right-0 mt-1 w-48 bg-surface border border-border rounded-lg shadow-lg z-10">
+          <div class="py-1">
+            <%= link_to "Overview", project_service_path(service.project, service), class: "block px-4 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
+            <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: "block px-4 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
+            <% if service.active? && !service.temporary_status? %>
+              <div class="border-t border-border mt-1 pt-1">
+                <%= button_to "Restart", project_service_restarts_path(service.project, service),
+                    class: "block w-full text-left px-4 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated",
+                    form: { data: { turbo_stream: true } } %>
+              </div>
+            <% end %>
+            <%= link_to "Settings", edit_project_service_path(service.project, service), class: "block px-4 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
+          </div>
         </div>
-        <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
-          <li><%= link_to "Overview", project_service_path(service.project, service) %></li>
-          <li><%= link_to "Logs", project_service_log_streams_path(service.project, service) %></li>
-          <% if service.active? && !service.temporary_status? %>
-            <li class="border-t border-base-300 mt-1 pt-1">
-              <%= button_to "Restart", project_service_restarts_path(service.project, service),
-                  class: "text-left",
-                  form: { data: { turbo_stream: true } } %>
-            </li>
-          <% end %>
-          <li><%= link_to "Settings", edit_project_service_path(service.project, service) %></li>
-        </ul>
       </div>
     </div>
   </div>
