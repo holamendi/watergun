@@ -29,43 +29,34 @@ module UiHelper
     content_tag :span, text, class: "badge badge-sm #{color_classes[color]}"
   end
 
-  def status_badge(status)
-    status_mapping = {
-      "active" => :green,
-      "cancelled" => :neutral,
-      "deleting" => :yellow,
-      "deploying" => :blue,
-      "enabling_ssl" => :blue,
-      "error" => :red,
-      "failure" => :red,
-      "pending" => :yellow,
-      "queued" => :yellow,
-      "running" => :blue,
-      "success" => :green
-    }
+  def status_dot(status, size: 2)
+    color_class = case status.to_s
+    when "running", "active", "success", "completed"
+      "bg-success shadow-success/50"
+    when "deploying", "pending", "warning"
+      "bg-warning shadow-warning/50 animate-pulse"
+    when "failed", "error"
+      "bg-error shadow-error/50"
+    else
+      "bg-text-muted"
+    end
 
-    badge(status.humanize, color: status_mapping[status])
+    tag.span(class: "w-#{size} h-#{size} rounded-full #{color_class} shadow inline-block")
   end
 
-  def status_dot(status, size: :sm)
-    color_class = case status.to_s
-    when "active", "success" then "status-success"
-    when "error", "failure" then "status-error"
-    when "pending", "queued", "deleting" then "status-warning"
-    when "deploying", "enabling_ssl", "running" then "status-info"
-    else "status-neutral"
-    end
-
-    animate_class = case status.to_s
-    when "deploying", "enabling_ssl", "running", "pending", "queued", "deleting"
-      "animate-pulse"
+  def status_badge(status)
+    colors = case status.to_s
+    when "running", "active", "success", "completed"
+      "bg-success-soft text-success"
+    when "deploying", "pending", "warning"
+      "bg-warning-soft text-warning"
+    when "failed", "error"
+      "bg-error-soft text-error"
     else
-      ""
+      "bg-elevated text-text-muted"
     end
 
-    size_class = "status-#{size}"
-
-    tag.span(class: "status #{size_class} #{color_class} #{animate_class}".squish)
+    tag.span(status.to_s.titleize, class: "px-2 py-0.5 text-xxs font-medium rounded #{colors}")
   end
 
   def spinner(size: "md", color: nil)

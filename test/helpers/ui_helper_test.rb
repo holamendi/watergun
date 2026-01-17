@@ -43,14 +43,22 @@ class UiHelperTest < ActionView::TestCase
 
   test "status_badge maps status to correct color" do
     {
-      "deploying" => "badge-info",
-      "error" => "badge-error",
-      "pending" => "badge-warning",
-      "success" => "badge-success"
-    }.each do |status, badge_class|
+      "running" => "bg-success-soft text-success",
+      "active" => "bg-success-soft text-success",
+      "success" => "bg-success-soft text-success",
+      "completed" => "bg-success-soft text-success",
+      "deploying" => "bg-warning-soft text-warning",
+      "pending" => "bg-warning-soft text-warning",
+      "warning" => "bg-warning-soft text-warning",
+      "failed" => "bg-error-soft text-error",
+      "error" => "bg-error-soft text-error",
+      "unknown" => "bg-elevated text-text-muted"
+    }.each do |status, expected_classes|
       result = status_badge(status)
-      assert_match(/#{status.humanize}/, result)
-      assert_match(/#{badge_class}/, result)
+      assert_match(/#{status.titleize}/, result)
+      expected_classes.split.each do |klass|
+        assert_match(/#{Regexp.escape(klass)}/, result, "Expected #{klass} in status_badge(#{status})")
+      end
     end
   end
 
