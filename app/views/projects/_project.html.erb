@@ -12,8 +12,8 @@
   </div>
 
   <div class="flex items-center gap-3 text-xs text-text-secondary mb-2">
-    <span><%= project.apps.kept.count %> apps</span>
-    <span><%= project.services.kept.count %> services</span>
+    <span><%= project.apps.select(&:kept?).size %> apps</span>
+    <span><%= project.services.select(&:kept?).size %> services</span>
   </div>
 
   <% if project.apps.kept.any? %>

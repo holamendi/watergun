@@ -19,7 +19,7 @@ class Project < ApplicationRecord
   end
 
   def status
-    kept_apps = apps.kept
+    kept_apps = apps.select(&:kept?)
     return :pending if kept_apps.empty?
     return :deploying if kept_apps.any?(&:deploying?)
     return :error if kept_apps.any?(&:error?)
