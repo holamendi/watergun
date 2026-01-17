@@ -1,20 +1,23 @@
 <%= link_to project_app_deployment_path(deployment.app.project, deployment.app, deployment),
     id: dom_id(deployment),
-    class: "block p-4 hover:bg-base-300/50 transition-colors" do %>
+    class: "block p-4 hover:bg-elevated/30 transition-colors" do %>
   <div class="flex items-center gap-3">
     <%= status_dot(deployment.status) %>
 
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2">
-        <span class="font-mono text-sm font-medium"><%= deployment.short_sha %></span>
+        <span class="font-mono text-xs font-medium text-text-primary"><%= deployment.short_sha %></span>
         <% if deployment.finished? %>
-          <span class="text-xs text-base-content/60"><%= time_ago_in_words(deployment.finished_at) %> ago</span>
+          <span class="text-xxs text-text-muted"><%= time_ago_in_words(deployment.finished_at) %> ago</span>
         <% elsif deployment.deploying? || deployment.pending? %>
-          <span class="text-xs text-base-content/60">In progress...</span>
+          <span class="text-xxs text-text-muted inline-flex items-center gap-1">
+            <span class="loading loading-spinner loading-xs"></span>
+            In progress
+          </span>
         <% end %>
       </div>
       <% if deployment.commit_message.present? %>
-        <p class="text-sm text-base-content/60 truncate mt-0.5"><%= deployment.commit_message.lines.first %></p>
+        <p class="text-xs text-text-secondary truncate mt-0.5"><%= deployment.commit_message.lines.first %></p>
       <% end %>
     </div>
 
@@ -22,7 +25,7 @@
       <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_login %>" class="w-6 h-6 rounded-full" title="<%= deployment.author_login %>">
     <% end %>
 
-    <svg class="w-4 h-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+    <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
     </svg>
   </div>

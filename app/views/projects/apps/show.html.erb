@@ -1,100 +1,105 @@
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
   <%= render "projects/apps/header", app: @app, active_tab: :overview %>
 
-  <%# Process cards %>
-  <% running_containers = @app.containers.select(&:running?) %>
-  <% if running_containers.any? %>
-    <div class="flex flex-wrap gap-3 mb-6">
-      <% running_containers.group_by(&:dokku_process_type).each do |process_type, containers| %>
-        <% container = containers.first %>
-        <div class="card bg-base-200 p-3 min-w-32">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="status status-success status-sm"></span>
-            <span class="font-mono text-sm font-medium"><%= process_type %></span>
-          </div>
-          <% if container.cpu_percentage.present? %>
-            <div class="text-xs text-base-content/60">
-              <%= number_to_percentage(container.cpu_percentage, precision: 0) %> CPU · <%= number_to_human_size(container.memory_used_bytes || 0) %>
+  <div class="py-6">
+    <%# Process cards %>
+    <% running_containers = @app.containers.select(&:running?) %>
+    <% if running_containers.any? %>
+      <div class="flex flex-wrap gap-3 mb-6">
+        <% running_containers.group_by(&:dokku_process_type).each do |process_type, containers| %>
+          <% container = containers.first %>
+          <div class="bg-surface rounded-xl border border-border p-3 min-w-32">
+            <div class="flex items-center gap-2 mb-1">
+              <%= status_dot(:active) %>
+              <span class="font-mono text-xs font-medium text-text-primary"><%= process_type %></span>
             </div>
+            <% if container.cpu_percentage.present? %>
+              <div class="text-xxs text-text-muted">
+                <%= number_to_percentage(container.cpu_percentage, precision: 0) %> CPU · <%= number_to_human_size(container.memory_used_bytes || 0) %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Recent deployments %>
+    <section class="mb-6">
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Recent Deployments</h2>
+      <% if @deployments.any? %>
+        <div class="bg-surface rounded-xl border border-border divide-y divide-border">
+          <% @deployments.each do |deployment| %>
+            <%= render "projects/apps/deployments/deployment_row", deployment: deployment %>
           <% end %>
         </div>
-      <% end %>
-    </div>
-  <% end %>
-
-  <%# Recent deployments %>
-  <% if @deployments.any? %>
-    <div class="card bg-base-200 divide-y divide-base-300">
-      <% @deployments.each do |deployment| %>
-        <%= render "projects/apps/deployments/deployment_row", deployment: deployment %>
-      <% end %>
-    </div>
-    <div class="mt-4">
-      <%= link_to "View all deployments", project_app_deployments_path(@project, @app), class: "text-sm text-primary hover:underline" %>
-    </div>
-  <% else %>
-    <div class="text-center py-12">
-      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-      </svg>
-      <h3 class="mt-4 text-lg font-medium">No deployments yet</h3>
-      <p class="mt-1 text-sm text-base-content/60">Deploy your app to get started.</p>
-      <% if @app.github_repo.present? %>
-        <div class="mt-6">
-          <%= button_to project_app_deployments_path(@project, @app),
-              class: "btn btn-primary btn-sm",
-              form: { data: { turbo_stream: true } } do %>
-            Deploy now
-          <% end %>
+        <div class="mt-3">
+          <%= link_to "View all deployments", project_app_deployments_path(@project, @app), class: "text-xs text-text-secondary hover:text-text-primary" %>
         </div>
       <% else %>
-        <div class="mt-6">
-          <%= link_to "Connect GitHub repo", new_app_github_repo_path(@app), class: "btn btn-primary btn-sm" %>
+        <div class="bg-surface rounded-xl border border-border p-8 text-center">
+          <svg class="mx-auto h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+          </svg>
+          <h3 class="mt-3 text-sm font-medium text-text-primary">No deployments yet</h3>
+          <p class="mt-1 text-xs text-text-muted">Deploy your app to get started.</p>
+          <% if @app.github_repo.present? %>
+            <div class="mt-4">
+              <%= button_to project_app_deployments_path(@project, @app),
+                  class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20",
+                  form: { data: { turbo_stream: true } } do %>
+                Deploy now
+              <% end %>
+            </div>
+          <% else %>
+            <div class="mt-4">
+              <%= link_to "Connect GitHub repo", new_app_github_repo_path(@app), class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20" %>
+            </div>
+          <% end %>
         </div>
       <% end %>
-    </div>
-  <% end %>
+    </section>
 
-  <%# Linked Services %>
-  <% if @linked_services.any? %>
-    <section class="mt-8">
-      <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Linked Services</h2>
-      <div class="card bg-base-200 divide-y divide-base-300">
-        <% @linked_services.each do |service| %>
-          <div class="p-4 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <%= status_dot(service.status) %>
-              <%= link_to service.name, project_service_path(@project, service), class: "font-mono hover:text-primary" %>
-              <span class="badge badge-sm badge-ghost"><%= service.service_type.to_s.titleize %></span>
+    <%# Linked Services %>
+    <% if @linked_services.any? %>
+      <section class="mb-6">
+        <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Linked Services</h2>
+        <div class="bg-surface rounded-xl border border-border divide-y divide-border">
+          <% @linked_services.each do |service| %>
+            <div class="p-4 flex items-center justify-between hover:bg-elevated/30 transition-colors">
+              <div class="flex items-center gap-2">
+                <%= status_dot(service.status) %>
+                <%= link_to service.name, project_service_path(@project, service), class: "font-mono text-sm text-text-primary hover:text-accent" %>
+                <span class="text-xxs text-text-muted bg-elevated px-1.5 py-0.5 rounded"><%= service.service_type.to_s.titleize %></span>
+              </div>
             </div>
-          </div>
-        <% end %>
-      </div>
-    </section>
-  <% end %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
 
-  <%# External links %>
-  <% if @app.github_repo.present? || @app.default_domain.present? %>
-    <section class="mt-8">
-      <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Links</h2>
-      <div class="flex flex-wrap gap-3">
-        <% if @app.github_repo.present? %>
-          <%= link_to @app.github_repo.web_url, target: :_blank, class: "btn btn-ghost btn-sm gap-2" do %>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-            </svg>
-            <%= @app.github_repo.repo %>
+    <%# External links %>
+    <% if @app.github_repo.present? || @app.default_domain.present? %>
+      <section>
+        <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Links</h2>
+        <div class="flex flex-wrap gap-2">
+          <% if @app.github_repo.present? %>
+            <%= link_to @app.github_repo.web_url, target: :_blank, class: "inline-flex items-center gap-2 px-3 py-2 bg-elevated hover:bg-border text-text-secondary hover:text-text-primary text-xs rounded-lg border border-border transition-colors" do %>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+              </svg>
+              <%= @app.github_repo.repo %>
+            <% end %>
           <% end %>
-        <% end %>
-        <% if @app.deployed? && @app.default_domain.present? %>
-          <%= link_to @app.default_domain.url, target: :_blank, class: "btn btn-ghost btn-sm gap-2" do %>
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-            </svg>
-            <%= @app.default_domain.hostname %>
+          <% if @app.deployed? && @app.default_domain.present? %>
+            <%= link_to @app.default_domain.url, target: :_blank, class: "inline-flex items-center gap-2 px-3 py-2 bg-elevated hover:bg-border text-text-secondary hover:text-text-primary text-xs rounded-lg border border-border transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+              </svg>
+              <%= @app.default_domain.hostname %>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
-    </section>
-  <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
 </div>
