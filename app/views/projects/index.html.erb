@@ -2,36 +2,22 @@
 
 <% @title = "Projects" %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4 py-6">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">Projects</h1>
-    <%= link_to new_project_path, class: "btn btn-primary btn-sm gap-2" do %>
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
+    <h1 class="text-xl font-semibold">Projects</h1>
+    <%= link_to new_project_path, class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20 hover:opacity-90 transition-all" do %>
       New Project
     <% end %>
   </div>
 
   <% if @projects.any? %>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       <%= render @projects %>
     </div>
   <% else %>
-    <div class="text-center py-16">
-      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-      </svg>
-      <h3 class="mt-4 text-lg font-medium">No projects yet</h3>
-      <p class="mt-1 text-sm text-base-content/60">Get started by creating your first project.</p>
-      <div class="mt-6">
-        <%= link_to new_project_path, class: "btn btn-primary btn-sm gap-2" do %>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          New Project
-        <% end %>
-      </div>
+    <div class="bg-surface rounded-xl border border-border p-12 text-center">
+      <p class="text-text-secondary mb-4">No projects yet</p>
+      <%= link_to "Create your first project", new_project_path, class: "text-accent hover:underline" %>
     </div>
   <% end %>
 </div>
