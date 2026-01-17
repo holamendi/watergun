@@ -30,6 +30,13 @@ module UiHelper
   end
 
   def status_dot(status, size: 2)
+    size_classes = {
+      2 => "w-2 h-2",
+      3 => "w-3 h-3",
+      4 => "w-4 h-4",
+      :md => "w-2.5 h-2.5"
+    }
+
     color_class = case status.to_s
     when "running", "active", "success", "completed"
       "bg-success shadow-success/50"
@@ -38,10 +45,10 @@ module UiHelper
     when "failed", "error"
       "bg-error shadow-error/50"
     else
-      "bg-text-muted"
+      "bg-elevated"
     end
 
-    tag.span(class: "w-#{size} h-#{size} rounded-full #{color_class} shadow inline-block")
+    tag.span(class: "#{size_classes.fetch(size, size_classes[2])} rounded-full #{color_class} shadow inline-block")
   end
 
   def status_badge(status)
