@@ -25,10 +25,10 @@
 
   <!-- Apps Section -->
   <div class="mb-6">
-    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Apps (<%= @project.apps.kept.count %>)</h2>
-    <% if @project.apps.kept.any? %>
+    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Apps (<%= @apps.size %>)</h2>
+    <% if @apps.any? %>
       <div class="bg-surface rounded-xl border border-border divide-y divide-border">
-        <%= render partial: "projects/apps/app_row", collection: @project.apps.kept, as: :app %>
+        <%= render partial: "projects/apps/app", collection: @apps %>
       </div>
     <% else %>
       <div class="bg-surface rounded-xl border border-border p-6 text-center">
@@ -39,10 +39,10 @@
 
   <!-- Services Section -->
   <div>
-    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Services (<%= @project.services.kept.count %>)</h2>
-    <% if @project.services.kept.any? %>
+    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Services (<%= @services.size %>)</h2>
+    <% if @services.any? %>
       <div class="bg-surface rounded-xl border border-border divide-y divide-border">
-        <%= render partial: "projects/services/service_row", collection: @project.services.kept, as: :service %>
+        <%= render partial: "projects/services/service", collection: @services %>
       </div>
     <% else %>
       <div class="bg-surface rounded-xl border border-border p-6 text-center">
