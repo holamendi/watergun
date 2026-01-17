@@ -9,10 +9,10 @@ module Accounts
 
     describe "#update" do
       test "updates the user theme" do
-        patch account_theme_url, params: {user: {theme: "dark"}}
+        patch account_theme_url, params: {user: {theme: "watergun"}}
 
         assert_response :success
-        assert_equal "dark", @user.reload.theme
+        assert_equal "watergun", @user.reload.theme
       end
 
       test "updates with all valid themes" do
@@ -34,7 +34,7 @@ module Accounts
       end
 
       test "returns turbo stream response" do
-        patch account_theme_url, params: {user: {theme: "dracula"}}, as: :turbo_stream
+        patch account_theme_url, params: {user: {theme: "watergun"}}, as: :turbo_stream
 
         assert_response :success
         assert_match "turbo-stream", response.content_type

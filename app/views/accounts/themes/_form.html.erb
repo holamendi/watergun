@@ -1,34 +1,16 @@
 <%= turbo_frame_tag :theme_form do %>
-  <%= form_with model: user, url: account_theme_path, method: :patch,
-                data: { controller: "theme-selector", action: "change->theme-selector#preview" } do |form| %>
-    <div class="space-y-4">
-      <div>
-        <%= form.label :theme, class: "block text-xs font-medium text-text-secondary mb-3" %>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <% User::THEMES.each do |theme| %>
-            <label class="cursor-pointer">
-              <%= form.radio_button :theme, theme,
-                  class: "hidden peer",
-                  checked: (user.theme || "watergun") == theme,
-                  data: { action: "change->theme-selector#preview" } %>
-              <div class="p-3 border-2 rounded-lg peer-checked:border-accent peer-checked:bg-accent/10 border-border hover:border-text-muted transition-colors"
-                   data-theme="<%= theme %>">
-                <div class="flex flex-col items-center gap-2">
-                  <div class="w-full h-6 rounded bg-base border border-border flex items-center justify-center">
-                    <div class="w-2.5 h-2.5 rounded-full bg-accent"></div>
-                  </div>
-                  <span class="text-xs font-medium capitalize text-text-primary"><%= theme %></span>
-                </div>
-              </div>
-            </label>
-          <% end %>
+  <div class="space-y-3">
+    <label class="block text-xs font-medium text-text-secondary">Theme</label>
+    <div class="p-4 border rounded-lg border-border bg-elevated">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-6 rounded bg-base border border-border flex items-center justify-center">
+          <div class="w-2 h-2 rounded-full bg-accent"></div>
+        </div>
+        <div>
+          <span class="text-sm font-medium text-text-primary">Watergun Dark</span>
+          <p class="text-xs text-text-muted mt-0.5">Custom dark theme optimized for deployment dashboards</p>
         </div>
       </div>
-
-      <div class="flex justify-end pt-2">
-        <%= form.submit "Save theme",
-            class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20 cursor-pointer hover:opacity-90" %>
-      </div>
     </div>
-  <% end %>
+  </div>
 <% end %>

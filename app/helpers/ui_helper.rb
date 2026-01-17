@@ -14,6 +14,7 @@ module UiHelper
   end
 
   def badge(text, color: :neutral)
+    # Maps semantic colors to CSS badge modifier classes
     color_classes = {
       blue: "badge-info",
       gray: "badge-neutral",

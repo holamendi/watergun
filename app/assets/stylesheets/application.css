@@ -59,6 +59,283 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
+
+  /* Button component */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-elevated text-text-primary border border-border hover:bg-surface hover:border-border-strong;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white border-accent hover:bg-accent-hover hover:border-accent-hover;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent border-transparent hover:bg-elevated hover:border-transparent;
+  }
+
+  .btn-error {
+    @apply bg-error text-white border-error hover:bg-error/80 hover:border-error/80;
+  }
+
+  .btn-outline {
+    @apply bg-transparent;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-xs {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .btn-square {
+    @apply p-2 aspect-square;
+  }
+
+  .btn-circle {
+    @apply p-2 rounded-full aspect-square;
+  }
+
+  .btn-disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  .btn-active {
+    @apply bg-accent text-white border-accent;
+  }
+
+  /* Join component (button group) */
+  .join {
+    @apply inline-flex;
+  }
+
+  .join-item {
+    @apply rounded-none first:rounded-l last:rounded-r;
+  }
+
+  /* Badge component */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded;
+    @apply bg-elevated text-text-secondary;
+  }
+
+  .badge-sm {
+    @apply px-1.5 py-0.5 text-xxs;
+  }
+
+  .badge-primary {
+    @apply bg-accent/20 text-accent;
+  }
+
+  .badge-success {
+    @apply bg-success-soft text-success;
+  }
+
+  .badge-warning {
+    @apply bg-warning-soft text-warning;
+  }
+
+  .badge-error {
+    @apply bg-error-soft text-error;
+  }
+
+  .badge-ghost {
+    @apply bg-surface text-text-muted;
+  }
+
+  .badge-neutral {
+    @apply bg-elevated text-text-secondary;
+  }
+
+  .badge-info {
+    @apply bg-accent/20 text-accent;
+  }
+
+  .badge-secondary {
+    @apply bg-pink/20 text-pink;
+  }
+
+  .badge-accent {
+    @apply bg-accent/20 text-accent;
+  }
+
+  /* Loading spinner */
+  .loading {
+    @apply inline-block;
+  }
+
+  .loading-spinner {
+    @apply w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin;
+  }
+
+  .loading-xs {
+    @apply w-3 h-3;
+  }
+
+  .loading-sm {
+    @apply w-4 h-4;
+  }
+
+  .loading-md {
+    @apply w-5 h-5;
+  }
+
+  .loading-lg {
+    @apply w-6 h-6;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-surface rounded-lg border border-border;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  /* Modal component */
+  .modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-opacity;
+  }
+
+  .modal[open] {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  .modal-box {
+    @apply relative bg-surface rounded-lg border border-border p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto;
+  }
+
+  /* Form components */
+  .fieldset {
+    @apply space-y-1;
+  }
+
+  .fieldset-label {
+    @apply block text-sm font-medium text-text-secondary;
+  }
+
+  .input {
+    @apply bg-elevated border border-border rounded px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent;
+  }
+
+  .input-bordered {
+    @apply border border-border;
+  }
+
+  /* Hero layout */
+  .hero {
+    @apply flex items-center justify-center;
+  }
+
+  /* Alert component */
+  .alert {
+    @apply flex items-center gap-4 p-4 bg-surface rounded-lg border border-border;
+  }
+
+  /* Dropdown component */
+  .dropdown {
+    @apply relative inline-block;
+  }
+
+  .dropdown-end {
+    /* Modifier for right-aligned dropdowns */
+  }
+
+  .dropdown-content {
+    @apply absolute top-full mt-1 opacity-0 invisible transition-all duration-150;
+  }
+
+  .dropdown:focus-within .dropdown-content,
+  .dropdown-content:focus-within {
+    @apply opacity-100 visible;
+  }
+
+  .dropdown-end .dropdown-content {
+    @apply right-0;
+  }
+
+  /* Menu component */
+  .menu {
+    @apply flex flex-col;
+  }
+
+  .menu li {
+    @apply list-none;
+  }
+
+  .menu li a,
+  .menu li button {
+    @apply block px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-elevated rounded transition-colors;
+  }
+
+  .rounded-box {
+    @apply rounded-lg;
+  }
+
+  /* Base color aliases for theme compatibility */
+  .bg-base-100 {
+    @apply bg-surface;
+  }
+
+  .bg-base-200 {
+    @apply bg-elevated;
+  }
+
+  .bg-base-300 {
+    @apply bg-base;
+  }
+
+  .border-base-300 {
+    @apply border-border;
+  }
+
+  .divide-base-300 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--color-border);
+  }
+
+  .text-base-content {
+    @apply text-text-primary;
+  }
+
+  .text-base-content\/40 {
+    @apply text-text-muted;
+  }
+
+  .text-base-content\/60 {
+    @apply text-text-secondary;
+  }
+
+  .text-base-content\/70 {
+    @apply text-text-secondary;
+  }
+
+  .text-base-content\/80 {
+    @apply text-text-primary;
+  }
+
+  .border-base-content\/10 {
+    border-color: rgba(240, 240, 245, 0.1);
+  }
+
+  /* Accent color utilities */
+  .text-primary {
+    @apply text-accent;
+  }
+
+  .hover\:text-primary:hover {
+    @apply text-accent;
+  }
+
+  .text-info {
+    @apply text-accent;
+  }
+
+  .fill-primary {
+    fill: var(--color-accent);
+  }
 }
 
 input[type="submit"] {
