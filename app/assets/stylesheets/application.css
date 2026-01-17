@@ -45,6 +45,22 @@
   --radius-xl: 10px;
 }
 
+@layer base {
+  body {
+    @apply bg-base text-text-primary;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(26, 26, 34, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
 input[type="submit"] {
   cursor: pointer;
 }
