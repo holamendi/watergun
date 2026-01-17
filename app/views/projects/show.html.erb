@@ -1,86 +1,53 @@
 <%= turbo_stream_from @project %>
 <% @title = @project.name %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-  <%# Header %>
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <%= link_to projects_path, class: "text-sm text-base-content/60 hover:text-base-content inline-flex items-center gap-1 mb-1" do %>
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-        </svg>
-        Projects
+      <%= link_to projects_path, class: "text-xs text-text-muted hover:text-text-secondary mb-1 inline-block" do %>
+        &larr; Projects
       <% end %>
-      <h1 class="text-2xl font-semibold font-mono"><%= @project.name %></h1>
+      <h1 class="text-xl font-semibold flex items-center gap-2">
+        <%= @project.name %>
+        <%= status_dot(@project.status) %>
+      </h1>
     </div>
-
     <div class="flex items-center gap-2">
-      <%= link_to new_project_app_path(@project), class: "btn btn-primary btn-sm gap-2" do %>
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        App
+      <%= link_to new_project_app_path(@project), class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20" do %>
+        New App
       <% end %>
-      <%= link_to new_project_service_path(@project), class: "btn btn-ghost btn-sm gap-2" do %>
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        Service
-      <% end %>
-      <%= link_to edit_project_path(@project), class: "btn btn-ghost btn-sm btn-square", title: "Settings" do %>
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
+      <%= link_to new_project_service_path(@project), class: "px-4 py-2 bg-elevated hover:bg-border text-text-primary text-xs font-medium rounded-lg border border-border" do %>
+        New Service
       <% end %>
     </div>
   </div>
 
-  <% if @project.any_resources? %>
-    <%# Apps section %>
-    <% if @apps.any? %>
-      <section class="mb-8">
-        <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Apps</h2>
-        <div class="card bg-base-100 border border-base-300 shadow-sm divide-y divide-base-300">
-          <% @apps.each do |app| %>
-            <%= render "projects/apps/app_row", app: app %>
-          <% end %>
-        </div>
-      </section>
+  <!-- Apps Section -->
+  <div class="mb-6">
+    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Apps (<%= @project.apps.kept.count %>)</h2>
+    <% if @project.apps.kept.any? %>
+      <div class="bg-surface rounded-xl border border-border divide-y divide-border">
+        <%= render partial: "projects/apps/app_row", collection: @project.apps.kept, as: :app %>
+      </div>
+    <% else %>
+      <div class="bg-surface rounded-xl border border-border p-6 text-center">
+        <p class="text-text-secondary text-sm">No apps yet</p>
+      </div>
     <% end %>
+  </div>
 
-    <%# Services section %>
-    <% if @services.any? %>
-      <section>
-        <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-3">Services</h2>
-        <div class="card bg-base-100 border border-base-300 shadow-sm divide-y divide-base-300">
-          <% @services.each do |service| %>
-            <%= render "projects/services/service_row", service: service %>
-          <% end %>
-        </div>
-      </section>
+  <!-- Services Section -->
+  <div>
+    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Services (<%= @project.services.kept.count %>)</h2>
+    <% if @project.services.kept.any? %>
+      <div class="bg-surface rounded-xl border border-border divide-y divide-border">
+        <%= render partial: "projects/services/service_row", collection: @project.services.kept, as: :service %>
+      </div>
+    <% else %>
+      <div class="bg-surface rounded-xl border border-border p-6 text-center">
+        <p class="text-text-secondary text-sm">No services yet</p>
+      </div>
     <% end %>
-  <% else %>
-    <%# Empty state %>
-    <div class="flex flex-col sm:flex-row gap-4 mt-12">
-      <%= link_to new_project_app_path(@project), class: "flex-1 card bg-base-200 hover:bg-base-300/50 transition-colors border-2 border-dashed border-base-300 hover:border-primary" do %>
-        <div class="card-body items-center text-center py-12">
-          <svg class="w-12 h-12 text-base-content/40" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-          </svg>
-          <h3 class="font-semibold mt-2">Add GitHub repository</h3>
-          <p class="text-sm text-base-content/60">Deploy an app from your repo</p>
-        </div>
-      <% end %>
-      <%= link_to new_project_service_path(@project), class: "flex-1 card bg-base-200 hover:bg-base-300/50 transition-colors border-2 border-dashed border-base-300 hover:border-primary" do %>
-        <div class="card-body items-center text-center py-12">
-          <svg class="w-12 h-12 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
-          </svg>
-          <h3 class="font-semibold mt-2">Create a database</h3>
-          <p class="text-sm text-base-content/60">PostgreSQL, Redis, MySQL...</p>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+  </div>
 </div>

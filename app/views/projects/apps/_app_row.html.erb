@@ -1,50 +1,39 @@
-<div id="<%= dom_id(app) %>" class="p-5 hover:bg-base-200/50 transition-colors">
-  <div class="flex items-center justify-between gap-4">
-    <%# Left: App info %>
-    <div class="flex items-center gap-4 min-w-0">
-      <%= status_dot(app.status, size: :md) %>
-
-      <div class="min-w-0">
-        <%= link_to app.name, project_app_path(app.project, app), class: "text-lg font-semibold font-mono hover:text-primary block truncate" %>
-
-        <div class="flex items-center gap-2 mt-0.5 text-sm text-base-content/60">
+<div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(app) %>">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      </div>
+      <div>
+        <%= link_to app.name, project_app_path(app.project, app), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
+        <div class="flex items-center gap-2 mt-0.5 text-xxs text-text-muted">
           <% if app.github_repo.present? %>
-            <span class="font-medium"><%= app.github_repo.branch %></span>
-            <span>·</span>
+            <span class="px-1.5 py-0.5 bg-elevated rounded"><%= app.github_repo.branch || "main" %></span>
           <% end %>
           <% if app.deployed? %>
             <span><%= time_ago_in_words(app.deployed_at) %> ago</span>
-          <% else %>
-            <span class="text-base-content/40">Not deployed</span>
           <% end %>
-
-          <%# Process indicators inline %>
-          <% running_containers = app.containers.select(&:running?) %>
-          <% if running_containers.any? %>
-            <span class="inline-flex items-center gap-1 ml-1">
-              <span class="status status-success status-xs"></span>
-              <span><%= running_containers.group_by(&:dokku_process_type).keys.join(", ") %></span>
-            </span>
+          <% app.containers.select(&:running?).group_by(&:dokku_process_type).each do |type, _| %>
+            <span class="text-success">● <%= type %></span>
           <% end %>
         </div>
       </div>
     </div>
 
-    <%# Right: Actions %>
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex items-center gap-2">
       <% if app.github_repo.present? && !app.temporary_status? %>
-        <%= button_to project_app_deployments_path(app.project, app),
-            class: "btn btn-primary btn-sm",
-            form: { data: { turbo_stream: true } } do %>
-          Deploy
-        <% end %>
+        <%= button_to "Deploy", project_app_deployments_path(app.project, app),
+            method: :post,
+            class: "px-3 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-lg text-xs font-medium shadow shadow-accent/20" %>
       <% end %>
-
-      <%# Overflow menu %>
+      <%= link_to "Logs", project_app_log_streams_path(app.project, app),
+          class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs" %>
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-square">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+        <div tabindex="0" role="button" class="p-1.5 text-text-muted hover:text-text-primary hover:bg-elevated rounded-lg cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">

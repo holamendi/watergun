@@ -1,30 +1,20 @@
-<div id="<%= dom_id(service) %>" class="p-5 hover:bg-base-200/50 transition-colors">
-  <div class="flex items-center justify-between gap-4">
-    <%# Left: Service info %>
-    <div class="flex items-center gap-4 min-w-0">
-      <%= status_dot(service.status, size: :md) %>
-
-      <div class="min-w-0">
-        <div class="flex items-center gap-2">
-          <%= link_to service.name, project_service_path(service.project, service), class: "text-lg font-semibold font-mono hover:text-primary truncate" %>
-          <span class="badge badge-sm badge-ghost shrink-0"><%= service.service_type.to_s.titleize %></span>
-        </div>
-
-        <div class="flex items-center gap-2 mt-0.5 text-sm text-base-content/60">
-          <% if service.version.present? %>
-            <span><%= service.version %></span>
-          <% end %>
-        </div>
+<div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(service) %>">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <%= status_dot(service.status) %>
+      <div>
+        <%= link_to service.name, project_service_path(service.project, service), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
+        <p class="text-xxs text-text-muted mt-0.5"><%= service.service_type.to_s.titleize %></p>
       </div>
     </div>
 
-    <%# Right: Actions %>
-    <div class="flex items-center gap-2 shrink-0">
-      <%# Overflow menu %>
+    <div class="flex items-center gap-2">
+      <%= link_to "Logs", project_service_log_streams_path(service.project, service),
+          class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs" %>
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-square">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+        <div tabindex="0" role="button" class="p-1.5 text-text-muted hover:text-text-primary hover:bg-elevated rounded-lg cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
