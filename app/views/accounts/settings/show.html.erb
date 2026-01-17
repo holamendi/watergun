@@ -1,43 +1,41 @@
 <% @title = "Settings" %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+<div class="max-w-2xl mx-auto px-4 py-6">
+  <!-- Header -->
   <div class="mb-8">
-    <h1 class="text-2xl font-semibold">Settings</h1>
-    <p class="text-base-content/60 mt-1">Manage your account and preferences.</p>
+    <h1 class="text-xl font-semibold text-text-primary">Settings</h1>
+    <p class="text-xs text-text-muted mt-1">Manage your account and preferences.</p>
   </div>
 
   <div class="space-y-8">
-    <section class="card bg-base-200 p-6">
-      <div class="flex items-start justify-between mb-4">
-        <div>
-          <h2 class="text-lg font-medium">Profile</h2>
-          <p class="text-sm text-base-content/60">Update your personal information.</p>
-        </div>
+    <!-- Profile Section -->
+    <section>
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-4">Profile</h2>
+      <div class="bg-surface rounded-xl border border-border p-5">
+        <p class="text-xs text-text-secondary mb-4">Update your personal information.</p>
+        <%= render "accounts/profiles/form", user: Current.user %>
       </div>
-      <%= render "accounts/profiles/form", user: Current.user %>
     </section>
 
-    <section class="card bg-base-200 p-6">
-      <div class="flex items-start justify-between mb-4">
-        <div>
-          <h2 class="text-lg font-medium">Appearance</h2>
-          <p class="text-sm text-base-content/60">Customize how Watergun looks for you.</p>
-        </div>
+    <!-- Appearance Section -->
+    <section>
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-4">Appearance</h2>
+      <div class="bg-surface rounded-xl border border-border p-5">
+        <p class="text-xs text-text-secondary mb-4">Customize how Watergun looks for you.</p>
+        <%= render "accounts/themes/form", user: Current.user %>
       </div>
-      <%= render "accounts/themes/form", user: Current.user %>
     </section>
 
-    <section class="card bg-base-200 p-6">
-      <div class="flex items-start justify-between mb-4">
-        <div>
-          <h2 class="text-lg font-medium">GitHub Integration</h2>
-          <p class="text-sm text-base-content/60">Connect your GitHub account for seamless deployments.</p>
-        </div>
+    <!-- GitHub Integration Section -->
+    <section>
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-4">GitHub Integration</h2>
+      <div class="bg-surface rounded-xl border border-border p-5">
+        <p class="text-xs text-text-secondary mb-4">Connect your GitHub account for seamless deployments.</p>
+        <%= render "accounts/github/settings",
+                   github_app: Current.account.github_app,
+                   github_app_manifest: Current.account.github_app_manifest,
+                   github_installation: Current.account.github_installation %>
       </div>
-      <%= render "accounts/github/settings",
-                 github_app: Current.account.github_app,
-                 github_app_manifest: Current.account.github_app_manifest,
-                 github_installation: Current.account.github_installation %>
     </section>
   </div>
 </div>

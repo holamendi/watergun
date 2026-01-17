@@ -2,30 +2,32 @@
   <%= form_with model: user, url: account_theme_path, method: :patch,
                 data: { controller: "theme-selector", action: "change->theme-selector#preview" } do |form| %>
     <div class="space-y-4">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Theme</legend>
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div>
+        <%= form.label :theme, class: "block text-xs font-medium text-text-secondary mb-3" %>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <% User::THEMES.each do |theme| %>
             <label class="cursor-pointer">
               <%= form.radio_button :theme, theme,
                   class: "hidden peer",
                   checked: (user.theme || "watergun") == theme,
                   data: { action: "change->theme-selector#preview" } %>
-              <div class="p-4 border-2 rounded-lg peer-checked:border-primary peer-checked:bg-primary/10 border-base-300 hover:border-base-content/30 transition-colors"
+              <div class="p-3 border-2 rounded-lg peer-checked:border-accent peer-checked:bg-accent/10 border-border hover:border-text-muted transition-colors"
                    data-theme="<%= theme %>">
                 <div class="flex flex-col items-center gap-2">
-                  <div class="w-full h-8 rounded bg-base-100 border border-base-300 flex items-center justify-center">
-                    <div class="w-3 h-3 rounded-full bg-primary"></div>
+                  <div class="w-full h-6 rounded bg-base border border-border flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full bg-accent"></div>
                   </div>
-                  <span class="text-sm font-medium capitalize text-base-content"><%= theme %></span>
+                  <span class="text-xs font-medium capitalize text-text-primary"><%= theme %></span>
                 </div>
               </div>
             </label>
           <% end %>
         </div>
-      </fieldset>
-      <div class="flex">
-        <%= submit_button "Save theme" %>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <%= form.submit "Save theme",
+            class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20 cursor-pointer hover:opacity-90" %>
       </div>
     </div>
   <% end %>
