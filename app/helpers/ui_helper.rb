@@ -67,9 +67,17 @@ module UiHelper
     tag.span(status.to_s.titleize, class: "px-2 py-0.5 text-xxs font-medium rounded #{colors}")
   end
 
-  def submit_button(text, variant: :primary)
-    base_classes = "inline-flex items-center justify-center gap-2 text-xs font-medium rounded transition-colors"
-    size_classes = "px-4 py-2"
+  def submit_button(text, variant: :primary, size: :default)
+    base_classes = "inline-flex items-center justify-center gap-2 font-medium rounded transition-colors"
+
+    size_classes = case size
+    when :sm
+      "px-3 py-1.5 text-xs"
+    when :xs
+      "px-2.5 py-1 text-xxs"
+    else
+      "px-4 py-2 text-xs"
+    end
 
     variant_classes = case variant
     when :primary
@@ -86,7 +94,7 @@ module UiHelper
       class: "#{base_classes} #{size_classes} #{variant_classes} #{disabled_classes}",
       data: {
         turbo_submits_with: tag.span(class: "inline-flex items-center gap-2") do
-          concat spinner_icon
+          concat spinner_icon(size)
           concat text
         end
       }
@@ -94,8 +102,9 @@ module UiHelper
 
   private
 
-  def spinner_icon
-    tag.svg(class: "w-3 h-3 animate-spin", viewBox: "0 0 24 24", fill: "none") do
+  def spinner_icon(size = :default)
+    size_class = (size == :xs) ? "w-2.5 h-2.5" : "w-3 h-3"
+    tag.svg(class: "#{size_class} animate-spin", viewBox: "0 0 24 24", fill: "none") do
       concat tag.circle(cx: 12, cy: 12, r: 10, stroke: "currentColor", "stroke-width": 4, class: "opacity-25")
       concat tag.path(fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z", class: "opacity-75")
     end

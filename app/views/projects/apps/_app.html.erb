@@ -24,9 +24,9 @@
 
     <div class="flex items-center gap-2">
       <% if app.github_repo.present? && !app.temporary_status? %>
-        <%= button_to "Deploy", project_app_deployments_path(app.project, app),
-            method: :post,
-            class: "px-2.5 py-1 bg-accent hover:bg-accent-hover text-white rounded text-xxs" %>
+        <%= form_with url: project_app_deployments_path(app.project, app), data: { turbo_stream: true } do %>
+          <%= submit_button "Deploy", size: :xs %>
+        <% end %>
       <% end %>
       <%= link_to "Logs", project_app_log_streams_path(app.project, app),
           class: "px-2.5 py-1 text-text-secondary hover:text-text-primary hover:bg-elevated rounded text-xxs" %>
@@ -47,6 +47,7 @@
             <li class="border-t border-border mt-1 pt-1">
               <%= button_to "Restart", project_app_restarts_path(app.project, app),
                   class: "text-left",
+                  data: { turbo_submits_with: "Restarting..." },
                   form: { data: { turbo_stream: true } } %>
             </li>
           <% end %>

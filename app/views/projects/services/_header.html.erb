@@ -22,10 +22,8 @@
 
       <div class="flex items-center gap-2">
         <% if service.active? && !service.temporary_status? %>
-          <%= button_to project_service_restarts_path(service.project, service),
-              class: "px-3 py-1.5 bg-elevated hover:bg-border text-text-primary text-xs rounded border border-border",
-              form: { data: { turbo_stream: true } } do %>
-            Restart
+          <%= form_with url: project_service_restarts_path(service.project, service), data: { turbo_stream: true } do %>
+            <%= submit_button "Restart", variant: :secondary, size: :sm %>
           <% end %>
         <% end %>
       </div>

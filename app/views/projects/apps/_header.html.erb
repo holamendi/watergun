@@ -25,17 +25,13 @@
 
       <div class="flex items-center gap-2">
         <% if app.github_repo.present? && !app.temporary_status? %>
-          <%= button_to project_app_deployments_path(app.project, app),
-              class: "px-3 py-1.5 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20",
-              form: { data: { turbo_stream: true } } do %>
-            Deploy
+          <%= form_with url: project_app_deployments_path(app.project, app), data: { turbo_stream: true } do %>
+            <%= submit_button "Deploy", size: :sm %>
           <% end %>
         <% end %>
         <% if app.deployed? && !app.temporary_status? %>
-          <%= button_to project_app_restarts_path(app.project, app),
-              class: "px-3 py-1.5 bg-elevated hover:bg-border text-text-primary text-xs rounded border border-border",
-              form: { data: { turbo_stream: true } } do %>
-            Restart
+          <%= form_with url: project_app_restarts_path(app.project, app), data: { turbo_stream: true } do %>
+            <%= submit_button "Restart", variant: :secondary, size: :sm %>
           <% end %>
         <% end %>
       </div>

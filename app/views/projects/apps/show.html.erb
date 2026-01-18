@@ -47,10 +47,8 @@
           <p class="mt-1 text-xs text-text-muted">Deploy your app to get started.</p>
           <% if @app.github_repo.present? %>
             <div class="mt-4">
-              <%= button_to project_app_deployments_path(@project, @app),
-                  class: "px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs rounded",
-                  form: { data: { turbo_stream: true } } do %>
-                Deploy now
+              <%= form_with url: project_app_deployments_path(@project, @app), data: { turbo_stream: true } do %>
+                <%= submit_button "Deploy now", size: :sm %>
               <% end %>
             </div>
           <% else %>
