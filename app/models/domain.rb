@@ -14,7 +14,7 @@ class Domain < ApplicationRecord
   validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
-  delegate :project, to: :app
+  delegate :project, :server, to: :app
 
   after_update_commit do
     broadcast_replace_later_to [app, :domains], target: dom_id(self), partial: "projects/apps/domains/domain", locals: {domain: self}

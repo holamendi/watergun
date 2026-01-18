@@ -36,7 +36,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
   end
 
   def destroy
-    Domain::Destroyer.new(@domain).destroy
+    Domain::DestroyDomain.new(@domain).destroy
     render turbo_stream: [
       stream_toast("Domain deleted"),
       turbo_stream.remove(@domain)
