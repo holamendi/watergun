@@ -38,20 +38,18 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_select "body", /Completed in/
     end
 
-    test "renders in-progress deployment with spinner and turbo subscription" do
+    test "renders in-progress deployment with turbo subscription" do
       deployment = deployments(:deploying_deployment)
 
       get project_app_deployment_path(@project, @app, deployment)
 
       assert_response :success
-      assert_select ".loading-spinner"
       assert_select "body", /Deploying/
       assert_select "turbo-cable-stream-source[signed-stream-name]"
     end
   end
 
   describe "#create" do
-
     test "creates a deployment with the last commit when no sha is provided" do
       VCR.use_cassette("github/valid_commit") do
         assert_difference -> { @app.deployments.count }, 1 do

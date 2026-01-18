@@ -68,7 +68,7 @@
   }
 
   .btn-primary {
-    @apply bg-accent text-white border-accent hover:bg-accent-hover hover:border-accent-hover;
+    @apply bg-gradient-to-r from-accent to-accent-hover text-white border-transparent shadow shadow-accent/20 hover:from-accent-hover hover:to-accent;
   }
 
   .btn-ghost {
@@ -219,7 +219,7 @@
   }
 
   .input {
-    @apply bg-elevated border border-border rounded px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent;
+    @apply bg-base border border-border rounded px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent;
   }
 
   .input-bordered {
@@ -229,6 +229,11 @@
   /* Hero layout */
   .hero {
     @apply flex items-center justify-center;
+  }
+
+  /* Navbar component */
+  .navbar {
+    @apply flex items-center justify-between;
   }
 
   /* Alert component */
@@ -336,6 +341,24 @@
 
   .fill-primary {
     fill: var(--color-accent);
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply bg-elevated hover:bg-border text-text-primary border border-border;
+  }
+
+  /* Tab component */
+  .tab-item {
+    @apply px-3 py-1.5 text-xs rounded-sm;
+  }
+
+  .tab-item-active {
+    @apply text-text-primary bg-surface shadow-sm font-medium;
+  }
+
+  .tab-item-inactive {
+    @apply text-text-secondary hover:text-text-primary;
   }
 }
 

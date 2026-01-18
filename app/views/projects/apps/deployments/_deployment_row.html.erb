@@ -1,11 +1,11 @@
 <tr id="<%= dom_id(deployment) %>" class="hover:bg-surface/50 transition-colors <%= 'bg-error/10' if deployment.error? %>">
   <td class="px-3 py-2 w-6">
     <% if deployment.error? %>
-      <span class="w-2 h-2 rounded-full bg-error inline-block"></span>
+      <span class="w-2 h-2 rounded-full bg-error shadow-lg shadow-error/50 inline-block"></span>
     <% elsif deployment.deploying? || deployment.pending? %>
-      <span class="w-2 h-2 rounded-full bg-warning animate-pulse inline-block"></span>
+      <span class="w-2 h-2 rounded-full bg-warning shadow-lg shadow-warning/50 animate-pulse inline-block"></span>
     <% else %>
-      <span class="w-2 h-2 rounded-full bg-success inline-block"></span>
+      <span class="w-2 h-2 rounded-full bg-success shadow-lg shadow-success/50 inline-block"></span>
     <% end %>
   </td>
   <td class="px-3 py-2">

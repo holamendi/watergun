@@ -11,7 +11,7 @@
           <% container = containers.first %>
           <div class="bg-elevated rounded border border-border p-3">
             <div class="flex items-center gap-2 mb-2">
-              <span class="w-2 h-2 rounded-full bg-success shadow shadow-success/50"></span>
+              <span class="w-2 h-2 rounded-full bg-success shadow-lg shadow-success/50"></span>
               <span class="text-xs"><%= process_type %></span>
             </div>
             <% if container.cpu_percentage.present? %>
@@ -70,7 +70,7 @@
           <% @linked_services.each do |service| %>
             <div class="px-4 py-3 flex items-center justify-between hover:bg-elevated/30 transition-colors">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-success shadow shadow-success/50"></span>
+                <span class="w-2 h-2 rounded-full bg-success shadow-lg shadow-success/50"></span>
                 <%= link_to service.name, project_service_path(@project, service), class: "font-mono text-sm hover:text-accent" %>
                 <span class="text-xxs text-text-muted bg-elevated px-1.5 py-0.5 rounded"><%= service.service_type.to_s.titleize %></span>
               </div>

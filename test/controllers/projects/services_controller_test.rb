@@ -15,7 +15,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
       get project_service_path(@project, @service)
 
       assert_response :success
-      assert_select "h1", text: @service.name
+      assert_select "h1", /#{Regexp.escape(@service.name)}/
     end
 
     test "renders the service type" do

@@ -9,13 +9,13 @@
   </div>
 
   <% if @server_actions.any? %>
-    <div id="server_actions" class="bg-surface rounded-xl border border-border divide-y divide-border">
+    <div id="server_actions" class="bg-surface rounded border border-border divide-y divide-border">
       <%= render @server_actions %>
     </div>
 
     <%= render "shared/pagination", pagy: @pagy %>
   <% else %>
-    <div class="bg-surface rounded-xl border border-border p-8 text-center">
+    <div class="bg-surface rounded border border-border p-8 text-center">
       <svg class="mx-auto h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
