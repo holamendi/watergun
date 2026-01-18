@@ -2,102 +2,117 @@
 
 <% @title = @server_action.slug %>
 
-<div class="p-6">
-  <div class="mb-8">
-    <h1 class="font-mono text-2xl font-bold"><%= @server_action.slug %></h1>
-    <p class="text-sm text-base-content/60 mt-1">
-      Action #<%= @server_action.id %>
-    </p>
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <!-- Back link -->
+  <div class="mb-4">
+    <%= link_to server_actions_path, class: "text-xs text-text-muted hover:text-text-secondary inline-flex items-center gap-1" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      All activity
+    <% end %>
+  </div>
+
+  <!-- Header -->
+  <div class="mb-6">
+    <div class="flex items-center gap-3">
+      <%= status_dot(@server_action.status, size: 3) %>
+      <h1 class="font-mono text-xl font-semibold text-text-primary"><%= @server_action.slug %></h1>
+      <span class="font-mono text-sm text-text-muted">#<%= @server_action.id %></span>
+    </div>
   </div>
 
   <% if @server_action.failure_message.present? %>
-    <div class="alert alert-error mb-6">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span><%= @server_action.failure_message %></span>
+    <div class="bg-error-soft border border-error/30 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <svg class="h-5 w-5 text-error flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-sm text-error"><%= @server_action.failure_message %></span>
+      </div>
     </div>
   <% end %>
 
-  <div class="card bg-base-200 mb-6">
-    <div class="card-body">
-      <h2 class="card-title text-base mb-4">Details</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+  <!-- Details Card -->
+  <div class="bg-surface rounded-xl border border-border mb-6">
+    <div class="px-4 py-3 border-b border-border">
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Details</h2>
+    </div>
+    <div class="p-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div>
-          <span class="text-base-content/60">Status</span>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Status</span>
           <div class="mt-1"><%= status_badge(@server_action.status) %></div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Source</span>
-          <div class="mt-1 font-mono"><%= @server_action.source %></div>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Source</span>
+          <div class="mt-1 font-mono text-xs text-text-primary"><%= @server_action.source %></div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Server</span>
-          <div class="mt-1"><%= @server_action.server.name %></div>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Server</span>
+          <div class="mt-1 text-xs text-text-primary"><%= @server_action.server.name %></div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Target</span>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Target</span>
           <div class="mt-1">
             <% if @server_action.actionable_type.present? %>
-              <span class="font-mono">
+              <span class="font-mono text-xs text-text-primary">
                 <%= "#{@server_action.actionable_type.underscore.split('/').last}:#{@server_action.actionable_id}" %>
               </span>
             <% else %>
-              <span class="text-base-content/40 italic">destroyed</span>
+              <span class="text-xs text-text-muted italic">destroyed</span>
             <% end %>
           </div>
         </div>
 
         <div>
-          <span class="text-base-content/60">User</span>
-          <div class="mt-1"><%= @server_action.user&.email || "—" %></div>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">User</span>
+          <div class="mt-1 text-xs text-text-primary"><%= @server_action.user&.email || "-" %></div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Duration</span>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Duration</span>
           <div class="mt-1">
             <% if @server_action.finished? %>
-              <span class="font-mono"><%= @server_action.duration.round(2) %>s</span>
+              <span class="font-mono text-xs text-text-primary"><%= @server_action.duration.round(2) %>s</span>
             <% else %>
-              <span class="text-base-content/40">—</span>
+              <span class="text-xs text-text-muted">-</span>
             <% end %>
           </div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Created</span>
-          <div class="mt-1">
-            <div class="tooltip" data-tip="<%= @server_action.created_at.strftime('%b %d, %Y at %H:%M:%S') %>">
-              <%= time_ago_in_words(@server_action.created_at) %> ago
-            </div>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Created</span>
+          <div class="mt-1 text-xs text-text-primary" title="<%= @server_action.created_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+            <%= time_ago_in_words(@server_action.created_at) %> ago
           </div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Started</span>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Started</span>
           <div class="mt-1">
             <% if @server_action.running_at %>
-              <div class="tooltip" data-tip="<%= @server_action.running_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+              <span class="text-xs text-text-primary" title="<%= @server_action.running_at.strftime('%b %d, %Y at %H:%M:%S') %>">
                 <%= time_ago_in_words(@server_action.running_at) %> ago
-              </div>
+              </span>
             <% else %>
-              <span class="text-base-content/40">—</span>
+              <span class="text-xs text-text-muted">-</span>
             <% end %>
           </div>
         </div>
 
         <div>
-          <span class="text-base-content/60">Finished</span>
+          <span class="text-xxs text-text-muted uppercase tracking-wider">Finished</span>
           <div class="mt-1">
             <% if @server_action.finished_at %>
-              <div class="tooltip" data-tip="<%= @server_action.finished_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+              <span class="text-xs text-text-primary" title="<%= @server_action.finished_at.strftime('%b %d, %Y at %H:%M:%S') %>">
                 <%= time_ago_in_words(@server_action.finished_at) %> ago
-              </div>
+              </span>
             <% else %>
-              <span class="text-base-content/40">—</span>
+              <span class="text-xs text-text-muted">-</span>
             <% end %>
           </div>
         </div>
@@ -105,45 +120,52 @@
     </div>
   </div>
 
-  <div class="card bg-base-200 mb-6">
-    <div class="card-body">
-      <h2 class="card-title text-base mb-4">Payload</h2>
-      <pre class="p-4 overflow-auto font-mono text-sm rounded-lg bg-base-300 max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
+  <!-- Payload Card -->
+  <div class="bg-surface rounded-xl border border-border mb-6">
+    <div class="px-4 py-3 border-b border-border">
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Payload</h2>
+    </div>
+    <div class="p-4">
+      <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
     </div>
   </div>
 
-  <div class="card bg-base-200">
-    <div class="card-body">
-      <h2 class="card-title text-base mb-4">Logs</h2>
-      <% if @server_action.queued? || @server_action.running? %>
-        <div class="p-4 rounded-lg bg-base-300 text-base-content/60 text-center">
-          <span class="loading loading-dots loading-sm"></span>
-          <p class="text-sm mt-2">Waiting for action to complete...</p>
-        </div>
-      <% elsif @server_action.log.present? && @server_action.log.ssh_commands.any? %>
-        <div class="space-y-4">
-          <% @server_action.log.ssh_commands.each do |command| %>
-            <div class="rounded-lg bg-base-300 overflow-hidden">
-              <div class="px-4 py-2 bg-base-100 border-b border-base-300 flex items-center justify-between">
-                <code class="text-sm font-mono text-primary"><%= command["cmd"] %></code>
-                <% if command["exit_code"] && command["exit_code"] != 0 %>
-                  <span class="badge badge-error badge-sm">exit <%= command["exit_code"] %></span>
-                <% end %>
-              </div>
-              <% output_text = command["output"]&.map { |o| o["data"] }&.join %>
-              <% if output_text.present? %>
-                <pre class="p-4 overflow-auto font-mono text-xs max-h-64 whitespace-pre-wrap"><%= output_text %></pre>
-              <% else %>
-                <div class="p-4 text-base-content/40 text-sm italic">No output</div>
+  <!-- Logs Card -->
+  <div class="bg-surface rounded-xl border border-border overflow-hidden">
+    <div class="px-4 py-3 border-b border-border">
+      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Logs</h2>
+    </div>
+    <% if @server_action.queued? || @server_action.running? %>
+      <div class="p-8 text-center">
+        <svg class="animate-spin mx-auto h-5 w-5 text-warning mb-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-xs text-text-muted">Waiting for action to complete...</p>
+      </div>
+    <% elsif @server_action.log.present? && @server_action.log.ssh_commands.any? %>
+      <div class="divide-y divide-border">
+        <% @server_action.log.ssh_commands.each do |command| %>
+          <div>
+            <div class="px-4 py-2 bg-elevated flex items-center justify-between">
+              <code class="text-xs font-mono text-accent"><%= command["cmd"] %></code>
+              <% if command["exit_code"] && command["exit_code"] != 0 %>
+                <span class="px-2 py-0.5 text-xxs font-medium rounded bg-error-soft text-error">exit <%= command["exit_code"] %></span>
               <% end %>
             </div>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="p-4 rounded-lg bg-base-300 text-base-content/60 text-center text-sm">
-          No logs available
-        </div>
-      <% end %>
-    </div>
+            <% output_text = command["output"]&.map { |o| o["data"] }&.join %>
+            <% if output_text.present? %>
+              <pre class="p-4 overflow-auto font-mono text-xs max-h-64 whitespace-pre-wrap text-text-secondary"><%= output_text %></pre>
+            <% else %>
+              <div class="p-4 text-text-muted text-xs italic">No output</div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-8 text-center">
+        <p class="text-xs text-text-muted">No logs available</p>
+      </div>
+    <% end %>
   </div>
 </div>

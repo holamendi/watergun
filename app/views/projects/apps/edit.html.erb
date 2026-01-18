@@ -1,42 +1,36 @@
 <%= turbo_stream_from @app %>
 <% @title = "#{@app.name} · Settings" %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
-  <div class="mb-8">
-    <%= link_to project_app_path(@project, @app), class: "text-sm text-base-content/60 hover:text-base-content inline-flex items-center gap-1" do %>
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-      </svg>
-      <%= @app.name %>
-    <% end %>
-    <h1 class="text-2xl font-semibold mt-1">Settings</h1>
-  </div>
+<div class="max-w-7xl mx-auto px-4">
+  <%= render "projects/apps/header", app: @app, active_tab: :edit %>
 
-  <div class="space-y-12">
-    <section>
-      <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-4">General</h2>
-      <%= render "form", app: @app %>
-    </section>
+  <div class="max-w-2xl py-4">
+    <div class="space-y-10">
+      <section>
+        <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">General</h2>
+        <%= render "form", app: @app %>
+      </section>
 
-    <section>
-      <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-4">Repository</h2>
-      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
-    </section>
+      <section>
+        <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">Repository</h2>
+        <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
+      </section>
 
-    <section>
-      <h2 class="text-sm font-medium text-base-content/60 uppercase tracking-wide mb-4">Builder</h2>
-      <%= render "projects/apps/builders/form", app: @app %>
-    </section>
+      <section>
+        <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">Builder</h2>
+        <%= render "projects/apps/builders/form", app: @app %>
+      </section>
 
-    <section class="pt-8 border-t border-base-300">
-      <h2 class="text-lg font-medium text-error">Danger zone</h2>
-      <p class="text-sm text-base-content/60 mt-2">
-        Deleting this app will permanently remove it and all deployment history from the server.
-      </p>
-      <%= button_to "Delete app", project_app_path(@project, @app),
-          method: :delete,
-          class: "btn btn-error btn-outline mt-4",
-          data: { turbo_confirm: "Delete #{@app.name}? This cannot be undone." } %>
-    </section>
+      <section class="pt-6 border-t border-border">
+        <h2 class="text-sm font-medium text-error">Danger zone</h2>
+        <p class="text-xs text-text-muted mt-1">
+          Deleting this app will permanently remove it and all deployment history from the server.
+        </p>
+        <%= button_to "Delete app", project_app_path(@project, @app),
+            method: :delete,
+            class: "mt-4 px-4 py-2 bg-transparent border border-error text-error text-xs rounded hover:bg-error/10 transition-colors",
+            data: { turbo_confirm: "Delete #{@app.name}? This cannot be undone." } %>
+      </section>
+    </div>
   </div>
 </div>

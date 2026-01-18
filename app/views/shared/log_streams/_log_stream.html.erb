@@ -1,14 +1,17 @@
-
 <div id="<%= dom_id(log_stream) %>"
-     class="px-2 py-1 relative overflow-auto text-xs text-gray-100 rounded-md bg-base-100 h-full"
+     class="p-3 relative overflow-auto font-mono text-xs text-text-primary h-full"
      data-controller="log-stream"
      data-log-stream-url-value="<%= url %>"
      data-log-stream-ping-interval-value="5000"
      data-turbo-temporary>
   <div data-log-stream-target="overlay">
-    <div class="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full">
-      <div class="font-mono text-lg">
-        initializing
+    <div class="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full text-text-muted">
+      <svg class="animate-spin h-5 w-5 mb-2" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <div class="text-sm">
+        Connecting to logs...
       </div>
     </div>
   </div>

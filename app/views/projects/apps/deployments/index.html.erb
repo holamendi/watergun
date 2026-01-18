@@ -1,32 +1,34 @@
 <%= turbo_stream_from @app, :deployments %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
   <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
 
-  <% if @app.github_repo.present? %>
-    <% if @deployments.any? %>
-      <div id="deployments" class="space-y-px">
-        <%= render @deployments %>
-      </div>
+  <div class="py-6">
+    <% if @app.github_repo.present? %>
+      <% if @deployments.any? %>
+        <div id="deployments" class="bg-surface rounded-xl border border-border divide-y divide-border">
+          <%= render @deployments %>
+        </div>
+      <% else %>
+        <div class="bg-surface rounded-xl border border-border p-8 text-center">
+          <svg class="mx-auto h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+          </svg>
+          <h3 class="mt-3 text-sm font-medium text-text-primary">No deployments yet</h3>
+          <p class="mt-1 text-xs text-text-muted">Click Deploy above to get started.</p>
+        </div>
+      <% end %>
     <% else %>
-      <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+      <div class="bg-surface rounded-xl border border-border p-8 text-center">
+        <svg class="mx-auto h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
         </svg>
-        <h3 class="mt-4 text-lg font-medium">No deployments yet</h3>
-        <p class="mt-1 text-sm text-base-content/60">Click Deploy above to get started.</p>
+        <h3 class="mt-3 text-sm font-medium text-text-primary">Connect a GitHub repository</h3>
+        <p class="mt-1 text-xs text-text-muted">Link a repository to enable deployments.</p>
+        <div class="mt-4">
+          <%= link_to "Connect Repository", new_app_github_repo_path(@app), class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20" %>
+        </div>
       </div>
     <% end %>
-  <% else %>
-    <div class="text-center py-12">
-      <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-      </svg>
-      <h3 class="mt-4 text-lg font-medium">Connect a GitHub repository</h3>
-      <p class="mt-1 text-sm text-base-content/60">Link a repository to enable deployments.</p>
-      <div class="mt-6">
-        <%= link_to "Connect Repository", new_app_github_repo_path(@app), class: "btn btn-primary" %>
-      </div>
-    </div>
-  <% end %>
+  </div>
 </div>

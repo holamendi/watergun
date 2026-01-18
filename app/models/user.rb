@@ -1,5 +1,6 @@
 class User < ApplicationRecord
-  THEMES = %w[watergun light dark dracula].freeze
+  # Single theme supported - custom dark design system
+  THEMES = %w[watergun].freeze
 
   has_secure_password
 

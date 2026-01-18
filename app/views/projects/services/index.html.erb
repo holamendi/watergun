@@ -10,31 +10,36 @@
 <%= render "apps/header", app: @app %>
 
 <div class="flex justify-start w-full pb-6">
-  <%= link_to "Attach Service", new_app_service_path(@app), class: "btn link btn-ghost btn-sm rounded-md font-normal text-sm" %>
+  <%= link_to "Attach Service", new_app_service_path(@app), class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs transition-colors" %>
 </div>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
+
+<% if @service_links.any? %>
+  <div class="bg-surface rounded-xl border border-border divide-y divide-border">
     <% @service_links.each do |service_link| %>
-      <tr>
-        <td><%= service_link.service.name %></td>
-        <td><%= service_link.service.service_type %></td>
-        <td>
+      <div class="px-4 py-3 flex items-center justify-between hover:bg-elevated/30 transition-colors">
+        <div class="flex items-center gap-3">
+          <%= status_dot(service_link.service.status) %>
+          <div>
+            <span class="font-mono text-sm font-medium text-text-primary"><%= service_link.service.name %></span>
+            <p class="text-xxs text-text-muted mt-0.5"><%= service_link.service.service_type.to_s.titleize %></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
           <% if service_link.pending? %>
-            <div class="badge badge-info">Provisioning</div>
+            <span class="text-xxs text-text-muted bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded">Provisioning</span>
           <% elsif service_link.linked? %>
-            <div class="badge badge-success">Active</div>
-          <% end  %>
-        </td>
-        <td class="text-right"><%= link_to "Delete", app_service_path(@app, service_link.service), class: "text-error", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure? "} %></td>
-      </tr>
+            <span class="text-xxs text-text-muted bg-green-500/10 text-green-400 px-2 py-0.5 rounded">Active</span>
+          <% end %>
+          <%= link_to "Delete", app_service_path(@app, service_link.service), class: "text-xs text-red-400 hover:text-red-300", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" } %>
+        </div>
+      </div>
     <% end %>
-  </tbody>
-</table>
+  </div>
+<% else %>
+  <div class="bg-surface rounded-xl border border-border p-8 text-center">
+    <p class="text-xs text-text-muted">No services attached to this app.</p>
+    <div class="mt-4">
+      <%= link_to "Attach Service", new_app_service_path(@app), class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20" %>
+    </div>
+  </div>
+<% end %>

@@ -1,35 +1,37 @@
-<li id="<%= dom_id(service) %>" class="relative flex justify-between px-4 py-5 gap-x-6 hover:bg-base-200 sm:px-6">
-  <div class="flex min-w-0 gap-x-4">
-    <div class="flex-auto min-w-0">
-      <p class="text-sm font-semibold leading-6">
-        <%= link_to project_service_path(service.project, service) do %>
-          <span class="absolute inset-x-0 bottom-0 -top-px"></span>
-          <%= service.name %>
-        <% end %>
-      </p>
-      <p class="flex mt-1 text-sm leading-5 text-base-content/60">
-        <%= service.service_type.titleize %> Database
-      </p>
+<div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(service) %>">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="w-2 h-2 rounded-full bg-success shadow shadow-success/50"></span>
+      <div>
+        <%= link_to service.name, project_service_path(service.project, service), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
+        <p class="text-xxs text-text-muted mt-0.5"><%= service.service_type.to_s.titleize %></p>
+      </div>
     </div>
-  </div>
-  <div class="flex items-center shrink-0 gap-x-4">
-    <div class="hidden sm:flex sm:flex-col sm:items-end">
-      <% if service.pending? %>
-        <div class="mt-1 flex items-center gap-x-1.5">
-          <%= spinner %>
-          <p class="text-sm leading-5 text-base-content/60">Initializing</p>
-        </div>
-      <% elsif service.active? %>
-        <div class="mt-1 flex items-center gap-x-1.5">
-          <div class="flex-none p-1 rounded-full bg-success/20">
-            <div class="h-1.5 w-1.5 rounded-full bg-success"></div>
+
+    <div class="flex items-center gap-2">
+      <%= link_to "Logs", project_service_log_streams_path(service.project, service),
+          class: "px-2.5 py-1 text-text-secondary hover:text-text-primary hover:bg-elevated rounded text-xxs" %>
+      <div class="relative" data-controller="dropdown">
+        <button type="button" data-action="dropdown#toggle" aria-label="Actions menu" class="p-1 text-text-muted hover:text-text-primary hover:bg-elevated rounded cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
+          </svg>
+        </button>
+        <div data-dropdown-target="menu" class="hidden absolute right-0 mt-1 w-48 bg-surface border border-border rounded shadow-lg z-10">
+          <div class="py-1">
+            <%= link_to "Overview", project_service_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
+            <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
+            <% if service.active? && !service.temporary_status? %>
+              <div class="border-t border-border mt-1 pt-1">
+                <%= button_to "Restart", project_service_restarts_path(service.project, service),
+                    class: "block w-full text-left px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated",
+                    form: { data: { turbo_stream: true } } %>
+              </div>
+            <% end %>
+            <%= link_to "Settings", edit_project_service_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
           </div>
-          <p class="text-sm leading-5 text-base-content/60">Active</p>
         </div>
-      <% end %>
+      </div>
     </div>
-    <svg class="flex-none w-5 h-5 text-base-content/40" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-      <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-    </svg>
   </div>
-</li>
+</div>

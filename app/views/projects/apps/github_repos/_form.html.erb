@@ -1,28 +1,22 @@
 <%= form_with model: github_repo, url: project_app_github_repo_path(github_repo.app.project, github_repo.app), id: "github_repo_form" do |form| %>
-  <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
-    <div class="sm:col-span-3">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Repository</legend>
-        <%= form.text_field :repo, class: "input w-full", disabled: true %>
-      </fieldset>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <div>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">Repository</label>
+      <%= form.text_field :repo, disabled: true, class: "w-full px-3 py-2 bg-elevated border border-border rounded text-sm font-mono text-text-muted cursor-not-allowed" %>
     </div>
-    <div class="sm:col-span-3">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Branch</legend>
-        <%= form.text_field :branch, class: "input w-full", disabled: true %>
-      </fieldset>
-    </div>
-    <div class="sm:col-span-full">
-      <label class="flex items-start gap-3 cursor-pointer">
-        <%= form.check_box :webhook_deploy, class: "checkbox checkbox-primary mt-1" %>
-        <div>
-          <span class="font-medium">Deploy on Push</span>
-          <p class="text-sm text-base-content/60">Automatically deploy the app when a push is made to the <code class="font-mono bg-base-200 px-1 py-0.5 rounded-sm"><%= github_repo.branch %></code> branch.</p>
-        </div>
-      </label>
+    <div>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">Branch</label>
+      <%= form.text_field :branch, disabled: true, class: "w-full px-3 py-2 bg-elevated border border-border rounded text-sm font-mono text-text-muted cursor-not-allowed" %>
     </div>
   </div>
-  <div class="flex items-center mt-6 gap-x-6">
-    <%= submit_button "Connect repository" %>
+  <label class="flex items-start gap-3 cursor-pointer">
+    <%= form.check_box :webhook_deploy, class: "mt-1 w-4 h-4 rounded bg-base border-border text-accent focus:ring-accent/20" %>
+    <div>
+      <span class="text-sm font-medium">Deploy on Push</span>
+      <p class="text-xs text-text-muted mt-0.5">Automatically deploy the app when a push is made to the <code class="font-mono bg-elevated px-1 py-0.5 rounded-sm text-xxs"><%= github_repo.branch %></code> branch.</p>
+    </div>
+  </label>
+  <div class="mt-4">
+    <%= form.submit "Save repository", class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20" %>
   </div>
 <% end %>
