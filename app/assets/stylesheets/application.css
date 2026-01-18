@@ -52,6 +52,17 @@
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px;
   }
+
+  /* Global cursor-pointer for interactive elements */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="submit"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer components {
@@ -360,8 +371,4 @@
   .tab-item-inactive {
     @apply text-text-secondary hover:text-text-primary;
   }
-}
-
-input[type="submit"] {
-  cursor: pointer;
 }

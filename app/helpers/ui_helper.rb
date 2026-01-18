@@ -67,27 +67,37 @@ module UiHelper
     tag.span(status.to_s.titleize, class: "px-2 py-0.5 text-xxs font-medium rounded #{colors}")
   end
 
-  def spinner(size: "md", color: nil)
-    size_class = case size.to_s
-    when "3", "4", "xs" then "loading-xs"
-    when "5", "sm" then "loading-sm"
-    when "6", "md" then "loading-md"
-    else "loading-lg"
+  def submit_button(text, variant: :primary)
+    base_classes = "text-xs font-medium rounded transition-colors"
+    size_classes = "px-4 py-2"
+
+    variant_classes = case variant
+    when :primary
+      "bg-gradient-to-r from-accent to-accent-hover text-white shadow shadow-accent/20"
+    when :secondary
+      "bg-elevated hover:bg-border text-text-primary border border-border"
+    when :destructive
+      "bg-error/20 text-error hover:bg-error/30"
     end
 
-    color_class = (color == "white") ? "text-white" : ""
+    disabled_classes = "disabled:opacity-50 disabled:cursor-not-allowed"
 
-    tag.span(class: "loading loading-spinner #{size_class} #{color_class}".strip)
-  end
-
-  def submit_button(text)
     button_tag text,
-      class: "btn btn-primary btn-sm",
+      class: "#{base_classes} #{size_classes} #{variant_classes} #{disabled_classes}",
       data: {
-        turbo_submits_with: tag.span(class: "flex items-center gap-2") do
-          concat tag.span(class: "loading loading-spinner loading-xs")
+        turbo_submits_with: tag.span(class: "inline-flex items-center gap-2") do
+          concat spinner_icon
           concat text
         end
       }
+  end
+
+  private
+
+  def spinner_icon
+    tag.svg(class: "w-3 h-3 animate-spin", viewBox: "0 0 24 24", fill: "none") do
+      concat tag.circle(cx: 12, cy: 12, r: 10, stroke: "currentColor", "stroke-width": 4, class: "opacity-25")
+      concat tag.path(fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z", class: "opacity-75")
+    end
   end
 end

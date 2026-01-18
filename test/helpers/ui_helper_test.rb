@@ -112,19 +112,18 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/inline-block/, result)
   end
 
-  test "spinner generates span with loading classes" do
-    span = spinner(size: "4", color: "white")
-    assert_match(/span/, span)
-    assert_match(/loading/, span)
-    assert_match(/loading-spinner/, span)
-    assert_match(/loading-xs/, span)
-  end
-
   test "submit_button generates button with correct attributes" do
     button = submit_button "Save"
     assert_match(/button/, button)
     assert_match(/Save/, button)
-    assert_match(/btn btn-primary/, button)
+    assert_match(/from-accent/, button)
     assert_match(/data-turbo-submits-with/, button)
+    assert_match(/animate-spin/, button) # loading spinner in turbo_submits_with
+  end
+
+  test "submit_button supports variant option" do
+    button = submit_button "Delete", variant: :destructive
+    assert_match(/bg-error/, button)
+    assert_match(/text-error/, button)
   end
 end
