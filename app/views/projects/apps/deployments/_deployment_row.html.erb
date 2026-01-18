@@ -1,35 +1,41 @@
-<%= link_to project_app_deployment_path(deployment.app.project, deployment.app, deployment),
-    id: dom_id(deployment),
-    class: "block p-4 hover:bg-elevated/30 transition-colors" do %>
-  <div class="flex items-center gap-3">
-    <%= status_dot(deployment.status) %>
-
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-xs font-medium text-text-primary"><%= deployment.short_sha %></span>
-        <% if deployment.finished? %>
-          <span class="text-xxs text-text-muted"><%= time_ago_in_words(deployment.finished_at) %> ago</span>
-        <% elsif deployment.deploying? || deployment.pending? %>
-          <span class="text-xxs text-text-muted inline-flex items-center gap-1">
-            <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            In progress
-          </span>
-        <% end %>
-      </div>
-      <% if deployment.commit_message.present? %>
-        <p class="text-xs text-text-secondary truncate mt-0.5"><%= deployment.commit_message.lines.first %></p>
-      <% end %>
-    </div>
-
-    <% if deployment.author_avatar_url.present? %>
-      <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_login %>" class="w-6 h-6 rounded-full" title="<%= deployment.author_login %>">
+<tr id="<%= dom_id(deployment) %>" class="hover:bg-surface/50 transition-colors <%= 'bg-error/10' if deployment.error? %>">
+  <td class="px-3 py-2 w-6">
+    <% if deployment.error? %>
+      <span class="w-2 h-2 rounded-full bg-error inline-block"></span>
+    <% elsif deployment.deploying? || deployment.pending? %>
+      <span class="w-2 h-2 rounded-full bg-warning animate-pulse inline-block"></span>
+    <% else %>
+      <span class="w-2 h-2 rounded-full bg-success inline-block"></span>
     <% end %>
-
-    <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-    </svg>
-  </div>
-<% end %>
+  </td>
+  <td class="px-3 py-2">
+    <%= link_to deployment.short_sha, project_app_deployment_path(deployment.app.project, deployment.app, deployment), class: "font-mono text-accent hover:underline" %>
+  </td>
+  <td class="px-3 py-2">
+    <% if deployment.commit_message.present? %>
+      <%= truncate(deployment.commit_message.lines.first&.strip, length: 50) %>
+      <% if deployment.error? %>
+        <span class="text-error text-xxs ml-1">Failed</span>
+      <% end %>
+    <% end %>
+  </td>
+  <td class="px-3 py-2 text-text-muted">
+    <% if deployment.finished? %>
+      <%= time_ago_in_words(deployment.finished_at) %> ago
+    <% elsif deployment.deploying? || deployment.pending? %>
+      <span class="inline-flex items-center gap-1">
+        <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </span>
+    <% end %>
+  </td>
+  <td class="px-3 py-2 text-right">
+    <% if deployment.author_avatar_url.present? %>
+      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-accent to-pink inline-block overflow-hidden">
+        <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_login %>" class="w-full h-full">
+      </div>
+    <% end %>
+  </td>
+</tr>

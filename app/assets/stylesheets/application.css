@@ -21,8 +21,8 @@
   --color-text-muted: #606070;
 
   /* Accent colors */
-  --color-accent: #6c5ce7;
-  --color-accent-hover: #8577ed;
+  --color-accent: #f43f5e;
+  --color-accent-hover: #fb7185;
   --color-success: #00cec9;
   --color-success-soft: rgba(0, 206, 201, 0.125);
   --color-warning: #fdcb6e;
@@ -30,6 +30,7 @@
   --color-error: #ff7675;
   --color-error-soft: rgba(255, 118, 117, 0.125);
   --color-pink: #fd79a8;
+  --color-cyan: #00b894;
 
   /* Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;

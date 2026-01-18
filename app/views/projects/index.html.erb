@@ -2,20 +2,20 @@
 
 <% @title = "Projects" %>
 
-<div class="max-w-6xl mx-auto px-4 py-6">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-xl font-semibold">Projects</h1>
-    <%= link_to new_project_path, class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20 hover:opacity-90 transition-all" do %>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-lg font-semibold">Projects</h1>
+    <%= link_to new_project_path, class: "px-3 py-1.5 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20" do %>
       New Project
     <% end %>
   </div>
 
   <% if @projects.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       <%= render @projects %>
     </div>
   <% else %>
-    <div class="bg-surface rounded-xl border border-border p-12 text-center">
+    <div class="bg-surface rounded border border-border p-12 text-center">
       <p class="text-text-secondary mb-4">No projects yet</p>
       <%= link_to "Create your first project", new_project_path, class: "text-accent hover:underline" %>
     </div>

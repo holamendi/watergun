@@ -93,10 +93,11 @@ Recurring jobs configured in `config/recurring.yml`.
 
 - Vite with Stimulus.js controllers in `app/javascript/`
 - Turbo for real-time updates and broadcasts
-- Tailwind CSS 4 with custom design system (see `app/assets/stylesheets/application.css`)
+- Tailwind CSS 4 with custom design system
+  - **Design reference**: `docs/design-system.html` (open in browser for visual examples)
+  - **Quick tokens**: `docs/design-tokens.md` (colors, patterns, component snippets)
   - Custom dark theme with colors: `base`, `surface`, `elevated`, `accent`, `success`, `warning`, `error`
   - Text colors: `text-primary`, `text-secondary`, `text-muted`
-  - Custom component classes: `btn`, `badge`, `card`, `modal`, `dropdown`, `menu`, `loading`
   - Use semantic color names for consistency
 
 ### Multi-Database Setup

@@ -1,24 +1,24 @@
 <%= link_to project_path(project),
     id: dom_id(project),
-    class: "group bg-surface rounded-xl border border-border p-4 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all" do %>
-  <div class="flex items-center justify-between mb-2">
-    <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-pink flex items-center justify-center text-white text-xs font-bold">
-        <%= project.name.first.upcase %>
-      </div>
-      <span class="font-medium group-hover:text-accent transition-colors"><%= project.name %></span>
+    class: "group bg-surface rounded border border-border p-4 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all" do %>
+  <div class="flex items-center gap-2 mb-2">
+    <div class="w-8 h-8 rounded bg-gradient-to-br from-accent to-pink flex items-center justify-center text-white text-xs font-bold">
+      <%= project.name.first.upcase %>
     </div>
-    <%= status_dot(project.status) %>
+    <span class="font-medium group-hover:text-accent transition-colors"><%= project.name %></span>
   </div>
 
   <div class="flex items-center gap-3 text-xs text-text-secondary mb-2">
-    <span><%= project.apps.select(&:kept?).size %> apps</span>
-    <span><%= project.services.select(&:kept?).size %> services</span>
+    <span><%= pluralize(project.apps.select(&:kept?).size, "app") %></span>
+    <span><%= pluralize(project.services.select(&:kept?).size, "service") %></span>
   </div>
 
-  <% if project.apps.kept.any? %>
-    <div class="text-xxs text-text-muted">
-      Last deploy <%= time_ago_in_words(project.apps.kept.map(&:deployed_at).compact.max || project.created_at) %> ago
-    </div>
-  <% end %>
+  <% last_deploy = project.apps.kept.map(&:deployed_at).compact.max %>
+  <div class="text-xxs text-text-muted">
+    <% if last_deploy %>
+      Last deploy <%= time_ago_in_words(last_deploy) %> ago
+    <% else %>
+      No deploys yet
+    <% end %>
+  </div>
 <% end %>

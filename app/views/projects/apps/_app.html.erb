@@ -1,7 +1,7 @@
 <div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(app) %>">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink flex items-center justify-center">
+      <div class="w-8 h-8 rounded bg-gradient-to-br from-accent to-pink flex items-center justify-center">
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
@@ -26,17 +26,17 @@
       <% if app.github_repo.present? && !app.temporary_status? %>
         <%= button_to "Deploy", project_app_deployments_path(app.project, app),
             method: :post,
-            class: "px-3 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-lg text-xs font-medium shadow shadow-accent/20" %>
+            class: "px-2.5 py-1 bg-accent hover:bg-accent-hover text-white rounded text-xxs" %>
       <% end %>
       <%= link_to "Logs", project_app_log_streams_path(app.project, app),
-          class: "px-3 py-1.5 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-lg text-xs" %>
+          class: "px-2.5 py-1 text-text-secondary hover:text-text-primary hover:bg-elevated rounded text-xxs" %>
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" aria-label="Actions menu" class="p-1.5 text-text-muted hover:text-text-primary hover:bg-elevated rounded-lg cursor-pointer">
+        <div tabindex="0" role="button" aria-label="Actions menu" class="p-1 text-text-muted hover:text-text-primary hover:bg-elevated rounded cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
           </svg>
         </div>
-        <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-48 p-2 shadow-lg border border-base-300">
+        <ul tabindex="0" class="dropdown-content menu bg-surface rounded z-10 w-48 p-2 shadow-lg border border-border">
           <li><%= link_to "Overview", project_app_path(app.project, app) %></li>
           <li><%= link_to "Deployments", project_app_deployments_path(app.project, app) %></li>
           <li><%= link_to "Logs", project_app_log_streams_path(app.project, app) %></li>
@@ -44,7 +44,7 @@
           <li><%= link_to "Variables", project_app_env_variables_path(app.project, app) %></li>
           <li><%= link_to "Domains", project_app_domains_path(app.project, app) %></li>
           <% if app.deployed? && !app.temporary_status? %>
-            <li class="border-t border-base-300 mt-1 pt-1">
+            <li class="border-t border-border mt-1 pt-1">
               <%= button_to "Restart", project_app_restarts_path(app.project, app),
                   class: "text-left",
                   form: { data: { turbo_stream: true } } %>

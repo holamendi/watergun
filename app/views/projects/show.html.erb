@@ -1,53 +1,60 @@
 <%= turbo_stream_from @project %>
 <% @title = @project.name %>
 
-<div class="max-w-6xl mx-auto px-4 py-6">
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+<div class="max-w-7xl mx-auto px-4">
+  <%# Header %>
+  <div class="flex items-center justify-between mb-4">
     <div>
-      <%= link_to projects_path, class: "text-xs text-text-muted hover:text-text-secondary mb-1 inline-block" do %>
+      <%= link_to projects_path, class: "text-xs text-text-muted hover:text-accent" do %>
         &larr; Projects
       <% end %>
-      <h1 class="text-xl font-semibold flex items-center gap-2">
+      <h1 class="text-lg font-semibold flex items-center gap-2">
         <%= @project.name %>
-        <%= status_dot(@project.status) %>
+        <span class="w-2 h-2 rounded-full bg-success shadow-lg shadow-success/50"></span>
       </h1>
     </div>
     <div class="flex items-center gap-2">
-      <%= link_to new_project_app_path(@project), class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20" do %>
+      <%= link_to new_project_app_path(@project), class: "px-3 py-1.5 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20" do %>
         New App
       <% end %>
-      <%= link_to new_project_service_path(@project), class: "px-4 py-2 bg-elevated hover:bg-border text-text-primary text-xs font-medium rounded-lg border border-border" do %>
+      <%= link_to new_project_service_path(@project), class: "px-3 py-1.5 bg-elevated hover:bg-border text-text-primary text-xs rounded border border-border" do %>
         New Service
       <% end %>
     </div>
   </div>
 
-  <!-- Apps Section -->
-  <div class="mb-6">
-    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Apps (<%= @apps.size %>)</h2>
-    <% if @apps.any? %>
-      <div class="bg-surface rounded-xl border border-border divide-y divide-border">
-        <%= render partial: "projects/apps/app", collection: @apps %>
+  <%# Split Panels: Apps | Services %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <%# Apps Panel %>
+    <div class="bg-surface rounded border border-border overflow-hidden">
+      <div class="px-3 py-2 border-b border-border bg-elevated/50">
+        <span class="text-xs font-medium text-text-muted uppercase tracking-wider">Apps (<%= @apps.size %>)</span>
       </div>
-    <% else %>
-      <div class="bg-surface rounded-xl border border-border p-6 text-center">
-        <p class="text-text-secondary text-sm">No apps yet</p>
-      </div>
-    <% end %>
-  </div>
+      <% if @apps.any? %>
+        <div class="divide-y divide-border">
+          <%= render partial: "projects/apps/app", collection: @apps %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center">
+          <p class="text-text-secondary text-sm">No apps yet</p>
+        </div>
+      <% end %>
+    </div>
 
-  <!-- Services Section -->
-  <div>
-    <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Services (<%= @services.size %>)</h2>
-    <% if @services.any? %>
-      <div class="bg-surface rounded-xl border border-border divide-y divide-border">
-        <%= render partial: "projects/services/service", collection: @services %>
+    <%# Services Panel %>
+    <div class="bg-surface rounded border border-border overflow-hidden">
+      <div class="px-3 py-2 border-b border-border bg-elevated/50">
+        <span class="text-xs font-medium text-text-muted uppercase tracking-wider">Services (<%= @services.size %>)</span>
       </div>
-    <% else %>
-      <div class="bg-surface rounded-xl border border-border p-6 text-center">
-        <p class="text-text-secondary text-sm">No services yet</p>
-      </div>
-    <% end %>
+      <% if @services.any? %>
+        <div class="divide-y divide-border">
+          <%= render partial: "projects/services/service", collection: @services %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center">
+          <p class="text-text-secondary text-sm">No services yet</p>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

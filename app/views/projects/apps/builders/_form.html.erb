@@ -1,14 +1,10 @@
 <%= form_with model: app, url: project_app_builder_path(app.project, app), id: "builder_form" do |form| %>
-  <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
-    <div class="sm:col-span-6">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Builder</legend>
-        <%= form.select :builder, App.builders, {}, class: "select w-full" %>
-        <%= error_messages_for(form.object, :builder) %>
-      </fieldset>
-    </div>
+  <div class="max-w-xs">
+    <label class="block text-xs font-medium text-text-secondary mb-1.5">Builder</label>
+    <%= form.select :builder, App.builders, {}, class: "w-full px-3 py-2 bg-base border border-border rounded text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all" %>
+    <%= error_messages_for(form.object, :builder) %>
   </div>
-  <div class="flex items-center mt-6 gap-x-6">
-    <%= submit_button "Save builder" %>
+  <div class="mt-4">
+    <%= form.submit "Save builder", class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20" %>
   </div>
 <% end %>

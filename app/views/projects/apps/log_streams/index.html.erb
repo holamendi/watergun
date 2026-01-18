@@ -1,12 +1,14 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @log_stream %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-  <%= render "projects/apps/header", app: @app, active_tab: :logs %>
-</div>
+<div class="max-w-7xl mx-auto px-4">
+  <%= render "projects/apps/header", app: @app, active_tab: :log_streams %>
 
-<div class="h-[calc(100vh-16rem)] bg-[#303446] rounded-lg mx-4 sm:mx-6 lg:mx-8">
-  <%= render "shared/log_streams/log_stream",
-      log_stream: @log_stream,
-      url: project_app_log_stream_path(@project, @app, @log_stream) %>
+  <div class="py-4">
+    <div class="bg-base rounded border border-border overflow-hidden h-[calc(100vh-14rem)]">
+      <%= render "shared/log_streams/log_stream",
+          log_stream: @log_stream,
+          url: project_app_log_stream_path(@project, @app, @log_stream) %>
+    </div>
+  </div>
 </div>
