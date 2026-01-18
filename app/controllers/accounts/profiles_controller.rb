@@ -1,6 +1,7 @@
 module Accounts
   class ProfilesController < ApplicationController
     def update
+      sleep 2
       if Current.user.update(user_params)
         render turbo_stream: [
           stream_toast("Setting saved"),

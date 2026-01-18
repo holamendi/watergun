@@ -20,7 +20,7 @@
             <%= form.text_field :name, class: "input w-full font-mono", autocomplete: "off" %>
             <%= error_messages_for(@project, :name) %>
           </fieldset>
-          <%= form.submit "Save", class: "btn btn-primary" %>
+          <%= submit_button "Save" %>
         </div>
       <% end %>
     </section>

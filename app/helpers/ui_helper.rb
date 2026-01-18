@@ -68,7 +68,7 @@ module UiHelper
   end
 
   def submit_button(text, variant: :primary)
-    base_classes = "text-xs font-medium rounded transition-colors"
+    base_classes = "inline-flex items-center justify-center gap-2 text-xs font-medium rounded transition-colors"
     size_classes = "px-4 py-2"
 
     variant_classes = case variant

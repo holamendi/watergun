@@ -28,8 +28,7 @@
       <p class="text-xs text-text-muted">Create a GitHub App to enable repository deployments.</p>
       <%= form_with url: github_app_manifest.registration_url, method: :post do |form| %>
         <%= form.hidden_field :manifest, value: github_app_manifest.to_param %>
-        <%= form.submit "Create GitHub App",
-            class: "px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs font-medium rounded-lg shadow shadow-accent/20 cursor-pointer hover:opacity-90" %>
+        <%= submit_button "Create GitHub App" %>
       <% end %>
     </div>
   <% end %>

@@ -18,7 +18,7 @@
       <%= error_messages_for(form.object, :value) %>
     </fieldset>
     <div class="flex items-end gap-2">
-      <%= form.submit "Save", class: "btn btn-primary" %>
+      <%= submit_button "Save" %>
       <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "btn btn-ghost" %>
     </div>
   </div>
