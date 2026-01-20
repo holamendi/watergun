@@ -158,6 +158,14 @@ Accent colors:
 
 <!-- Nav links -->
 <a href="#" class="px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary rounded">Link</a>
+
+<!-- Back link (chevron + context) -->
+<a href="#" class="text-sm text-text-muted hover:text-text-secondary inline-flex items-center gap-1">
+  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+  </svg>
+  Context Name
+</a>
 ```
 
 ### Gradient Avatars
@@ -172,4 +180,42 @@ Accent colors:
 
 ```html
 <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">Section Title</h2>
+```
+
+### Danger Zone
+
+```html
+<section class="pt-6 border-t border-border">
+  <h2 class="text-sm font-medium text-error">Danger zone</h2>
+  <p class="text-xs text-text-muted mt-1">
+    Destructive action description here.
+  </p>
+  <button class="mt-4 px-4 py-2 bg-transparent border border-error text-error text-xs rounded hover:bg-error/10 transition-colors">
+    Delete item
+  </button>
+</section>
+```
+
+### Form Layouts
+
+```html
+<!-- Centered form card (new/edit pages) -->
+<div class="max-w-sm mx-auto px-4 py-12">
+  <div class="mb-6">
+    <!-- Back link -->
+  </div>
+  <div class="bg-surface rounded-xl border border-border p-6">
+    <h1 class="text-lg font-semibold mb-5">Page Title</h1>
+    <!-- Form content -->
+  </div>
+</div>
+
+<!-- Inline field with save (settings pattern) -->
+<div class="flex gap-3 items-end">
+  <div class="flex-1">
+    <label class="block text-xs font-medium text-text-secondary mb-1.5">Field name</label>
+    <input type="text" class="w-full px-3 py-2 bg-base border border-border rounded text-sm font-mono focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all">
+  </div>
+  <button class="px-4 py-2 bg-gradient-to-r from-accent to-accent-hover text-white text-xs rounded shadow shadow-accent/20">Save</button>
+</div>
 ```
