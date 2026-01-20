@@ -1,10 +1,11 @@
 module IconsHelper
   ICONS_PATH = Rails.root.join("app/assets/icons")
 
+  # Icons with embedded brand colors (don't apply color class)
+  BRAND_COLOR_ICONS = %i[postgres redis mysql].freeze
+
+  # Fallback colors for icons using currentColor
   SERVICE_COLORS = {
-    postgres: "text-[#336791]",
-    redis: "text-[#DC382D]",
-    mysql: "text-[#4479A1]",
     mariadb: "text-[#003545]",
     mongo: "text-[#47A248]",
     elasticsearch: "text-[#005571]",
@@ -16,8 +17,14 @@ module IconsHelper
 
   def service_icon(type, size: :md)
     size_class = icon_size_class(size)
-    color_class = SERVICE_COLORS[type.to_sym] || "text-text-secondary"
-    load_svg_icon("services/#{type}", class: "#{size_class} #{color_class}")
+    type_sym = type.to_sym
+
+    if BRAND_COLOR_ICONS.include?(type_sym)
+      load_svg_icon("services/#{type}", class: size_class)
+    else
+      color_class = SERVICE_COLORS[type_sym] || "text-text-secondary"
+      load_svg_icon("services/#{type}", class: "#{size_class} #{color_class}")
+    end
   end
 
   def app_icon(app, size: :md)
@@ -37,10 +44,10 @@ module IconsHelper
 
   def icon_size_class(size)
     case size
-    when :sm then "w-3 h-3"
-    when :md then "w-3.5 h-3.5"
-    when :lg then "w-4 h-4"
-    else "w-3.5 h-3.5"
+    when :sm then "w-3.5 h-3.5"
+    when :md then "w-4 h-4"
+    when :lg then "w-5 h-5"
+    else "w-4 h-4"
     end
   end
 
