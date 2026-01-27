@@ -1,38 +1,16 @@
-<div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(service) %>">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <span class="w-2 h-2 rounded-full bg-success shadow shadow-success/50"></span>
-      <div>
-        <%= link_to service.name, project_service_path(service.project, service), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
-        <p class="text-xxs text-text-muted mt-0.5"><%= service.service_type.to_s.titleize %></p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <%= link_to "Logs", project_service_log_streams_path(service.project, service),
-          class: "px-2.5 py-1 text-text-secondary hover:text-text-primary hover:bg-elevated rounded text-xxs" %>
-      <div class="relative" data-controller="dropdown">
-        <button type="button" data-action="dropdown#toggle" aria-label="Actions menu" class="p-1 text-text-muted hover:text-text-primary hover:bg-elevated rounded cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
-          </svg>
-        </button>
-        <div data-dropdown-target="menu" class="hidden absolute right-0 mt-1 w-48 bg-surface border border-border rounded shadow-lg z-10">
-          <div class="py-1">
-            <%= link_to "Overview", project_service_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
-            <%= link_to "Logs", project_service_log_streams_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
-            <% if service.active? && !service.temporary_status? %>
-              <div class="border-t border-border mt-1 pt-1">
-                <%= button_to "Restart", project_service_restarts_path(service.project, service),
-                    class: "block w-full text-left px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated",
-                    data: { turbo_submits_with: "Restarting..." },
-                    form: { data: { turbo_stream: true } } %>
-              </div>
-            <% end %>
-            <%= link_to "Settings", edit_project_service_path(service.project, service), class: "block px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-elevated" %>
-          </div>
-        </div>
-      </div>
+<%= link_to project_service_path(service.project, service),
+    class: "flex items-center justify-between px-4 py-3 hover:bg-elevated/50 transition-colors border-b border-border last:border-b-0 group",
+    id: dom_id(service) do %>
+  <div class="flex items-center gap-3">
+    <%= service_icon(service.service_type, size: :md) %>
+    <div>
+      <span class="font-mono text-sm font-medium group-hover:text-accent transition-colors"><%= service.name %></span>
+      <% if service.version.present? %>
+        <p class="text-xxs text-text-muted mt-0.5"><%= service.version %></p>
+      <% end %>
     </div>
   </div>
-</div>
+  <svg class="w-4 h-4 text-text-muted group-hover:text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+  </svg>
+<% end %>

@@ -44,14 +44,14 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_app_path(@project)}']", text: /App/
+      assert_select "a[href='#{new_project_app_path(@project)}']", text: /New/
     end
 
     test "shows add service action" do
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_service_path(@project)}']", text: /Service/
+      assert_select "a[href='#{new_project_service_path(@project)}']", text: /New/
     end
   end
 

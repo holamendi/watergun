@@ -1,59 +1,16 @@
-<div class="px-4 py-3 hover:bg-elevated/30 transition-colors" id="<%= dom_id(app) %>">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded bg-gradient-to-br from-accent to-pink flex items-center justify-center">
-        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-        </svg>
-      </div>
-      <div>
-        <%= link_to app.name, project_app_path(app.project, app), class: "font-mono text-sm font-medium hover:text-accent transition-colors" %>
-        <div class="flex items-center gap-2 mt-0.5 text-xxs text-text-muted">
-          <% if app.github_repo.present? %>
-            <span class="px-1.5 py-0.5 bg-elevated rounded"><%= app.github_repo.branch || "main" %></span>
-          <% end %>
-          <% if app.deployed? %>
-            <span><%= time_ago_in_words(app.deployed_at) %> ago</span>
-          <% end %>
-          <% app.containers.select(&:running?).group_by(&:dokku_process_type).each do |type, _| %>
-            <span class="text-success">● <%= type %></span>
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <% if app.github_repo.present? && !app.temporary_status? %>
-        <%= form_with url: project_app_deployments_path(app.project, app), data: { turbo_stream: true } do %>
-          <%= submit_button "Deploy", size: :xs %>
-        <% end %>
+<%= link_to project_app_path(app.project, app),
+    class: "flex items-center justify-between px-4 py-3 hover:bg-elevated/50 transition-colors border-b border-border last:border-b-0 group",
+    id: dom_id(app) do %>
+  <div class="flex items-center gap-3">
+    <%= app_icon(app, size: :md) %>
+    <div>
+      <span class="font-mono text-sm font-medium group-hover:text-accent transition-colors"><%= app.name %></span>
+      <% if app.github_repo.present? %>
+        <p class="text-xxs text-text-muted mt-0.5"><%= app.github_repo.repo %> <span class="text-text-muted/60">·</span> <%= app.github_repo.branch %></p>
       <% end %>
-      <%= link_to "Logs", project_app_log_streams_path(app.project, app),
-          class: "px-2.5 py-1 text-text-secondary hover:text-text-primary hover:bg-elevated rounded text-xxs" %>
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" aria-label="Actions menu" class="p-1 text-text-muted hover:text-text-primary hover:bg-elevated rounded cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
-          </svg>
-        </div>
-        <ul tabindex="0" class="dropdown-content menu bg-surface rounded z-10 w-48 p-2 shadow-lg border border-border">
-          <li><%= link_to "Overview", project_app_path(app.project, app) %></li>
-          <li><%= link_to "Deployments", project_app_deployments_path(app.project, app) %></li>
-          <li><%= link_to "Logs", project_app_log_streams_path(app.project, app) %></li>
-          <li><%= link_to "Metrics", project_app_metrics_path(app.project, app) %></li>
-          <li><%= link_to "Variables", project_app_env_variables_path(app.project, app) %></li>
-          <li><%= link_to "Domains", project_app_domains_path(app.project, app) %></li>
-          <% if app.deployed? && !app.temporary_status? %>
-            <li class="border-t border-border mt-1 pt-1">
-              <%= button_to "Restart", project_app_restarts_path(app.project, app),
-                  class: "text-left",
-                  data: { turbo_submits_with: "Restarting..." },
-                  form: { data: { turbo_stream: true } } %>
-            </li>
-          <% end %>
-          <li><%= link_to "Settings", edit_project_app_path(app.project, app) %></li>
-        </ul>
-      </div>
     </div>
   </div>
-</div>
+  <svg class="w-4 h-4 text-text-muted group-hover:text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+  </svg>
+<% end %>
