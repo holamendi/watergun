@@ -1,8 +1,8 @@
 <%= turbo_stream_from @deployment %>
 
-<div class="max-w-7xl mx-auto px-4">
-  <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
+<%= render "projects/apps/header", app: @app, active_tab: :deployments %>
 
+<div class="max-w-7xl mx-auto px-4">
   <%# Back to deployments list %>
   <div class="pt-4">
     <%= link_to project_app_deployments_path(@project, @app), class: "text-xs text-accent hover:underline inline-flex items-center gap-1" do %>

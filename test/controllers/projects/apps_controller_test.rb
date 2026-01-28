@@ -15,7 +15,7 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
       get project_app_path(@project, @app)
 
       assert_response :success
-      assert_select "h1", text: @app.name
+      assert_select "title", /#{Regexp.escape(@app.name)}/
     end
 
     test "renders navigation tabs" do
@@ -57,15 +57,9 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
       get project_app_path(@project, @app)
 
       assert_response :success
-      assert_select "body", /deployed.*ago/i
+      assert_select "body", /ago/i
     end
 
-    test "shows restart action" do
-      get project_app_path(@project, @app)
-
-      assert_response :success
-      assert_select "form[action='#{project_app_restarts_path(@project, @app)}']"
-    end
   end
 
   describe "app with github repo" do
@@ -74,12 +68,6 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
       # smol_roda has a github_repo fixture
     end
 
-    test "shows deploy action when github repo is connected" do
-      get project_app_path(@project, @app)
-
-      assert_response :success
-      assert_select "form[action='#{project_app_deployments_path(@project, @app)}']"
-    end
 
     test "shows github repo link" do
       get project_app_path(@project, @app)

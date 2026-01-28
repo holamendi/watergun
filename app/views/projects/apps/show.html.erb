@@ -1,6 +1,6 @@
-<div class="max-w-7xl mx-auto px-4">
-  <%= render "projects/apps/header", app: @app, active_tab: :overview %>
+<%= render "projects/apps/header", app: @app, active_tab: :overview %>
 
+<div class="max-w-7xl mx-auto px-4">
   <div class="py-4">
     <%# Process cards %>
     <% running_containers = @app.containers.select(&:running?) %>

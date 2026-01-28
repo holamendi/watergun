@@ -15,7 +15,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
       get project_service_path(@project, @service)
 
       assert_response :success
-      assert_select "h1", /#{Regexp.escape(@service.name)}/
+      assert_select "title", /#{Regexp.escape(@service.name)}/
     end
 
     test "renders the service type" do
@@ -64,12 +64,6 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
       @service.update!(status: :active)
     end
 
-    test "shows restart action" do
-      get project_service_path(@project, @service)
-
-      assert_response :success
-      assert_select "form[action='#{project_service_restarts_path(@project, @service)}']"
-    end
   end
 
   describe "pending service" do

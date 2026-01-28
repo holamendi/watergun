@@ -2,58 +2,37 @@
 <% @title = service.name %>
 <% active_tab ||= nil %>
 
-<div class="bg-surface border-b border-border">
-  <div class="max-w-7xl mx-auto px-4 py-3">
-    <%# Back + Title %>
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-      <div>
-        <%= link_to project_path(service.project), class: "text-xxs text-text-muted hover:text-accent" do %>
-          &larr; <%= service.project.name %>
-        <% end %>
-        <h1 class="text-lg font-semibold flex items-center gap-2">
-          <%= service.name %>
-          <span class="w-2 h-2 rounded-full bg-success shadow-lg shadow-success/50"></span>
-          <span class="text-xxs text-text-muted bg-elevated px-1.5 py-0.5 rounded font-normal"><%= service.service_type.to_s.titleize %></span>
-        </h1>
-        <% if service.version.present? %>
-          <div class="text-xs text-text-muted mt-0.5">Version <%= service.version %></div>
-        <% end %>
-      </div>
+<div class="-mt-6 border-b border-border bg-surface">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+    <nav class="scrollable-tabs flex items-center gap-0 -mb-px overflow-x-auto" aria-label="Service navigation">
+      <%= link_to "Overview", project_service_path(service.project, service),
+          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
+            "text-accent font-medium border-accent": active_tab == :overview,
+            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :overview),
+          aria: { current: (active_tab == :overview ? "page" : nil) } %>
+      <%= link_to "Metrics", project_service_metrics_path(service.project, service),
+          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
+            "text-accent font-medium border-accent": active_tab == :metrics,
+            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :metrics),
+          aria: { current: (active_tab == :metrics ? "page" : nil) } %>
+      <%= link_to "Logs", project_service_log_streams_path(service.project, service),
+          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
+            "text-accent font-medium border-accent": active_tab == :logs,
+            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :logs),
+          aria: { current: (active_tab == :logs ? "page" : nil) },
+          data: { turbo_prefetch: false } %>
+      <%= link_to "Settings", edit_project_service_path(service.project, service),
+          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
+            "text-accent font-medium border-accent": active_tab == :edit,
+            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :edit),
+          aria: { current: (active_tab == :edit ? "page" : nil) } %>
+    </nav>
 
-      <div class="flex items-center gap-2">
-        <% if service.active? && !service.temporary_status? %>
-          <%= form_with url: project_service_restarts_path(service.project, service), data: { turbo_stream: true } do %>
-            <%= submit_button "Restart", variant: :secondary, size: :sm %>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-
-    <%# Segmented Control Tabs %>
-    <div class="overflow-x-auto">
-      <nav class="inline-flex bg-elevated rounded p-0.5" aria-label="Service navigation">
-        <%= link_to "Overview", project_service_path(service.project, service),
-            class: class_names("px-3 py-1.5 text-xs rounded-sm",
-              "text-text-primary bg-surface shadow-sm font-medium": active_tab == :overview,
-              "text-text-secondary hover:text-text-primary": active_tab != :overview),
-            aria: { current: (active_tab == :overview ? "page" : nil) } %>
-        <%= link_to "Metrics", project_service_metrics_path(service.project, service),
-            class: class_names("px-3 py-1.5 text-xs rounded-sm",
-              "text-text-primary bg-surface shadow-sm font-medium": active_tab == :metrics,
-              "text-text-secondary hover:text-text-primary": active_tab != :metrics),
-            aria: { current: (active_tab == :metrics ? "page" : nil) } %>
-        <%= link_to "Logs", project_service_log_streams_path(service.project, service),
-            class: class_names("px-3 py-1.5 text-xs rounded-sm",
-              "text-text-primary bg-surface shadow-sm font-medium": active_tab == :logs,
-              "text-text-secondary hover:text-text-primary": active_tab != :logs),
-            aria: { current: (active_tab == :logs ? "page" : nil) },
-            data: { turbo_prefetch: false } %>
-        <%= link_to "Settings", edit_project_service_path(service.project, service),
-            class: class_names("px-3 py-1.5 text-xs rounded-sm",
-              "text-text-primary bg-surface shadow-sm font-medium": active_tab == :edit,
-              "text-text-secondary hover:text-text-primary": active_tab != :edit),
-            aria: { current: (active_tab == :edit ? "page" : nil) } %>
-      </nav>
+    <div class="flex items-center shrink-0">
+      <span class="text-xxs text-text-muted">
+        <span class="w-1.5 h-1.5 rounded-full bg-success inline-block mr-1"></span>
+        <%= service.service_type.to_s.titleize %> · <%= service.version.presence || "latest" %>
+      </span>
     </div>
   </div>
 </div>

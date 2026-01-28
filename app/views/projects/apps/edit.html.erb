@@ -1,8 +1,9 @@
 <%= turbo_stream_from @app %>
 <% @title = "#{@app.name} · Settings" %>
 
+<%= render "projects/apps/header", app: @app, active_tab: :edit %>
+
 <div class="max-w-7xl mx-auto px-4">
-  <%= render "projects/apps/header", app: @app, active_tab: :edit %>
 
   <div class="max-w-2xl py-4">
     <div class="space-y-10">

@@ -484,6 +484,16 @@
     @apply text-xxs text-text-muted mt-0.5;
   }
 
+  /* Scrollable tabs */
+  .scrollable-tabs {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .scrollable-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Mobile adjustments */
   @media (max-width: 480px) {
     .top-nav {

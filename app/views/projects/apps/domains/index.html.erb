@@ -1,9 +1,9 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @app, :domains %>
 
-<div class="max-w-7xl mx-auto px-4">
-  <%= render "projects/apps/header", app: @app, active_tab: :domains %>
+<%= render "projects/apps/header", app: @app, active_tab: :domains %>
 
+<div class="max-w-7xl mx-auto px-4">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-lg font-medium">Domains</h2>
     <button onclick="domain_modal.showModal()" class="btn btn-primary btn-sm">
