@@ -1,0 +1,46 @@
+#!/bin/sh
+set -e
+cd "${CONDUCTOR_WORKSPACE_PATH:="$(dirname "$0")/.."}"
+
+# ──────────────────────────────────────
+# Copy gitignored files from repo root
+# ──────────────────────────────────────
+
+# .env files (contain ActiveRecord encryption keys, etc.)
+for envfile in "$CONDUCTOR_ROOT_PATH"/.env*; do
+  [ -f "$envfile" ] || continue
+  filename="$(basename "$envfile")"
+  ln -sf "$envfile" "$filename"
+  echo "Linked $filename"
+done
+
+# config/master.key (Rails credentials decryption)
+if [ -f "$CONDUCTOR_ROOT_PATH/config/master.key" ]; then
+  ln -sf "$CONDUCTOR_ROOT_PATH/config/master.key" config/master.key
+  echo "Linked config/master.key"
+fi
+
+# storage/ directory (SQLite dev/test databases)
+rm -rf storage
+cp -a "$CONDUCTOR_ROOT_PATH/storage" storage
+echo "Copied storage/"
+
+# ──────────────────────────────────────
+# Install dependencies
+# ──────────────────────────────────────
+
+if command -v mise > /dev/null 2>&1; then
+  mise install
+fi
+
+gem install bundler --conservative
+bundle check || bundle install
+npm ci
+
+# ──────────────────────────────────────
+# Prepare databases (runs migrations on the linked storage DBs)
+# ──────────────────────────────────────
+
+bin/rails db:prepare
+
+echo "Conductor setup complete!"

@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cd "${CONDUCTOR_WORKSPACE_PATH:="$(dirname "$0")/.."}"
+
+export PORT="${CONDUCTOR_PORT:-3000}"
+export VITE_RUBY_PORT=$((PORT + 36))
+
+overmind start -f Procfile.dev
