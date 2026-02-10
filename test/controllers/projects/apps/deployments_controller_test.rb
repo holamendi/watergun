@@ -20,6 +20,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
 
       assert_response :success
       assert_select "a[href='#{project_app_deployment_path(@project, @app, deployment)}']"
+      assert_select "form[action='#{project_app_deployments_path(@project, @app)}'] button", text: "Deploy"
     end
   end
 
