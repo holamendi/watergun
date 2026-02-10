@@ -5,6 +5,7 @@ export default class extends Controller {
 
   connect() {
     this.autoScroll = true;
+    this.scrollToBottom();
     this.observeLogs();
     this.observeScroll();
   }
