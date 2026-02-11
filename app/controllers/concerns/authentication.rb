@@ -11,9 +11,17 @@ module Authentication
 
   def authenticate
     if (session = Session.find_by_active_token(cookies.signed[:session_token]))
+      restore_server_selection(session.user)
       Current.session = session
     else
       redirect_to login_path, notice: "Please sign in"
+    end
+  end
+
+  def restore_server_selection(user)
+    if (server_id = cookies.signed[:server_id])
+      server = user.memberships.first&.account&.servers&.find_by(id: server_id)
+      Current.server = server if server
     end
   end
 end

@@ -1,0 +1,19 @@
+services:
+  dokku:
+    image: dokku/dokku:0.36.7
+    container_name: watergun-dokku
+    ports:
+      - "3022:22"
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - dokku-data:/mnt/dokku
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DOKKU_HOSTNAME: dokku.local
+      DOKKU_HOST_ROOT: /mnt/dokku/home/dokku
+      DOKKU_LIB_HOST_ROOT: /mnt/dokku/var/lib/dokku
+    restart: unless-stopped
+
+volumes:
+  dokku-data:

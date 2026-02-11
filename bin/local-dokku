@@ -1,0 +1,219 @@
+#!/usr/bin/env ruby
+require "socket"
+
+APP_ROOT = File.expand_path("..", __dir__)
+COMPOSE_FILE = File.join(APP_ROOT, "docker-compose.dokku.yml")
+CONTAINER_NAME = "watergun-dokku"
+SSH_USER = "watergun"
+SSH_PORT = 3022
+
+def system!(*args)
+  system(*args, exception: true)
+end
+
+def compose(*args)
+  system!("docker", "compose", "-f", COMPOSE_FILE, *args)
+end
+
+def exec_container(*args)
+  system!("docker", "exec", CONTAINER_NAME, *args)
+end
+
+def container_running?
+  `docker ps --format '{{.Names}}' 2>/dev/null`.include?(CONTAINER_NAME)
+end
+
+def wait_for_ssh
+  puts "Waiting for Dokku SSH to be ready on port #{SSH_PORT}..."
+  30.times do
+    TCPSocket.new("127.0.0.1", SSH_PORT).close
+    puts "SSH is ready."
+    return
+  rescue Errno::ECONNREFUSED, Errno::ECONNRESET
+    sleep 1
+  end
+  abort "Error: SSH not ready after 30s"
+end
+
+def create_watergun_user
+  puts "Creating '#{SSH_USER}' user inside container..."
+
+  exec_container "bash", "-c", "id #{SSH_USER} &>/dev/null || adduser --disabled-password --gecos '' #{SSH_USER}"
+  exec_container "usermod", "-aG", "docker", SSH_USER
+  exec_container "bash", "-c", "echo '#{SSH_USER} ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/#{SSH_USER} && chmod 440 /etc/sudoers.d/#{SSH_USER}"
+  exec_container "bash", "-c", [
+    "mkdir -p /home/#{SSH_USER}/.ssh",
+    "chown -R #{SSH_USER}:#{SSH_USER} /home/#{SSH_USER}/.ssh",
+    "chmod 700 /home/#{SSH_USER}/.ssh",
+    "touch /home/#{SSH_USER}/.ssh/authorized_keys",
+    "chown #{SSH_USER}:#{SSH_USER} /home/#{SSH_USER}/.ssh/authorized_keys",
+    "chmod 600 /home/#{SSH_USER}/.ssh/authorized_keys"
+  ].join(" && ")
+
+  puts "User '#{SSH_USER}' is ready."
+end
+
+def boot_rails!
+  return if defined?(Rails)
+  ENV["RAILS_ENV"] ||= "development"
+  require File.expand_path("../config/environment", __dir__)
+end
+
+def ensure_server
+  puts "Ensuring local server exists in Watergun dev database..."
+  boot_rails!
+
+  account = Account.first
+  abort "No account found. Start the app and log in first." if account.nil?
+
+  server = account.servers.find_by(public_ip: "127.0.0.1")
+  if server.nil?
+    server = account.servers.create!(name: "local-dokku", public_ip: "127.0.0.1", ssh_port: SSH_PORT, cpu_type: :arm64, status: :active)
+    puts "Created local server (127.0.0.1:#{SSH_PORT})"
+  else
+    puts "Local server already exists (127.0.0.1:#{SSH_PORT})"
+  end
+
+  public_key = server.ssh_key.public_key
+  abort "Error: Got empty public key from database" if public_key.nil? || public_key.empty?
+
+  puts "Injecting public key into container..."
+  IO.popen(["docker", "exec", "-i", CONTAINER_NAME, "bash", "-c", "cat > /home/#{SSH_USER}/.ssh/authorized_keys"], "w") do |io|
+    io.write(public_key)
+  end
+  abort "Failed to inject SSH key" unless $?.success?
+
+  puts "SSH key injected. Watergun can now connect to 127.0.0.1:#{SSH_PORT}"
+end
+
+cmd_setup = -> {
+  puts "Starting local Dokku container..."
+  compose "up", "-d"
+
+  wait_for_ssh
+  create_watergun_user
+  ensure_server
+
+  puts <<~MSG
+
+    Local Dokku is ready!
+      SSH:  127.0.0.1:#{SSH_PORT} (user: #{SSH_USER})
+      HTTP: http://localhost:8080
+
+    Your Watergun server (127.0.0.1) should now be able to connect.
+  MSG
+}
+
+cmd_start = -> {
+  puts "Starting local Dokku container..."
+  compose "up", "-d"
+  puts "Started. SSH available on port #{SSH_PORT}"
+}
+
+cmd_stop = -> {
+  puts "Stopping local Dokku container..."
+  compose "down"
+  puts "Stopped. Data is preserved."
+}
+
+cmd_reset = -> {
+  puts "Destroying local Dokku container and all data..."
+  compose "down", "-v"
+  puts "Reset complete. Run 'bin/local-dokku setup' to start fresh."
+}
+
+cmd_ssh = -> {
+  exec "docker", "exec", "-it", CONTAINER_NAME, "su", "-", SSH_USER
+}
+
+cmd_inject_key = -> {
+  ensure_server
+}
+
+cmd_status = -> {
+  if container_running?
+    puts "Dokku container: running"
+    puts "  SSH:  127.0.0.1:#{SSH_PORT}"
+    puts "  HTTP: http://localhost:8080"
+    system "docker", "ps", "--filter", "name=#{CONTAINER_NAME}", "--format", "  Uptime: {{.Status}}"
+  else
+    puts "Dokku container: stopped"
+  end
+}
+
+DOKKU_DOMAIN = "dokku.local"
+
+cmd_dns = -> {
+  puts "Setting up DNS for *.#{DOKKU_DOMAIN} -> 127.0.0.1"
+  puts "This requires sudo access to restart dnsmasq and create /etc/resolver."
+  puts ""
+
+  # Prompt for sudo upfront so subsequent commands don't ask again
+  system!("sudo", "-v")
+
+  # Check if dnsmasq is installed
+  unless system("brew list dnsmasq &>/dev/null")
+    puts "Installing dnsmasq via Homebrew..."
+    system!("brew", "install", "dnsmasq")
+  end
+
+  # Configure dnsmasq to resolve *.dokku.local
+  dnsmasq_conf = "/opt/homebrew/etc/dnsmasq.conf"
+  dnsmasq_conf = "/usr/local/etc/dnsmasq.conf" unless File.exist?(dnsmasq_conf)
+  rule = "address=/#{DOKKU_DOMAIN}/127.0.0.1"
+
+  if File.exist?(dnsmasq_conf) && File.read(dnsmasq_conf).include?(rule)
+    puts "dnsmasq rule already configured."
+  else
+    puts "Adding rule: #{rule}"
+    File.open(dnsmasq_conf, "a") { |f| f.puts(rule) }
+  end
+
+  # Restart dnsmasq
+  puts "Restarting dnsmasq..."
+  system!("sudo", "brew", "services", "restart", "dnsmasq")
+
+  # Create resolver directory and config
+  resolver_file = "/etc/resolver/#{DOKKU_DOMAIN}"
+  unless File.exist?(resolver_file)
+    puts "Creating #{resolver_file}..."
+    system!("sudo", "mkdir", "-p", "/etc/resolver")
+    system!("sudo", "bash", "-c", "echo 'nameserver 127.0.0.1' > #{resolver_file}")
+  else
+    puts "Resolver already configured."
+  end
+
+  puts ""
+  puts "DNS is ready! *.#{DOKKU_DOMAIN} now resolves to 127.0.0.1"
+  puts "Apps are accessible at http://<app>.#{DOKKU_DOMAIN}:8080"
+}
+
+cmd_help = -> {
+  puts <<~HELP
+    Usage: bin/local-dokku <command>
+
+    Commands:
+      setup       Start container, create watergun user, inject SSH key
+      start       Start the container
+      stop        Stop the container (data persists)
+      reset       Destroy container and all data
+      ssh         Shell into the container as watergun
+      inject-key  Re-inject SSH key from dev database
+      status      Show container status
+      dns         Set up wildcard DNS for *.#{DOKKU_DOMAIN} (one-time)
+  HELP
+}
+
+commands = {
+  "setup" => cmd_setup,
+  "start" => cmd_start,
+  "stop" => cmd_stop,
+  "reset" => cmd_reset,
+  "ssh" => cmd_ssh,
+  "inject-key" => cmd_inject_key,
+  "status" => cmd_status,
+  "dns" => cmd_dns
+}
+
+command = commands[ARGV[0]]
+command ? command.call : cmd_help.call

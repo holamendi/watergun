@@ -21,7 +21,7 @@ class Current < ActiveSupport::CurrentAttributes
 
     self.membership = user.memberships.first
     self.account = membership.account
-    self.server = account.servers.first
+    self.server ||= account.servers.first
   end
 
   def api_token=(api_token)
@@ -29,6 +29,6 @@ class Current < ActiveSupport::CurrentAttributes
     return unless api_token
 
     self.account = api_token.account
-    self.server = account.servers.first
+    self.server ||= account.servers.first
   end
 end
