@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy]
   def index
-    @projects = Current.account.projects.kept.includes(:apps, :services)
+    @projects = Current.server.projects.kept.includes(:apps, :services)
   end
 
   def show

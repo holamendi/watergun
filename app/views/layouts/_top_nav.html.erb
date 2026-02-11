@@ -49,6 +49,26 @@
   </div>
 
   <div class="top-nav-right">
+    <%# Server selector - only show when multiple servers exist %>
+    <% if Current.account&.servers&.count.to_i > 1 %>
+      <div class="nav-dropdown nav-server-dropdown">
+        <a class="nav-server-selector" tabindex="0">
+          <span><%= Current.server&.name %></span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+          </svg>
+        </a>
+        <div class="nav-dropdown-menu">
+          <div class="nav-dropdown-label">Servers</div>
+          <% Current.account.servers.each do |server| %>
+            <%= link_to select_server_path(server), data: { turbo_method: :post }, class: "nav-dropdown-item #{server.id == Current.server&.id ? 'active' : ''}" do %>
+              <%= server.name %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <%# User avatar dropdown %>
     <div class="nav-dropdown nav-avatar-dropdown">
       <div class="nav-avatar" tabindex="0">

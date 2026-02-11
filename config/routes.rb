@@ -61,6 +61,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :servers, only: [] do
+    post :select, on: :member
+  end
+
   resources :server_actions, only: [:index, :show]
 
   resource :account, controller: "accounts/settings" do

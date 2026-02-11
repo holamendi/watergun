@@ -9,6 +9,28 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:bobby)
   end
 
+  describe "#index" do
+    test "shows projects for the current server only" do
+      post select_server_path(servers(:amd))
+
+      get projects_path
+
+      assert_response :success
+      assert_select "a", text: /Default Project/
+      assert_select "a", text: /Arm Project/, count: 0
+    end
+
+    test "switching server shows that server's projects" do
+      post select_server_path(servers(:arm))
+
+      get projects_path
+
+      assert_response :success
+      assert_select "a", text: /Arm Project/
+      assert_select "a", text: /Default Project/, count: 0
+    end
+  end
+
   describe "#show" do
     test "renders the project name" do
       get project_path(@project)

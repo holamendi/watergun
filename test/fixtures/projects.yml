@@ -2,3 +2,8 @@ default:
   account: default
   server: amd
   name: Default Project
+
+arm_project:
+  account: default
+  server: arm
+  name: Arm Project
