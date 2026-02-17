@@ -1,6 +1,4 @@
-<%= render "projects/apps/header", app: @app, active_tab: :variables %>
-
-<div class="max-w-7xl mx-auto px-4">
+<%= render "projects/apps/settings/layout", app: @app, active_section: :variables do %>
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-lg font-medium">Environment Variables</h2>
     <%= link_to new_project_app_env_variable_path(@project, @app),
@@ -27,4 +25,4 @@
       <p class="mt-1 text-sm text-text-secondary">Add variables to configure your app.</p>
     </div>
   <% end %>
-</div>
+<% end %>

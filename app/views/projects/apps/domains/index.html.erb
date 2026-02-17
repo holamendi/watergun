@@ -1,9 +1,7 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @app, :domains %>
 
-<%= render "projects/apps/header", app: @app, active_tab: :domains %>
-
-<div class="max-w-7xl mx-auto px-4">
+<%= render "projects/apps/settings/layout", app: @app, active_section: :domains do %>
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-lg font-medium">Domains</h2>
     <button onclick="domain_modal.showModal()" class="btn btn-primary btn-sm">
@@ -26,7 +24,7 @@
       <p class="mt-1 text-sm text-text-secondary">Add a custom domain to access your app.</p>
     </div>
   <% end %>
-</div>
+<% end %>
 
 <%= render "shared/modal", id: "domain_modal", title: "Add Domain" do %>
   <%= render "projects/apps/domains/form", domain: @app.domains.new %>

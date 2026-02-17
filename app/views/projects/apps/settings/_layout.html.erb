@@ -1,8 +1,8 @@
 <%= render "projects/apps/header", app: app, active_tab: :settings %>
 
 <div class="max-w-7xl mx-auto px-4 py-4">
-  <div class="settings-shell">
-    <aside class="self-start">
+  <div class="grid grid-cols-12 gap-6">
+    <aside class="col-span-3 self-start min-w-0">
       <nav class="space-y-0.5" aria-label="Settings navigation">
         <%= link_to "General", project_app_settings_path(app.project, app),
             class: class_names("block rounded px-3 py-1.5 text-sm transition-colors",
@@ -28,7 +28,7 @@
       </nav>
     </aside>
 
-    <div class="min-w-0">
+    <div class="col-span-9 min-w-0">
       <%= yield %>
     </div>
   </div>

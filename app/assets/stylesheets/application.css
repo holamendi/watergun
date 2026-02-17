@@ -515,12 +515,6 @@
     display: none;
   }
 
-  /* App settings layout */
-  .settings-shell {
-    @apply grid gap-6;
-    grid-template-columns: 220px minmax(0, 1fr);
-  }
-
   /* Mobile adjustments */
   @media (max-width: 480px) {
     .top-nav {
@@ -549,12 +543,6 @@
 
     .nav-avatar {
       @apply w-7 h-7 text-xxs;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .settings-shell {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
 }
