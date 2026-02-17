@@ -48,7 +48,7 @@
                 <div class="p-4 flex items-center justify-between hover:bg-elevated/30 transition-colors">
                   <div class="flex items-center gap-2">
                     <%= status_dot(app.status) %>
-                    <%= link_to app.name, project_app_path(@project, app), class: "font-mono text-sm text-text-primary hover:text-accent" %>
+                    <%= link_to app.name, project_app_deployments_path(@project, app), class: "font-mono text-sm text-text-primary hover:text-accent" %>
                   </div>
                 </div>
               <% end %>

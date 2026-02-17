@@ -35,7 +35,7 @@
         <%# App or Service segment %>
         <% if defined?(@app) && @app.present? %>
           <span class="nav-breadcrumb-separator">/</span>
-          <%= link_to project_app_path(@project, @app), class: "nav-breadcrumb-item" do %>
+          <%= link_to project_app_deployments_path(@project, @app), class: "nav-breadcrumb-item" do %>
             <span><%= @app.name %></span>
           <% end %>
         <% elsif defined?(@service) && @service.present? %>

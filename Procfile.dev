@@ -1,4 +1,4 @@
 
 vite: bin/vite dev
-web: bin/rails s -p ${PORT:-3000}
+web: bin/rails s
 worker: bundle exec rake solid_queue:start

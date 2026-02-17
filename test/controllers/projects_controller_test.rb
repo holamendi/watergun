@@ -51,7 +51,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{project_app_path(@project, app)}']", text: /#{app.name}/
+      assert_select "a[href='#{project_app_deployments_path(@project, app)}']", text: /#{app.name}/
     end
 
     test "lists services with links" do
