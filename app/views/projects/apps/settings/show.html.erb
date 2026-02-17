@@ -1,0 +1,31 @@
+<% @title = "#{@app.name} · Settings" %>
+
+<%= render "layout", app: @app, active_section: :general do %>
+  <div class="max-w-2xl space-y-10">
+    <section id="general">
+      <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">General</h2>
+      <%= render "projects/apps/form", app: @app %>
+    </section>
+
+    <section id="repository">
+      <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">Repository</h2>
+      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
+    </section>
+
+    <section id="builder">
+      <h2 class="text-xxs font-medium text-text-muted uppercase tracking-wider mb-4">Builder</h2>
+      <%= render "projects/apps/builders/form", app: @app %>
+    </section>
+
+    <section id="danger-zone" class="pt-6 border-t border-border">
+      <h2 class="text-sm font-medium text-error">Danger zone</h2>
+      <p class="text-xs text-text-muted mt-1">
+        Deleting this app will permanently remove it and all deployment history from the server.
+      </p>
+      <%= button_to "Delete app", project_app_path(@project, @app),
+          method: :delete,
+          class: "mt-4 px-4 py-2 bg-transparent border border-error text-error text-xs rounded hover:bg-error/10 transition-colors",
+          data: { turbo_confirm: "Delete #{@app.name}? This cannot be undone." } %>
+    </section>
+  </div>
+<% end %>

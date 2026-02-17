@@ -92,7 +92,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "body", /Linked Apps/
-      assert_select "a[href='#{project_app_path(@project, @app)}']"
+      assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
     end
   end
 end

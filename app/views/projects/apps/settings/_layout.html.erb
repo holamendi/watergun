@@ -1,0 +1,35 @@
+<%= render "projects/apps/header", app: app, active_tab: :settings %>
+
+<div class="max-w-7xl mx-auto px-4 py-4">
+  <div class="settings-shell">
+    <aside class="self-start">
+      <nav class="space-y-0.5" aria-label="Settings navigation">
+        <%= link_to "General", project_app_settings_path(app.project, app),
+            class: class_names("block rounded px-3 py-1.5 text-sm transition-colors",
+              "bg-elevated border border-border text-text-primary": active_section == :general,
+              "text-text-secondary hover:text-text-primary hover:bg-elevated/60": active_section != :general),
+            aria: { current: (active_section == :general ? "page" : nil) } %>
+        <%= link_to "Variables", project_app_env_variables_path(app.project, app),
+            class: class_names("block rounded px-3 py-1.5 text-sm transition-colors",
+              "bg-elevated border border-border text-text-primary": active_section == :variables,
+              "text-text-secondary hover:text-text-primary hover:bg-elevated/60": active_section != :variables),
+            aria: { current: (active_section == :variables ? "page" : nil) } %>
+        <%= link_to "Domains", project_app_domains_path(app.project, app),
+            class: class_names("block rounded px-3 py-1.5 text-sm transition-colors",
+              "bg-elevated border border-border text-text-primary": active_section == :domains,
+              "text-text-secondary hover:text-text-primary hover:bg-elevated/60": active_section != :domains),
+            aria: { current: (active_section == :domains ? "page" : nil) } %>
+        <%= link_to "Repository", project_app_settings_path(app.project, app, anchor: "repository"),
+            class: "block rounded px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-elevated/60 transition-colors" %>
+        <%= link_to "Builder", project_app_settings_path(app.project, app, anchor: "builder"),
+            class: "block rounded px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-elevated/60 transition-colors" %>
+        <%= link_to "Danger zone", project_app_settings_path(app.project, app, anchor: "danger-zone"),
+            class: "block rounded px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-elevated/60 transition-colors" %>
+      </nav>
+    </aside>
+
+    <div class="min-w-0">
+      <%= yield %>
+    </div>
+  </div>
+</div>

@@ -44,6 +44,8 @@ Rails.application.routes.draw do
           resource :github_repo
           resources :restarts, only: :create
 
+          resource :settings, only: :show
+
           concerns :log_streamable
           concerns :metrics
         end

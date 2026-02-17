@@ -13,18 +13,18 @@ class Projects::AppsController < Projects::BaseController
     @create_app = App::CreateApp.new(create_app_params.merge(project: @project))
 
     if @create_app.save
-      redirect_to project_app_path(@project, @create_app.app), notice: "App created"
+      redirect_to project_app_deployments_path(@project, @create_app.app), notice: "App created"
     else
       render :new, status: :unprocessable_content
     end
   end
 
   def show
-    @deployments = @app.deployments.kept.recent.limit(5)
-    @linked_services = @app.services.kept
+    redirect_to project_app_deployments_path(@project, @app)
   end
 
   def edit
+    redirect_to project_app_settings_path(@project, @app)
   end
 
   def update
