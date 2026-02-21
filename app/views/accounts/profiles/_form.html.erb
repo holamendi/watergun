@@ -1,16 +1,14 @@
 <%= turbo_frame_tag :profile_settings do %>
   <%= form_with model: user, url: account_profile_path, method: :patch, class: "space-y-4" do |form| %>
-    <div>
-      <%= form.label :name, class: "block text-xs font-medium text-text-secondary mb-1.5" %>
-      <%= form.text_field :name,
-          class: "w-full px-3 py-2 bg-base border border-border rounded-lg text-sm placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all" %>
-    </div>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Name</legend>
+      <%= form.text_field :name, class: "input w-full" %>
+    </fieldset>
 
-    <div>
-      <%= form.label :email, class: "block text-xs font-medium text-text-secondary mb-1.5" %>
-      <%= form.email_field :email,
-          class: "w-full px-3 py-2 bg-base border border-border rounded-lg text-sm placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all" %>
-    </div>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Email</legend>
+      <%= form.email_field :email, class: "input w-full" %>
+    </fieldset>
 
     <div class="flex justify-end pt-2">
       <%= submit_button "update profile" %>

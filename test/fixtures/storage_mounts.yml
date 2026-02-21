@@ -1,0 +1,7 @@
+uploads_mount:
+  account: default
+  app: domain_test_app
+  host_path: /var/lib/dokku/data/storage/domain-test-app/app_storage
+  container_path: /app/storage
+  chown: herokuish
+  status: active

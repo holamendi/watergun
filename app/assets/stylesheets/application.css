@@ -207,17 +207,19 @@
     @apply p-6;
   }
 
-  /* Modal component */
+  /* Modal component — uses native <dialog> with showModal() */
   .modal {
-    @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-opacity;
+    @apply max-w-lg w-full rounded-lg border border-border-strong p-0;
+    background: var(--color-elevated);
+    margin: auto;
   }
 
-  .modal[open] {
-    @apply opacity-100 pointer-events-auto;
+  .modal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
   }
 
   .modal-box {
-    @apply relative bg-surface rounded-lg border border-border p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto;
+    @apply relative p-6 max-h-[90vh] overflow-y-auto;
   }
 
   /* Form components */
@@ -225,12 +227,21 @@
     @apply space-y-1;
   }
 
-  .fieldset-label {
-    @apply block text-sm font-medium text-text-secondary;
+  .fieldset-label,
+  .fieldset-legend {
+    @apply block text-xs font-medium text-text-secondary;
   }
 
   .input {
-    @apply bg-base border border-border rounded px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent;
+    @apply bg-base border border-border rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all;
+  }
+
+  .select {
+    @apply bg-base border border-border rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all;
+  }
+
+  .checkbox {
+    @apply w-4 h-4 rounded bg-base border-border text-accent focus:ring-accent/20;
   }
 
   .input-bordered {

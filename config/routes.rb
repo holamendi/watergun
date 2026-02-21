@@ -41,6 +41,7 @@ Rails.application.routes.draw do
           end
 
           resources :env_variables, path: :env
+          resources :storage_mounts, path: :storage, only: %i[index create destroy]
           resource :github_repo
           resources :restarts, only: :create
 

@@ -9,16 +9,14 @@
     </div>
   <% end %>
 
-  <div>
-    <%= f.label :name, class: "block text-xs font-medium text-text-secondary mb-1.5" %>
-    <%= f.text_field :name,
-        class: "w-full px-3 py-2 bg-base border border-border rounded text-sm font-mono placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all",
-        placeholder: "my-project" %>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Name</legend>
+    <%= f.text_field :name, class: "input w-full font-mono", placeholder: "my-project" %>
     <p class="text-xxs text-text-muted mt-1.5">A short identifier for your project</p>
-  </div>
+  </fieldset>
 
   <div class="flex justify-end gap-2 pt-2">
-    <%= link_to "Cancel", projects_path, class: "px-4 py-2 text-xs text-text-secondary hover:text-text-primary rounded" %>
+    <%= link_to "Cancel", projects_path, class: "btn btn-ghost" %>
     <%= submit_button "Create Project" %>
   </div>
 <% end %>

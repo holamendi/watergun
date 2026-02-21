@@ -19,6 +19,7 @@ class App < ApplicationRecord
   has_one :deployment, -> { success.recent }
 
   has_many :env_variables, dependent: :destroy
+  has_many :storage_mounts, dependent: :destroy
 
   has_one :github_repo, class_name: "Github::Repo", dependent: :destroy
 

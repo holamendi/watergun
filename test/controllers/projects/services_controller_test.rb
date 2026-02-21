@@ -63,7 +63,6 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @service.update!(status: :active)
     end
-
   end
 
   describe "pending service" do
