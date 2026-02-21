@@ -1,25 +1,33 @@
-<div class="flex flex-col min-h-full px-4 pt-40 lg:px-4">
-  <div class="px-6 pt-2 pb-8 shadow-lg rounded-xl sm:mx-auto sm:w-full sm:max-w-sm bg-base-100">
-    <%= form_with(model: @user, url: first_run_path, class: "space-y-4") do |form| %>
-      <%= hidden_field_tag :signed_id, params[:signed_id] %>
-      <%= form.label :email, class: "form-control" do %>
-        <div class="label"><span class="label-text">Email</span></div>
-        <%= form.email_field :email, class: "input input-sm px-2 text-sm rounded-md input-bordered", required: true %>
-        <%= error_messages_for(form.object, :email) %>
+<div class="hero min-h-screen bg-base">
+  <div class="card bg-surface w-full max-w-sm shadow-2xl">
+    <div class="card-body gap-6">
+      <h1 class="text-lg font-semibold text-text-primary">Set up your account</h1>
+
+      <%= form_with(model: @user, url: first_run_path, class: "space-y-4") do |form| %>
+        <%= hidden_field_tag :signed_id, params[:signed_id] %>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Email</legend>
+          <%= form.email_field :email, class: "input w-full", required: true %>
+          <%= error_messages_for(form.object, :email) %>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Password</legend>
+          <%= form.password_field :password, class: "input w-full", required: true %>
+          <%= error_messages_for(form.object, :password) %>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Password confirmation</legend>
+          <%= form.password_field :password_confirmation, class: "input w-full", required: true %>
+          <%= error_messages_for(form.object, :password_confirmation) %>
+        </fieldset>
+
+        <div class="pt-2">
+          <%= submit_button "Save changes" %>
+        </div>
       <% end %>
-      <%= form.label :password, class: "form-control" do %>
-        <div class="label"><span class="label-text">Password</span></div>
-        <%= form.password_field :password, class: "input input-sm px-2 text-sm rounded-md input-bordered", required: true %>
-        <%= error_messages_for(form.object, :password) %>
-      <% end %>
-      <%= form.label :password_confirmation, class: "form-control" do %>
-        <div class="label"><span class="label-text">Password confirmation</span></div>
-        <%= form.password_field :password_confirmation, class: "input input-sm px-2 text-sm rounded-md input-bordered", required: true %>
-        <%= error_messages_for(form.object, :password_confirmation) %>
-      <% end %>
-      <div class="pt-2">
-        <%= submit_button "Save changes" %>
-      </div>
-    <% end %>
+    </div>
   </div>
 </div>

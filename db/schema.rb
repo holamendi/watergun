@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_18_092831) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_20_194722) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -394,6 +394,22 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_18_092831) do
     t.index ["account_id"], name: "index_ssh_keys_on_account_id"
     t.index ["id", "server_id"], name: "index_ssh_keys_on_id_and_server_id", unique: true
     t.index ["server_id"], name: "index_ssh_keys_on_server_id"
+  end
+
+  create_table "storage_mounts", force: :cascade do |t|
+    t.integer "account_id"
+    t.integer "app_id"
+    t.string "chown"
+    t.string "container_path", null: false
+    t.datetime "created_at", null: false
+    t.datetime "discarded_at"
+    t.string "host_path", null: false
+    t.string "status", default: "pending"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_storage_mounts_on_account_id"
+    t.index ["app_id", "container_path"], name: "index_storage_mounts_on_app_id_and_container_path", unique: true
+    t.index ["app_id"], name: "index_storage_mounts_on_app_id"
+    t.index ["discarded_at"], name: "index_storage_mounts_on_discarded_at"
   end
 
   create_table "users", force: :cascade do |t|

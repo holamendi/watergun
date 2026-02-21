@@ -3,8 +3,7 @@ module Dokku
     class Mount
       attr_reader :app, :host_directory, :container_directory
 
-      def initialize(ssh_session, app:, host_directory:, container_directory: nil)
-        @ssh_session = ssh_session
+      def initialize(app:, host_directory:, container_directory:)
         @app = app
         @host_directory = host_directory
         @container_directory = container_directory

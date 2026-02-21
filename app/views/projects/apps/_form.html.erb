@@ -1,10 +1,10 @@
 <%= form_with model: [app.project, app], id: "app_form" do |form| %>
   <div class="flex gap-3 items-end">
-    <div class="flex-1">
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">App name</label>
-      <%= form.text_field :name, class: "w-full px-3 py-2 bg-base border border-border rounded text-sm font-mono focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all" %>
+    <fieldset class="fieldset flex-1">
+      <legend class="fieldset-legend">App name</legend>
+      <%= form.text_field :name, class: "input w-full font-mono" %>
       <%= error_messages_for app, :name %>
-    </div>
+    </fieldset>
     <%= submit_button "Save" %>
   </div>
 <% end %>

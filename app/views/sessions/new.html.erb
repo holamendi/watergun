@@ -10,32 +10,17 @@
 
       <%= form_with scope: :session, url: session_path, class: "space-y-4" do |form| %>
         <fieldset class="fieldset">
-          <label class="fieldset-label" for="session_email">Email address</label>
-          <label class="input input-bordered w-full flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-            </svg>
-            <%= form.email_field :email, class: "grow bg-transparent border-0 focus:outline-none focus:ring-0", placeholder: "you@example.com", required: true, autocomplete: "email", autofocus: true %>
-          </label>
+          <legend class="fieldset-legend">Email address</legend>
+          <%= form.email_field :email, class: "input w-full", placeholder: "you@example.com", required: true, autocomplete: "email", autofocus: true %>
         </fieldset>
 
         <fieldset class="fieldset">
-          <label class="fieldset-label" for="session_password">Password</label>
-          <label class="input input-bordered w-full flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            <%= form.password_field :password, class: "grow bg-transparent border-0 focus:outline-none focus:ring-0", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
-          </label>
+          <legend class="fieldset-legend">Password</legend>
+          <%= form.password_field :password, class: "input w-full", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
         </fieldset>
 
         <div class="pt-2">
-          <button type="submit" class="btn btn-primary w-full">
-            Sign in
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
+          <%= submit_button "Sign in" %>
         </div>
       <% end %>
     </div>

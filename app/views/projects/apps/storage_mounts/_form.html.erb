@@ -1,0 +1,8 @@
+<%= form_with model: [storage_mount.project, storage_mount.app, storage_mount], class: "space-y-4", id: "storage_mount_form", data: {turbo_frame: "storage_mount_form"} do |form| %>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Container path</legend>
+    <%= form.text_field :container_path, class: "input w-full", placeholder: "/app/uploads" %>
+    <%= error_messages_for(form.object, :container_path) %>
+  </fieldset>
+  <%= submit_button "Add mount" %>
+<% end %>
