@@ -1,16 +1,18 @@
 <%= link_to project_app_deployments_path(app.project, app),
-    class: "flex items-center justify-between px-4 py-3 hover:bg-elevated/50 transition-colors border-b border-border last:border-b-0 group",
+    class: "resource-item",
     id: dom_id(app) do %>
-  <div class="flex items-center gap-3">
-    <%= app_icon(app, size: :md) %>
+  <div class="resource-item-left">
     <div>
-      <span class="font-mono text-sm font-medium group-hover:text-accent transition-colors"><%= app.name %></span>
-      <% if app.github_repo.present? %>
-        <p class="text-xxs text-text-muted mt-0.5"><%= app.github_repo.repo %> <span class="text-text-muted/60">·</span> <%= app.github_repo.branch %></p>
-      <% end %>
+      <div class="resource-name"><%= app.name %></div>
+      <div class="resource-meta">
+        <% if app.github_repo.present? %>
+          <%= app.github_repo.repo %> · <%= app.github_repo.branch %>
+        <% end %>
+      </div>
     </div>
   </div>
-  <svg class="w-4 h-4 text-text-muted group-hover:text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-  </svg>
+  <div class="resource-item-right">
+    <%= status_badge(app.status) %>
+    <span class="arrow-icon">›</span>
+  </div>
 <% end %>

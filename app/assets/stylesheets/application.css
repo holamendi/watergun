@@ -658,6 +658,275 @@
     }
   }
 
+  /* Resource list (project detail app/service rows) */
+  .resource-list {
+    @apply flex flex-col bg-surface border border-border rounded-lg overflow-hidden;
+    gap: 1px;
+    background: var(--color-border);
+  }
+
+  .resource-item {
+    @apply flex items-center justify-between px-4 py-3.5 bg-surface no-underline text-inherit transition-colors;
+    gap: 12px;
+  }
+
+  .resource-item:hover {
+    @apply bg-elevated;
+  }
+
+  .resource-item-left {
+    @apply flex items-center gap-3 min-w-0 flex-1;
+  }
+
+  .resource-name {
+    @apply font-medium text-sm;
+  }
+
+  .resource-meta {
+    @apply text-text-muted font-mono text-xs;
+  }
+
+  .resource-item-right {
+    @apply flex items-center gap-2 shrink-0;
+  }
+
+  .arrow-icon {
+    @apply text-text-muted text-sm;
+  }
+
+  /* Deploy row (deployment list items) */
+  .deploy-row {
+    @apply flex items-center justify-between px-4 py-3.5 bg-surface no-underline text-inherit transition-colors;
+    gap: 12px;
+  }
+
+  .deploy-row:hover {
+    @apply bg-elevated;
+  }
+
+  .deploy-left {
+    @apply flex items-center gap-3 min-w-0 flex-1;
+  }
+
+  .deploy-hash {
+    @apply font-mono text-xs font-medium text-accent;
+  }
+
+  .deploy-msg {
+    @apply text-xs text-text-secondary truncate;
+  }
+
+  .deploy-time {
+    @apply text-xs text-text-muted whitespace-nowrap;
+  }
+
+  /* Deploy detail info grid */
+  .deploy-info-grid {
+    @apply grid gap-3 mb-6;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .deploy-info-item {
+    @apply bg-surface border border-border rounded px-3.5 py-3;
+  }
+
+  .deploy-info-label {
+    @apply text-text-muted mb-1;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .deploy-info-value {
+    @apply text-sm font-medium;
+  }
+
+  .deploy-info-value.mono {
+    @apply font-mono text-xs;
+  }
+
+  /* Badge dot */
+  .badge-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-current;
+  }
+
+  /* Activity feed */
+  .activity-list {
+    @apply flex flex-col border border-border rounded-lg overflow-hidden;
+    gap: 1px;
+    background: var(--color-border);
+  }
+
+  .activity-item {
+    @apply flex items-center px-4 py-3 bg-surface gap-3 no-underline text-inherit transition-colors;
+  }
+
+  .activity-item:hover {
+    @apply bg-elevated;
+  }
+
+  .activity-icon {
+    @apply w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0;
+  }
+
+  .activity-icon.deploy {
+    @apply bg-success-soft text-success;
+  }
+
+  .activity-icon.config {
+    @apply bg-warning-soft text-warning;
+  }
+
+  .activity-icon.error {
+    @apply bg-error-soft text-error;
+  }
+
+  .activity-icon.service {
+    background: rgba(244, 63, 94, 0.1);
+    @apply text-accent;
+  }
+
+  .activity-body {
+    @apply flex-1 min-w-0;
+  }
+
+  .activity-title {
+    @apply text-sm font-medium truncate;
+  }
+
+  .activity-slug {
+    @apply font-mono text-xs text-text-muted mt-0.5;
+  }
+
+  .activity-time {
+    @apply text-xs text-text-muted whitespace-nowrap shrink-0;
+  }
+
+  /* Danger zone */
+  .danger-zone {
+    @apply rounded-lg p-5;
+    border: 1px solid rgba(255, 118, 117, 0.3);
+    background: rgba(255, 118, 117, 0.03);
+  }
+
+  .danger-zone-header {
+    @apply text-sm font-semibold text-error mb-2;
+  }
+
+  .danger-zone-desc {
+    @apply text-xs text-text-secondary mb-4 leading-relaxed;
+  }
+
+  /* Button danger outline */
+  .btn-danger {
+    @apply bg-transparent text-error hover:bg-error-soft;
+    border: 1px solid var(--color-error);
+  }
+
+  .btn-danger:hover {
+    @apply bg-error-soft;
+  }
+
+  /* Service info grid */
+  .service-info-grid {
+    @apply grid grid-cols-2 gap-3 mb-6;
+  }
+
+  .service-info-card {
+    @apply bg-surface border border-border rounded-lg p-4;
+  }
+
+  .service-info-label {
+    @apply text-text-muted mb-1.5;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .service-info-value {
+    @apply text-sm font-medium;
+  }
+
+  .service-info-value.mono {
+    @apply font-mono text-xs;
+  }
+
+  /* DSN box */
+  .dsn-box {
+    @apply bg-base border border-border rounded px-3.5 py-2.5 font-mono text-xs text-text-secondary flex items-center justify-between gap-3 break-all mb-6;
+  }
+
+  /* Linked apps list */
+  .linked-apps-list {
+    @apply flex flex-col border border-border rounded-lg overflow-hidden;
+    gap: 1px;
+    background: var(--color-border);
+  }
+
+  .linked-app-item {
+    @apply flex items-center justify-between px-4 py-3 bg-surface;
+  }
+
+  .linked-app-name {
+    @apply font-mono text-xs font-medium;
+  }
+
+  /* Section label (smaller than section-title) */
+  .section-label {
+    @apply text-text-muted font-semibold mb-3;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  /* Card header/footer pattern (for form cards inside settings) */
+  .card-header {
+    @apply px-5 py-3.5 border-b border-border flex items-center justify-between;
+  }
+
+  .card-title {
+    @apply text-sm font-semibold;
+  }
+
+  .card-footer {
+    @apply px-5 py-3 border-t border-border flex justify-end gap-2;
+    background: rgba(18, 18, 24, 0.3);
+  }
+
+  /* Page header sub text */
+  .page-header-sub {
+    @apply text-text-secondary text-xs mt-0.5;
+  }
+
+  /* Project card styles */
+  .project-card {
+    @apply bg-surface border border-border rounded-lg p-5 no-underline text-inherit transition-all flex flex-col gap-3.5;
+  }
+
+  .project-card:hover {
+    @apply border-border-strong bg-elevated;
+  }
+
+  .project-card-header {
+    @apply flex items-center gap-3;
+  }
+
+  .project-name {
+    @apply font-semibold text-sm;
+  }
+
+  .project-stats {
+    @apply flex gap-4 text-xs text-text-secondary;
+  }
+
+  .project-stat {
+    @apply flex items-center gap-1;
+  }
+
+  .project-stat-num {
+    @apply font-semibold text-text-primary;
+  }
+
   /* Mobile adjustments */
   @media (max-width: 480px) {
     .top-nav-inner {

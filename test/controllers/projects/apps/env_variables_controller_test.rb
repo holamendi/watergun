@@ -14,7 +14,7 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
       get project_app_env_variables_path(@project, @app)
 
       assert_response :success
-      assert_select "h2", text: "Environment Variables"
+      assert_select "h1", text: "Environment Variables"
       assert_select "nav[aria-label='Settings navigation']"
     end
   end

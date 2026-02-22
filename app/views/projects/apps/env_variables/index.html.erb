@@ -1,10 +1,13 @@
 <%= render "projects/apps/settings/layout", app: @app, active_section: :variables do %>
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-medium">Environment Variables</h2>
+  <div class="page-header">
+    <div>
+      <h1 style="font-size: 16px; font-weight: 600;">Environment Variables</h1>
+      <div class="page-header-sub"><%= @env_variables.size %> <%= "variable".pluralize(@env_variables.size) %> configured</div>
+    </div>
     <%= link_to new_project_app_env_variable_path(@project, @app),
         class: "btn btn-primary btn-sm",
         data: { turbo_frame: "new_env_variable" } do %>
-      Add Variable
+      + Add Variable
     <% end %>
   </div>
 

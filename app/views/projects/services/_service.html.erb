@@ -1,16 +1,14 @@
 <%= link_to project_service_path(service.project, service),
-    class: "flex items-center justify-between px-4 py-3 hover:bg-elevated/50 transition-colors border-b border-border last:border-b-0 group",
+    class: "resource-item",
     id: dom_id(service) do %>
-  <div class="flex items-center gap-3">
-    <%= service_icon(service.service_type, size: :md) %>
+  <div class="resource-item-left">
     <div>
-      <span class="font-mono text-sm font-medium group-hover:text-accent transition-colors"><%= service.name %></span>
-      <% if service.version.present? %>
-        <p class="text-xxs text-text-muted mt-0.5"><%= service.version %></p>
-      <% end %>
+      <div class="resource-name"><%= service.name %></div>
+      <div class="resource-meta"><%= service.service_type.to_s.titleize %><%= " · #{service.version}" if service.version.present? %></div>
     </div>
   </div>
-  <svg class="w-4 h-4 text-text-muted group-hover:text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-  </svg>
+  <div class="resource-item-right">
+    <%= status_badge(service.status) %>
+    <span class="arrow-icon">›</span>
+  </div>
 <% end %>

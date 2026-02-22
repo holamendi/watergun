@@ -1,28 +1,31 @@
-<div class="hero min-h-screen bg-base">
-  <div class="card bg-surface w-full max-w-md shadow-2xl">
-    <div class="card-body gap-6">
-      <div class="flex flex-col items-center gap-3">
-        <svg class="w-auto h-12 fill-primary" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
-          <path class="cls-1" d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
+<div class="min-h-screen flex items-center justify-center bg-base px-5">
+  <div class="w-full max-w-[380px] bg-surface border border-border rounded-lg p-8">
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 rounded-xl bg-accent inline-flex items-center justify-center mb-3">
+        <svg class="w-8 h-8 fill-white" viewBox="132.84 235.85 667.16 328.29" xmlns="http://www.w3.org/2000/svg">
+          <path d="M635.86,564.14c-53.14,0-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.58-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37s-96.37-43.23-96.37-96.37v-135.55c0-21.61-17.57-39.18-39.18-39.18s-39.18,17.58-39.18,39.18v28.59h-57.19v-28.59c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.58,39.18,39.19,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.37-96.37s96.37,43.23,96.37,96.37v135.55c0,21.6,17.57,39.18,39.18,39.18s39.18-17.58,39.18-39.18v-135.55c0-53.14,43.23-96.37,96.36-96.37h28.59v57.19h-28.59c-21.6,0-39.18,17.58-39.18,39.18v135.55c0,53.13-43.23,96.37-96.37,96.37Z"/>
         </svg>
-        <p class="text-text-secondary text-sm">Sign in to your watergun account</p>
       </div>
-
-      <%= form_with scope: :session, url: session_path, class: "space-y-4" do |form| %>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Email address</legend>
-          <%= form.email_field :email, class: "input w-full", placeholder: "you@example.com", required: true, autocomplete: "email", autofocus: true %>
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Password</legend>
-          <%= form.password_field :password, class: "input w-full", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
-        </fieldset>
-
-        <div class="pt-2">
-          <%= submit_button "Sign in" %>
-        </div>
-      <% end %>
+      <h1 class="text-lg font-semibold">Watergun</h1>
+      <p class="text-xs text-text-muted mt-1">Sign in to manage your deployments</p>
     </div>
+
+    <%= form_with scope: :session, url: session_path, class: "space-y-4" do |form| %>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Email</legend>
+        <%= form.email_field :email, class: "input w-full", placeholder: "you@example.com", required: true, autocomplete: "email", autofocus: true %>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Password</legend>
+        <%= form.password_field :password, class: "input w-full", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
+      </fieldset>
+
+      <div class="pt-2">
+        <button type="submit" class="w-full py-2.5 text-sm font-semibold bg-accent hover:bg-accent-hover text-white rounded transition-colors">
+          Sign In
+        </button>
+      </div>
+    <% end %>
   </div>
 </div>

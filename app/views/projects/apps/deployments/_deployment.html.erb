@@ -1,45 +1,26 @@
-<div id="<%= dom_id(deployment) %>" class="relative p-4 hover:bg-elevated/30 transition-colors">
-  <div class="flex items-start gap-4">
-    <%# Author avatar %>
-    <% if deployment.author_avatar_url.present? %>
-      <div class="flex-shrink-0">
-        <img src="<%= deployment.author_avatar_url %>" alt="<%= deployment.author_login %>" class="w-8 h-8 rounded-full" title="<%= deployment.author_login %>">
-      </div>
+<%= link_to project_app_deployment_path(deployment.app.project, deployment.app, deployment),
+    id: dom_id(deployment),
+    class: "deploy-row" do %>
+  <div class="deploy-left">
+    <%= status_badge(deployment.status) %>
+    <span class="deploy-hash"><%= deployment.short_sha %></span>
+    <% if deployment.commit_message.present? %>
+      <span class="deploy-msg"><%= deployment.commit_message.lines.first.strip %></span>
     <% end %>
-
-    <%# Main content %>
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <%= link_to deployment.commit_html_url, target: "_blank", rel: "noopener noreferrer", class: "relative z-10 font-mono text-xs font-semibold text-text-primary hover:text-accent" do %>
-            <%= deployment.short_sha %>
-          <% end %>
-          <%= status_badge(deployment.status) %>
-        </div>
-        <span class="text-xxs text-text-muted flex-shrink-0">
-          <% if deployment.finished? %>
-            <time title="<%= deployment.finished_at %>" datetime="<%= deployment.finished_at.iso8601 %>">
-              <%= time_ago_in_words(deployment.finished_at) %> ago
-            </time>
-          <% elsif deployment.deploying? || deployment.pending? %>
-            <span class="inline-flex items-center gap-1">
-              <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              In progress
-            </span>
-          <% end %>
-        </span>
-      </div>
-      <% if deployment.commit_message.present? %>
-        <p class="text-xs text-text-secondary mt-1 truncate"><%= deployment.commit_message.lines.first.strip %></p>
-      <% end %>
-    </div>
   </div>
-
-  <%# Stretched link for navigation to deployment show page %>
-  <%= link_to project_app_deployment_path(deployment.app.project, deployment.app, deployment),
-      class: "absolute inset-0 z-0",
-      aria: { label: "View deployment #{deployment.short_sha}" } do %><% end %>
-</div>
+  <span class="deploy-time">
+    <% if deployment.finished? %>
+      <time title="<%= deployment.finished_at %>" datetime="<%= deployment.finished_at.iso8601 %>">
+        <%= time_ago_in_words(deployment.finished_at) %> ago
+      </time>
+    <% elsif deployment.deploying? || deployment.pending? %>
+      <span class="inline-flex items-center gap-1">
+        <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        In progress
+      </span>
+    <% end %>
+  </span>
+<% end %>
