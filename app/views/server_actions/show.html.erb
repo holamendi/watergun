@@ -2,24 +2,19 @@
 
 <% @title = @server_action.slug %>
 
-<div class="max-w-6xl mx-auto px-4 py-6">
-  <!-- Back link -->
+<div class="page-shell py-6">
   <div class="mb-4">
-    <%= link_to server_actions_path, class: "text-xs text-text-muted hover:text-text-secondary inline-flex items-center gap-1" do %>
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-      </svg>
-      All activity
+    <%= link_to server_actions_path, class: "btn btn-ghost btn-xs", style: "padding-left: 0;" do %>
+      &larr; All Activity
     <% end %>
   </div>
 
-  <!-- Header -->
-  <div class="mb-6">
-    <div class="flex items-center gap-3">
-      <%= status_dot(@server_action.status, size: 3) %>
-      <h1 class="font-mono text-xl font-semibold text-text-primary"><%= @server_action.slug %></h1>
-      <span class="font-mono text-sm text-text-muted">#<%= @server_action.id %></span>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title font-mono"><%= @server_action.slug %></h1>
+      <div class="page-header-sub">#<%= @server_action.id %></div>
     </div>
+    <%= status_badge(@server_action.status) %>
   </div>
 
   <% if @server_action.failure_message.present? %>
@@ -33,108 +28,56 @@
     </div>
   <% end %>
 
-  <!-- Details Card -->
-  <div class="bg-surface rounded-xl border border-border mb-6">
-    <div class="px-4 py-3 border-b border-border">
-      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Details</h2>
+  <div class="deploy-info-grid">
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">Source</div>
+      <div class="deploy-info-value mono"><%= @server_action.source %></div>
     </div>
-    <div class="p-4">
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Status</span>
-          <div class="mt-1"><%= status_badge(@server_action.status) %></div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Source</span>
-          <div class="mt-1 font-mono text-xs text-text-primary"><%= @server_action.source %></div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Server</span>
-          <div class="mt-1 text-xs text-text-primary"><%= @server_action.server.name %></div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Target</span>
-          <div class="mt-1">
-            <% if @server_action.actionable_type.present? %>
-              <span class="font-mono text-xs text-text-primary">
-                <%= "#{@server_action.actionable_type.underscore.split('/').last}:#{@server_action.actionable_id}" %>
-              </span>
-            <% else %>
-              <span class="text-xs text-text-muted italic">destroyed</span>
-            <% end %>
-          </div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">User</span>
-          <div class="mt-1 text-xs text-text-primary"><%= @server_action.user&.email || "-" %></div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Duration</span>
-          <div class="mt-1">
-            <% if @server_action.finished? %>
-              <span class="font-mono text-xs text-text-primary"><%= @server_action.duration.round(2) %>s</span>
-            <% else %>
-              <span class="text-xs text-text-muted">-</span>
-            <% end %>
-          </div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Created</span>
-          <div class="mt-1 text-xs text-text-primary" title="<%= @server_action.created_at.strftime('%b %d, %Y at %H:%M:%S') %>">
-            <%= time_ago_in_words(@server_action.created_at) %> ago
-          </div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Started</span>
-          <div class="mt-1">
-            <% if @server_action.running_at %>
-              <span class="text-xs text-text-primary" title="<%= @server_action.running_at.strftime('%b %d, %Y at %H:%M:%S') %>">
-                <%= time_ago_in_words(@server_action.running_at) %> ago
-              </span>
-            <% else %>
-              <span class="text-xs text-text-muted">-</span>
-            <% end %>
-          </div>
-        </div>
-
-        <div>
-          <span class="text-xxs text-text-muted uppercase tracking-wider">Finished</span>
-          <div class="mt-1">
-            <% if @server_action.finished_at %>
-              <span class="text-xs text-text-primary" title="<%= @server_action.finished_at.strftime('%b %d, %Y at %H:%M:%S') %>">
-                <%= time_ago_in_words(@server_action.finished_at) %> ago
-              </span>
-            <% else %>
-              <span class="text-xs text-text-muted">-</span>
-            <% end %>
-          </div>
-        </div>
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">Server</div>
+      <div class="deploy-info-value"><%= @server_action.server.name %></div>
+    </div>
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">Target</div>
+      <div class="deploy-info-value mono">
+        <% if @server_action.actionable_type.present? %>
+          <%= "#{@server_action.actionable_type.underscore.split('/').last}:#{@server_action.actionable_id}" %>
+        <% else %>
+          <span class="text-text-muted">destroyed</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">User</div>
+      <div class="deploy-info-value"><%= @server_action.user&.email || "-" %></div>
+    </div>
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">Duration</div>
+      <div class="deploy-info-value mono">
+        <% if @server_action.finished? %>
+          <%= @server_action.duration.round(2) %>s
+        <% else %>
+          -
+        <% end %>
+      </div>
+    </div>
+    <div class="deploy-info-item">
+      <div class="deploy-info-label">Created</div>
+      <div class="deploy-info-value" title="<%= @server_action.created_at.strftime('%b %d, %Y at %H:%M:%S') %>">
+        <%= time_ago_in_words(@server_action.created_at) %> ago
       </div>
     </div>
   </div>
 
-  <!-- Payload Card -->
-  <div class="bg-surface rounded-xl border border-border mb-6">
-    <div class="px-4 py-3 border-b border-border">
-      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Payload</h2>
-    </div>
+  <div class="section-label">Payload</div>
+  <div class="bg-surface rounded-lg border border-border mb-6">
     <div class="p-4">
       <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
     </div>
   </div>
 
-  <!-- Logs Card -->
-  <div class="bg-surface rounded-xl border border-border overflow-hidden">
-    <div class="px-4 py-3 border-b border-border">
-      <h2 class="text-xs font-medium text-text-muted uppercase tracking-wider">Logs</h2>
-    </div>
+  <div class="section-label">Logs</div>
+  <div class="bg-base border border-border rounded-lg overflow-hidden">
     <% if @server_action.queued? || @server_action.running? %>
       <div class="p-8 text-center">
         <svg class="animate-spin mx-auto h-5 w-5 text-warning mb-2" fill="none" viewBox="0 0 24 24">

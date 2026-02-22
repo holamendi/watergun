@@ -1,46 +1,42 @@
 <%= link_to server_action_path(server_action),
     id: dom_id(server_action),
-    class: "block p-4 hover:bg-elevated/30 transition-colors" do %>
-  <div class="flex items-center gap-3">
-    <%= status_dot(server_action.status) %>
-
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-xs font-medium text-text-primary"><%= server_action.slug %></span>
-        <span class="font-mono text-xxs text-text-muted">#<%= server_action.id %></span>
-        <% if server_action.finished? %>
-          <span class="text-xxs text-text-muted"><%= time_ago_in_words(server_action.finished_at) %> ago</span>
-        <% elsif server_action.running? %>
-          <span class="text-xxs text-text-muted inline-flex items-center gap-1">
-            <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Running
-          </span>
-        <% elsif server_action.queued? %>
-          <span class="text-xxs text-text-muted">Queued</span>
-        <% end %>
-      </div>
-      <div class="flex items-center gap-3 mt-0.5">
-        <% if server_action.actionable_type.present? %>
-          <span class="font-mono text-xxs text-text-muted">
-            <%= "#{server_action.actionable_type.underscore.split('/').last}:#{server_action.actionable_id}" %>
-          </span>
-        <% else %>
-          <span class="text-xxs text-text-muted italic">destroyed</span>
-        <% end %>
-        <% if server_action.user.present? %>
-          <span class="text-xxs text-text-muted"><%= server_action.user.email %></span>
-        <% end %>
-        <% if server_action.finished? %>
-          <span class="font-mono text-xxs text-text-muted"><%= server_action.duration.round(1) %>s</span>
-        <% end %>
-      </div>
+    class: "activity-item" do %>
+  <% icon_type = if server_action.slug.to_s.include?("deploy")
+                   "deploy"
+                 elsif server_action.slug.to_s.include?("config") || server_action.slug.to_s.include?("domain") || server_action.slug.to_s.include?("letsencrypt")
+                   "config"
+                 elsif server_action.slug.to_s.include?("service")
+                   "service"
+                 elsif server_action.status.to_s == "error" || server_action.status.to_s == "failed"
+                   "error"
+                 else
+                   "deploy"
+                 end %>
+  <div class="activity-icon <%= icon_type %>"></div>
+  <div class="activity-body">
+    <div class="activity-title"><%= server_action.slug %></div>
+    <div class="activity-slug">
+      <% if server_action.actionable_type.present? %>
+        <%= server_action.actionable_type.underscore.split("/").last %>:<%= server_action.actionable_id %>
+      <% else %>
+        destroyed
+      <% end %>
     </div>
-
-    <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-    </svg>
+  </div>
+  <div class="activity-time">
+    <%= status_badge(server_action.status) %>
+    <% if server_action.finished? %>
+      <span class="ml-2"><%= time_ago_in_words(server_action.finished_at) %> ago</span>
+    <% elsif server_action.running? %>
+      <span class="ml-2 inline-flex items-center gap-1">
+        <svg class="animate-spin h-3 w-3 text-warning" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Running
+      </span>
+    <% elsif server_action.queued? %>
+      <span class="ml-2">Queued</span>
+    <% end %>
   </div>
 <% end %>

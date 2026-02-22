@@ -2,10 +2,13 @@
 <%= turbo_stream_from @app, :domains %>
 
 <%= render "projects/apps/settings/layout", app: @app, active_section: :domains do %>
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-medium">Domains</h2>
+  <div class="page-header">
+    <div>
+      <h1 style="font-size: 16px; font-weight: 600;">Domains</h1>
+      <div class="page-header-sub"><%= @domains.size %> <%= "domain".pluralize(@domains.size) %> configured</div>
+    </div>
     <button onclick="domain_modal.showModal()" class="btn btn-primary btn-sm">
-      Add Domain
+      + Add Domain
     </button>
   </div>
 

@@ -2,10 +2,13 @@
 <%= turbo_stream_from @app, :storage_mounts %>
 
 <%= render "projects/apps/settings/layout", app: @app, active_section: :storage do %>
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-medium">Storage</h2>
+  <div class="page-header">
+    <div>
+      <h1 style="font-size: 16px; font-weight: 600;">Storage</h1>
+      <div class="page-header-sub"><%= @storage_mounts.size %> <%= "mount".pluralize(@storage_mounts.size) %> configured</div>
+    </div>
     <button onclick="storage_mount_modal.showModal()" class="btn btn-primary btn-sm">
-      Add Mount
+      + Add Mount
     </button>
   </div>
 

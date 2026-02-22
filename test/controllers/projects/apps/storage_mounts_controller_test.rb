@@ -14,7 +14,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
       get project_app_storage_mounts_path(@project, @app)
 
       assert_response :success
-      assert_select "h2", text: "Storage"
+      assert_select "h1", text: "Storage"
       assert_select "nav[aria-label='Settings navigation']"
     end
   end

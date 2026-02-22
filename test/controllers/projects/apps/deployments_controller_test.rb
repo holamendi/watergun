@@ -20,7 +20,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
 
       assert_response :success
       assert_select "a[href='#{project_app_deployment_path(@project, @app, deployment)}']"
-      assert_select "form[action='#{project_app_deployments_path(@project, @app)}'] button", text: "Deploy"
+      assert_select "form[action='#{project_app_deployments_path(@project, @app)}'] button", text: "Deploy Now"
     end
   end
 
@@ -36,7 +36,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
       assert_select "a[href='#{project_app_settings_path(@project, @app)}']"
       assert_select "body", /#{deployment.short_sha}/
-      assert_select "body", /Completed in/
+      assert_select "body", /Duration/
     end
 
     test "renders in-progress deployment with turbo subscription" do

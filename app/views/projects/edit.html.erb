@@ -32,20 +32,17 @@
       </div>
     </div>
 
-    <div class="form-card mt-6">
-      <div class="form-card-header">
-        <h2 class="text-error">Danger zone</h2>
-      </div>
-      <div class="form-card-body">
-        <p class="text-xs text-text-muted">
+    <div class="mt-6">
+      <div class="section-label" style="color: var(--color-error);">Danger Zone</div>
+      <div class="danger-zone">
+        <div class="danger-zone-header">Delete Project</div>
+        <div class="danger-zone-desc">
           Deleting this project will permanently remove all apps, services, and deployment history.
-        </p>
-        <div class="flex justify-end mt-4">
-          <%= button_to "Delete project", project_path(@project),
-              method: :delete,
-              class: "btn btn-sm bg-transparent border border-error text-error hover:bg-error/10",
-              data: { turbo_confirm: "Delete #{@project.name}? This cannot be undone." } %>
         </div>
+        <%= button_to "Delete Project", project_path(@project),
+            method: :delete,
+            class: "btn btn-danger btn-sm",
+            data: { turbo_confirm: "Delete #{@project.name}? This cannot be undone." } %>
       </div>
     </div>
   </div>

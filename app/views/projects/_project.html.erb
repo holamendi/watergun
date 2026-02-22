@@ -3,21 +3,17 @@
 
 <%= link_to project_path(project),
     id: dom_id(project),
-    class: "group bg-surface rounded border border-border p-4 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all" do %>
-  <div class="mb-3">
-    <span class="font-medium group-hover:text-accent transition-colors"><%= project.name %></span>
+    class: "project-card" do %>
+  <div class="project-card-header">
+    <div class="project-name"><%= project.name %></div>
   </div>
 
-  <% if kept_apps.any? || kept_services.any? %>
-    <div class="flex items-center gap-2 flex-wrap">
-      <% kept_apps.each do |app| %>
-        <span class="text-xxs text-text-muted"><%= app.name %></span>
-      <% end %>
-      <% kept_services.each do |service| %>
-        <span class="text-xxs text-text-muted"><%= service.name %></span>
-      <% end %>
+  <div class="project-stats">
+    <div class="project-stat">
+      <span class="project-stat-num"><%= kept_apps.size %></span> <%= "app".pluralize(kept_apps.size) %>
     </div>
-  <% else %>
-    <div class="text-xs text-text-muted">Empty project</div>
-  <% end %>
+    <div class="project-stat">
+      <span class="project-stat-num"><%= kept_services.size %></span> <%= "service".pluralize(kept_services.size) %>
+    </div>
+  </div>
 <% end %>

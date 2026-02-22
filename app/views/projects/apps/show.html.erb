@@ -1,7 +1,7 @@
 <%= render "projects/apps/header", app: @app, active_tab: :overview %>
 
-<div class="max-w-7xl mx-auto px-4">
-  <div class="py-4">
+<div class="page-shell py-4">
+  <div>
     <%# Process cards %>
     <% running_containers = @app.containers.select(&:running?) %>
     <% if running_containers.any? %>

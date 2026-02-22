@@ -2,9 +2,11 @@
 <% @title = @project.name %>
 
 <div class="page-shell py-6">
-  <%# Header %>
   <div class="page-header">
-    <h1 class="page-title"><%= @project.name %></h1>
+    <div>
+      <h1 class="page-title"><%= @project.name %></h1>
+      <div class="page-header-sub"><%= @apps.size %> <%= "app".pluralize(@apps.size) %> · <%= @services.size %> <%= "service".pluralize(@services.size) %></div>
+    </div>
     <div class="flex items-center gap-2">
       <div class="action-dropdown">
         <button class="btn btn-primary btn-sm" tabindex="0">+ New</button>
@@ -26,16 +28,14 @@
   </div>
 
   <%# Apps Section %>
-  <section class="mb-8">
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="section-title">Apps</h2>
-    </div>
+  <section class="mb-6">
+    <div class="section-label">Apps</div>
     <% if @apps.any? %>
-      <div class="bg-surface rounded border border-border overflow-hidden">
+      <div class="resource-list">
         <%= render partial: "projects/apps/app", collection: @apps %>
       </div>
     <% else %>
-      <div class="bg-surface rounded border border-border p-6 text-center">
+      <div class="bg-surface rounded-lg border border-border p-6 text-center">
         <p class="text-text-secondary text-sm">No apps yet</p>
       </div>
     <% end %>
@@ -43,15 +43,13 @@
 
   <%# Services Section %>
   <section>
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="section-title">Services</h2>
-    </div>
+    <div class="section-label">Services</div>
     <% if @services.any? %>
-      <div class="bg-surface rounded border border-border overflow-hidden">
+      <div class="resource-list">
         <%= render partial: "projects/services/service", collection: @services %>
       </div>
     <% else %>
-      <div class="bg-surface rounded border border-border p-6 text-center">
+      <div class="bg-surface rounded-lg border border-border p-6 text-center">
         <p class="text-text-secondary text-sm">No services yet</p>
       </div>
     <% end %>

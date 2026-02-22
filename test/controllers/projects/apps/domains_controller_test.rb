@@ -14,7 +14,7 @@ class Projects::Apps::DomainsControllerTest < ActionDispatch::IntegrationTest
       get project_app_domains_path(@project, @app)
 
       assert_response :success
-      assert_select "h2", text: "Domains"
+      assert_select "h1", text: "Domains"
       assert_select "nav[aria-label='Settings navigation']"
     end
   end
