@@ -11,8 +11,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOKKU_HOSTNAME: dokku.local
-      DOKKU_HOST_ROOT: /mnt/dokku/home/dokku
-      DOKKU_LIB_HOST_ROOT: /mnt/dokku/var/lib/dokku
+      DOKKU_HOST_ROOT: /var/lib/docker/volumes/watergun_dokku-data/_data/home/dokku
+      DOKKU_LIB_HOST_ROOT: /var/lib/docker/volumes/watergun_dokku-data/_data/var/lib/dokku
     restart: unless-stopped
 
 volumes:

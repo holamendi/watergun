@@ -1,9 +1,14 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+# Create the default dev account, user, and membership.
+# Idempotent — safe to run multiple times.
 #
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# After seeding, bin/local-dokku setup can find Account.first
+# and create the local server record automatically.
+
+account = Account.find_or_create_by!(name: "Default")
+
+user = User.find_or_initialize_by(email: "hola@mendi.cl")
+user.update!(name: "Dev User", password: "abc123")
+
+Membership.find_or_create_by!(user: user, account: account)
+
+puts "Seeded: account=#{account.name}, user=#{user.email}"
