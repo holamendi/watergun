@@ -4,7 +4,7 @@ class UiHelperTest < ActionView::TestCase
   test "container generates div with correct classes" do
     result = container { "content" }
     assert_match(/div/, result)
-    assert_match(/max-w-5xl px-4 mx-auto sm:px-6 lg:px-8/, result)
+    assert_match(/page-shell/, result)
     assert_match(/content/, result)
   end
 

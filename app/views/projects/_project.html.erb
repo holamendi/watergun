@@ -11,14 +11,10 @@
   <% if kept_apps.any? || kept_services.any? %>
     <div class="flex items-center gap-2 flex-wrap">
       <% kept_apps.each do |app| %>
-        <div class="w-6 h-6 rounded bg-elevated flex items-center justify-center" title="<%= app.name %>">
-          <%= app_icon(app) %>
-        </div>
+        <span class="text-xxs text-text-muted"><%= app.name %></span>
       <% end %>
       <% kept_services.each do |service| %>
-        <div class="w-6 h-6 rounded bg-elevated flex items-center justify-center" title="<%= service.name %> (<%= service.service_type.titleize %>)">
-          <%= service_icon(service.service_type) %>
-        </div>
+        <span class="text-xxs text-text-muted"><%= service.name %></span>
       <% end %>
     </div>
   <% else %>

@@ -2,9 +2,9 @@
 
 <%= render "projects/apps/header", app: @app, active_tab: :deployments %>
 
-<div class="max-w-7xl mx-auto px-4">
+<div class="page-shell py-6">
   <%# Back to deployments list %>
-  <div class="pt-4">
+  <div class="mb-4">
     <%= link_to project_app_deployments_path(@project, @app), class: "text-xs text-accent hover:underline inline-flex items-center gap-1" do %>
       <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -14,7 +14,7 @@
   </div>
 
   <%# Deployment info card - broadcasts here when status changes %>
-  <div id="<%= dom_id(@deployment, :info) %>" class="py-4">
+  <div id="<%= dom_id(@deployment, :info) %>" class="mb-4">
     <%= render "projects/apps/deployments/deployment_info", deployment: @deployment %>
   </div>
 

@@ -1,47 +1,52 @@
 <% @title = "New Service" %>
 
-<div class="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto py-12">
-  <div class="text-center mb-8">
-    <h1 class="text-xl font-semibold text-text-primary">Add a service</h1>
-    <p class="text-text-muted text-xs mt-2">Managed databases and caches for your apps.</p>
-  </div>
-
-  <%= form_with model: @create_service, scope: :create_service, url: project_services_path(@project), method: :post do |form| %>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-      <%
-        services = {
-          postgres: { name: "PostgreSQL", desc: "Relational database" },
-          redis: { name: "Redis", desc: "In-memory cache" },
-          mysql: { name: "MySQL", desc: "Relational database" },
-          mariadb: { name: "MariaDB", desc: "MySQL fork" },
-          mongo: { name: "MongoDB", desc: "Document database" },
-          memcached: { name: "Memcached", desc: "Memory cache" },
-          elasticsearch: { name: "Elasticsearch", desc: "Search engine" },
-          rabbitmq: { name: "RabbitMQ", desc: "Message queue" },
-          clickhouse: { name: "ClickHouse", desc: "Analytics database" },
-          meilisearch: { name: "Meilisearch", desc: "Search engine" }
-        }
-      %>
-      <% services.each do |key, info| %>
-        <label class="cursor-pointer">
-          <%= form.radio_button :service_type, key, class: "hidden peer" %>
-          <div class="bg-surface rounded-xl border-2 border-border p-4 peer-checked:border-accent peer-checked:bg-accent/5 hover:bg-elevated/30 transition-colors">
-            <div class="font-mono text-sm font-medium text-text-primary"><%= info[:name] %></div>
-            <div class="text-xxs text-text-muted"><%= info[:desc] %></div>
-          </div>
-        </label>
-      <% end %>
-    </div>
-
-    <% if @create_service.errors.any? %>
-      <div class="text-red-400 text-xs text-center mb-4">
-        <%= @create_service.errors.full_messages.join(", ") %>
+<div class="page-shell py-6">
+  <div class="max-w-2xl mx-auto">
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>Add a service</h2>
+        <p class="text-xs text-text-muted mt-1">Managed databases and caches for your apps.</p>
       </div>
-    <% end %>
+      <div class="form-card-body">
+        <%= form_with model: @create_service, scope: :create_service, url: project_services_path(@project), method: :post do |form| %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+            <%
+              services = {
+                postgres: { name: "PostgreSQL", desc: "Relational database" },
+                redis: { name: "Redis", desc: "In-memory cache" },
+                mysql: { name: "MySQL", desc: "Relational database" },
+                mariadb: { name: "MariaDB", desc: "MySQL fork" },
+                mongo: { name: "MongoDB", desc: "Document database" },
+                memcached: { name: "Memcached", desc: "Memory cache" },
+                elasticsearch: { name: "Elasticsearch", desc: "Search engine" },
+                rabbitmq: { name: "RabbitMQ", desc: "Message queue" },
+                clickhouse: { name: "ClickHouse", desc: "Analytics database" },
+                meilisearch: { name: "Meilisearch", desc: "Search engine" }
+              }
+            %>
+            <% services.each do |key, info| %>
+              <label class="cursor-pointer">
+                <%= form.radio_button :service_type, key, class: "hidden peer" %>
+                <div class="bg-surface rounded-xl border-2 border-border p-4 peer-checked:border-accent peer-checked:bg-accent/5 hover:bg-elevated/30 transition-colors">
+                  <div class="font-mono text-sm font-medium text-text-primary"><%= info[:name] %></div>
+                  <div class="text-xxs text-text-muted"><%= info[:desc] %></div>
+                </div>
+              </label>
+            <% end %>
+          </div>
 
-    <div class="flex justify-center gap-3">
-      <%= link_to "Cancel", project_path(@project), class: "px-4 py-2 bg-elevated hover:bg-border text-text-secondary text-xs font-medium rounded-lg border border-border transition-colors" %>
-      <%= submit_button "Create Service" %>
+          <% if @create_service.errors.any? %>
+            <div class="text-error text-xs text-center mb-4">
+              <%= @create_service.errors.full_messages.join(", ") %>
+            </div>
+          <% end %>
+
+          <div class="form-card-footer -mx-5 -mb-5 mt-5">
+            <%= link_to "Cancel", project_path(@project), class: "btn btn-sm" %>
+            <%= submit_button "Create Service" %>
+          </div>
+        <% end %>
+      </div>
     </div>
-  <% end %>
+  </div>
 </div>
