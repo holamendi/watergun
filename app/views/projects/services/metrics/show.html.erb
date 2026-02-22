@@ -2,7 +2,7 @@
 
 <%= render "projects/services/header", service: @service, active_tab: :metrics %>
 
-<div class="max-w-6xl mx-auto px-4">
+<div class="page-shell">
   <div class="py-6 space-y-6">
     <%= turbo_frame_tag :stats, src: stats_project_service_metrics_path(@project, @service) %>
     <%= turbo_frame_tag :cpu_chart, src: cpu_chart_project_service_metrics_path(@project, @service) %>
