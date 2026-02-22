@@ -2,29 +2,29 @@
 <% @title = app.name %>
 <% active_tab ||= nil %>
 
-<div class="-mt-6 border-b border-border bg-surface">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+<div class="app-tabs-wrapper">
+  <div class="app-tabs">
     <nav class="scrollable-tabs flex items-center gap-0 -mb-px overflow-x-auto" aria-label="App navigation">
       <%= link_to "Deployments", project_app_deployments_path(app.project, app),
-          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
-            "text-accent font-medium border-accent": active_tab == :deployments,
-            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :deployments),
+          class: class_names("app-tab",
+            "app-tab-active": active_tab == :deployments,
+            "app-tab-inactive": active_tab != :deployments),
           aria: { current: (active_tab == :deployments ? "page" : nil) } %>
       <%= link_to "Logs", project_app_log_streams_path(app.project, app),
-          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
-            "text-accent font-medium border-accent": active_tab == :logs,
-            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :logs),
+          class: class_names("app-tab",
+            "app-tab-active": active_tab == :logs,
+            "app-tab-inactive": active_tab != :logs),
           aria: { current: (active_tab == :logs ? "page" : nil) },
           data: { turbo_prefetch: false } %>
       <%= link_to "Metrics", project_app_metrics_path(app.project, app),
-          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
-            "text-accent font-medium border-accent": active_tab == :metrics,
-            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :metrics),
+          class: class_names("app-tab",
+            "app-tab-active": active_tab == :metrics,
+            "app-tab-inactive": active_tab != :metrics),
           aria: { current: (active_tab == :metrics ? "page" : nil) } %>
       <%= link_to "Settings", project_app_settings_path(app.project, app),
-          class: class_names("shrink-0 px-3 py-2.5 text-xs border-b-2",
-            "text-accent font-medium border-accent": active_tab == :settings,
-            "text-text-secondary hover:text-text-primary border-transparent hover:border-text-muted": active_tab != :settings),
+          class: class_names("app-tab",
+            "app-tab-active": active_tab == :settings,
+            "app-tab-inactive": active_tab != :settings),
           aria: { current: (active_tab == :settings ? "page" : nil) } %>
     </nav>
 

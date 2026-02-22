@@ -1,4 +1,5 @@
 <nav class="top-nav">
+  <div class="top-nav-inner">
   <div class="top-nav-left">
     <%# Logo %>
     <%= link_to projects_path, class: "top-nav-logo" do %>
@@ -84,5 +85,6 @@
         <%= link_to "Sign out", logout_path, data: { turbo_method: :delete }, class: "nav-dropdown-item nav-dropdown-item-muted" %>
       </div>
     </div>
+  </div>
   </div>
 </nav>

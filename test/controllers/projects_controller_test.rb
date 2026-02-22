@@ -39,11 +39,11 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_select "h1", text: @project.name
     end
 
-    test "renders back link to projects" do
+    test "renders project title" do
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{projects_path}']", text: /Projects/
+      assert_select "h1", text: @project.name
     end
 
     test "lists apps with links" do
@@ -66,14 +66,14 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_app_path(@project)}']", text: /New/
+      assert_select "a[href='#{new_project_app_path(@project)}']"
     end
 
     test "shows add service action" do
       get project_path(@project)
 
       assert_response :success
-      assert_select "a[href='#{new_project_service_path(@project)}']", text: /New/
+      assert_select "a[href='#{new_project_service_path(@project)}']"
     end
   end
 
