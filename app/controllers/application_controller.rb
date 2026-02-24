@@ -12,8 +12,8 @@ class ApplicationController < ActionController::Base
     @nav_projects = Current.account&.projects&.kept || []
   end
 
-  def stream_toast(message, title: nil, type: :notice)
-    turbo_stream.append("toasts", partial: "shared/toast", locals: {message:, title:, type:})
+  def stream_toast(message, title: nil, type: :notice, link_text: nil, link_url: nil)
+    turbo_stream.append("toasts", partial: "shared/toast", locals: {message:, title:, type:, link_text:, link_url:})
   end
 
   def set_source
