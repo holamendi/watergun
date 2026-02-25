@@ -1,25 +1,20 @@
-<%= form_with model: [env_variable.project, env_variable.app, env_variable], class: "card bg-elevated p-4" do |form| %>
-  <div class="flex flex-col sm:flex-row gap-4">
-    <fieldset class="fieldset flex-1">
-      <legend class="fieldset-legend">Name</legend>
-      <%= form.text_field :name,
-          class: "input w-full font-mono",
-          placeholder: "MY_VARIABLE",
-          readonly: form.object.persisted?,
-          autofocus: form.object.new_record? %>
-      <%= error_messages_for(form.object, :name) %>
-    </fieldset>
-    <fieldset class="fieldset flex-1">
-      <legend class="fieldset-legend">Value</legend>
-      <%= form.text_field :value,
-          class: "input w-full font-mono",
-          placeholder: "value",
-          autofocus: form.object.persisted? %>
-      <%= error_messages_for(form.object, :value) %>
-    </fieldset>
-    <div class="flex items-end gap-2">
-      <%= submit_button "Save" %>
-      <%= link_to "Cancel", project_app_env_variables_path(env_variable.project, env_variable.app), class: "btn btn-ghost text-text-secondary" %>
-    </div>
-  </div>
+<%= form_with model: [env_variable.project, env_variable.app, env_variable], class: "space-y-4", data: { turbo_frame: "env_variable_form" } do |form| %>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Name</legend>
+    <%= form.text_field :name,
+        class: "input w-full font-mono",
+        placeholder: "MY_VARIABLE",
+        readonly: form.object.persisted?,
+        autofocus: form.object.new_record? %>
+    <%= error_messages_for(form.object, :name) %>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Value</legend>
+    <%= form.text_field :value,
+        class: "input w-full font-mono",
+        placeholder: "value",
+        autofocus: form.object.persisted? %>
+    <%= error_messages_for(form.object, :value) %>
+  </fieldset>
+  <%= submit_button "Save" %>
 <% end %>

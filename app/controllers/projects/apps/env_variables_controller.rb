@@ -19,12 +19,12 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h)
 
       render turbo_stream: [
-        turbo_stream.remove_all("#new_env_variable form"),
         turbo_stream.prepend(
           "env_variables",
           partial: "projects/apps/env_variables/env_variable",
           locals: {env_variable: @env_variable}
         ),
+        close_modal_stream,
         stream_toast("Environment variable created")
       ], status: :created
     else
@@ -40,6 +40,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
       render turbo_stream: [
         turbo_stream_env_variable,
+        close_modal_stream,
         stream_toast("Environment variable updated successfully.")
       ]
     else
@@ -72,5 +73,9 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       partial: "projects/apps/env_variables/env_variable",
       locals: {env_variable: @env_variable}
     )
+  end
+
+  def close_modal_stream
+    turbo_stream.action(:close_dialog, "env_var_modal")
   end
 end
