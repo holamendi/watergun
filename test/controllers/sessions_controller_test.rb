@@ -4,6 +4,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "new" do
     get new_session_url
     assert_response :success
+    assert_select "button[data-ui-component='button'][type='submit']", text: "Sign In"
   end
 
   test "create with valid credentials creates a session" do

@@ -10,6 +10,16 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
+  describe "#index" do
+    test "renders app list with project-scoped links" do
+      get project_apps_path(@project)
+
+      assert_response :success
+      assert_select "a[href='#{new_project_app_path(@project)}']", text: "Create New App"
+      assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
+    end
+  end
+
   describe "#show" do
     test "redirects to deployments" do
       get project_app_path(@project, @app)
@@ -50,6 +60,8 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
       assert_select "body", /General/
       assert_select "a[href='#{project_app_env_variables_path(@project, @app)}']"
       assert_select "a[href='#{project_app_domains_path(@project, @app)}']"
+      assert_select "[data-ui-component='danger-zone']"
+      assert_select "a[data-ui-component='button'][data-turbo-method='delete'][href='#{project_app_path(@project, @app)}']"
     end
   end
 end

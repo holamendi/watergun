@@ -30,18 +30,18 @@
     </div>
 
     <div id="danger-zone">
-      <div class="section-label" style="color: var(--color-error);">Danger Zone</div>
-      <div class="danger-zone">
-        <div class="danger-zone-header">Delete Application</div>
-        <div class="danger-zone-desc">
-          Once you delete this application, there is no going back. This will permanently remove the app,
-          its deployments, domains, and environment variables from the server.
-        </div>
-        <%= button_to "Delete Application", project_app_path(@project, @app),
+      <div class="section-label text-error">Danger Zone</div>
+      <%= ui_danger_zone(
+          title: "Delete Application",
+          description: "Once you delete this application, there is no going back. This will permanently remove the app, its deployments, domains, and environment variables from the server."
+        ) do %>
+        <%= ui_button "Delete Application",
+            href: project_app_path(@project, @app),
             method: :delete,
-            class: "btn btn-danger btn-sm",
+            variant: :danger,
+            size: :sm,
             data: { turbo_confirm: "Delete #{@app.name}? This cannot be undone." } %>
-      </div>
+      <% end %>
     </div>
   </div>
 <% end %>

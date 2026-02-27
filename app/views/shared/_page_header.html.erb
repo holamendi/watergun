@@ -1,10 +1,4 @@
-<div class="pb-4 md:flex md:items-center md:justify-between">
-  <div class="flex-1 min-w-0">
-    <h2 class="text-xl font-bold font-mono leading-7 sm:truncate sm:text-2xl"><%= title %></h2>
-  </div>
-  <% if actions.present? %>
-    <div class="flex gap-2 mt-3 md:ml-4 md:mt-0">
-      <%= actions %>
-    </div>
-  <% end %>
-</div>
+<%= render "shared/ui/page_header",
+    title: title,
+    subtitle: local_assigns[:subtitle],
+    actions: actions %>

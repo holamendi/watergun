@@ -2,11 +2,10 @@
 <% @title = @project.name %>
 
 <div class="page-shell py-6">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title"><%= @project.name %></h1>
-      <div class="page-header-sub"><%= @apps.size %> <%= "app".pluralize(@apps.size) %> · <%= @services.size %> <%= "service".pluralize(@services.size) %></div>
-    </div>
+  <%= ui_page_header(
+      title: @project.name,
+      subtitle: "#{@apps.size} #{'app'.pluralize(@apps.size)} · #{@services.size} #{'service'.pluralize(@services.size)}"
+    ) do %>
     <div class="flex items-center gap-2">
       <div class="action-dropdown">
         <button class="btn btn-primary btn-sm" tabindex="0">+ New</button>
@@ -25,7 +24,7 @@
         </svg>
       <% end %>
     </div>
-  </div>
+  <% end %>
 
   <%# Apps Section %>
   <section class="mb-6">
@@ -35,9 +34,7 @@
         <%= render partial: "projects/apps/app", collection: @apps %>
       </div>
     <% else %>
-      <div class="bg-surface rounded-lg border border-border p-6 text-center">
-        <p class="text-text-secondary text-sm">No apps yet</p>
-      </div>
+      <%= ui_empty_state(title: "No apps yet") %>
     <% end %>
   </section>
 
@@ -49,9 +46,7 @@
         <%= render partial: "projects/services/service", collection: @services %>
       </div>
     <% else %>
-      <div class="bg-surface rounded-lg border border-border p-6 text-center">
-        <p class="text-text-secondary text-sm">No services yet</p>
-      </div>
+      <%= ui_empty_state(title: "No services yet") %>
     <% end %>
   </section>
 </div>
