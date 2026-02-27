@@ -19,8 +19,12 @@ import '@hotwired/turbo-rails'
 
 Turbo.StreamActions.redirect = function () {
   const url = this.getAttribute('url') || '/'
-  // Turbo.visit(url, { frame: '_top', action: 'advance' })
   Turbo.visit(url)
+}
+
+Turbo.StreamActions.close_dialog = function () {
+  const dialog = document.getElementById(this.getAttribute('target'))
+  if (dialog) dialog.close()
 }
 //
 // import ActiveStorage from '@rails/activestorage'

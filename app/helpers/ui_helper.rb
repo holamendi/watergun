@@ -30,6 +30,19 @@ module UiHelper
     content_tag :span, text, class: "badge badge-sm #{color_classes[color]}"
   end
 
+  def env_variable_dot_color(status)
+    case status.to_s
+    when "running", "active", "success", "completed"
+      "bg-success"
+    when "deploying", "pending", "warning"
+      "bg-warning animate-pulse"
+    when "failed", "error"
+      "bg-error"
+    else
+      "bg-text-muted"
+    end
+  end
+
   def status_dot(status, size: 2)
     size_classes = {
       2 => "w-2 h-2",

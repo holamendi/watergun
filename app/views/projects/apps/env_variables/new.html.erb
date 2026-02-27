@@ -1,3 +1,4 @@
-<%= turbo_frame_tag "new_env_variable" do %>
+<turbo-frame id="env_variable_form">
+  <%= render "modal_header", title: "Add Variable" %>
   <%= render "form", env_variable: @env_variable %>
-<% end %>
+</turbo-frame>
