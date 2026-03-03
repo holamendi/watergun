@@ -28,35 +28,22 @@
     <section class="mb-6">
       <div class="text-xxs text-text-muted uppercase tracking-wider mb-2">Recent Deployments</div>
       <% if @deployments.any? %>
-        <div class="bg-elevated rounded border border-border overflow-hidden">
-          <table class="w-full text-xs">
-            <tbody class="divide-y divide-border">
-              <% @deployments.each do |deployment| %>
-                <%= render "projects/apps/deployments/deployment_row", deployment: deployment %>
-              <% end %>
-            </tbody>
-          </table>
+        <div class="resource-list">
+          <%= render partial: "projects/apps/deployments/deployment", collection: @deployments %>
         </div>
         <%= link_to "View all deployments", project_app_deployments_path(@project, @app), class: "text-xs text-accent hover:underline mt-2 inline-block" %>
       <% else %>
-        <div class="bg-surface rounded border border-border p-8 text-center">
-          <svg class="mx-auto h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-          </svg>
-          <h3 class="mt-3 text-sm font-medium text-text-primary">No deployments yet</h3>
-          <p class="mt-1 text-xs text-text-muted">Deploy your app to get started.</p>
+        <%= ui_empty_state(title: "No deployments yet", body: "Deploy your app to get started.") do %>
           <% if @app.github_repo.present? %>
-            <div class="mt-4">
-              <%= form_with url: project_app_deployments_path(@project, @app), data: { turbo_stream: true } do %>
-                <%= submit_button "Deploy now", size: :sm %>
-              <% end %>
-            </div>
+            <%= form_with url: project_app_deployments_path(@project, @app), data: { turbo_stream: true } do %>
+              <%= submit_button "Deploy now", size: :sm %>
+            <% end %>
           <% else %>
-            <div class="mt-4">
-              <%= link_to "Connect GitHub repo", new_app_github_repo_path(@app), class: "px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs rounded" %>
-            </div>
+            <%= ui_button "Connect GitHub repo",
+                href: new_project_app_github_repo_path(@project, @app),
+                size: :sm %>
           <% end %>
-        </div>
+        <% end %>
       <% end %>
     </section>
 

@@ -11,9 +11,11 @@
           </div>
           <p class="text-xs text-text-muted mt-1 ml-6">Account: <%= github_installation.login %></p>
         </div>
-        <%= button_to "Disconnect", github_installation_path(github_installation),
+        <%= ui_button "Disconnect",
+            href: github_installation_path(github_installation),
             method: :delete,
-            class: "btn btn-danger btn-sm" %>
+            variant: :danger,
+            size: :sm %>
       </div>
     <% else %>
       <div class="flex items-center justify-between gap-4">
