@@ -12,7 +12,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
       ServerActions::MountStorage.run_later!(@app.server, @storage_mount)
       render turbo_stream: [
         stream_toast("Storage mount added"),
-        storage_mounts_section_stream
+        stream_storage_mounts
       ]
     else
       render turbo_stream: turbo_stream.replace(
@@ -27,7 +27,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
     StorageMount::DestroyStorageMount.new(@storage_mount).destroy
     render turbo_stream: [
       stream_toast("Storage mount removed"),
-      storage_mounts_section_stream
+      stream_storage_mounts
     ]
   end
 
@@ -45,7 +45,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
     @app.storage_mounts.kept
   end
 
-  def storage_mounts_section_stream
+  def stream_storage_mounts
     turbo_stream.replace(
       "storage_mounts",
       partial: "projects/apps/storage_mounts/storage_mounts",

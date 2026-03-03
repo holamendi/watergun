@@ -16,7 +16,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h)
 
       render turbo_stream: [
-        env_variables_section_stream,
+        stream_env_variables,
         close_modal_stream,
         stream_toast("Environment variable created")
       ], status: :created
@@ -32,7 +32,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     if @env_variable.update(env_variable_params)
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
       render turbo_stream: [
-        env_variables_section_stream,
+        stream_env_variables,
         close_modal_stream,
         stream_toast("Environment variable updated successfully.")
       ]
@@ -45,7 +45,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     @env_variable.discard!
     ServerActions::UpdateEnv.run_later!(@app.server, @app, unset: [@env_variable.name])
     render turbo_stream: [
-      env_variables_section_stream,
+      stream_env_variables,
       stream_toast("Environment variable deleted successfully.")
     ]
   end
@@ -67,7 +67,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       .order(:name)
   end
 
-  def env_variables_section_stream
+  def stream_env_variables
     turbo_stream.replace(
       "env_variables_section",
       partial: "projects/apps/env_variables/env_variables",
