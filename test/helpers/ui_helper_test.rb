@@ -112,6 +112,15 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-ui-component="back-link"/, result)
   end
 
+  test "ui_modal_trigger renders standardized trigger contract" do
+    result = ui_modal_trigger("+ Add Domain", modal_id: "domain_modal")
+
+    assert_match(/<button/, result)
+    assert_match(/data-ui-component="modal-trigger"/, result)
+    assert_match(/data-dialog-trigger-target-value="domain_modal"/, result)
+    assert_match(/click-&gt;dialog-trigger#open|click->dialog-trigger#open/, result)
+  end
+
   test "badge generates span with correct classes and colors" do
     result = badge("Test Badge", color: :blue)
 

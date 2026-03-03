@@ -16,6 +16,9 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
       assert_response :success
       assert_select "h1", text: "Storage"
       assert_select "nav[aria-label='Settings navigation']"
+      assert_select "[data-ui-component='page-header']"
+      assert_select "button[data-ui-component='modal-trigger']"
+      assert_select "#storage_mounts"
     end
   end
 

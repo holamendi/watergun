@@ -2,7 +2,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
   before_action :set_storage_mount, only: :destroy
 
   def index
-    @storage_mounts = @app.storage_mounts.kept
+    @storage_mounts = storage_mounts_scope
   end
 
   def create
@@ -12,7 +12,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
       ServerActions::MountStorage.run_later!(@app.server, @storage_mount)
       render turbo_stream: [
         stream_toast("Storage mount added"),
-        turbo_stream.replace("storage_mounts", partial: "projects/apps/storage_mounts/storage_mounts", locals: {app: @app})
+        storage_mounts_section_stream
       ]
     else
       render turbo_stream: turbo_stream.replace(
@@ -27,7 +27,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
     StorageMount::DestroyStorageMount.new(@storage_mount).destroy
     render turbo_stream: [
       stream_toast("Storage mount removed"),
-      turbo_stream.remove(@storage_mount)
+      storage_mounts_section_stream
     ]
   end
 
@@ -39,5 +39,22 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
 
   def storage_mount_params
     params.require(:storage_mount).permit(:container_path)
+  end
+
+  def storage_mounts_scope
+    @app.storage_mounts.kept
+  end
+
+  def storage_mounts_section_stream
+    turbo_stream.replace(
+      "storage_mounts",
+      partial: "projects/apps/storage_mounts/storage_mounts",
+      locals: {
+        project: @project,
+        app: @app,
+        storage_mounts: storage_mounts_scope,
+        modal_id: helpers.dom_id(@app, :storage_mount_modal)
+      }
+    )
   end
 end

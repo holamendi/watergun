@@ -4,18 +4,15 @@
 
 <div class="page-shell py-6">
   <div class="mb-4">
-    <%= link_to server_actions_path, class: "btn btn-ghost btn-xs", style: "padding-left: 0;" do %>
-      &larr; All Activity
-    <% end %>
+    <%= ui_back_link "All Activity", server_actions_path %>
   </div>
 
-  <div class="page-header">
-    <div>
-      <h1 class="page-title font-mono"><%= @server_action.slug %></h1>
-      <div class="page-header-sub">#<%= @server_action.id %></div>
-    </div>
+  <%= ui_page_header(
+      title: content_tag(:span, @server_action.slug, class: "font-mono"),
+      subtitle: "##{@server_action.id}"
+    ) do %>
     <%= status_badge(@server_action.status) %>
-  </div>
+  <% end %>
 
   <% if @server_action.failure_message.present? %>
     <div class="bg-error-soft border border-error/30 rounded-xl p-4 mb-6">
@@ -77,7 +74,7 @@
   </div>
 
   <div class="section-label">Logs</div>
-  <div class="bg-base border border-border rounded-lg overflow-hidden">
+  <div class="log-panel">
     <% if @server_action.queued? || @server_action.running? %>
       <div class="p-8 text-center">
         <svg class="animate-spin mx-auto h-5 w-5 text-warning mb-2" fill="none" viewBox="0 0 24 24">
@@ -98,7 +95,7 @@
             </div>
             <% output_text = command["output"]&.map { |o| o["data"] }&.join %>
             <% if output_text.present? %>
-              <pre class="p-4 overflow-auto font-mono text-xs max-h-64 whitespace-pre-wrap text-text-secondary"><%= output_text %></pre>
+              <pre class="log-panel-content max-h-64 whitespace-pre-wrap"><%= output_text %></pre>
             <% else %>
               <div class="p-4 text-text-muted text-xs italic">No output</div>
             <% end %>

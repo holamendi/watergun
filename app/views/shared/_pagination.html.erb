@@ -8,7 +8,7 @@
           </svg>
         <% end %>
       <% else %>
-        <button class="join-item btn btn-sm btn-disabled">
+        <button type="button" class="join-item btn btn-sm btn-disabled">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
@@ -19,9 +19,9 @@
         <% if item.is_a?(Integer) %>
           <%= link_to item, pagy_url_for(pagy, item), class: "join-item btn btn-sm" %>
         <% elsif item.is_a?(String) %>
-          <button class="join-item btn btn-sm btn-active"><%= item %></button>
+          <button type="button" class="join-item btn btn-sm btn-active"><%= item %></button>
         <% elsif item == :gap %>
-          <button class="join-item btn btn-sm btn-disabled">...</button>
+          <button type="button" class="join-item btn btn-sm btn-disabled">...</button>
         <% end %>
       <% end %>
 
@@ -32,7 +32,7 @@
           </svg>
         <% end %>
       <% else %>
-        <button class="join-item btn btn-sm btn-disabled">
+        <button type="button" class="join-item btn btn-sm btn-disabled">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>

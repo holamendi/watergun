@@ -41,5 +41,8 @@ jobs:
           bundle exec rails db:create
           bundle exec rails db:schema:load
 
+      - name: Check UI consistency
+        run: script/check-ui-consistency
+
       - name: Run tests
         run: bundle exec rails test

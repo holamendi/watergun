@@ -61,6 +61,23 @@ module UiHelper
     end
   end
 
+  def ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, class: nil, data: {}, **options, &block)
+    css_class = binding.local_variable_get(:class)
+    trigger_data = normalize_ui_data(data, component: "modal-trigger")
+    trigger_data[:controller] = merge_data_tokens(trigger_data[:controller], "dialog-trigger")
+    trigger_data[:action] = merge_data_tokens(trigger_data[:action], "click->dialog-trigger#open")
+    trigger_data[:dialog_trigger_target_value] = modal_id
+
+    ui_button(text,
+      variant: variant,
+      size: size,
+      type: :button,
+      class: css_class,
+      data: trigger_data,
+      **options,
+      &block)
+  end
+
   def ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
     class: nil, data: {}, method: nil, disabled: false, turbo_submits_with: nil,
     **options, &block)
@@ -197,6 +214,10 @@ module UiHelper
     normalized = (data || {}).dup
     normalized[:ui_component] ||= component
     normalized
+  end
+
+  def merge_data_tokens(existing, value)
+    [existing, value].compact.flat_map { |entry| entry.to_s.split(/\s+/) }.reject(&:blank?).uniq.join(" ")
   end
 
   def normalize_ui_variant(variant)

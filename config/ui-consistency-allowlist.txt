@@ -1,0 +1,4 @@
+# Temporary allowlist for phased migration.
+# One glob path per line, relative to repository root.
+# Example:
+# app/views/legacy/**/*.erb

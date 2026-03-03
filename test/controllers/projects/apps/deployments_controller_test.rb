@@ -33,8 +33,9 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_response :success
       assert_select "##{dom_id(deployment, :info)}"
       assert_select "##{dom_id(deployment, :logs)}"
-      assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
+      assert_select "a[data-ui-component='back-link'][href='#{project_app_deployments_path(@project, @app)}']"
       assert_select "a[href='#{project_app_settings_path(@project, @app)}']"
+      assert_select ".log-panel"
       assert_select "body", /#{deployment.short_sha}/
       assert_select "body", /Duration/
     end

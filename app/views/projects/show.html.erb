@@ -8,7 +8,7 @@
     ) do %>
     <div class="flex items-center gap-2">
       <div class="action-dropdown">
-        <button class="btn btn-primary btn-sm" tabindex="0">+ New</button>
+        <button type="button" class="btn btn-primary btn-sm" tabindex="0">+ New</button>
         <div class="action-dropdown-menu">
           <div class="action-dropdown-label">Apps</div>
           <%= link_to "From GitHub repo", new_project_app_path(@project), class: "action-dropdown-item" %>

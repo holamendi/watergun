@@ -819,6 +819,19 @@
     @apply font-mono text-xs;
   }
 
+  /* Log panel */
+  .log-panel {
+    @apply bg-base border border-border rounded-lg overflow-hidden;
+  }
+
+  .log-panel-content {
+    @apply p-4 overflow-auto font-mono text-xs text-text-secondary;
+  }
+
+  .log-panel-content-relaxed {
+    line-height: 1.7;
+  }
+
   /* Badge dot */
   .badge-dot {
     @apply w-1.5 h-1.5 rounded-full bg-current;

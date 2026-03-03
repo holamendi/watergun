@@ -86,6 +86,15 @@ ui_back_link(text, path, **options)
 
 - Canonical compact back navigation link.
 
+### `ui_modal_trigger`
+
+```ruby
+ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &block)
+```
+
+- Standard modal-open trigger.
+- Uses Stimulus (`dialog-trigger`) instead of inline `onclick`.
+
 ## Shared Partials
 
 - `app/views/shared/ui/_page_header.html.erb`

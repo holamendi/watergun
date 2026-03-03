@@ -19,6 +19,9 @@ class ServerActionsControllerTest < ActionDispatch::IntegrationTest
       server_action = server_actions(:deploy_success)
       get server_action_url(server_action)
       assert_response :success
+      assert_select "a[data-ui-component='back-link'][href='#{server_actions_path}']"
+      assert_select "[data-ui-component='page-header']"
+      assert_select ".log-panel"
     end
 
     test "displays failed server action with failure message" do
