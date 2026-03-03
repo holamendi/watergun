@@ -2,6 +2,12 @@
 
 This document is the UI contract for Rails ERB screens in this repository.
 
+## Docs
+
+- `components.md`: component/helper API signatures and usage
+- `patterns.md`: canonical layout/pattern rules and allowed/forbidden examples
+- `migration-guide.md`: migration process and UI PR checklist
+
 ## Goals
 
 - Keep the current Watergun visual language.
