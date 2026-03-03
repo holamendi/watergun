@@ -1,0 +1,21 @@
+<%# locals: (project:, app:, env_variables:) -%>
+
+<div id="env_variables_section">
+  <% if env_variables.any? %>
+    <div class="card bg-elevated divide-y divide-border">
+      <div id="env_variables">
+        <%= render env_variables %>
+      </div>
+    </div>
+  <% else %>
+    <%= ui_empty_state(
+        title: "No environment variables",
+        body: "Add variables to configure your app."
+      ) do %>
+      <%= ui_button "+ Add Variable",
+          href: new_project_app_env_variable_path(project, app),
+          size: :sm,
+          data: { turbo_frame: "env_variable_form" } %>
+    <% end %>
+  <% end %>
+</div>

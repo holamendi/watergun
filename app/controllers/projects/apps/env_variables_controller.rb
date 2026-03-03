@@ -6,10 +6,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   end
 
   def index
-    @env_variables = @app.env_variables.kept
-      .editable
-      .includes(service_link: :service)
-      .order(:name)
+    @env_variables = env_variables_scope
   end
 
   def create
@@ -19,11 +16,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h)
 
       render turbo_stream: [
-        turbo_stream.prepend(
-          "env_variables",
-          partial: "projects/apps/env_variables/env_variable",
-          locals: {env_variable: @env_variable}
-        ),
+        stream_env_variables,
         close_modal_stream,
         stream_toast("Environment variable created")
       ], status: :created
@@ -39,7 +32,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     if @env_variable.update(env_variable_params)
       ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
       render turbo_stream: [
-        turbo_stream_env_variable,
+        stream_env_variables,
         close_modal_stream,
         stream_toast("Environment variable updated successfully.")
       ]
@@ -52,7 +45,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     @env_variable.discard!
     ServerActions::UpdateEnv.run_later!(@app.server, @app, unset: [@env_variable.name])
     render turbo_stream: [
-      turbo_stream.remove(@env_variable),
+      stream_env_variables,
       stream_toast("Environment variable deleted successfully.")
     ]
   end
@@ -67,11 +60,22 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
     params.require(:env_variable).permit(:name, :value)
   end
 
-  def turbo_stream_env_variable
+  def env_variables_scope
+    @app.env_variables.kept
+      .editable
+      .includes(service_link: :service)
+      .order(:name)
+  end
+
+  def stream_env_variables
     turbo_stream.replace(
-      @env_variable,
-      partial: "projects/apps/env_variables/env_variable",
-      locals: {env_variable: @env_variable}
+      "env_variables_section",
+      partial: "projects/apps/env_variables/env_variables",
+      locals: {
+        project: @project,
+        app: @app,
+        env_variables: env_variables_scope
+      }
     )
   end
 

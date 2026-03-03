@@ -1,16 +1,15 @@
 <%= turbo_stream_from @app %>
 <%= turbo_stream_from @app, :storage_mounts %>
 
+<% modal_id = dom_id(@app, :storage_mount_modal) %>
+
 <%= render "projects/apps/settings/layout", app: @app, active_section: :storage do %>
-  <div class="page-header">
-    <div>
-      <h1 style="font-size: 16px; font-weight: 600;">Storage</h1>
-      <div class="page-header-sub"><%= @storage_mounts.size %> <%= "mount".pluralize(@storage_mounts.size) %> configured</div>
-    </div>
-    <button onclick="storage_mount_modal.showModal()" class="btn btn-primary btn-sm">
-      + Add Mount
-    </button>
-  </div>
+  <%= ui_page_header(
+      title: "Storage",
+      subtitle: "#{@storage_mounts.size} #{'mount'.pluralize(@storage_mounts.size)} configured"
+    ) do %>
+    <%= ui_modal_trigger "+ Add Mount", modal_id: modal_id, size: :sm %>
+  <% end %>
 
   <div class="rounded border border-border bg-surface p-3 mb-4">
     <p class="text-sm text-text-secondary">
@@ -18,23 +17,13 @@
     </p>
   </div>
 
-  <% if @storage_mounts.any? %>
-    <div class="card bg-elevated divide-y divide-border">
-      <div id="storage_mounts">
-        <%= render @storage_mounts %>
-      </div>
-    </div>
-  <% else %>
-    <div class="bg-surface rounded border border-border p-12 text-center">
-      <svg class="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
-      </svg>
-      <h3 class="mt-4 text-lg font-medium">No storage mounts configured</h3>
-      <p class="mt-1 text-sm text-text-secondary">Add a persistent storage mount to preserve data across deployments.</p>
-    </div>
-  <% end %>
+  <%= render "storage_mounts",
+      project: @project,
+      app: @app,
+      storage_mounts: @storage_mounts,
+      modal_id: modal_id %>
 <% end %>
 
-<%= render "shared/modal", id: "storage_mount_modal", title: "Add Storage Mount" do %>
+<%= render "shared/modal", id: modal_id, title: "Add Storage Mount" do %>
   <%= render "projects/apps/storage_mounts/form", storage_mount: @app.storage_mounts.new %>
 <% end %>

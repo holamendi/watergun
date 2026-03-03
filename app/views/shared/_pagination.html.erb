@@ -2,41 +2,41 @@
   <div class="flex justify-center mt-6">
     <div class="join">
       <% if pagy.prev %>
-        <%= link_to pagy_url_for(pagy, pagy.prev), class: "join-item btn btn-sm" do %>
+        <%= ui_icon_button(label: "Previous page", href: pagy_url_for(pagy, pagy.prev), variant: :secondary, size: :sm, class: "join-item") do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         <% end %>
       <% else %>
-        <button class="join-item btn btn-sm btn-disabled">
+        <%= ui_icon_button(label: "Previous page", variant: :secondary, size: :sm, class: "join-item btn-disabled", disabled: true) do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-        </button>
+        <% end %>
       <% end %>
 
       <% pagy.series.each do |item| %>
         <% if item.is_a?(Integer) %>
-          <%= link_to item, pagy_url_for(pagy, item), class: "join-item btn btn-sm" %>
+          <%= ui_button item, href: pagy_url_for(pagy, item), variant: :secondary, size: :sm, class: "join-item" %>
         <% elsif item.is_a?(String) %>
-          <button class="join-item btn btn-sm btn-active"><%= item %></button>
+          <%= ui_button item, variant: :secondary, size: :sm, class: "join-item btn-active", disabled: true %>
         <% elsif item == :gap %>
-          <button class="join-item btn btn-sm btn-disabled">...</button>
+          <%= ui_button "...", variant: :secondary, size: :sm, class: "join-item btn-disabled", disabled: true %>
         <% end %>
       <% end %>
 
       <% if pagy.next %>
-        <%= link_to pagy_url_for(pagy, pagy.next), class: "join-item btn btn-sm" do %>
+        <%= ui_icon_button(label: "Next page", href: pagy_url_for(pagy, pagy.next), variant: :secondary, size: :sm, class: "join-item") do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         <% end %>
       <% else %>
-        <button class="join-item btn btn-sm btn-disabled">
+        <%= ui_icon_button(label: "Next page", variant: :secondary, size: :sm, class: "join-item btn-disabled", disabled: true) do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
-        </button>
+        <% end %>
       <% end %>
     </div>
   </div>

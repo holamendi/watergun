@@ -1,0 +1,14 @@
+<div class="page-header" data-ui-component="page-header">
+  <div class="min-w-0">
+    <h1 class="page-title"><%= title %></h1>
+    <% if subtitle.present? %>
+      <div class="page-header-sub"><%= subtitle %></div>
+    <% end %>
+  </div>
+
+  <% if actions.present? %>
+    <div class="flex items-center gap-2 shrink-0">
+      <%= actions %>
+    </div>
+  <% end %>
+</div>

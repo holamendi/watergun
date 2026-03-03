@@ -1,4 +1,19 @@
 module UiHelper
+  UI_BUTTON_VARIANTS = {
+    primary: "btn-primary",
+    secondary: "btn-secondary",
+    ghost: "btn-ghost",
+    danger: "btn-danger",
+    destructive: "btn-danger"
+  }.freeze
+
+  UI_BUTTON_SIZES = {
+    xs: "btn-xs",
+    sm: "btn-sm",
+    md: nil,
+    default: nil
+  }.freeze
+
   def container(&block)
     content_tag :div, class: "page-shell", &block
   end
@@ -7,10 +22,111 @@ module UiHelper
     content_tag :div, class: "w-full px-4 mx-auto sm:px-6 lg:px-8", &block
   end
 
+  # Legacy compatibility wrapper.
   def page_header(title, actions = nil, &block)
     actions = capture(&block) if block_given?
+    ui_page_header(title: title, actions: actions)
+  end
 
-    render "shared/page_header", title: title, actions: actions.presence || ""
+  def ui_page_header(title:, subtitle: nil, actions: nil, &block)
+    actions = capture(&block) if block_given?
+
+    render "shared/ui/page_header", title: title, subtitle: subtitle, actions: actions.presence
+  end
+
+  def ui_empty_state(title:, body: nil, icon: nil, actions: nil, &block)
+    actions = capture(&block) if block_given?
+
+    render "shared/ui/empty_state", title: title, body: body, icon: icon, actions: actions.presence
+  end
+
+  def ui_danger_zone(title:, description:, actions: nil, &block)
+    actions = capture(&block) if block_given?
+
+    render "shared/ui/danger_zone", title: title, description: description, actions: actions.presence
+  end
+
+  def ui_back_link(text, path, icon: "\u2190", class: nil, **options)
+    css_class = binding.local_variable_get(:class)
+    link_data = normalize_ui_data(options.delete(:data), component: "back-link")
+
+    link_to path,
+      class: class_names("btn btn-ghost btn-xs rounded-md font-normal pl-0 pr-2", css_class),
+      data: link_data,
+      **options do
+      safe_join([
+        tag.span(icon, class: "mr-1", "aria-hidden": true),
+        tag.span(text)
+      ])
+    end
+  end
+
+  def ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, class: nil, data: {}, **options, &block)
+    css_class = binding.local_variable_get(:class)
+    trigger_data = normalize_ui_data(data, component: "modal-trigger")
+    trigger_data[:controller] = merge_data_tokens(trigger_data[:controller], "dialog-trigger")
+    trigger_data[:action] = merge_data_tokens(trigger_data[:action], "click->dialog-trigger#open")
+    trigger_data[:dialog_trigger_target_value] = modal_id
+
+    ui_button(text,
+      variant: variant,
+      size: size,
+      type: :button,
+      class: css_class,
+      data: trigger_data,
+      **options,
+      &block)
+  end
+
+  def ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
+    class: nil, data: {}, method: nil, disabled: false, turbo_submits_with: nil,
+    **options, &block)
+    css_class = binding.local_variable_get(:class)
+    content = block_given? ? capture(&block) : text
+    classes = class_names("btn", ui_button_size_class(size), ui_button_variant_class(variant), css_class)
+
+    if href.present?
+      link_data = normalize_ui_data(data, component: "button")
+      link_data[:turbo_method] = method if method.present?
+      link_options = options.merge(class: classes, data: link_data)
+
+      link_to(content, href, **link_options)
+    else
+      button_data = normalize_ui_data(data, component: "button")
+      button_data[:turbo_submits_with] = turbo_submits_with if turbo_submits_with.present?
+
+      button_tag content,
+        type: type,
+        class: classes,
+        data: button_data,
+        disabled: disabled,
+        **options
+    end
+  end
+
+  def ui_icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm, type: :button,
+    class: nil, data: {}, **options, &block)
+    css_class = binding.local_variable_get(:class)
+    icon_content = block_given? ? capture(&block) : icon
+    icon_content ||= "+"
+
+    aria_options = (options.delete(:aria) || {}).dup
+    aria_options[:label] ||= label
+
+    ui_button(nil,
+      href: href,
+      variant: variant,
+      size: size,
+      type: type,
+      class: class_names("btn-square", css_class),
+      data: normalize_ui_data(data, component: "icon-button"),
+      aria: aria_options,
+      **options) do
+      content_tag(:span,
+        icon_content,
+        class: class_names("inline-flex items-center justify-center", ui_icon_size_class(size)),
+        "aria-hidden": true)
+    end
   end
 
   def badge(text, color: :neutral)
@@ -48,7 +164,7 @@ module UiHelper
       2 => "w-2 h-2",
       3 => "w-3 h-3",
       4 => "w-4 h-4",
-      :md => "w-2.5 h-2.5"
+      md: "w-2.5 h-2.5"
     }
 
     color_class = case status.to_s
@@ -80,43 +196,68 @@ module UiHelper
     tag.span(status.to_s.titleize, class: "px-2 py-0.5 text-xxs font-medium rounded #{colors}")
   end
 
-  def submit_button(text, variant: :primary, size: :default)
-    base_classes = "inline-flex items-center justify-center gap-2 font-medium rounded transition-colors"
+  def submit_button(text, variant: :primary, size: :md, **options)
+    ui_size = normalize_ui_size(size)
+    turbo_submits_with = options.delete(:turbo_submits_with) || turbo_submit_content(text, ui_size)
 
-    size_classes = case size
-    when :sm
-      "px-3 py-1.5 text-xs"
-    when :xs
-      "px-2.5 py-1 text-xxs"
-    else
-      "px-4 py-2 text-xs"
-    end
-
-    variant_classes = case variant
-    when :primary
-      "bg-gradient-to-r from-accent to-accent-hover text-white shadow shadow-accent/20"
-    when :secondary
-      "bg-elevated hover:bg-border text-text-primary border border-border"
-    when :destructive
-      "bg-error/20 text-error hover:bg-error/30"
-    end
-
-    disabled_classes = "disabled:opacity-50 disabled:cursor-not-allowed"
-
-    button_tag text,
-      class: "#{base_classes} #{size_classes} #{variant_classes} #{disabled_classes}",
-      data: {
-        turbo_submits_with: tag.span(class: "inline-flex items-center gap-2") do
-          concat spinner_icon(size)
-          concat text
-        end
-      }
+    ui_button(text,
+      variant: variant,
+      size: ui_size,
+      type: :submit,
+      turbo_submits_with: turbo_submits_with,
+      **options)
   end
 
   private
 
-  def spinner_icon(size = :default)
-    size_class = (size == :xs) ? "w-2.5 h-2.5" : "w-3 h-3"
+  def normalize_ui_data(data, component:)
+    normalized = (data || {}).dup
+    normalized[:ui_component] ||= component
+    normalized
+  end
+
+  def merge_data_tokens(existing, value)
+    [existing, value].compact.flat_map { |entry| entry.to_s.split(/\s+/) }.reject(&:blank?).uniq.join(" ")
+  end
+
+  def normalize_ui_variant(variant)
+    value = variant.to_s.downcase.to_sym
+    return :danger if value == :destructive
+
+    value
+  end
+
+  def normalize_ui_size(size)
+    value = size.to_s.downcase.to_sym
+    value == :default ? :md : value
+  end
+
+  def ui_button_variant_class(variant)
+    UI_BUTTON_VARIANTS.fetch(normalize_ui_variant(variant), UI_BUTTON_VARIANTS[:secondary])
+  end
+
+  def ui_button_size_class(size)
+    UI_BUTTON_SIZES.fetch(normalize_ui_size(size), UI_BUTTON_SIZES[:md])
+  end
+
+  def ui_icon_size_class(size)
+    case normalize_ui_size(size)
+    when :xs then "w-3 h-3"
+    when :md then "w-4 h-4"
+    else "w-3.5 h-3.5"
+    end
+  end
+
+  def turbo_submit_content(text, size)
+    tag.span(class: "inline-flex items-center gap-2") do
+      concat spinner_icon(size)
+      concat text
+    end
+  end
+
+  def spinner_icon(size = :md)
+    size_class = (normalize_ui_size(size) == :xs) ? "w-2.5 h-2.5" : "w-3 h-3"
+
     tag.svg(class: "#{size_class} animate-spin", viewBox: "0 0 24 24", fill: "none") do
       concat tag.circle(cx: 12, cy: 12, r: 10, stroke: "currentColor", "stroke-width": 4, class: "opacity-25")
       concat tag.path(fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z", class: "opacity-75")

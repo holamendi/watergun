@@ -29,6 +29,14 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_select "a", text: /Arm Project/
       assert_select "a", text: /Default Project/, count: 0
     end
+
+    test "renders ui page header and primary action" do
+      get projects_path
+
+      assert_response :success
+      assert_select "[data-ui-component='page-header']"
+      assert_select "a[data-ui-component='button'][href='#{new_project_path}']"
+    end
   end
 
   describe "#show" do
@@ -74,6 +82,22 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "a[href='#{new_project_service_path(@project)}']"
+    end
+
+    test "renders ui page header shell" do
+      get project_path(@project)
+
+      assert_response :success
+      assert_select "[data-ui-component='page-header']"
+    end
+
+    test "renders empty states with shared component for empty project" do
+      empty_project = @account.projects.create!(name: "Empty Project", server: @server)
+
+      get project_path(empty_project)
+
+      assert_response :success
+      assert_select "[data-ui-component='empty-state']", count: 2
     end
   end
 

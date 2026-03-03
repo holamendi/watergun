@@ -2,7 +2,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
   before_action :set_domain, only: %i[destroy make_default]
 
   def index
-    @domains = @app.domains.kept
+    @domains = domains_scope
   end
 
   def new
@@ -16,7 +16,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
       ServerActions::CreateDomain.run_later!(@app.server, @domain)
       render turbo_stream: [
         stream_toast("Domain added"),
-        turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app})
+        stream_domains
       ]
     else
       render turbo_stream: turbo_stream.replace(
@@ -30,7 +30,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
   def make_default
     @domain.make_default!
     render turbo_stream: [
-      turbo_stream.replace("domains", partial: "projects/apps/domains/domains", locals: {app: @app}),
+      stream_domains,
       stream_toast("Domain set as default")
     ]
   end
@@ -39,7 +39,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
     Domain::DestroyDomain.new(@domain).destroy
     render turbo_stream: [
       stream_toast("Domain deleted"),
-      turbo_stream.remove(@domain)
+      stream_domains
     ]
   end
 
@@ -51,5 +51,22 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
 
   def domain_params
     params.require(:domain).permit(:hostname)
+  end
+
+  def domains_scope
+    @app.domains.kept
+  end
+
+  def stream_domains
+    turbo_stream.replace(
+      "domains",
+      partial: "projects/apps/domains/domains",
+      locals: {
+        project: @project,
+        app: @app,
+        domains: domains_scope,
+        modal_id: helpers.dom_id(@app, :domain_modal)
+      }
+    )
   end
 end

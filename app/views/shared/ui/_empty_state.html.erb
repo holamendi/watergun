@@ -1,0 +1,19 @@
+<div class="bg-surface rounded border border-border p-12 text-center" data-ui-component="empty-state">
+  <% if icon.present? %>
+    <div class="mx-auto h-12 w-12 text-text-muted">
+      <%= icon %>
+    </div>
+  <% end %>
+
+  <h3 class="<%= icon.present? ? 'mt-4' : '' %> text-lg font-medium"><%= title %></h3>
+
+  <% if body.present? %>
+    <p class="mt-1 text-sm text-text-secondary"><%= body %></p>
+  <% end %>
+
+  <% if actions.present? %>
+    <div class="mt-4 flex items-center justify-center gap-2">
+      <%= actions %>
+    </div>
+  <% end %>
+</div>

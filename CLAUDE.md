@@ -137,8 +137,10 @@ Bearer token auth via `ApiToken`. Endpoints: apps (list/show), deployments (list
 - Vite with Stimulus.js controllers in `app/javascript/controllers/`
 - Turbo for real-time updates and broadcasts (app/service status, deployments, logs, toasts)
 - Tailwind CSS 4 with custom design system
-  - **Design reference**: `docs/design-system.html` (open in browser for visual examples)
-  - **Quick tokens**: `docs/design-tokens.md` (colors, patterns, component snippets)
+  - **Design reference**: `docs/design-system/README.md`
+  - **Components**: `docs/design-system/components.md`
+  - **Patterns**: `docs/design-system/patterns.md`
+  - **Migration guide**: `docs/design-system/migration-guide.md`
   - Custom dark theme with colors: `base`, `surface`, `elevated`, `accent`, `success`, `warning`, `error`
   - Text colors: `text-primary`, `text-secondary`, `text-muted`
   - Use semantic color names for consistency

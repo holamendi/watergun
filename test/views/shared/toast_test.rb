@@ -9,6 +9,7 @@ class ToastPartialTest < ActionView::TestCase
     assert_select ".toast-progress"
     assert_select "p", text: "App created"
     assert_select ".toast-link", count: 0
+    assert_select "button[data-ui-component='icon-button'][data-action='click->notification#hide']"
   end
 
   test "renders notice toast" do

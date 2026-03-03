@@ -19,8 +19,19 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       get project_app_deployments_path(@project, @app)
 
       assert_response :success
+      assert_select "[data-ui-component='page-header']"
       assert_select "a[href='#{project_app_deployment_path(@project, @app, deployment)}']"
       assert_select "form[action='#{project_app_deployments_path(@project, @app)}'] button", text: "Deploy Now"
+    end
+
+    test "renders connect repository empty state when app has no github repo" do
+      app = apps(:domain_test_app)
+
+      get project_app_deployments_path(app.project, app)
+
+      assert_response :success
+      assert_select "[data-ui-component='empty-state']"
+      assert_select "a[data-ui-component='button'][href='#{new_project_app_github_repo_path(app.project, app)}']", text: "Connect Repository"
     end
   end
 
@@ -33,8 +44,9 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_response :success
       assert_select "##{dom_id(deployment, :info)}"
       assert_select "##{dom_id(deployment, :logs)}"
-      assert_select "a[href='#{project_app_deployments_path(@project, @app)}']"
+      assert_select "a[data-ui-component='back-link'][href='#{project_app_deployments_path(@project, @app)}']"
       assert_select "a[href='#{project_app_settings_path(@project, @app)}']"
+      assert_select ".log-panel"
       assert_select "body", /#{deployment.short_sha}/
       assert_select "body", /Duration/
     end

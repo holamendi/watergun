@@ -4,35 +4,32 @@
 
 <div class="page-shell py-6">
   <% if @app.github_repo.present? %>
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Deployments</h1>
-        <div class="page-header-sub"><%= @deployments.size %> total <%= "deployment".pluralize(@deployments.size) %></div>
-      </div>
+    <%= ui_page_header(
+        title: "Deployments",
+        subtitle: "#{@deployments.size} total #{'deployment'.pluralize(@deployments.size)}"
+      ) do %>
       <% unless @app.temporary_status? %>
         <%= form_with url: project_app_deployments_path(@app.project, @app), data: { turbo_stream: true } do %>
           <%= submit_button "Deploy Now", size: :sm %>
         <% end %>
       <% end %>
-    </div>
+    <% end %>
 
     <% if @deployments.any? %>
       <div id="deployments" class="resource-list">
         <%= render @deployments %>
       </div>
     <% else %>
-      <div class="bg-surface rounded-lg border border-border p-8 text-center">
-        <h3 class="text-sm font-medium text-text-primary">No deployments yet</h3>
-        <p class="mt-1 text-xs text-text-muted">Click Deploy Now to get started.</p>
-      </div>
+      <%= ui_empty_state(title: "No deployments yet", body: "Click Deploy Now to get started.") %>
     <% end %>
   <% else %>
-    <div class="bg-surface rounded-lg border border-border p-8 text-center">
-      <h3 class="text-sm font-medium text-text-primary">Connect a GitHub repository</h3>
-      <p class="mt-1 text-xs text-text-muted">Link a repository to enable deployments.</p>
-      <div class="mt-4">
-        <%= link_to "Connect Repository", new_app_github_repo_path(@app), class: "btn btn-primary btn-sm" %>
-      </div>
-    </div>
+    <%= ui_empty_state(
+        title: "Connect a GitHub repository",
+        body: "Link a repository to enable deployments."
+      ) do %>
+      <%= ui_button "Connect Repository",
+          href: new_project_app_github_repo_path(@project, @app),
+          size: :sm %>
+    <% end %>
   <% end %>
 </div>

@@ -1,16 +1,16 @@
 <div class="w-full">
   <div class="flex justify-start">
-    <%= link_to "Create New App", new_app_path, class: "btn link btn-ghost btn-sm rounded-md font-normal text-sm" %>
+    <%= link_to "Create New App", new_project_app_path(@project), class: "btn btn-ghost btn-sm rounded-md font-normal text-sm" %>
   </div>
 </div>
 <div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-3">
   <% @apps.each do |app| %>
-    <%= link_to app do %>
-      <div class="flex h-full rounded-md shadow-lg hover:shadow-xl card bg-base-200">
+    <%= link_to project_app_deployments_path(@project, app) do %>
+      <div class="flex h-full rounded-md shadow-lg hover:shadow-xl card bg-elevated">
         <div class="flex-grow card-body">
           <h2 class="text-lg font-bold card-title"><%= app.name %></h2>
           <% if app.github_repo.present? %>
-            <span class="text-xs text-neutral-500"><%= app.github_repo.repo %></span>
+            <span class="text-xs text-text-muted"><%= app.github_repo.repo %></span>
           <% end %>
         </div>
       </div>

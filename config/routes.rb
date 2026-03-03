@@ -52,7 +52,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :services do
+      resources :services, except: :index do
         scope module: :services do
           resources :restarts, only: :create
           concerns :log_streamable

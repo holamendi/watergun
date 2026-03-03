@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+ALLOWLIST_FILE="config/ui-consistency-allowlist.txt"
+declare -a EXCLUDE_ARGS=()
+
+if [[ -f "$ALLOWLIST_FILE" ]]; then
+  while IFS= read -r raw_line; do
+    line="${raw_line%%#*}"
+    line="$(echo "$line" | xargs)"
+    [[ -z "$line" ]] && continue
+    EXCLUDE_ARGS+=("--glob" "!${line}")
+  done < "$ALLOWLIST_FILE"
+fi
+
+failures=0
+
+run_required_check() {
+  local label="$1"
+  local regex="$2"
+  local pcre="${3:-false}"
+
+  local -a cmd=(rg -n --glob "*.erb")
+  if (( ${#EXCLUDE_ARGS[@]} > 0 )); then
+    cmd+=("${EXCLUDE_ARGS[@]}")
+  fi
+  if [[ "$pcre" == "true" ]]; then
+    cmd+=(-P)
+  fi
+  cmd+=("$regex" app/views)
+
+  local output
+  if output=$("${cmd[@]}"); then
+    failures=$((failures + 1))
+    echo "[FAIL] $label"
+    echo "$output"
+    echo
+  fi
+}
+
+run_optional_check() {
+  local label="$1"
+  local regex="$2"
+
+  local -a cmd=(rg -n --glob "*.erb")
+  if (( ${#EXCLUDE_ARGS[@]} > 0 )); then
+    cmd+=("${EXCLUDE_ARGS[@]}")
+  fi
+  cmd+=("$regex" app/views)
+
+  local output
+  if output=$("${cmd[@]}"); then
+    echo "[WARN] $label"
+    echo "$output"
+    echo
+  fi
+}
+
+run_required_check "Inline style attributes are not allowed" 'style="'
+run_required_check "Inline onclick handlers are not allowed" 'onclick='
+run_required_check "Raw <button> elements must include an explicit type" '<button(?![^>]*\btype=)' true
+
+# Keep these as non-blocking while migration is in progress.
+run_optional_check "Ad hoc accent gradient button bundles should be phased out" 'from-accent to-accent-hover|from-accent-hover to-accent'
+run_optional_check "Hardcoded destructive red bundles should be phased out" 'text-red-[0-9]+|bg-red-[0-9]+|border-red-[0-9]+|hover:bg-red-[0-9]+|hover:text-red-[0-9]+'
+run_optional_check "Legacy alias classes should be phased out" 'text-base-content|bg-base-200|divide-base-300|text-neutral-500|btn link'
+
+if (( failures > 0 )); then
+  echo "UI consistency checks failed (${failures} issue group(s))."
+  exit 1
+fi
+
+echo "UI consistency checks passed."

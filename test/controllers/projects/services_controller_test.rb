@@ -16,6 +16,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "title", /#{Regexp.escape(@service.name)}/
+      assert_select "[data-ui-component='page-header']"
     end
 
     test "renders the service type" do
@@ -23,6 +24,7 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "body", /#{@service.service_type.to_s.titleize}/
+      assert_select "[data-ui-component='empty-state']"
     end
 
     test "renders navigation tabs" do
@@ -56,6 +58,8 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "input[name='service[name]'][value='#{@service.name}']"
+      assert_select "[data-ui-component='danger-zone']"
+      assert_select "a[data-ui-component='button'][data-turbo-method='delete'][href='#{project_service_path(@project, @service)}']"
     end
   end
 

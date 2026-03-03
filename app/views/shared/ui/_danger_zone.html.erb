@@ -1,0 +1,10 @@
+<section class="danger-zone" data-ui-component="danger-zone">
+  <div class="danger-zone-header"><%= title %></div>
+  <div class="danger-zone-desc"><%= description %></div>
+
+  <% if actions.present? %>
+    <div class="flex items-center gap-2">
+      <%= actions %>
+    </div>
+  <% end %>
+</section>

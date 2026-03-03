@@ -1,32 +1,16 @@
 <%= render "projects/apps/settings/layout", app: @app, active_section: :variables do %>
   <div>
-    <div class="page-header">
-      <div>
-        <h1 style="font-size: 16px; font-weight: 600;">Environment Variables</h1>
-        <div class="page-header-sub"><%= @env_variables.size %> <%= "variable".pluralize(@env_variables.size) %> configured</div>
-      </div>
-      <%= link_to new_project_app_env_variable_path(@project, @app),
-          class: "btn btn-primary btn-sm",
-          data: { turbo_frame: "env_variable_form" } do %>
-        + Add Variable
-      <% end %>
-    </div>
-
-    <% if @env_variables.any? %>
-      <div class="card bg-elevated divide-y divide-border">
-        <div id="env_variables">
-          <%= render @env_variables %>
-        </div>
-      </div>
-    <% else %>
-      <div class="bg-surface rounded border border-border p-12 text-center">
-        <svg class="mx-auto h-12 w-12 text-text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
-        </svg>
-        <h3 class="mt-4 text-lg font-medium">No environment variables</h3>
-        <p class="mt-1 text-sm text-text-secondary">Add variables to configure your app.</p>
-      </div>
+    <%= ui_page_header(
+        title: "Environment Variables",
+        subtitle: "#{@env_variables.size} #{'variable'.pluralize(@env_variables.size)} configured"
+      ) do %>
+      <%= ui_button "+ Add Variable",
+          href: new_project_app_env_variable_path(@project, @app),
+          size: :sm,
+          data: { turbo_frame: "env_variable_form" } %>
     <% end %>
+
+    <%= render "env_variables", project: @project, app: @app, env_variables: @env_variables %>
   </div>
 <% end %>
 
