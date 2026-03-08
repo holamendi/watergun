@@ -46,16 +46,21 @@ module UiHelper
     render "shared/ui/danger_zone", title: title, description: description, actions: actions.presence
   end
 
-  def ui_back_link(text, path, icon: "\u2190", class: nil, **options)
+  def ui_back_link(text, path, icon: nil, class: nil, **options)
     css_class = binding.local_variable_get(:class)
     link_data = normalize_ui_data(options.delete(:data), component: "back-link")
+    default_icon = tag.svg(
+      tag.path("stroke-linecap": "round", "stroke-linejoin": "round", d: "M15.75 19.5 8.25 12l7.5-7.5"),
+      class: "w-3.5 h-3.5", fill: "none", viewBox: "0 0 24 24", "stroke-width": "2", stroke: "currentColor"
+    )
+    icon_content = icon || default_icon
 
     link_to path,
-      class: class_names("btn btn-ghost btn-xs rounded-md font-normal pl-0 pr-2", css_class),
+      class: class_names("btn btn-ghost btn-xs rounded-md font-normal pl-0.5 pr-2", css_class),
       data: link_data,
       **options do
       safe_join([
-        tag.span(icon, class: "mr-1", "aria-hidden": true),
+        tag.span(icon_content, class: "inline-flex items-center", "aria-hidden": true),
         tag.span(text)
       ])
     end
@@ -164,7 +169,7 @@ module UiHelper
       2 => "w-2 h-2",
       3 => "w-3 h-3",
       4 => "w-4 h-4",
-      md: "w-2.5 h-2.5"
+      :md => "w-2.5 h-2.5"
     }
 
     color_class = case status.to_s
@@ -229,7 +234,7 @@ module UiHelper
 
   def normalize_ui_size(size)
     value = size.to_s.downcase.to_sym
-    value == :default ? :md : value
+    (value == :default) ? :md : value
   end
 
   def ui_button_variant_class(variant)

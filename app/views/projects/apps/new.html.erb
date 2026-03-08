@@ -36,7 +36,7 @@
             </label>
 
             <div class="form-card-footer -mx-5 -mb-5 mt-5">
-              <%= link_to "Cancel", project_path(@project), class: "btn btn-sm" %>
+              <%= ui_button "Cancel", href: project_path(@project), variant: :secondary, size: :sm %>
               <%= submit_button "Create App" %>
             </div>
           <% end %>
