@@ -2,11 +2,6 @@ class RunServerActionJob < ApplicationJob
   limits_concurrency to: 1, key: ->(server_action) { server_action.concurrency_key }, duration: 30.minutes
 
   def perform(server_action)
-    if server_action.preceding_action&.failure?
-      server_action.cancelled!
-      return server_action
-    end
-
     server_action.running!
 
     # Set up periodic log persistence if configured

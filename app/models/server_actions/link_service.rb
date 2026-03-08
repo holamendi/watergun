@@ -26,6 +26,8 @@ class ServerActions::LinkService < ServerAction
     service
   end
 
+  private
+
   def run
     link_dokku_service!
     schedule_pull_env!
@@ -35,8 +37,6 @@ class ServerActions::LinkService < ServerAction
   else
     service_link.active!
   end
-
-  private
 
   def link_dokku_service!
     ssh.execute!(Dokku::Services::LinkCommand.new(plugin: service_type, service: dokku_service_id, app: dokku_app_id, env_name:))
