@@ -21,15 +21,15 @@
   --color-text-muted: #606070;
 
   /* Accent colors */
-  --color-accent: #f43f5e;
-  --color-accent-hover: #fb7185;
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
   --color-success: #00cec9;
   --color-success-soft: rgba(0, 206, 201, 0.125);
   --color-warning: #fdcb6e;
   --color-warning-soft: rgba(253, 203, 110, 0.125);
   --color-error: #ff7675;
   --color-error-soft: rgba(255, 118, 117, 0.125);
-  --color-pink: #fd79a8;
+  --color-pink: #a5b4fc;
   --color-cyan: #00b894;
 
   /* Typography */
@@ -41,9 +41,9 @@
   --text-xxs--line-height: 1rem;
 
   /* Border radius */
-  --radius-DEFAULT: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 10px;
+  --radius-DEFAULT: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
 }
 
 @layer base {
@@ -73,7 +73,7 @@
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-accent to-accent-hover text-white border-transparent shadow shadow-accent/20 hover:from-accent-hover hover:to-accent;
+    @apply bg-accent text-white border-transparent shadow shadow-accent/20 hover:bg-accent-hover;
   }
 
   .btn-ghost {
@@ -229,7 +229,7 @@
   }
 
   .toast-notification.toast-info {
-    background: rgba(244, 63, 94, 0.08);
+    background: rgba(99, 102, 241, 0.08);
     @apply border border-accent/20;
   }
 
@@ -763,7 +763,7 @@
   }
 
   .activity-icon.service {
-    background: rgba(244, 63, 94, 0.1);
+    background: rgba(99, 102, 241, 0.1);
     @apply text-accent;
   }
 

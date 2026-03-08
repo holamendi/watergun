@@ -3,12 +3,7 @@
 <div class="page-shell py-6">
   <div class="max-w-md mx-auto">
     <div class="mb-4">
-      <%= link_to project_path(@project), class: "text-xs text-text-muted hover:text-accent inline-flex items-center gap-1" do %>
-        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-        </svg>
-        <%= @project.name %>
-      <% end %>
+      <%= ui_back_link @project.name, project_path(@project) %>
     </div>
 
     <div class="form-card">
