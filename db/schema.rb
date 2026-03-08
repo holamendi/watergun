@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_20_194722) do
+ActiveRecord::Schema[8.2].define(version: 2026_03_08_104344) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -283,7 +283,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_20_194722) do
     t.string "failure_message"
     t.datetime "finished_at"
     t.json "payload", default: {}, null: false
-    t.integer "preceding_server_action_id"
     t.datetime "running_at"
     t.integer "server_id", null: false
     t.string "source", null: false
@@ -294,7 +293,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_20_194722) do
     t.index "json_extract(payload, '$.dokku_app_id')", name: "index_server_actions_on_dokku_app_id"
     t.index ["account_id"], name: "index_server_actions_on_account_id"
     t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
-    t.index ["preceding_server_action_id"], name: "index_server_actions_on_preceding_server_action_id"
     t.index ["server_id"], name: "index_server_actions_on_server_id"
     t.index ["status"], name: "index_server_actions_on_status"
     t.index ["user_id"], name: "index_server_actions_on_user_id"
@@ -456,7 +454,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_20_194722) do
   add_foreign_key "server_action_logs", "accounts"
   add_foreign_key "server_action_logs", "server_actions"
   add_foreign_key "server_actions", "accounts"
-  add_foreign_key "server_actions", "server_actions", column: "preceding_server_action_id"
   add_foreign_key "server_actions", "servers"
   add_foreign_key "server_actions", "users"
   add_foreign_key "server_checks", "accounts"

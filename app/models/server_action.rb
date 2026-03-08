@@ -1,10 +1,8 @@
 class ServerAction < ApplicationRecord
   belongs_to :account, default: -> { server.account }
   belongs_to :actionable, polymorphic: true, optional: true
-  belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
   belongs_to :server
   belongs_to :user, default: -> { Current.user }, optional: true
-  belongs_to :preceding_action, class_name: "ServerAction", optional: true, foreign_key: "preceding_server_action_id"
 
   has_one :log, class_name: "ServerActionLog", dependent: :destroy
 
@@ -78,14 +76,14 @@ class ServerAction < ApplicationRecord
       ActiveModel::Name.new(ServerAction)
     end
 
-    def run_now!(server, actionable, depends_on: nil, **)
-      action = create!(server:, actionable:, preceding_action: depends_on, **)
+    def run_now!(server, actionable, **)
+      action = create!(server:, actionable:, **)
       action.run_now
       action
     end
 
-    def run_later!(server, actionable, depends_on: nil, **)
-      action = create!(server:, actionable:, preceding_action: depends_on, **)
+    def run_later!(server, actionable, **)
+      action = create!(server:, actionable:, **)
       action.run_later
       action
     end

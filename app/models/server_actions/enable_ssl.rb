@@ -18,6 +18,10 @@ class ServerActions::EnableSsl < ServerAction
 
     app.domains.ssl_disabled.each(&:enabling_ssl!)
     enable_ssl!
+  rescue Ssh::CommandExecutionError
+    app.domains.enabling_ssl.each(&:active!)
+    raise
+  else
     update_domains
   end
 
