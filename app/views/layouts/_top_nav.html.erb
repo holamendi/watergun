@@ -11,27 +11,15 @@
     <%# Breadcrumb - only show when in a project context %>
     <% if defined?(@project) && @project.present? %>
       <div class="nav-breadcrumb">
-        <%# Project dropdown %>
-        <div class="nav-dropdown">
-          <a class="nav-breadcrumb-item" tabindex="0">
+        <% if @project.persisted? %>
+          <%= link_to project_path(@project), class: "nav-breadcrumb-item" do %>
             <span><%= @project.name %></span>
-            <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-            </svg>
-          </a>
-          <div class="nav-dropdown-menu">
-            <div class="nav-dropdown-label">Projects</div>
-            <% @nav_projects.each do |project| %>
-              <%= link_to project_path(project), class: "nav-dropdown-item #{project.id == @project.id ? 'active' : ''}" do %>
-                <%= project.name %>
-              <% end %>
-            <% end %>
-            <div class="nav-dropdown-divider"></div>
-            <%= link_to projects_path, class: "nav-dropdown-item nav-dropdown-item-muted" do %>
-              View all projects
-            <% end %>
-          </div>
-        </div>
+          <% end %>
+        <% else %>
+          <span class="nav-breadcrumb-item">
+            <span><%= @project.name %></span>
+          </span>
+        <% end %>
 
         <%# App or Service segment %>
         <% if defined?(@app) && @app.present? %>
