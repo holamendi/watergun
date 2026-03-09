@@ -201,7 +201,7 @@ module UiHelper
     tag.span(status.to_s.titleize, class: "px-2 py-0.5 text-xxs font-medium rounded #{colors}")
   end
 
-  def submit_button(text, variant: :primary, size: :md, **options)
+  def submit_button(text, variant: :primary, size: :sm, **options)
     ui_size = normalize_ui_size(size)
     turbo_submits_with = options.delete(:turbo_submits_with) || turbo_submit_content(text, ui_size)
 
