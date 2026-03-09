@@ -1,5 +1,5 @@
 
 vite: bin/vite dev
-web: bin/rails s -p 3000
+web: bin/rails s -p ${CONDUCTOR_PORT:-3000}
 worker: bundle exec rake solid_queue:start
 funnel: tailscale funnel 3000
