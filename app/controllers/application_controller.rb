@@ -4,13 +4,8 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate
   before_action :set_source
-  before_action :set_nav_projects
 
   private
-
-  def set_nav_projects
-    @nav_projects = Current.account&.projects&.kept || []
-  end
 
   def stream_toast(message, title: nil, type: :notice, link_text: nil, link_url: nil)
     turbo_stream.append("toasts", partial: "shared/toast", locals: {message:, title:, type:, link_text:, link_url:})
