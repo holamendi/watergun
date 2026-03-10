@@ -1,35 +1,23 @@
 <% @title = "#{@app.name} · Settings" %>
 
 <%= render "layout", app: @app, active_section: :general do %>
-  <div class="space-y-6">
-    <div class="form-card" id="general">
-      <div class="card-header">
-        <span class="card-title">App Name</span>
-      </div>
-      <div class="card-body">
-        <%= render "projects/apps/form", app: @app %>
-      </div>
+  <div class="settings-sections">
+    <div class="settings-section" id="general">
+      <h3 class="settings-section-title">App Name</h3>
+      <%= render "projects/apps/form", app: @app %>
     </div>
 
-    <div class="form-card" id="repository">
-      <div class="card-header">
-        <span class="card-title">Repository</span>
-      </div>
-      <div class="card-body">
-        <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
-      </div>
+    <div class="settings-section" id="repository">
+      <h3 class="settings-section-title">Repository</h3>
+      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
     </div>
 
-    <div class="form-card" id="builder">
-      <div class="card-header">
-        <span class="card-title">Builder</span>
-      </div>
-      <div class="card-body">
-        <%= render "projects/apps/builders/form", app: @app %>
-      </div>
+    <div class="settings-section" id="builder">
+      <h3 class="settings-section-title">Builder</h3>
+      <%= render "projects/apps/builders/form", app: @app %>
     </div>
 
-    <div id="danger-zone">
+    <div class="settings-section settings-section-last" id="danger-zone">
       <div class="section-label text-error">Danger Zone</div>
       <%= ui_danger_zone(
           title: "Delete Application",

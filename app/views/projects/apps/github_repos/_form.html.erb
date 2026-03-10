@@ -12,11 +12,11 @@
   <label class="flex items-start gap-3 cursor-pointer">
     <%= form.check_box :webhook_deploy, class: "checkbox mt-1" %>
     <div>
-      <span class="text-sm font-medium">Deploy on Push</span>
+      <span class="text-xs font-medium">Deploy on Push</span>
       <p class="text-xs text-text-muted mt-0.5">Automatically deploy the app when a push is made to the <code class="font-mono bg-elevated px-1 py-0.5 rounded-sm text-xxs"><%= github_repo.branch %></code> branch.</p>
     </div>
   </label>
-  <div class="mt-4">
+  <div class="mt-4 flex justify-end">
     <%= submit_button "Save repository" %>
   </div>
 <% end %>
