@@ -1,6 +1,6 @@
 <%= render "projects/apps/header", app: app, active_tab: :settings %>
 
-<div class="page-shell py-6">
+<div class="page-shell settings-page">
   <div class="settings-layout">
     <aside>
       <nav class="settings-nav" aria-label="Settings navigation">
@@ -24,12 +24,6 @@
               "settings-nav-item-active": active_section == :storage,
               "settings-nav-item-inactive": active_section != :storage),
             aria: { current: (active_section == :storage ? "page" : nil) } %>
-        <%= link_to "Repository", project_app_settings_path(app.project, app, anchor: "repository"),
-            class: "settings-nav-item settings-nav-item-inactive" %>
-        <%= link_to "Builder", project_app_settings_path(app.project, app, anchor: "builder"),
-            class: "settings-nav-item settings-nav-item-inactive" %>
-        <%= link_to "Danger zone", project_app_settings_path(app.project, app, anchor: "danger-zone"),
-            class: "settings-nav-item settings-nav-item-inactive" %>
       </nav>
     </aside>
 

@@ -1,10 +1,10 @@
 <%= form_with model: app, url: project_app_builder_path(app.project, app), id: "builder_form" do |form| %>
-  <fieldset class="fieldset max-w-xs">
+  <fieldset class="fieldset">
     <legend class="fieldset-legend">Builder</legend>
     <%= form.select :builder, App.builders, {}, class: "select w-full" %>
     <%= error_messages_for(form.object, :builder) %>
   </fieldset>
-  <div class="mt-4">
+  <div class="mt-4 flex justify-end">
     <%= submit_button "Save builder" %>
   </div>
 <% end %>
