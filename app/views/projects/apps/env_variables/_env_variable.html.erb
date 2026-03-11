@@ -32,7 +32,7 @@
       </svg>
     </button>
 
-    <%= ui_icon_button(label: "Edit Variable",
+    <%= icon_button(label: "Edit Variable",
         href: edit_project_app_env_variable_path(@project, @app, env_variable),
         size: :xs,
         class: "text-text-muted hover:text-text-primary",
@@ -42,7 +42,7 @@
       </svg>
     <% end %>
 
-    <%= ui_icon_button(label: "Delete Variable",
+    <%= icon_button(label: "Delete Variable",
         href: project_app_env_variable_path(@project, @app, env_variable),
         size: :xs,
         class: "text-error hover:text-error",

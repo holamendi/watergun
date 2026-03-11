@@ -29,10 +29,10 @@ Disallowed:
 
 All helpers live in `UiHelper`.
 
-### `ui_button`
+### `button`
 
 ```ruby
-ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
+button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
   class: nil, data: {}, method: nil, disabled: false, turbo_submits_with: nil,
   **options, &block)
 ```
@@ -47,55 +47,55 @@ ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
 submit_button(text, variant: :primary, size: :md, **options)
 ```
 
-- Delegates to `ui_button`.
+- Delegates to `button`.
 - Uses `type="submit"` and default Turbo loading text with spinner.
 
-### `ui_icon_button`
+### `icon_button`
 
 ```ruby
-ui_icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm,
+icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm,
   type: :button, class: nil, data: {}, **options, &block)
 ```
 
 - Icon-only control with required accessible label.
 - Accepts icon via `icon:` string/safe HTML or block.
 
-### `ui_page_header`
+### `page_header`
 
 ```ruby
-ui_page_header(title:, subtitle: nil, actions: nil, &block)
+page_header(title:, subtitle: nil, actions: nil, &block)
 ```
 
 - Renders consistent page title/subtitle/actions shell.
 
-### `ui_empty_state`
+### `empty_state`
 
 ```ruby
-ui_empty_state(title:, body: nil, icon: nil, actions: nil, &block)
+empty_state(title:, body: nil, icon: nil, actions: nil, &block)
 ```
 
 - Standard card for empty collections.
 
-### `ui_danger_zone`
+### `danger_zone`
 
 ```ruby
-ui_danger_zone(title:, description:, actions: nil, &block)
+danger_zone(title:, description:, actions: nil, &block)
 ```
 
 - Standard destructive section shell.
 
-### `ui_back_link`
+### `back_link`
 
 ```ruby
-ui_back_link(text, path, **options)
+back_link(text, path, **options)
 ```
 
 - Canonical compact back navigation link.
 
-### `ui_modal_trigger`
+### `modal_trigger`
 
 ```ruby
-ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &block)
+modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &block)
 ```
 
 - Standard modal-open trigger.

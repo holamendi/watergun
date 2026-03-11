@@ -22,31 +22,25 @@ module UiHelper
     content_tag :div, class: "w-full px-4 mx-auto sm:px-6 lg:px-8", &block
   end
 
-  # Legacy compatibility wrapper.
-  def page_header(title, actions = nil, &block)
-    actions = capture(&block) if block_given?
-    ui_page_header(title: title, actions: actions)
-  end
-
-  def ui_page_header(title:, subtitle: nil, actions: nil, &block)
+  def page_header(title:, subtitle: nil, actions: nil, &block)
     actions = capture(&block) if block_given?
 
     render "shared/ui/page_header", title: title, subtitle: subtitle, actions: actions.presence
   end
 
-  def ui_empty_state(title:, body: nil, icon: nil, actions: nil, &block)
+  def empty_state(title:, body: nil, icon: nil, actions: nil, &block)
     actions = capture(&block) if block_given?
 
     render "shared/ui/empty_state", title: title, body: body, icon: icon, actions: actions.presence
   end
 
-  def ui_danger_zone(title:, description:, actions: nil, &block)
+  def danger_zone(title:, description:, actions: nil, &block)
     actions = capture(&block) if block_given?
 
     render "shared/ui/danger_zone", title: title, description: description, actions: actions.presence
   end
 
-  def ui_back_link(text, path, icon: nil, class: nil, **options)
+  def back_link(text, path, icon: nil, class: nil, **options)
     css_class = binding.local_variable_get(:class)
     link_data = normalize_ui_data(options.delete(:data), component: "back-link")
     default_icon = tag.svg(
@@ -66,14 +60,22 @@ module UiHelper
     end
   end
 
-  def ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, class: nil, data: {}, **options, &block)
+  def modal(id:, title:, frame: nil, &block)
+    render "shared/modal", id: id, title: title, frame: frame, &block
+  end
+
+  def modal_frame(frame_id, title:, &block)
+    render "shared/modal_frame", frame_id: frame_id, title: title, &block
+  end
+
+  def modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, class: nil, data: {}, **options, &block)
     css_class = binding.local_variable_get(:class)
     trigger_data = normalize_ui_data(data, component: "modal-trigger")
     trigger_data[:controller] = merge_data_tokens(trigger_data[:controller], "dialog-trigger")
     trigger_data[:action] = merge_data_tokens(trigger_data[:action], "click->dialog-trigger#open")
     trigger_data[:dialog_trigger_target_value] = modal_id
 
-    ui_button(text,
+    button(text,
       variant: variant,
       size: size,
       type: :button,
@@ -83,12 +85,12 @@ module UiHelper
       &block)
   end
 
-  def ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
+  def button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
     class: nil, data: {}, method: nil, disabled: false, turbo_submits_with: nil,
     **options, &block)
     css_class = binding.local_variable_get(:class)
     content = block_given? ? capture(&block) : text
-    classes = class_names("btn", ui_button_size_class(size), ui_button_variant_class(variant), css_class)
+    classes = class_names("btn", button_size_class(size), button_variant_class(variant), css_class)
 
     if href.present?
       link_data = normalize_ui_data(data, component: "button")
@@ -109,7 +111,7 @@ module UiHelper
     end
   end
 
-  def ui_icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm, type: :button,
+  def icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm, type: :button,
     class: nil, data: {}, **options, &block)
     css_class = binding.local_variable_get(:class)
     icon_content = block_given? ? capture(&block) : icon
@@ -118,7 +120,7 @@ module UiHelper
     aria_options = (options.delete(:aria) || {}).dup
     aria_options[:label] ||= label
 
-    ui_button(nil,
+    button(nil,
       href: href,
       variant: variant,
       size: size,
@@ -129,7 +131,7 @@ module UiHelper
       **options) do
       content_tag(:span,
         icon_content,
-        class: class_names("inline-flex items-center justify-center", ui_icon_size_class(size)),
+        class: class_names("inline-flex items-center justify-center", icon_size_class(size)),
         "aria-hidden": true)
     end
   end
@@ -205,7 +207,7 @@ module UiHelper
     ui_size = normalize_ui_size(size)
     turbo_submits_with = options.delete(:turbo_submits_with) || turbo_submit_content(text, ui_size)
 
-    ui_button(text,
+    button(text,
       variant: variant,
       size: ui_size,
       type: :submit,
@@ -237,15 +239,15 @@ module UiHelper
     (value == :default) ? :md : value
   end
 
-  def ui_button_variant_class(variant)
+  def button_variant_class(variant)
     UI_BUTTON_VARIANTS.fetch(normalize_ui_variant(variant), UI_BUTTON_VARIANTS[:secondary])
   end
 
-  def ui_button_size_class(size)
+  def button_size_class(size)
     UI_BUTTON_SIZES.fetch(normalize_ui_size(size), UI_BUTTON_SIZES[:md])
   end
 
-  def ui_icon_size_class(size)
+  def icon_size_class(size)
     case normalize_ui_size(size)
     when :xs then "w-3 h-3"
     when :md then "w-4 h-4"

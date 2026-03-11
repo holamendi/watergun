@@ -17,16 +17,16 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/content/, result)
   end
 
-  test "page_header delegates to ui page header partial" do
-    result = page_header("My Title", "Some Actions")
+  test "page_header renders title and actions" do
+    result = page_header(title: "My Title", actions: "Some Actions")
 
     assert_match(/My Title/, result)
     assert_match(/Some Actions/, result)
     assert_match(/data-ui-component="page-header"/, result)
   end
 
-  test "ui_button renders a button by default" do
-    button = ui_button("Save")
+  test "button renders a button by default" do
+    button = button("Save")
 
     assert_match(/<button/, button)
     assert_match(/type="button"/, button)
@@ -35,8 +35,8 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-ui-component="button"/, button)
   end
 
-  test "ui_button renders link when href is provided" do
-    button = ui_button("Delete", href: "/projects/1", method: :delete, variant: :danger)
+  test "button renders link when href is provided" do
+    button = button("Delete", href: "/projects/1", method: :delete, variant: :danger)
 
     assert_match(/<a/, button)
     assert_match(/href="\/projects\/1"/, button)
@@ -44,16 +44,16 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-turbo-method="delete"/, button)
   end
 
-  test "ui_button supports size variants" do
-    assert_match(/btn-xs/, ui_button("XS", size: :xs))
-    assert_match(/btn-sm/, ui_button("SM", size: :sm))
+  test "button supports size variants" do
+    assert_match(/btn-xs/, button("XS", size: :xs))
+    assert_match(/btn-sm/, button("SM", size: :sm))
 
-    md = ui_button("MD", size: :md)
+    md = button("MD", size: :md)
     refute_match(/btn-sm/, md)
     refute_match(/btn-xs/, md)
   end
 
-  test "submit_button delegates to ui_button with submit type and loading content" do
+  test "submit_button delegates to button with submit type and loading content" do
     button = submit_button("Save")
 
     assert_match(/<button/, button)
@@ -69,16 +69,16 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/btn-danger/, button)
   end
 
-  test "ui_icon_button renders aria label and square sizing" do
-    button = ui_icon_button(label: "Edit", icon: "\u270e")
+  test "icon_button renders aria label and square sizing" do
+    button = icon_button(label: "Edit", icon: "\u270e")
 
     assert_match(/aria-label="Edit"/, button)
     assert_match(/btn-square/, button)
     assert_match(/data-ui-component="icon-button"/, button)
   end
 
-  test "ui_page_header renders subtitle and actions" do
-    result = ui_page_header(title: "Domains", subtitle: "2 configured", actions: "Action")
+  test "page_header renders subtitle and actions" do
+    result = page_header(title: "Domains", subtitle: "2 configured", actions: "Action")
 
     assert_match(/Domains/, result)
     assert_match(/2 configured/, result)
@@ -86,8 +86,8 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-ui-component="page-header"/, result)
   end
 
-  test "ui_empty_state renders content and actions" do
-    result = ui_empty_state(title: "No domains", body: "Add one", actions: "Create")
+  test "empty_state renders content and actions" do
+    result = empty_state(title: "No domains", body: "Add one", actions: "Create")
 
     assert_match(/No domains/, result)
     assert_match(/Add one/, result)
@@ -95,8 +95,8 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-ui-component="empty-state"/, result)
   end
 
-  test "ui_danger_zone renders standard shell" do
-    result = ui_danger_zone(title: "Danger", description: "This cannot be undone", actions: "Delete")
+  test "danger_zone renders standard shell" do
+    result = danger_zone(title: "Danger", description: "This cannot be undone", actions: "Delete")
 
     assert_match(/Danger/, result)
     assert_match(/cannot be undone/, result)
@@ -104,16 +104,45 @@ class UiHelperTest < ActionView::TestCase
     assert_match(/data-ui-component="danger-zone"/, result)
   end
 
-  test "ui_back_link renders canonical back link" do
-    result = ui_back_link("All Deployments", "/deployments")
+  test "back_link renders canonical back link" do
+    result = back_link("All Deployments", "/deployments")
 
     assert_match(/href="\/deployments"/, result)
     assert_match(/All Deployments/, result)
     assert_match(/data-ui-component="back-link"/, result)
   end
 
-  test "ui_modal_trigger renders standardized trigger contract" do
-    result = ui_modal_trigger("+ Add Domain", modal_id: "domain_modal")
+  test "modal renders inline dialog with title and content" do
+    result = modal(id: "test_modal", title: "Test Title") { "modal content" }
+
+    assert_match(/<dialog/, result)
+    assert_match(/id="test_modal"/, result)
+    assert_match(/Test Title/, result)
+    assert_match(/modal content/, result)
+    assert_match(/data-controller="dialog"/, result)
+    assert_no_match(/<turbo-frame/, result)
+  end
+
+  test "modal with frame renders turbo-frame inside dialog" do
+    result = modal(id: "test_modal", title: "Test Title", frame: "my_frame") { "frame content" }
+
+    assert_match(/<dialog/, result)
+    assert_match(/<turbo-frame id="my_frame"/, result)
+    assert_match(/turbo:frame-load->dialog#open/, result)
+    assert_match(/frame content/, result)
+  end
+
+  test "modal_frame renders turbo-frame with header and close button" do
+    result = modal_frame("my_frame", title: "Frame Title") { "form content" }
+
+    assert_match(/<turbo-frame id="my_frame"/, result)
+    assert_match(/Frame Title/, result)
+    assert_match(/form content/, result)
+    assert_match(/method="dialog"/, result)
+  end
+
+  test "modal_trigger renders standardized trigger contract" do
+    result = modal_trigger("+ Add Domain", modal_id: "domain_modal")
 
     assert_match(/<button/, result)
     assert_match(/data-ui-component="modal-trigger"/, result)

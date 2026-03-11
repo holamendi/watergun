@@ -4,10 +4,10 @@
 
 <div class="page-shell py-6">
   <div class="mb-4">
-    <%= ui_back_link "All Activity", server_actions_path %>
+    <%= back_link "All Activity", server_actions_path %>
   </div>
 
-  <%= ui_page_header(
+  <%= page_header(
       title: content_tag(:span, @server_action.slug, class: "font-mono"),
       subtitle: "##{@server_action.id}"
     ) do %>

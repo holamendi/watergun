@@ -19,11 +19,11 @@ Forbidden:
 
 ### Page header
 
-Use `ui_page_header` for title/subtitle/action composition.
+Use `page_header` for title/subtitle/action composition.
 
 ### Empty state
 
-Use `ui_empty_state` with action slot when the user can recover.
+Use `empty_state` with action slot when the user can recover.
 
 ### List shell
 
@@ -37,15 +37,15 @@ Use `projects/apps/deployments/_deployment.html.erb` as the canonical deployment
 
 ### Settings sections
 
-Use settings layout + `ui_page_header` + content card(s) + semantic actions.
+Use settings layout + `page_header` + content card(s) + semantic actions.
 
 ### Danger zone
 
-Use `ui_danger_zone` and `ui_button variant: :danger`.
+Use `danger_zone` and `button variant: :danger`.
 
 ### Modal trigger
 
-Use `ui_modal_trigger` (Stimulus-backed) instead of inline `onclick`.
+Use `modal_trigger` (Stimulus-backed) instead of inline `onclick`.
 
 ### Log panel
 
@@ -59,8 +59,8 @@ Use semantic tokens:
 Preferred:
 
 ```erb
-<%= ui_page_header(title: "Domains", subtitle: "2 configured") do %>
-  <%= ui_modal_trigger "+ Add Domain", modal_id: dom_id(@app, :domain_modal) %>
+<%= page_header(title: "Domains", subtitle: "2 configured") do %>
+  <%= modal_trigger "+ Add Domain", modal_id: dom_id(@app, :domain_modal) %>
 <% end %>
 ```
 

@@ -32,9 +32,9 @@ Use this process for any UI migration or new UI feature.
 ## Agent Checklist (UI PR)
 
 - Read `docs/design-system/README.md`.
-- Use `ui_button`/`ui_icon_button` for actions.
-- Use `ui_page_header` and `ui_empty_state` where applicable.
-- Prefer `ui_modal_trigger` for dialog opens.
-- Ensure destructive actions use `ui_danger_zone` + danger variant button.
+- Use `button`/`icon_button` for actions.
+- Use `page_header` and `empty_state` where applicable.
+- Prefer `modal_trigger` for dialog opens.
+- Ensure destructive actions use `danger_zone` + danger variant button.
 - Run `script/check-ui-consistency`.
 - Run relevant tests with `mise exec`.

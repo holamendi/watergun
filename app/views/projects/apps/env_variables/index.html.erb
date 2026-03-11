@@ -1,10 +1,10 @@
 <%= render "projects/apps/settings/layout", app: @app, active_section: :variables do %>
   <div>
-    <%= ui_page_header(
+    <%= page_header(
         title: "Environment Variables",
         subtitle: "#{@env_variables.size} #{'variable'.pluralize(@env_variables.size)} configured"
       ) do %>
-      <%= ui_button "+ Add Variable",
+      <%= button "+ Add Variable",
           href: new_project_app_env_variable_path(@project, @app),
           size: :sm,
           data: { turbo_frame: "env_variable_form" } %>
@@ -14,11 +14,6 @@
   </div>
 <% end %>
 
-<dialog id="env_var_modal" class="modal" data-controller="dialog">
-  <div class="modal-box">
-    <turbo-frame id="env_variable_form" data-action="turbo:frame-load->dialog#open">
-      <%= render "modal_header", title: "Add Variable" %>
-      <%= render "form", env_variable: @app.env_variables.new %>
-    </turbo-frame>
-  </div>
-</dialog>
+<%= modal(id: "env_var_modal", title: "Add Variable", frame: "env_variable_form") do %>
+  <%= render "form", env_variable: @app.env_variables.new %>
+<% end %>
