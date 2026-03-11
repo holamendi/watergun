@@ -4,7 +4,7 @@
 
 <div class="page-shell py-6">
   <% if @app.github_repo.present? %>
-    <%= ui_page_header(
+    <%= page_header(
         title: "Deployments",
         subtitle: "#{@deployments.size} total #{'deployment'.pluralize(@deployments.size)}"
       ) do %>
@@ -20,14 +20,14 @@
         <%= render @deployments %>
       </div>
     <% else %>
-      <%= ui_empty_state(title: "No deployments yet", body: "Click Deploy Now to get started.") %>
+      <%= empty_state(title: "No deployments yet", body: "Click Deploy Now to get started.") %>
     <% end %>
   <% else %>
-    <%= ui_empty_state(
+    <%= empty_state(
         title: "Connect a GitHub repository",
         body: "Link a repository to enable deployments."
       ) do %>
-      <%= ui_button "Connect Repository",
+      <%= button "Connect Repository",
           href: new_project_app_github_repo_path(@project, @app),
           size: :sm %>
     <% end %>

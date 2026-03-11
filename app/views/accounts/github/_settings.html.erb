@@ -11,7 +11,7 @@
           </div>
           <p class="text-xs text-text-muted mt-1 ml-6">Account: <%= github_installation.login %></p>
         </div>
-        <%= ui_button "Disconnect",
+        <%= button "Disconnect",
             href: github_installation_path(github_installation),
             method: :delete,
             variant: :danger,
@@ -20,7 +20,7 @@
     <% else %>
       <div class="flex items-center justify-between gap-4">
         <p class="text-xs text-text-muted">Link your GitHub account to enable repository deployments.</p>
-        <%= ui_button "Connect GitHub",
+        <%= button "Connect GitHub",
             href: github_app.new_installation_url,
             size: :sm %>
       </div>

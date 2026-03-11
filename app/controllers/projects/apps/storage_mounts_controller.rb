@@ -12,7 +12,8 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
       ServerActions::MountStorage.run_later!(@app.server, @storage_mount)
       render turbo_stream: [
         stream_toast("Storage mount added"),
-        stream_storage_mounts
+        stream_storage_mounts,
+        turbo_stream.action(:close_dialog, helpers.dom_id(@app, :storage_mount_modal))
       ]
     else
       render turbo_stream: turbo_stream.replace(

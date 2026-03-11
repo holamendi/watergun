@@ -33,13 +33,13 @@
         </div>
         <%= link_to "View all deployments", project_app_deployments_path(@project, @app), class: "text-xs text-accent hover:underline mt-2 inline-block" %>
       <% else %>
-        <%= ui_empty_state(title: "No deployments yet", body: "Deploy your app to get started.") do %>
+        <%= empty_state(title: "No deployments yet", body: "Deploy your app to get started.") do %>
           <% if @app.github_repo.present? %>
             <%= form_with url: project_app_deployments_path(@project, @app), data: { turbo_stream: true } do %>
               <%= submit_button "Deploy now", size: :sm %>
             <% end %>
           <% else %>
-            <%= ui_button "Connect GitHub repo",
+            <%= button "Connect GitHub repo",
                 href: new_project_app_github_repo_path(@project, @app),
                 size: :sm %>
           <% end %>

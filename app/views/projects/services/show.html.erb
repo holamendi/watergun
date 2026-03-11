@@ -1,7 +1,7 @@
 <%= render "projects/services/header", service: @service, active_tab: :overview %>
 
 <div class="page-shell py-6">
-  <%= ui_page_header(
+  <%= page_header(
       title: @service.name,
       subtitle: "#{@service.service_type.to_s.titleize} service"
     ) %>
@@ -36,7 +36,7 @@
     <div class="section-label">Connection String</div>
     <div class="dsn-box">
       <span class="overflow-hidden text-ellipsis"><%= @service.dsn %></span>
-      <%= ui_button nil,
+      <%= button nil,
           variant: :secondary,
           size: :xs,
           type: :button,
@@ -61,7 +61,7 @@
           <div>
             <div class="linked-app-name"><%= app.name %></div>
           </div>
-          <%= ui_button "View",
+          <%= button "View",
               href: project_app_deployments_path(@project, app),
               variant: :ghost,
               size: :xs %>
@@ -69,6 +69,6 @@
       <% end %>
     </div>
   <% else %>
-    <%= ui_empty_state(title: "No apps linked to this service.") %>
+    <%= empty_state(title: "No apps linked to this service.") %>
   <% end %>
 </div>

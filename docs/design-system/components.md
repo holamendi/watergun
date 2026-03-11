@@ -6,10 +6,10 @@ This reference defines the approved UI helper and partial API for Rails ERB.
 
 All helpers live in `app/helpers/ui_helper.rb`.
 
-### `ui_button`
+### `button`
 
 ```ruby
-ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
+button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
   class: nil, data: {}, method: nil, disabled: false, turbo_submits_with: nil,
   **options, &block)
 ```
@@ -22,8 +22,8 @@ ui_button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
 Example:
 
 ```erb
-<%= ui_button "Save" %>
-<%= ui_button "Delete", href: project_path(@project), method: :delete, variant: :danger, size: :sm %>
+<%= button "Save" %>
+<%= button "Delete", href: project_path(@project), method: :delete, variant: :danger, size: :sm %>
 ```
 
 ### `submit_button`
@@ -32,54 +32,92 @@ Example:
 submit_button(text, variant: :primary, size: :md, **options)
 ```
 
-- Delegates to `ui_button`.
+- Delegates to `button`.
 - Includes Turbo submit loading content by default.
 
-### `ui_icon_button`
+### `icon_button`
 
 ```ruby
-ui_icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm,
+icon_button(label:, href: nil, icon: nil, variant: :ghost, size: :sm,
   type: :button, class: nil, data: {}, **options, &block)
 ```
 
 - Icon-only button, required `label:` for accessibility.
 
-### `ui_page_header`
+### `page_header`
 
 ```ruby
-ui_page_header(title:, subtitle: nil, actions: nil, &block)
+page_header(title:, subtitle: nil, actions: nil, &block)
 ```
 
 - Standard page header shell for title/subtitle/actions.
 
-### `ui_empty_state`
+### `empty_state`
 
 ```ruby
-ui_empty_state(title:, body: nil, icon: nil, actions: nil, &block)
+empty_state(title:, body: nil, icon: nil, actions: nil, &block)
 ```
 
 - Standardized empty-state card.
 
-### `ui_danger_zone`
+### `danger_zone`
 
 ```ruby
-ui_danger_zone(title:, description:, actions: nil, &block)
+danger_zone(title:, description:, actions: nil, &block)
 ```
 
 - Standardized destructive action container.
 
-### `ui_back_link`
+### `back_link`
 
 ```ruby
-ui_back_link(text, path, **options)
+back_link(text, path, **options)
 ```
 
 - Canonical compact back link.
 
-### `ui_modal_trigger`
+### `modal`
 
 ```ruby
-ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &block)
+modal(id:, title:, frame: nil, &block)
+```
+
+- Renders a native `<dialog>` modal with title, close button, and content.
+- **Inline mode** (default): Content is rendered on the page inside the dialog.
+- **Lazy mode** (`frame:`): Wraps content in a `<turbo-frame>` that auto-opens the dialog when the frame navigates.
+
+```erb
+<%# Inline modal %>
+<%= modal(id: dom_id(@app, :domain_modal), title: "Add Domain") do %>
+  <%= render "form", domain: @app.domains.new %>
+<% end %>
+
+<%# Lazy modal (loaded via turbo frame) %>
+<%= modal(id: "env_var_modal", title: "Add Variable", frame: "env_variable_form") do %>
+  <%= render "form", env_variable: @app.env_variables.new %>
+<% end %>
+```
+
+### `modal_frame`
+
+```ruby
+modal_frame(frame_id, title:, &block)
+```
+
+- Used in `new`/`edit` views that load into a lazy modal's turbo frame.
+- Wraps content in a `<turbo-frame>` with the modal header (title + close button).
+
+```erb
+<%# app/views/things/new.html.erb %>
+<%= modal_frame "thing_form", title: "Add Thing" do %>
+  <%= render "form", thing: @thing %>
+<% end %>
+```
+
+### `modal_trigger`
+
+```ruby
+modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &block)
 ```
 
 - Canonical modal trigger using Stimulus (`dialog-trigger`).
@@ -93,14 +131,15 @@ ui_modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options,
 ## Shared Controls
 
 - `app/views/shared/_modal.html.erb`
+- `app/views/shared/_modal_frame.html.erb`
 - `app/views/shared/_pagination.html.erb`
 - `app/views/shared/_toast.html.erb`
 
-These controls should use semantic UI helpers (`ui_button` / `ui_icon_button`) instead of raw ad hoc bundles.
+These controls should use semantic UI helpers (`button` / `icon_button`) instead of raw ad hoc bundles.
 
 ## Accessibility Defaults
 
-- All icon-only actions must use `ui_icon_button(label: ...)`.
+- All icon-only actions must use `icon_button(label: ...)`.
 - All raw `<button>` tags must include explicit `type`.
 - Toasts must keep dismiss controls keyboard accessible.
 - Back links and modal triggers should remain semantically links/buttons (not non-interactive elements with click handlers).

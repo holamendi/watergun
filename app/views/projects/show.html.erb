@@ -2,13 +2,13 @@
 <% @title = @project.name %>
 
 <div class="page-shell py-6">
-  <%= ui_page_header(
+  <%= page_header(
       title: @project.name,
       subtitle: "#{@apps.size} #{'app'.pluralize(@apps.size)} · #{@services.size} #{'service'.pluralize(@services.size)}"
     ) do %>
     <div class="flex items-center gap-2">
       <div class="action-dropdown">
-        <%= ui_button "+ New", variant: :primary, size: :sm, tabindex: 0 %>
+        <%= button "+ New", variant: :primary, size: :sm, tabindex: 0 %>
         <div class="action-dropdown-menu">
           <div class="action-dropdown-label">Apps</div>
           <%= link_to "From GitHub repo", new_project_app_path(@project), class: "action-dropdown-item" %>
@@ -34,7 +34,7 @@
         <%= render partial: "projects/apps/app", collection: @apps %>
       </div>
     <% else %>
-      <%= ui_empty_state(title: "No apps yet") %>
+      <%= empty_state(title: "No apps yet") %>
     <% end %>
   </section>
 
@@ -46,7 +46,7 @@
         <%= render partial: "projects/services/service", collection: @services %>
       </div>
     <% else %>
-      <%= ui_empty_state(title: "No services yet") %>
+      <%= empty_state(title: "No services yet") %>
     <% end %>
   </section>
 </div>

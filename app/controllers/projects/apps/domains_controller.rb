@@ -16,7 +16,8 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
       ServerActions::CreateDomain.run_later!(@app.server, @domain)
       render turbo_stream: [
         stream_toast("Domain added"),
-        stream_domains
+        stream_domains,
+        turbo_stream.action(:close_dialog, helpers.dom_id(@app, :domain_modal))
       ]
     else
       render turbo_stream: turbo_stream.replace(
