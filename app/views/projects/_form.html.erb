@@ -1,22 +1,10 @@
-<%= form_with model: project, class: "space-y-5" do |f| %>
-  <% if project.errors.any? %>
-    <div class="bg-error/10 border border-error/20 rounded p-4">
-      <ul class="text-error text-sm space-y-1">
-        <% project.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+<%= form_with model: project, class: "space-y-4", id: "project_form" do |f| %>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Name</legend>
     <%= f.text_field :name, class: "input w-full font-mono", placeholder: "my-project" %>
+    <%= error_messages_for(f.object, :name) %>
     <p class="text-xxs text-text-muted mt-1.5">A short identifier for your project</p>
   </fieldset>
 
-  <div class="flex justify-end gap-2 pt-2">
-    <%= link_to "Cancel", projects_path, class: "btn btn-ghost" %>
-    <%= submit_button "Create Project" %>
-  </div>
+  <%= submit_button "Create Project" %>
 <% end %>
