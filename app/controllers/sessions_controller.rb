@@ -4,6 +4,10 @@ class SessionsController < ApplicationController
   layout "sessions"
 
   def new
+    if Rails.env.development? && Current.session.nil?
+      sign_in(User.first)
+    end
+
     redirect_to root_path if Current.session
 
     @session = Session.new

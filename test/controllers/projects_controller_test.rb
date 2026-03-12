@@ -30,12 +30,12 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_select "a", text: /Default Project/, count: 0
     end
 
-    test "renders ui page header and primary action" do
+    test "renders ui page header and modal trigger" do
       get projects_path
 
       assert_response :success
       assert_select "[data-ui-component='page-header']"
-      assert_select "a[data-ui-component='button'][href='#{new_project_path}']"
+      assert_select "button[data-ui-component='modal-trigger']", text: "New Project"
     end
   end
 
@@ -117,20 +117,22 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
 
     test "does not create a project when the name is not present" do
       assert_no_difference -> { Project.count } do
-        post projects_url, params: {project: {name: ""}}
+        post projects_url, params: {project: {name: ""}}, as: :turbo_stream
       end
 
-      assert_response :unprocessable_content
+      assert_response :success
+      assert_includes response.body, "turbo-stream"
     end
 
     test "does not create a project when the name exists" do
       project = projects(:default)
 
       assert_no_difference -> { Project.count } do
-        post projects_url, params: {project: {name: project.name}}
+        post projects_url, params: {project: {name: project.name}}, as: :turbo_stream
       end
 
-      assert_response :unprocessable_content
+      assert_response :success
+      assert_includes response.body, "turbo-stream"
     end
   end
 end

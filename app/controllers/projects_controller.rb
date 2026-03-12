@@ -2,15 +2,12 @@ class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy]
   def index
     @projects = Current.server.projects.kept.includes(:apps, :services)
+    @project = Current.account.projects.new(server: Current.server)
   end
 
   def show
     @apps = @project.apps.kept.includes(:github_repo, :containers)
     @services = @project.services.kept.includes(:linked_apps)
-  end
-
-  def new
-    @project = Current.account.projects.new(server: Current.server)
   end
 
   def create
@@ -19,7 +16,11 @@ class ProjectsController < ApplicationController
     if @project.save
       redirect_to @project, notice: "Project created."
     else
-      render :new, status: :unprocessable_content
+      render turbo_stream: turbo_stream.replace(
+        "project_form",
+        partial: "projects/form",
+        locals: {project: @project}
+      )
     end
   end
 
