@@ -1,15 +1,16 @@
 <% @title = "New Service" %>
 
 <div class="page-shell py-6">
-  <div class="max-w-2xl mx-auto">
-    <div class="form-card">
-      <div class="form-card-header">
-        <h2>Add a service</h2>
-        <p class="text-xs text-text-muted mt-1">Managed databases and caches for your apps.</p>
-      </div>
-      <div class="form-card-body">
-        <%= form_with model: @create_service, scope: :create_service, url: project_services_path(@project), method: :post do |form| %>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+  <div class="max-w-2xl">
+    <div class="page-header">
+      <h1 class="page-title">New Service</h1>
+    </div>
+
+    <%= form_with model: @create_service, scope: :create_service, url: project_services_path(@project), method: :post do |form| %>
+      <div class="settings-sections">
+        <div class="settings-section settings-section-last">
+          <h3 class="settings-section-title">Service Type</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <%
               services = {
                 postgres: { name: "PostgreSQL", desc: "Relational database" },
@@ -36,17 +37,17 @@
           </div>
 
           <% if @create_service.errors.any? %>
-            <div class="text-error text-xs text-center mb-4">
+            <div class="text-error text-xs mt-4">
               <%= @create_service.errors.full_messages.join(", ") %>
             </div>
           <% end %>
-
-          <div class="form-card-footer -mx-5 -mb-5 mt-5">
-            <%= button "Cancel", href: project_path(@project), variant: :secondary, size: :sm %>
-            <%= submit_button "Create Service" %>
-          </div>
-        <% end %>
+        </div>
       </div>
-    </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <%= button "Cancel", href: project_path(@project), variant: :secondary, size: :sm %>
+        <%= submit_button "Create Service" %>
+      </div>
+    <% end %>
   </div>
 </div>
