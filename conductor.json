@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "setup": "bin/conductor-setup",
+    "setup": "mise install && mise exec -- bin/conductor-setup",
     "run": "bin/conductor-run"
   },
   "runScriptMode": "nonconcurrent"
