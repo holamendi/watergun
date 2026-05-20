@@ -327,6 +327,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_03_08_104344) do
     t.string "name", null: false
     t.string "public_ip"
     t.integer "ssh_port", default: 22
+    t.string "ssh_user", default: "dokku", null: false
     t.string "status"
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_servers_on_account_id"
