@@ -8,9 +8,11 @@ module Dokku
       end
 
       def parse_output(exit_code, text_output)
-        return unless exit_code.zero?
+        return [] unless exit_code.zero?
 
-        text_output.split("\n").map(&:strip).map do |line|
+        text_output.split("\n").map(&:strip).reject do |line|
+          line.blank? || line.start_with?("----->")
+        end.map do |line|
           name, version, enabled = line.split(" ")
           PluginData.new(name:, version:, enabled: (enabled == "enabled"))
         end
