@@ -1,8 +1,6 @@
 class AddIndexesToServerActionPayload < ActiveRecord::Migration[7.2]
   def change
-    execute <<-SQL
-      CREATE INDEX index_server_actions_on_dokku_app_id ON server_actions (json_extract(payload, '$.dokku_app_id'));
-      CREATE INDEX index_server_actions_on_dokku_service_id ON server_actions (json_extract(payload, '$.dokku_service_id'));
-    SQL
+    add_index :server_actions, "(payload ->> 'dokku_app_id')", name: "index_server_actions_on_dokku_app_id"
+    add_index :server_actions, "(payload ->> 'dokku_service_id')", name: "index_server_actions_on_dokku_service_id"
   end
 end

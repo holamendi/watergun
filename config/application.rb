@@ -39,7 +39,7 @@ module Watergun
     # Don't generate system test files.
     config.generators.system_tests = nil
 
-    config.solid_queue.connects_to = {database: {writing: :queue, reading: :queue}}
+    config.solid_queue.connects_to = {database: {writing: :primary, reading: :primary}}
     # config.solid_queue.logger = Rails.application.logger
     #
     config.active_record.encryption.support_unencrypted_data = true

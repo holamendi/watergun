@@ -116,7 +116,7 @@ Located in `app/models/<model>/` (e.g., `App::CreateApp`, `Deployment::CreateDep
 
 ### Background Jobs
 
-Uses Solid Queue with SQLite. Jobs in `app/jobs/`:
+Uses Solid Queue backed by the primary PostgreSQL database. Jobs in `app/jobs/`:
 - `RunServerActionJob`: Executes server actions via SSH, handles log persistence
 - `FetchContainerMetricsJob`: Runs every 30s, collects docker stats from all servers
 - `StartLogStreamJob`/`StopLogStreamJob`: Real-time log streaming via Turbo
@@ -146,9 +146,9 @@ Bearer token auth via `ApiToken`. Endpoints: apps (list/show), deployments (list
   - Use semantic color names for consistency
 - Chartkick/Chart.js for metrics visualization
 
-### Multi-Database Setup
+### Database Setup
 
-Three SQLite databases (primary, queue, cable) per environment. Migrations for queue/cable have separate paths in `db/queue_migrate` and `db/cable_migrate`.
+PostgreSQL is the single database backend. Solid Queue and Solid Cable tables live in the primary database through normal migrations under `db/migrate`.
 
 ### Authentication
 

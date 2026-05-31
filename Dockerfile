@@ -13,7 +13,7 @@ ENV RAILS_ENV=production \
 FROM base AS build
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
-    build-essential curl git node-gyp libyaml-dev pkg-config python-is-python3 libjemalloc2 && \
+    build-essential curl git node-gyp libpq-dev libyaml-dev pkg-config python-is-python3 libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
 ARG NODE_VERSION=24.2.0
@@ -43,7 +43,7 @@ RUN rm -rf node_modules package-lock.json && \
 FROM base
 
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
-    curl libsqlite3-0 && \
+    curl libpq5 && \
     rm -rf /var/lib/apt/lists* /var/cache/apt/archives*
 
 COPY --from=build /usr/local/bundle /usr/local/bundle

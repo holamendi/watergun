@@ -20,11 +20,6 @@ if [ -f "$CONDUCTOR_ROOT_PATH/config/master.key" ]; then
   echo "Linked config/master.key"
 fi
 
-# storage/ directory (SQLite dev/test databases)
-rm -rf storage
-cp -a "$CONDUCTOR_ROOT_PATH/storage" storage
-echo "Copied storage/"
-
 # ──────────────────────────────────────
 # Install dependencies
 # ──────────────────────────────────────
@@ -38,7 +33,13 @@ bundle check || bundle install
 npm ci
 
 # ──────────────────────────────────────
-# Prepare databases (runs migrations on the linked storage DBs)
+# Start Postgres
+# ──────────────────────────────────────
+
+docker compose -f docker-compose.yml up -d postgres
+
+# ──────────────────────────────────────
+# Prepare databases
 # ──────────────────────────────────────
 
 bin/rails db:prepare

@@ -2,7 +2,7 @@
 require "socket"
 
 APP_ROOT = File.expand_path("..", __dir__)
-COMPOSE_FILE = File.join(APP_ROOT, "docker-compose.dokku.yml")
+COMPOSE_FILE = File.join(APP_ROOT, "docker-compose.yml")
 CONTAINER_NAME = "watergun-dokku"
 SSH_USER = "watergun"
 SSH_PORT = 3022

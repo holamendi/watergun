@@ -1,4 +1,17 @@
 services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: watergun-postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: watergun
+      POSTGRES_PASSWORD: watergun
+      POSTGRES_DB: watergun_development
+    restart: unless-stopped
+
   dokku:
     image: dokku/dokku:0.36.7
     container_name: watergun-dokku
@@ -16,4 +29,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  postgres-data:
   dokku-data:
