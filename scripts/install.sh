@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# curl -sSL https://raw.githubusercontent.com/holamendi/watergun/refs/heads/main/scripts/install.sh | bash -s <domain> <email>
+# curl -sSL https://raw.githubusercontent.com/holamendi/watergun/refs/heads/main/scripts/install.sh | bash -s <domain> <email> [--register-self]
 
 command_exists() {
   command -v "$1" >/dev/null 2>&1
+}
+
+usage() {
+  echo "Usage: curl -sSL https://install.watergun.dev | bash -s <domain> <email> [--register-self]"
 }
 
 # constants
@@ -11,20 +15,32 @@ SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
 DOKKU_TAG=v0.36.7
 DOKKU_APP="watergun"
-DOKKU_APP_STORAGE_PATH="/var/lib/dokku/data/storage/$DOKKU_APP"
+DOKKU_POSTGRES_SERVICE="watergun-db"
+POSTGRES_IMAGE_VERSION=18
 WATERGUN_DOCKER_REPO="holamendi/watergun"
 WATERGUN_GIT_REPO="https://github.com/holamendi/watergun.git"
 WATERGUN_GIT_BRANCH="main"
 LETSENCRYPT_PLUGIN_REPO="https://github.com/dokku/dokku-letsencrypt.git"
-
-# server info
-HOSTNAME=$(hostname)
-CPU_TYPE=$(uname -m)
-PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
+POSTGRES_PLUGIN_REPO="https://github.com/dokku/dokku-postgres.git"
 
 # args
-DOMAIN="$1"
-EMAIL="$2"
+DOMAIN="${1:-}"
+EMAIL="${2:-}"
+REGISTER_SELF=false
+
+if [ "$#" -gt 3 ]; then
+  usage
+  exit 1
+fi
+
+if [ -n "${3:-}" ]; then
+  if [ "$3" != "--register-self" ]; then
+    usage
+    exit 1
+  fi
+
+  REGISTER_SELF=true
+fi
 
 # validate script is run as root
 if [ "$EUID" -ne 0 ]; then
@@ -34,7 +50,7 @@ fi
 
 # validate args
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
-  echo "Usage: curl -sSL https://install.watergun.dev | bash -s <domain> <email>"
+  usage
   exit 1
 fi
 
@@ -44,19 +60,35 @@ if ! echo "$EMAIL" | grep -qE "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
   exit 1
 fi
 
-# validate domain resolves to public ip
-if ! host "$DOMAIN" | grep -q "$PUBLIC_IP"; then
-  echo "error: $DOMAIN does not resolve to $PUBLIC_IP"
-  exit 1
-fi
-
 # ensure dependencies are installed
-for cmd in wget; do
+for cmd in curl host jq openssl wget; do
   if ! command_exists "$cmd"; then
     echo "error: $cmd is not installed."
     exit 1
   fi
 done
+
+# server info
+HOSTNAME=$(hostname)
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
+
+case "$(uname -m)" in
+  x86_64 | amd64)
+    CPU_TYPE="x86"
+    ;;
+  aarch64 | arm64)
+    CPU_TYPE="arm64"
+    ;;
+  *)
+    CPU_TYPE=$(uname -m)
+    ;;
+esac
+
+# validate domain resolves to public ip
+if ! host "$DOMAIN" | grep -q "$PUBLIC_IP"; then
+  echo "error: $DOMAIN does not resolve to $PUBLIC_IP"
+  exit 1
+fi
 
 # dokku installation
 if ! command_exists "dokku"; then
@@ -76,6 +108,14 @@ dokku domains:set-global "$DOMAIN"
 if ! dokku plugin:list | grep -q "letsencrypt"; then
   if ! dokku plugin:install "$LETSENCRYPT_PLUGIN_REPO"; then
     echo "error: failed to install dokku-letsencrypt plugin"
+    exit 1
+  fi
+fi
+
+# install postgres plugin
+if ! dokku plugin:list | grep -q "postgres"; then
+  if ! dokku plugin:install "$POSTGRES_PLUGIN_REPO" postgres; then
+    echo "error: failed to install dokku-postgres plugin"
     exit 1
   fi
 fi
@@ -122,9 +162,20 @@ dokku config:set "$DOKKU_APP" \
   SECRET_KEY_BASE=$(openssl rand -hex 64) \
   --no-restart
 
-# mount persistent storage
-dokku storage:ensure-directory "$DOKKU_APP" --chown false
-dokku storage:mount "$DOKKU_APP" "$DOKKU_APP_STORAGE_PATH:/app/storage"
+# create and link postgres service
+if ! dokku postgres:exists "$DOKKU_POSTGRES_SERVICE" >/dev/null 2>&1; then
+  if ! dokku postgres:create "$DOKKU_POSTGRES_SERVICE" --image postgres --image-version "$POSTGRES_IMAGE_VERSION"; then
+    echo "error: failed to create postgres service $DOKKU_POSTGRES_SERVICE"
+    exit 1
+  fi
+fi
+
+if ! dokku postgres:linked "$DOKKU_POSTGRES_SERVICE" "$DOKKU_APP" >/dev/null 2>&1; then
+  if ! dokku postgres:link "$DOKKU_POSTGRES_SERVICE" "$DOKKU_APP" --no-restart; then
+    echo "error: failed to link postgres service $DOKKU_POSTGRES_SERVICE to $DOKKU_APP"
+    exit 1
+  fi
+fi
 
 # sync git repo
 dokku git:sync "$DOKKU_APP" "$WATERGUN_GIT_REPO" "$WATERGUN_GIT_BRANCH"
@@ -136,16 +187,75 @@ dokku ps:rebuild "$DOKKU_APP"
 # dokku git:from-image "$DOKKU_APP" "$WATERGUN_DOCKER_REPO"
 
 # set app domain
-dokku domains:set "$DOKKU_APP" "$DOMAIN"
-dokku ps:scale "$DOKKU_APP" web=1 worker=1
-dokku letsencrypt:enable "$DOKKU_APP"
+if ! dokku domains:set "$DOKKU_APP" "$DOMAIN"; then
+  echo "error: failed to set domain $DOMAIN on $DOKKU_APP"
+  exit 1
+fi
+
+if ! dokku ps:scale "$DOKKU_APP" web=1 worker=1; then
+  echo "error: failed to scale $DOKKU_APP"
+  exit 1
+fi
+
+if ! dokku letsencrypt:enable "$DOKKU_APP"; then
+  echo "error: failed to enable letsencrypt for $DOKKU_APP"
+  exit 1
+fi
 
 # set up watergun account
-SETUP_TOKEN=$(dokku config:get $DOKKU_APP ACCOUNT_SETUP_TOKEN)
+SETUP_TOKEN=$(dokku config:get "$DOKKU_APP" ACCOUNT_SETUP_TOKEN)
+
+if [ "$REGISTER_SELF" = true ]; then
+  DATABASE_URL=$(dokku config:get "$DOKKU_APP" DATABASE_URL)
+
+  if [ -z "$DATABASE_URL" ]; then
+    echo "error: DATABASE_URL is not set on $DOKKU_APP"
+    exit 1
+  fi
+
+  SETUP_PAYLOAD=$(jq -n \
+    --arg server_name "$HOSTNAME" \
+    --arg public_ip "$PUBLIC_IP" \
+    --arg cpu_type "$CPU_TYPE" \
+    --arg email "$EMAIL" \
+    --arg domain "$DOMAIN" \
+    --arg dokku_app "$DOKKU_APP" \
+    --arg postgres_service "$DOKKU_POSTGRES_SERVICE" \
+    --arg postgres_version "$POSTGRES_IMAGE_VERSION" \
+    --arg database_url "$DATABASE_URL" \
+    '{
+      server: {name: $server_name, public_ip: $public_ip, cpu_type: $cpu_type},
+      user: {email: $email},
+      installation: {
+        project: {name: "Watergun"},
+        app: {name: "Watergun", dokku_id: $dokku_app, builder: "dockerfile"},
+        domain: {hostname: $domain, ssl_enabled: true},
+        service: {
+          name: "Watergun DB",
+          dokku_id: $postgres_service,
+          service_type: "postgres",
+          version: $postgres_version,
+          dsn: $database_url
+        },
+        service_link: {env_name: "DATABASE_URL"}
+      }
+    }')
+else
+  SETUP_PAYLOAD=$(jq -n \
+    --arg server_name "$HOSTNAME" \
+    --arg public_ip "$PUBLIC_IP" \
+    --arg cpu_type "$CPU_TYPE" \
+    --arg email "$EMAIL" \
+    '{
+      server: {name: $server_name, public_ip: $public_ip, cpu_type: $cpu_type},
+      user: {email: $email}
+    }')
+fi
+
 SETUP_RESPONSE=$(curl -s -X POST "https://$DOMAIN/api/internal/setups" \
   -H "Authorization: Bearer $SETUP_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"server\":{\"name\":\"$HOSTNAME\",\"public_ip\":\"$PUBLIC_IP\",\"cpu_type\":\"$CPU_TYPE\"},\"user\":{\"email\":\"$EMAIL\"}}")
+  -d "$SETUP_PAYLOAD")
 
 if [ $? -ne 0 ]; then
   echo "error: failed to set up watergun account"

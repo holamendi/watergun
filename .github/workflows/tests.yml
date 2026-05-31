@@ -36,6 +36,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check installer
+        run: scripts/test-install-smoke.sh
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

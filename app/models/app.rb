@@ -59,7 +59,7 @@ class App < ApplicationRecord
   private
 
   def set_dokku_id
-    self.dokku_id = name.parameterize.dasherize
+    self.dokku_id = name.parameterize.dasherize if dokku_id.blank?
 
     loop do
       break unless server.apps.kept.exists?(dokku_id:)

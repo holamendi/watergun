@@ -22,8 +22,10 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       Account.destroy_all
       User.destroy_all
 
-      assert_difference ["Account.count", "Server.count", "User.count"], 1 do
-        post api_internal_setups_url, params: @valid_params, headers: @headers
+      assert_no_difference ["Project.count", "App.count", "Domain.count", "Service.count", "EnvVariable.count", "ServiceLink.count", "ServerAction.count"] do
+        assert_difference ["Account.count", "Server.count", "User.count"], 1 do
+          post api_internal_setups_url, params: @valid_params, headers: @headers
+        end
       end
 
       assert_response :success
@@ -39,6 +41,78 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       assert_equal "test.example.com", server.name
       assert_equal "127.0.0.1", server.public_ip
       assert_equal "arm64", server.cpu_type
+    end
+
+    test "imports installed watergun resources when installation params are provided" do
+      Account.destroy_all
+      User.destroy_all
+
+      dsn = "postgres://watergun:secret@dokku-postgres-watergun-db:5432/watergun-db"
+      params = @valid_params.deep_merge(
+        installation: {
+          project: {
+            name: "Watergun"
+          },
+          app: {
+            name: "Watergun",
+            dokku_id: "watergun",
+            builder: "dockerfile"
+          },
+          domain: {
+            hostname: "watergun.example.com",
+            ssl_enabled: true
+          },
+          service: {
+            name: "Watergun DB",
+            dokku_id: "watergun-db",
+            service_type: "postgres",
+            version: "18",
+            dsn:
+          },
+          service_link: {
+            env_name: "DATABASE_URL"
+          }
+        }
+      )
+
+      assert_no_difference "ServerAction.count" do
+        assert_difference ["Account.count", "Server.count", "User.count", "Project.count", "App.count", "Domain.count", "Service.count", "EnvVariable.count", "ServiceLink.count"], 1 do
+          post api_internal_setups_url, params:, headers: @headers
+        end
+      end
+
+      assert_response :success
+
+      account = Account.find_by!(name: "Default")
+      project = account.projects.find_by!(name: "Watergun")
+      app = project.apps.find_by!(dokku_id: "watergun")
+      domain = app.domains.find_by!(hostname: "watergun.example.com")
+      service = project.services.find_by!(dokku_id: "watergun-db")
+      env_variable = app.env_variables.find_by!(name: "DATABASE_URL")
+      service_link = ServiceLink.find_by!(app:, service:)
+
+      assert_equal "Watergun", app.name
+      assert_equal "dockerfile", app.builder
+      assert_equal "active", app.status
+      assert_predicate app.deployed_at, :present?
+
+      assert_equal "active", domain.status
+      assert_predicate domain, :is_default?
+      assert_predicate domain, :ssl_enabled?
+
+      assert_equal "Watergun DB", service.name
+      assert_equal "postgres", service.service_type
+      assert_equal "active", service.status
+      assert_equal "18", service.version
+      assert_equal dsn, service.dsn
+      assert_predicate service.deployed_at, :present?
+
+      assert_equal dsn, env_variable.value
+      assert_predicate env_variable, :internal?
+      assert_equal "synced", env_variable.status
+      assert_predicate env_variable.synced_at, :present?
+      assert_equal env_variable, service_link.env_variable
+      assert_equal "active", service_link.status
     end
 
     test "returns an error if the setup token is invalid" do
