@@ -68,8 +68,6 @@ Rails.application.routes.draw do
     post :select, on: :member
   end
 
-  resource :dokku_import, only: :create
-
   resources :server_actions, only: [:index, :show]
 
   resource :account, controller: "accounts/settings" do

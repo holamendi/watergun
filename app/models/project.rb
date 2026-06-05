@@ -7,11 +7,6 @@ class Project < ApplicationRecord
   has_many :apps, dependent: :destroy
   has_many :deployments, through: :apps, source: :deployments
   has_many :services, dependent: :destroy
-  has_many :service_links, through: :services
-
-  store_attribute :data, :dokku_import, :boolean, default: false
-
-  scope :dokku_imports, -> { where("data ->> 'dokku_import' = ?", "true") }
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
 

@@ -2,14 +2,10 @@
 
 <% @title = "Projects" %>
 <% modal_id = "new_project_modal" %>
-<% import_modal_id = "dokku_import_modal" %>
 
 <div class="page-shell py-6">
   <%= page_header(title: "Projects") do %>
-    <div class="flex items-center gap-2">
-      <%= modal_trigger "Import Dokku", modal_id: import_modal_id, variant: :secondary, size: :sm %>
-      <%= modal_trigger "New Project", modal_id: modal_id, size: :sm %>
-    </div>
+    <%= modal_trigger "New Project", modal_id: modal_id, size: :sm %>
   <% end %>
 
   <% if @projects.any? %>
@@ -25,20 +21,4 @@
 
 <%= modal(id: modal_id, title: "New Project") do %>
   <%= render "form", project: @project %>
-<% end %>
-
-<%= modal(id: import_modal_id, title: "Import Dokku") do %>
-  <%= form_with url: dokku_import_path, method: :post, class: "space-y-4" do |form| %>
-    <label class="flex items-start gap-3 cursor-pointer">
-      <%= form.check_box :include_watergun, class: "checkbox mt-1" %>
-      <div>
-        <span class="text-xs font-medium">Include Watergun resources</span>
-        <p class="text-xs text-text-muted mt-0.5">Import apps and services whose Dokku IDs start with <code class="font-mono bg-elevated px-1 py-0.5 rounded-sm text-xxs">watergun</code>.</p>
-      </div>
-    </label>
-
-    <div class="flex justify-end">
-      <%= submit_button "Start import" %>
-    </div>
-  <% end %>
 <% end %>
