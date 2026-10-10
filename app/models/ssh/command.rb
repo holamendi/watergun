@@ -45,9 +45,13 @@ class Ssh::Command
     @output.map(&:data).join
   end
 
+  def redacted_cmd
+    @input.respond_to?(:redacted_cmd) ? @input.redacted_cmd : cmd
+  end
+
   def as_json(_options = {})
     {
-      cmd:,
+      cmd: redacted_cmd,
       exit_code:,
       started_at:,
       finished_at:,
