@@ -65,7 +65,8 @@ class Ssh::Command
     @parsed_output ||= if @input.is_a?(String)
       text_output
     elsif @input.respond_to?(:parse_output)
-      @input.parse_output(exit_code, text_output)
+      stdout = @output.select { |log| log.stream == "stdout" }.map(&:data).join
+      @input.parse_output(exit_code, stdout)
     else
       raise "input must be a string or an object that responds to #parse_output"
     end
