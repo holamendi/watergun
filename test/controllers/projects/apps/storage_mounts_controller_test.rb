@@ -2,6 +2,7 @@ require "test_helper"
 
 class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationTest
   include StoragePhaseTestHelper
+  include ActionView::RecordIdentifier
 
   setup do
     @project = projects(:default)
@@ -169,15 +170,72 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     assert_select "input[type='checkbox'][name='storage_mount[restart]']", count: 10
     assert_select "input[type='checkbox'][name='storage_mount[restart]'][checked]", count: 0
     assert_select "label", text: "Restart app", count: 10
-    assert_select "label.text-text-primary", text: "Restart app", count: 10
+    assert_select "label.restart-option", text: "Restart app", count: 10
     assert_select "[data-turbo-confirm]", count: 0
     ["Storage mounts persist", "hides existing image contents", "automatically restarts", "For non-root Dockerfile", "Adding storage restarts", "Data is retained. Retry", "Detached; backing data retained", "Add mount and restart"].each do |text|
       assert_not_includes response.body, text
     end
-    assert_includes response.body, "Configured; Restart Pending"
-    assert_includes response.body, "Detach Configured; Restart Pending"
-    assert_includes response.body, "Mount Failed"
-    assert_includes response.body, "Detach Failed"
+    assert_select ".badge-warning", text: "Restart pending"
+    assert_select ".badge-warning", text: "Detach pending"
+    assert_select ".badge-error", text: "Mount failed"
+    assert_select ".badge-error", text: "Detach failed"
+  end
+
+  test "storage rows isolate restart controls in accessible action dialogs" do
+    mount = storage_mounts(:uploads_mount)
+    mount.update!(status: :configured, chown: "heroku")
+    get project_app_storage_mounts_path(@project, @app)
+    assert_response :success
+    assert_select "##{dom_id(mount)} .storage-mount-row" do
+      assert_select "input", count: 0
+      assert_select "form", count: 0
+      assert_select ".storage-host-path[title=?]", mount.host_path
+      assert_select ".storage-ownership", text: "UID:GID 1000:1000"
+      assert_select ".badge-warning", text: "Restart pending"
+      assert_select ".action-dropdown", count: 1
+      assert_select "button[data-controller='dialog-trigger']", count: 2
+    end
+    ["resume", "detach"].each do |action|
+      assert_select "dialog##{dom_id(mount, "#{action}_modal")}" do
+        assert_select ".storage-dialog-target", text: mount.container_path
+        assert_select "input[type='checkbox'][name='storage_mount[restart]']:not([checked])", count: 1
+        assert_select ".storage-dialog-footer button[type='submit']", count: 1
+        assert_select ".storage-dialog-footer button[data-action='dialog#close']", text: "Cancel"
+      end
+    end
+    ids = css_select("[id]").map { |element| element["id"] }
+    assert_equal ids.uniq, ids
+    assert_select "label[for='storage_mount_container_path']", text: "Container path"
+  end
+
+  test "storage statuses use semantic colors and busy rows do not offer conflicting actions" do
+    {error: ["Mount failed", "error"], detach_failed: ["Detach failed", "error"], detached: ["Retained", "neutral"], pending: ["Mounting", "warning"], detaching: ["Detaching", "warning"], detach_configured: ["Detach pending", "warning"]}.each do |status, (label, color)|
+      mount = storage_mounts(:uploads_mount)
+      mount.update!(status: status)
+      get project_app_storage_mounts_path(@project, @app)
+      assert_select "##{dom_id(mount)} .badge-#{color}", text: label
+      if [:pending, :detaching].include?(status)
+        assert_select "##{dom_id(mount)} button", count: 0
+      end
+    end
+  end
+
+  test "successful row actions close the specific dialog before replacing its mount collection" do
+    mount = storage_mounts(:uploads_mount)
+    mount.update!(status: :detached)
+    patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
+    assert_response :success
+    assert_select "turbo-stream[action='close_dialog'][target='#{dom_id(mount, :resume_modal)}']"
+    assert_operator response.body.index('action="close_dialog"'), :<, response.body.index('target="storage_mounts"')
+    mount.server_actions.update_all(status: :success)
+    mount.update!(status: :active)
+    delete project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
+    assert_response :success
+    assert_select "turbo-stream[action='close_dialog'][target='#{dom_id(mount, :detach_modal)}']"
+    assert_operator response.body.index('action="close_dialog"'), :<, response.body.index('target="storage_mounts"')
+    patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
+    assert_response :conflict
+    assert_not_includes response.body, "close_dialog"
   end
 
   test "tenant and app scopes reject mount IDs and project IDs from outside request scope" do

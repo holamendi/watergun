@@ -1,34 +1,56 @@
-<div id="<%= dom_id(storage_mount) %>" class="p-4 flex items-center justify-between gap-4">
-  <div class="flex flex-col gap-1 min-w-0">
-    <span class="font-mono text-sm truncate"><%= storage_mount.container_path %></span>
-    <span class="font-mono text-xs text-text-muted truncate"><%= storage_mount.host_path %></span>
-    <span class="text-xs text-text-secondary">Ownership: <%= storage_mount.chown.presence || "Unchanged" %></span>
-  </div>
+<% status_label, status_color = {
+  "active" => ["Mounted", :green],
+  "pending" => ["Mounting", :yellow],
+  "deleting" => ["Detaching", :yellow],
+  "detaching" => ["Detaching", :yellow],
+  "configured" => ["Restart pending", :yellow],
+  "detach_configured" => ["Detach pending", :yellow],
+  "detached" => ["Retained", :neutral],
+  "error" => ["Mount failed", :red],
+  "detach_failed" => ["Detach failed", :red]
+}.fetch(storage_mount.status) %>
+<% ownership = {"heroku" => "UID:GID 1000:1000", "herokuish" => "UID:GID 32767:32767", "paketo" => "UID:GID 2000:2000", "false" => "Dokku-managed"}.fetch(storage_mount.chown, "Unchanged") %>
+<% resume_label = if storage_mount.detached? || storage_mount.detach_configured?
+  "Reattach"
+elsif storage_mount.configured?
+  "Apply mount"
+elsif storage_mount.detach_failed?
+  "Retry detach"
+elsif storage_mount.error?
+  "Retry mount"
+end %>
+<% detach_label = if storage_mount.active? || storage_mount.configured? || storage_mount.detach_configured? || storage_mount.error?
+  storage_mount.detach_configured? ? "Apply detach" : "Detach (keep data)"
+end %>
 
-  <div class="flex items-center gap-4 shrink-0">
-    <% status_label = {"configured" => "Configured; restart pending", "detach_configured" => "Detach configured; restart pending", "error" => "Mount failed", "detach_failed" => "Detach failed"}.fetch(storage_mount.status, storage_mount.status) %>
-    <%= status_badge(status_label) %>
-    <% path = project_app_storage_mount_path(storage_mount.app.project_id, storage_mount.app_id, storage_mount) %>
-    <% if storage_mount.detached? || storage_mount.detach_configured? || storage_mount.configured? || storage_mount.error? || storage_mount.detach_failed? %>
-      <% label = if storage_mount.detached? || storage_mount.detach_configured?
-        "Reattach"
-      elsif storage_mount.configured?
-        "Apply mount"
-      elsif storage_mount.detach_failed?
-        "Retry detach"
-      else
-        "Retry mount"
-      end %>
-      <%= form_with url: path, method: :patch, class: "flex flex-col gap-2" do %>
-        <%= render "projects/apps/storage_mounts/restart_option", id: dom_id(storage_mount, :resume_restart) %>
-        <%= button_tag label, class: "btn btn-ghost btn-sm" %>
+<div id="<%= dom_id(storage_mount) %>">
+  <div class="storage-mount-row">
+    <div class="storage-mount-paths">
+      <span class="storage-container-path" title="<%= storage_mount.container_path %>"><%= storage_mount.container_path %></span>
+      <span class="storage-host-path" title="<%= storage_mount.host_path %>"><%= storage_mount.host_path %></span>
+      <span class="storage-ownership"><%= ownership %></span>
+    </div>
+    <div class="storage-mount-status"><%= badge(status_label, color: status_color) %></div>
+    <div class="storage-mount-actions">
+      <% if resume_label || detach_label %>
+        <div class="action-dropdown">
+          <%= icon_button(label: "Actions for #{storage_mount.container_path}", icon: "⋯", class: "storage-actions-button", aria: {expanded: nil}) %>
+          <div class="action-dropdown-menu">
+            <% if resume_label %>
+              <%= modal_trigger resume_label, modal_id: dom_id(storage_mount, :resume_modal), variant: :ghost, class: "action-dropdown-item storage-menu-action" %>
+            <% end %>
+            <% if detach_label %>
+              <%= modal_trigger detach_label, modal_id: dom_id(storage_mount, :detach_modal), variant: :ghost, class: "action-dropdown-item storage-menu-action" %>
+            <% end %>
+          </div>
+        </div>
       <% end %>
-    <% end %>
-    <% if storage_mount.active? || storage_mount.configured? || storage_mount.detach_configured? || storage_mount.error? %>
-      <%= form_with url: path, method: :delete, class: "flex flex-col gap-2" do %>
-        <%= render "projects/apps/storage_mounts/restart_option", id: dom_id(storage_mount, :detach_restart) %>
-        <%= button_tag(storage_mount.detach_configured? ? "Apply detach" : "Detach (keep data)", class: "btn btn-ghost btn-sm text-warning") %>
-      <% end %>
-    <% end %>
+    </div>
   </div>
+  <% if resume_label %>
+    <%= render "projects/apps/storage_mounts/action_dialog", storage_mount: storage_mount, action: :resume, label: resume_label, method: :patch %>
+  <% end %>
+  <% if detach_label %>
+    <%= render "projects/apps/storage_mounts/action_dialog", storage_mount: storage_mount, action: :detach, label: detach_label, method: :delete %>
+  <% end %>
 </div>

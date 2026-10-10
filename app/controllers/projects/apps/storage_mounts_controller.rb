@@ -25,7 +25,11 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
 
   def update
     if @storage_mount.resume(restart: restart_requested?)
-      render turbo_stream: [stream_toast("Storage operation queued"), stream_storage_mounts]
+      render turbo_stream: [
+        turbo_stream.action(:close_dialog, helpers.dom_id(@storage_mount, :resume_modal)),
+        stream_toast("Storage operation queued"),
+        stream_storage_mounts
+      ]
     else
       head :conflict
     end
@@ -34,6 +38,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
   def destroy
     if StorageMount::DestroyStorageMount.new(@storage_mount).destroy(restart: restart_requested?)
       render turbo_stream: [
+        turbo_stream.action(:close_dialog, helpers.dom_id(@storage_mount, :detach_modal)),
         stream_toast("Detach queued"),
         stream_storage_mounts
       ]
