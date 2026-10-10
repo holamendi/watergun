@@ -13,7 +13,7 @@ usage() {
 # constants
 SSH_USER="watergun"
 SSH_DIR="/home/$SSH_USER/.ssh"
-DOKKU_TAG=v0.36.7
+DOKKU_TAG=v0.38.31
 DOKKU_APP="watergun"
 DOKKU_POSTGRES_SERVICE="watergun-db"
 POSTGRES_IMAGE_VERSION=18

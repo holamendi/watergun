@@ -32,7 +32,7 @@ class ServerActions::StorageRestartTest < ActiveSupport::TestCase
       action.run
       assert_equal status, mount.reload.status
       assert_equal false, action.reload.payload["restart"]
-      assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-list") }
+      assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-app-mounts") }
       assert_not session.commands.any? { |tokens| tokens.include?("ps:restart") }
       assert_not mount.discarded?
     end

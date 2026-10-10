@@ -4,12 +4,12 @@ require_relative "../../../app/models/ssh/session"
 class Ssh::CommandTest < ActiveSupport::TestCase
   test "structured command parsing excludes stderr but retains it in logs" do
     command = Ssh::Command.new(Dokku::Storage::ListCommand.new(app: "app", phase: "deploy"))
-    command.append_output(:stdout, "[{\"host_path\":\"/host\",\"container_path\":\"/data\"}]")
+    command.append_output(:stdout, [{entry: {name: "legacy-123", host_path: "/host", scheduler: "docker-local"}, attachment: {entry_name: "legacy-123", container_path: "/data"}}].to_json)
     warning = " !     Deprecated: please use the 'storage-app-mounts' plugin trigger instead of 'storage-list'\n"
     command.append_output(:stderr, warning)
     command.finish(0)
 
-    assert_equal [{"host_path" => "/host", "container_path" => "/data"}], command.parsed_output
+    assert_equal [{"entry_name" => "legacy-123", "host_path" => "/host", "container_path" => "/data", "scheduler" => "docker-local"}], command.parsed_output
     assert_includes command.text_output, warning
     assert_includes command.as_json.to_json, "Deprecated"
   end

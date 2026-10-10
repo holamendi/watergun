@@ -274,7 +274,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     action.ssh_session = session
     action.run
     assert_equal preference ? 1 : 0, session.commands.count { |tokens| tokens.include?("ps:restart") }
-    assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-list") }
+    assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-app-mounts") }
     expected_status = if attaching
       preference ? "active" : "configured"
     else

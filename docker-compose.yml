@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   dokku:
-    image: dokku/dokku:0.36.7
+    image: dokku/dokku:0.38.31
     container_name: watergun-dokku
     # Dokku-created app containers run on Docker's default bridge.
     network_mode: bridge
