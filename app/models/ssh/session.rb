@@ -84,6 +84,6 @@ class Ssh::CommandExecutionError < StandardError
   end
 
   def message
-    "command failed with status #{ssh_command.exit_code}: #{ssh_command.cmd}"
+    "command failed with status #{ssh_command.exit_code}: #{ssh_command.redacted_cmd}"
   end
 end

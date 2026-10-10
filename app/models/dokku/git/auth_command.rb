@@ -9,6 +9,10 @@ module Dokku
       def cmd
         "dokku git:auth #{@host} u #{@access_token}"
       end
+
+      def redacted_cmd
+        "dokku git:auth #{@host} u [FILTERED]"
+      end
     end
   end
 end
