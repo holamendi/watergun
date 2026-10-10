@@ -31,6 +31,10 @@ class ServerAction < ApplicationRecord
     partial: "server_actions/server_action",
     inserts_by: :prepend
 
+  def on_failure
+    # Subclasses can reconcile their target when connection setup fails.
+  end
+
   def run_now
     RunServerActionJob.perform_now(self)
   end

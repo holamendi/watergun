@@ -1,8 +1,11 @@
 class ServerActions::UnmountStorage < ServerAction
+  include StorageOperation
+
   SLUG = "apps.unmount_storage"
 
   actionable StorageMount
 
+  store_attribute :payload, :restart, :boolean, default: false
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :host_path, :string
   store_attribute :payload, :container_path, :string
@@ -21,19 +24,29 @@ class ServerActions::UnmountStorage < ServerAction
     storage_mount.app
   end
 
+  def on_failure
+    storage_mount.detach_failed!
+  end
+
   def run
-    storage_mount.deleting!
-    unmount_storage!
-  rescue Ssh::CommandExecutionError
-    storage_mount.error!
+    storage_mount.detaching!
+    storage_phase_bindings.each do |phase, mounts|
+      unmount_storage!(phase) if binding_present?(mounts)
+    end
+    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
+    if storage_phase_bindings.values.any? { |mounts| mounts.any? { |mount| mount["container_path"] == container_path } }
+      raise "Storage detach was not confirmed by Dokku in deploy and run"
+    end
+  rescue
+    storage_mount.detach_failed!
     raise
   else
-    storage_mount.destroy!
+    storage_mount.update!(status: restart ? :detached : :detach_configured)
   end
 
   private
 
-  def unmount_storage!
-    execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, host_directory: host_path, container_directory: container_path))
+  def unmount_storage!(phase)
+    execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, host_directory: host_path, container_directory: container_path, phase: phase))
   end
 end

@@ -1,8 +1,17 @@
-<%= form_with model: [storage_mount.project, storage_mount.app, storage_mount], class: "space-y-4", id: "storage_mount_form", data: {turbo_frame: "storage_mount_form"} do |form| %>
-  <fieldset class="fieldset">
-    <legend class="fieldset-legend">Container path</legend>
-    <%= form.text_field :container_path, class: "input w-full", placeholder: "/app/uploads" %>
+<%= form_with model: [storage_mount.project, storage_mount.app, storage_mount], class: "storage-dialog-form", id: "storage_mount_form" do |form| %>
+  <div class="storage-dialog-field">
+    <%= form.label :container_path, "Container path", class: "fieldset-legend" %>
+    <%= form.text_field :container_path, class: "input w-full", placeholder: "/app/uploads", required: true %>
     <%= error_messages_for(form.object, :container_path) %>
-  </fieldset>
-  <%= submit_button "Add mount" %>
+  </div>
+  <div class="storage-dialog-field">
+    <%= form.label :chown, "Directory ownership", class: "fieldset-legend" %>
+    <%= form.select :chown, [["Builder default", ""], ["Keep Dokku-managed ownership", "false"], ["UID:GID 1000:1000 (Heroku / Nixpacks)", "heroku"], ["UID:GID 32767:32767 (Herokuish)", "herokuish"], ["UID:GID 2000:2000 (Paketo)", "paketo"]], {}, class: "input w-full" %>
+    <%= error_messages_for(form.object, :chown) %>
+  </div>
+  <%= render "projects/apps/storage_mounts/restart_option", id: "storage_mount_create_restart" %>
+  <div class="storage-dialog-footer">
+    <%= button "Cancel", variant: :secondary, data: {action: "dialog#close"} %>
+    <%= submit_button "Add mount" %>
+  </div>
 <% end %>

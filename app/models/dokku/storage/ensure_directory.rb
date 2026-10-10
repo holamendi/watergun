@@ -9,9 +9,7 @@ module Dokku
       end
 
       def cmd
-        cmd = "dokku storage:ensure_directory #{directory}"
-        cmd += " --chown=#{chown}" if chown
-        cmd
+        Shellwords.join(["dokku", "storage:ensure-directory", "--chown", chown.presence || "false", directory])
       end
     end
   end

@@ -5,11 +5,14 @@ class StorageMount < ApplicationRecord
   belongs_to :account, default: -> { app.account }
   belongs_to :app, touch: true
 
-  enum :status, Enum[:pending, :active, :deleting, :error], default: :pending
+  enum :status, Enum[:pending, :active, :deleting, :error, :detaching, :detached, :detach_failed, :configured, :detach_configured], default: :pending
 
   validates :container_path, presence: true,
     uniqueness: {scope: :app_id, conditions: -> { undiscarded }},
     format: {with: /\A\//, message: "must be an absolute path"}
+
+  validates :chown, inclusion: {in: %w[herokuish heroku paketo false]}, allow_blank: true
+  validate :safe_container_path, if: :will_save_change_to_container_path?
 
   delegate :project, :server, to: :app
 
@@ -25,14 +28,46 @@ class StorageMount < ApplicationRecord
     broadcast_remove_to [app, :storage_mounts], target: dom_id(self)
   end
 
+  def save_and_mount(restart: false)
+    self.class.transaction do
+      if save
+        ServerActions::MountStorage.run_later!(server, self, restart: restart)
+        true
+      else
+        false
+      end
+    end
+  end
+
+  def resume(restart: false)
+    with_lock do
+      return false unless detached? || detach_configured? || configured? || error? || detach_failed?
+      return false if server_actions.queued_or_running.exists?
+
+      action_class = detach_failed? ? ServerActions::UnmountStorage : ServerActions::MountStorage
+      update!(status: detach_failed? ? :detaching : :pending)
+      action_class.run_later!(server, self, restart: restart)
+    end
+    true
+  end
+
   private
 
+  def safe_container_path
+    return if container_path.blank?
+    segments = container_path.split("/", -1).drop(1)
+    unless container_path.match?(%r{\A/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\z}) && segments.none? { |segment| [".", ".."].include?(segment) }
+      errors.add(:container_path, "must be a normalized absolute non-root path using letters, numbers, dots, underscores or hyphens")
+    end
+  end
+
   def set_host_path
-    sanitized = container_path.delete_prefix("/").tr("/", "_")
-    self.host_path = "/var/lib/dokku/data/storage/#{app.dokku_id}/#{sanitized}"
+    self.host_path = "/var/lib/dokku/data/storage/watergun-#{SecureRandom.hex(16)}"
   end
 
   def set_chown
+    return if chown.present?
+
     self.chown = case app.builder
     when "herokuish" then "herokuish"
     when "nixpacks" then "heroku"

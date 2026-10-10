@@ -15,17 +15,20 @@ module SshTestHelper
   #   ]
   # )
   #
-  def mock_ssh_session(host:, user:, port:, private_key:, commands: [])
+  def mock_ssh_session(host:, user:, port:, private_key:, commands: [], ordered: false)
     session = mock
     channel = mock
 
+    command_order = sequence("ssh commands") if ordered
     commands.each do |config|
       cmd = config[:cmd]
       stdout = Array(config[:stdout]).compact
       stderr = Array(config[:stderr]).compact
       exit_code = config[:exit_code] || 0
 
-      session.expects(:exec!).with do |exec_cmd, opts|
+      expectation = session.expects(:exec!)
+      expectation.in_sequence(command_order) if ordered
+      expectation.with do |exec_cmd, opts|
         opts[:status][:exit_code] = exit_code if exec_cmd == cmd
       end.multiple_yields(
         *stdout.map { [channel, :stdout, it] },

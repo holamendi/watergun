@@ -1,5 +1,5 @@
 class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
-  before_action :set_storage_mount, only: :destroy
+  before_action :set_storage_mount, only: %i[update destroy]
 
   def index
     @storage_mounts = storage_mounts_scope
@@ -8,8 +8,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
   def create
     @storage_mount = @app.storage_mounts.new(storage_mount_params)
 
-    if @storage_mount.save
-      ServerActions::MountStorage.run_later!(@app.server, @storage_mount)
+    if @storage_mount.save_and_mount(restart: restart_requested?)
       render turbo_stream: [
         stream_toast("Storage mount added"),
         stream_storage_mounts,
@@ -24,12 +23,28 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
     end
   end
 
+  def update
+    if @storage_mount.resume(restart: restart_requested?)
+      render turbo_stream: [
+        turbo_stream.action(:close_dialog, helpers.dom_id(@storage_mount, :resume_modal)),
+        stream_toast("Storage operation queued"),
+        stream_storage_mounts
+      ]
+    else
+      head :conflict
+    end
+  end
+
   def destroy
-    StorageMount::DestroyStorageMount.new(@storage_mount).destroy
-    render turbo_stream: [
-      stream_toast("Storage mount removed"),
-      stream_storage_mounts
-    ]
+    if StorageMount::DestroyStorageMount.new(@storage_mount).destroy(restart: restart_requested?)
+      render turbo_stream: [
+        turbo_stream.action(:close_dialog, helpers.dom_id(@storage_mount, :detach_modal)),
+        stream_toast("Detach queued"),
+        stream_storage_mounts
+      ]
+    else
+      head :conflict
+    end
   end
 
   private
@@ -38,8 +53,12 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
     @storage_mount = @app.storage_mounts.kept.find(params[:id])
   end
 
+  def restart_requested?
+    ActiveModel::Type::Boolean.new.cast(params.dig(:storage_mount, :restart)) == true
+  end
+
   def storage_mount_params
-    params.require(:storage_mount).permit(:container_path)
+    params.require(:storage_mount).permit(:container_path, :chown)
   end
 
   def storage_mounts_scope
