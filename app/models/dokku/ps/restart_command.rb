@@ -6,7 +6,7 @@ module Dokku
       end
 
       def cmd
-        "dokku ps:restart #{@app}"
+        Shellwords.join(["dokku", "ps:restart", @app])
       end
     end
   end

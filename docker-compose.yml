@@ -3,7 +3,7 @@ services:
     image: postgres:18-alpine
     container_name: watergun-postgres
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${LOCAL_BIND_ADDRESS:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql
     environment:
@@ -15,12 +15,16 @@ services:
   dokku:
     image: dokku/dokku:0.36.7
     container_name: watergun-dokku
+    # Dokku-created app containers run on Docker's default bridge.
+    network_mode: bridge
     ports:
-      - "3022:22"
-      - "8080:80"
-      - "8443:443"
+      - "${LOCAL_BIND_ADDRESS:-127.0.0.1}:3022:22"
+      - "${LOCAL_BIND_ADDRESS:-127.0.0.1}:${DOKKU_HTTP_PORT:-8080}:80"
+      - "${LOCAL_BIND_ADDRESS:-127.0.0.1}:${DOKKU_HTTPS_PORT:-8443}:443"
     volumes:
       - dokku-data:/mnt/dokku
+      # App containers use the host Docker socket, so storage paths must match.
+      - /var/lib/dokku/data/storage:/mnt/dokku/var/lib/dokku/data/storage
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOKKU_HOSTNAME: dokku.local

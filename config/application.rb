@@ -39,7 +39,10 @@ module Watergun
     # Don't generate system test files.
     config.generators.system_tests = nil
 
-    config.solid_queue.connects_to = {database: {writing: :primary, reading: :primary}}
+    # Share the primary connection pool, not just its database name: storage
+    # lifecycle transactions must include Solid Queue's insert. Other jobs still
+    # retain ApplicationJob's enqueue-after-commit behavior.
+    config.solid_queue.connects_to = nil
     # config.solid_queue.logger = Rails.application.logger
     #
     config.active_record.encryption.support_unencrypted_data = true

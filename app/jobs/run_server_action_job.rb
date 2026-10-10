@@ -26,6 +26,7 @@ class RunServerActionJob < ApplicationJob
     end
     server_action.status = session.status
   rescue => e
+    server_action.on_failure
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
     server_action.failure_message = <<~ERROR
