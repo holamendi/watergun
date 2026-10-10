@@ -27,6 +27,51 @@ class Projects::ServicesControllerTest < ActionDispatch::IntegrationTest
       assert_select "[data-ui-component='empty-state']"
     end
 
+    test "shows unknown instead of error when an active service has no container observations" do
+      @service.update!(status: :active)
+
+      get project_service_path(@project, @service)
+
+      assert_response :success
+      assert_select ".service-info-card", text: /Status/ do
+        assert_select "span", text: "Unknown"
+        assert_select ".text-error", count: 0
+      end
+    end
+
+    %i[pending stopped error].each do |status|
+      test "preserves #{status} status without container observations" do
+        @service.update!(status: status)
+
+        get project_service_path(@project, @service)
+
+        assert_response :success
+        assert_select ".service-info-card", text: /Status/ do
+          assert_select "span", text: status.to_s.titleize
+        end
+      end
+    end
+
+    test "shows running for an observed running service container" do
+      @service.update!(status: :active)
+      @service.containers.create!(
+        server: @service.server,
+        cid: "postgres-running",
+        name: "dokku.postgres.#{@service.dokku_id}",
+        checked_at: Time.current,
+        cpu_percentage: 0,
+        memory_percentage: 0,
+        status: :running
+      )
+
+      get project_service_path(@project, @service)
+
+      assert_response :success
+      assert_select ".service-info-card", text: /Status/ do
+        assert_select "span.text-success", text: "Running"
+      end
+    end
+
     test "renders navigation tabs" do
       get project_service_path(@project, @service)
 

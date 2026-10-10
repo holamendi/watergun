@@ -47,6 +47,49 @@ class FetchContainerMetricsJobTest < ActiveSupport::TestCase
     assert_equal 1.25, check.load_average
   end
 
+  test "persists large byte metrics for app and service containers and their checks" do
+    service = services(:postgres)
+    stats = ["#{@app.dokku_id}.web.1", "dokku.postgres.#{service.dokku_id}"].map.with_index do |name, index|
+      {
+        "BlockIO" => "3GiB / 4GiB",
+        "CPUPerc" => "5.32",
+        "ID" => "large#{index}",
+        "MemPerc" => "50.0",
+        "MemUsage" => "5GiB / 10GiB",
+        "Name" => name,
+        "NetIO" => "6GiB / 7GiB"
+      }.to_json
+    end.join("\n")
+
+    mock_ssh_session(
+      host: @server.public_ip,
+      user: SshKey::USER,
+      port: @server.ssh_port,
+      private_key: @server.ssh_key.private_key,
+      commands: [
+        {cmd: Docker::StatsCommand.new.cmd, stdout: stats, exit_code: 0},
+        {cmd: System::MetricsCommand.new.cmd, stdout: "25.5\n1073741824\n2147483648\n10737418240\n21474836480\n1.25\n", exit_code: 0}
+      ]
+    )
+
+    FetchContainerMetricsJob.perform_now
+
+    expected = {
+      "block_io_read_bytes" => 3.gigabytes,
+      "block_io_write_bytes" => 4.gigabytes,
+      "memory_used_bytes" => 5.gigabytes,
+      "memory_limit_bytes" => 10.gigabytes,
+      "network_io_in_bytes" => 6.gigabytes,
+      "network_io_out_bytes" => 7.gigabytes
+    }
+    [@app, service].each do |resource|
+      container = resource.containers.sole.reload
+      assert container.running?
+      assert_equal expected, container.attributes.slice(*expected.keys)
+      assert_equal expected, container.checks.sole.reload.attributes.slice(*expected.keys)
+    end
+  end
+
   test "does not create server check when metrics command fails" do
     docker_stats_output = {
       "BlockIO" => "1.5kB / 2.3MB",
