@@ -11,12 +11,6 @@
     <%= modal_trigger "+ Add Mount", modal_id: modal_id, size: :sm %>
   <% end %>
 
-  <div class="rounded border border-border bg-surface p-3 mb-4">
-    <p class="text-sm text-text-secondary">
-      Storage mounts persist data across deployments. Adding, detaching or reattaching storage automatically restarts the app and may briefly interrupt requests. A mount hides existing image contents at the container path; it does not copy them. Detaching keeps backing data for reattachment.
-    </p>
-  </div>
-
   <%= render "storage_mounts",
       project: @project,
       app: @app,

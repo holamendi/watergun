@@ -8,7 +8,7 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
   def create
     @storage_mount = @app.storage_mounts.new(storage_mount_params)
 
-    if @storage_mount.save_and_mount
+    if @storage_mount.save_and_mount(restart: restart_requested?)
       render turbo_stream: [
         stream_toast("Storage mount added"),
         stream_storage_mounts,
@@ -24,17 +24,17 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
   end
 
   def update
-    if @storage_mount.resume
-      render turbo_stream: [stream_toast("Storage operation queued; app will restart"), stream_storage_mounts]
+    if @storage_mount.resume(restart: restart_requested?)
+      render turbo_stream: [stream_toast("Storage operation queued"), stream_storage_mounts]
     else
       head :conflict
     end
   end
 
   def destroy
-    if StorageMount::DestroyStorageMount.new(@storage_mount).destroy
+    if StorageMount::DestroyStorageMount.new(@storage_mount).destroy(restart: restart_requested?)
       render turbo_stream: [
-        stream_toast("Detach queued; data will be kept and app will restart"),
+        stream_toast("Detach queued"),
         stream_storage_mounts
       ]
     else
@@ -46,6 +46,10 @@ class Projects::Apps::StorageMountsController < Projects::Apps::BaseController
 
   def set_storage_mount
     @storage_mount = @app.storage_mounts.kept.find(params[:id])
+  end
+
+  def restart_requested?
+    ActiveModel::Type::Boolean.new.cast(params.dig(:storage_mount, :restart)) == true
   end
 
   def storage_mount_params

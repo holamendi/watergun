@@ -5,7 +5,7 @@ class StorageMount < ApplicationRecord
   belongs_to :account, default: -> { app.account }
   belongs_to :app, touch: true
 
-  enum :status, Enum[:pending, :active, :deleting, :error, :detaching, :detached, :detach_failed], default: :pending
+  enum :status, Enum[:pending, :active, :deleting, :error, :detaching, :detached, :detach_failed, :configured, :detach_configured], default: :pending
 
   validates :container_path, presence: true,
     uniqueness: {scope: :app_id, conditions: -> { undiscarded }},
@@ -28,10 +28,10 @@ class StorageMount < ApplicationRecord
     broadcast_remove_to [app, :storage_mounts], target: dom_id(self)
   end
 
-  def save_and_mount
+  def save_and_mount(restart: false)
     self.class.transaction do
       if save
-        ServerActions::MountStorage.run_later!(server, self)
+        ServerActions::MountStorage.run_later!(server, self, restart: restart)
         true
       else
         false
@@ -39,14 +39,14 @@ class StorageMount < ApplicationRecord
     end
   end
 
-  def resume
+  def resume(restart: false)
     with_lock do
-      return false unless detached? || error? || detach_failed?
+      return false unless detached? || detach_configured? || configured? || error? || detach_failed?
       return false if server_actions.queued_or_running.exists?
 
       action_class = detach_failed? ? ServerActions::UnmountStorage : ServerActions::MountStorage
       update!(status: detach_failed? ? :detaching : :pending)
-      action_class.run_later!(server, self)
+      action_class.run_later!(server, self, restart: restart)
     end
     true
   end

@@ -9,7 +9,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     @storage_mount.update_columns(container_path: "/app/a file$(id);'[]#.^$/", host_path: "/var/lib/dokku/data/storage/old file$(id);'[]#.^$")
     path = @storage_mount.host_path
     session = storage_phase_session(@storage_mount)
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     action.ssh_session = session
     action.run
     assert @storage_mount.reload.active?
@@ -17,7 +17,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     assert_includes session.commands, ["dokku", "docker-options:add", @app.dokku_id, "run", "-v #{path}:#{@storage_mount.container_path}"]
     action.on_failure
     assert @storage_mount.reload.error?
-    detach = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
+    detach = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     detach.ssh_session = session
     detach.run
     assert @storage_mount.reload.detached?
@@ -27,7 +27,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "partial mount failure reconciles run phase on retry" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: false)
     session.fail_run_once = true
     action.ssh_session = session
@@ -40,7 +40,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "mount verifies run phase before reporting success" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: false)
     session.ignore_run_change = true
     action.ssh_session = session
@@ -75,7 +75,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount)
+    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount, restart: true)
 
     assert server_action.success?
     assert @storage_mount.reload.active?
@@ -100,14 +100,14 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
         non_interactive: true)
       .yields(stub_session)
 
-    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount)
+    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount, restart: true)
 
     assert server_action.failure?
     assert @storage_mount.reload.error?
   end
 
   test "mount retry skips already configured binding and retries restart and verification" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     list = stub(parsed_output: [{"host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}])
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(list)
@@ -120,7 +120,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "does not claim active when verification returns different mount" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     session.stubs(:execute!).returns(stub(parsed_output: [{"host_path" => "/other", "container_path" => "/app/uploads"}]))
     action.ssh_session = session
@@ -139,7 +139,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
         {cmd: "dokku docker-options:add domain-test-app run -v\\ #{@storage_mount.host_path}:/app/uploads"},
         {cmd: "dokku ps:restart domain-test-app", exit_code: 1}
       ])
-    action = ServerActions::MountStorage.run_now!(@server, @storage_mount)
+    action = ServerActions::MountStorage.run_now!(@server, @storage_mount, restart: true)
     assert action.failure?
     assert @storage_mount.reload.error?
   end
@@ -147,7 +147,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   test "connection failures before run leave storage retryable" do
     [ServerActions::MountStorage, ServerActions::UnmountStorage].each do |klass|
       @storage_mount.update!(status: (klass == ServerActions::MountStorage) ? :pending : :detaching)
-      action = klass.create!(server: @server, actionable: @storage_mount)
+      action = klass.create!(server: @server, actionable: @storage_mount, restart: true)
       action.server.stubs(:ssh_session).raises(Net::SSH::ConnectionTimeout, "unreachable")
       assert_raises(Net::SSH::ConnectionTimeout) { action.run_now }
       assert_equal (klass == ServerActions::MountStorage) ? "error" : "detach_failed", @storage_mount.reload.status
@@ -157,7 +157,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
 
   test "reattaching legacy backing paths checks exact directory without creating a different one" do
     @storage_mount.update_column(:host_path, "/var/lib/dokku/data/storage/domain-test-app/app_uploads")
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []), stub(parsed_output: []), stub(parsed_output: [{"host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}]))
     session.expects(:execute!).with("test -d #{@storage_mount.host_path}")
@@ -170,7 +170,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "successful mount command is not active until final verification confirms exact binding" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []))
     session.expects(:execute!).with(instance_of(Dokku::Storage::EnsureDirectory))
@@ -182,7 +182,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "malformed verification JSON leaves operation retryable" do
-    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::MountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     result = mock
     result.expects(:parsed_output).raises(JSON::ParserError, "invalid JSON")
@@ -211,7 +211,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount)
+    server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount, restart: true)
 
     assert_equal "domain-test-app", server_action.dokku_app_id
     assert_equal @storage_mount.host_path, server_action.host_path

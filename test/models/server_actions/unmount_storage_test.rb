@@ -5,7 +5,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   include StoragePhaseTestHelper
 
   test "partial unmount failure reconciles run phase on retry" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: true)
     session.fail_run_once = true
     action.ssh_session = session
@@ -18,7 +18,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   end
 
   test "unmount verifies run phase before reporting success" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: true)
     session.ignore_run_change = true
     action.ssh_session = session
@@ -53,7 +53,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
 
     path = @storage_mount.host_path
     assert_no_difference -> { StorageMount.count } do
-      action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount)
+      action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
       assert action.success?
     end
     assert_equal "detached", @storage_mount.reload.status
@@ -62,7 +62,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   end
 
   test "detach retry skips absent binding and still restarts and verifies" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []))
     session.expects(:execute!).with(instance_of(Dokku::Ps::RestartCommand))
@@ -73,7 +73,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   end
 
   test "verification failure preserves record and failed detach intent" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
+    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
     session = mock
     session.stubs(:execute!).returns(stub(parsed_output: [{"host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}]))
     action.ssh_session = session
@@ -92,7 +92,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
         {cmd: "dokku docker-options:remove domain-test-app run -v\\ #{@storage_mount.host_path}:/app/uploads"},
         {cmd: "dokku ps:restart domain-test-app", exit_code: 1}
       ])
-    action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount)
+    action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
     assert action.failure?
     assert_equal "detach_failed", @storage_mount.reload.status
     assert_not @storage_mount.discarded?
@@ -117,7 +117,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
         non_interactive: true)
       .yields(stub_session)
 
-    server_action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount)
+    server_action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
 
     assert server_action.failure?
     assert_equal "detach_failed", @storage_mount.reload.status

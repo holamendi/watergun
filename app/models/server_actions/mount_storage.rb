@@ -5,6 +5,7 @@ class ServerActions::MountStorage < ServerAction
 
   actionable StorageMount
 
+  store_attribute :payload, :restart, :boolean, default: false
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :host_path, :string
   store_attribute :payload, :container_path, :string
@@ -37,7 +38,7 @@ class ServerActions::MountStorage < ServerAction
     missing = phases.select { |phase, mounts| !binding_present?(mounts) }.keys
     ensure_directory! if missing.any?
     missing.each { |phase| mount_storage!(phase) }
-    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id))
+    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
     unless storage_phase_bindings.values.all? { |mounts| binding_present?(mounts) }
       raise "Storage mount was not confirmed by Dokku in deploy and run"
     end
@@ -45,7 +46,7 @@ class ServerActions::MountStorage < ServerAction
     storage_mount.error!
     raise
   else
-    storage_mount.active!
+    storage_mount.update!(status: restart ? :active : :configured)
   end
 
   private

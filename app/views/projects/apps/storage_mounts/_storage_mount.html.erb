@@ -3,23 +3,32 @@
     <span class="font-mono text-sm truncate"><%= storage_mount.container_path %></span>
     <span class="font-mono text-xs text-text-muted truncate"><%= storage_mount.host_path %></span>
     <span class="text-xs text-text-secondary">Ownership: <%= storage_mount.chown.presence || "Unchanged" %></span>
-    <% if storage_mount.error? || storage_mount.detach_failed? %>
-      <span class="text-xs text-error"><%= storage_mount.detach_failed? ? "Detach failed; state unconfirmed" : "Mount failed; state unconfirmed" %>. Data is retained. Retry to reconcile Dokku and restart the app.</span>
-    <% elsif storage_mount.detached? %>
-      <span class="text-xs text-text-secondary">Detached; backing data retained for reattachment.</span>
-    <% end %>
   </div>
 
   <div class="flex items-center gap-4 shrink-0">
-    <%= status_badge(storage_mount.status) %>
+    <% status_label = {"configured" => "Configured; restart pending", "detach_configured" => "Detach configured; restart pending", "error" => "Mount failed", "detach_failed" => "Detach failed"}.fetch(storage_mount.status, storage_mount.status) %>
+    <%= status_badge(status_label) %>
     <% path = project_app_storage_mount_path(storage_mount.app.project_id, storage_mount.app_id, storage_mount) %>
-    <% if storage_mount.detached? || storage_mount.error? || storage_mount.detach_failed? %>
-      <%= link_to(storage_mount.detached? ? "Reattach" : (storage_mount.detach_failed? ? "Retry detach" : "Retry mount"), path,
-          class: "btn btn-ghost btn-sm", data: {turbo_method: :patch, turbo_confirm: "This operation restarts the app. Continue?"}) %>
+    <% if storage_mount.detached? || storage_mount.detach_configured? || storage_mount.configured? || storage_mount.error? || storage_mount.detach_failed? %>
+      <% label = if storage_mount.detached? || storage_mount.detach_configured?
+        "Reattach"
+      elsif storage_mount.configured?
+        "Apply mount"
+      elsif storage_mount.detach_failed?
+        "Retry detach"
+      else
+        "Retry mount"
+      end %>
+      <%= form_with url: path, method: :patch, class: "flex flex-col gap-2" do %>
+        <%= render "projects/apps/storage_mounts/restart_option", id: dom_id(storage_mount, :resume_restart) %>
+        <%= button_tag label, class: "btn btn-ghost btn-sm" %>
+      <% end %>
     <% end %>
-    <% if storage_mount.active? || storage_mount.error? %>
-      <%= link_to "Detach (keep data)", path, class: "btn btn-ghost btn-sm text-warning",
-          data: {turbo_method: :delete, turbo_confirm: "Detach #{storage_mount.container_path} and restart the app? Backing data is kept; image contents at this path become visible again."} %>
+    <% if storage_mount.active? || storage_mount.configured? || storage_mount.detach_configured? || storage_mount.error? %>
+      <%= form_with url: path, method: :delete, class: "flex flex-col gap-2" do %>
+        <%= render "projects/apps/storage_mounts/restart_option", id: dom_id(storage_mount, :detach_restart) %>
+        <%= button_tag(storage_mount.detach_configured? ? "Apply detach" : "Detach (keep data)", class: "btn btn-ghost btn-sm text-warning") %>
+      <% end %>
     <% end %>
   </div>
 </div>
