@@ -14,7 +14,7 @@
         <% if container %>
           <%= status_badge(:running) %>
         <% else %>
-          <%= status_badge(:error) %>
+          <%= status_badge(@service.active? ? :unknown : @service.status) %>
         <% end %>
       </div>
     </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_05_31_090001) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_10_121500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,15 +66,15 @@ ActiveRecord::Schema[8.2].define(version: 2026_05_31_090001) do
 
   create_table "container_checks", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.integer "block_io_read_bytes"
-    t.integer "block_io_write_bytes"
+    t.bigint "block_io_read_bytes"
+    t.bigint "block_io_write_bytes"
     t.integer "container_id", null: false
     t.float "cpu_percentage", null: false
-    t.integer "memory_limit_bytes"
+    t.bigint "memory_limit_bytes"
     t.float "memory_percentage", null: false
-    t.integer "memory_used_bytes"
-    t.integer "network_io_in_bytes"
-    t.integer "network_io_out_bytes"
+    t.bigint "memory_used_bytes"
+    t.bigint "network_io_in_bytes"
+    t.bigint "network_io_out_bytes"
     t.datetime "timestamp", null: false
     t.index ["account_id"], name: "index_container_checks_on_account_id"
     t.index ["container_id", "timestamp"], name: "index_container_checks_on_container_id_and_timestamp"
@@ -84,20 +84,20 @@ ActiveRecord::Schema[8.2].define(version: 2026_05_31_090001) do
 
   create_table "containers", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.integer "block_io_read_bytes"
-    t.integer "block_io_write_bytes"
+    t.bigint "block_io_read_bytes"
+    t.bigint "block_io_write_bytes"
     t.datetime "checked_at", null: false
     t.string "cid", null: false
     t.integer "containerizable_id", null: false
     t.string "containerizable_type", null: false
     t.float "cpu_percentage", null: false
     t.datetime "created_at", null: false
-    t.integer "memory_limit_bytes"
+    t.bigint "memory_limit_bytes"
     t.float "memory_percentage", null: false
-    t.integer "memory_used_bytes"
+    t.bigint "memory_used_bytes"
     t.string "name", null: false
-    t.integer "network_io_in_bytes"
-    t.integer "network_io_out_bytes"
+    t.bigint "network_io_in_bytes"
+    t.bigint "network_io_out_bytes"
     t.integer "server_id", null: false
     t.string "status"
     t.datetime "stopped_at"
