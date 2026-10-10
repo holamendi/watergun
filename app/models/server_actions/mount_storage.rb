@@ -32,12 +32,16 @@ class ServerActions::MountStorage < ServerAction
 
   def run
     phases = storage_phase_bindings
+    validate_storage_scope!(phases)
     if phases.values.any? { |mounts| mounts.any? { |mount| mount["container_path"] == container_path && mount["host_path"] != host_path } }
       raise "Container path is already mounted from another directory"
     end
     missing = phases.select { |phase, mounts| !binding_present?(mounts) }.keys
-    ensure_directory! if missing.any?
-    missing.each { |phase| mount_storage!(phase) }
+    if missing.any?
+      execute!("test -d #{Shellwords.escape(host_path)}") unless managed_host_path?
+      name = storage_entry_name(phases)
+      execute!(Dokku::Storage::Mount.new(app: dokku_app_id, entry_name: name, container_directory: container_path))
+    end
     execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
     unless storage_phase_bindings.values.all? { |mounts| binding_present?(mounts) }
       raise "Storage mount was not confirmed by Dokku in deploy and run"
@@ -51,16 +55,27 @@ class ServerActions::MountStorage < ServerAction
 
   private
 
-  def ensure_directory!
-    if host_path.match?(%r{\A/var/lib/dokku/data/storage/watergun-[a-f0-9]{32}\z})
-      execute!(Dokku::Storage::EnsureDirectory.new(directory: File.basename(host_path), chown: chown))
-    else
-      # Preserve legacy paths and data; never create a different directory on retry.
-      execute!("test -d #{Shellwords.escape(host_path)}")
-    end
+  def managed_host_path?
+    host_path.match?(%r{\A/var/lib/dokku/data/storage/watergun-[a-f0-9]{32}\z})
   end
 
-  def mount_storage!(phase)
-    execute!(Dokku::Storage::Mount.new(app: dokku_app_id, host_directory: host_path, container_directory: container_path, phase: phase))
+  def storage_entry_name(phases)
+    binding = phases.values.flatten.find { |mount| binding_present?([mount]) }
+    return binding.fetch("entry_name") if binding
+
+    entries = execute!(Dokku::Storage::ListEntriesCommand.new).parsed_output
+    entry = entries.find { |item| item["host_path"] == host_path }
+    return entry.fetch("name") if entry
+
+    name = managed_host_path? ? File.basename(host_path) : "watergun-#{Digest::SHA256.hexdigest(host_path).first(32)}"
+    raise "Storage entry name is already registered for another directory" if entries.any? { |item| item["name"] == name }
+
+    if managed_host_path?
+      execute!(Dokku::Storage::CreateEntry.new(name: name, chown: chown))
+    else
+      # Register the exact retained path; never create a replacement or chown it.
+      execute!(Dokku::Storage::CreateEntry.new(name: name, path: host_path))
+    end
+    name
   end
 end

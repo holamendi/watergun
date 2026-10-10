@@ -30,8 +30,10 @@ class ServerActions::UnmountStorage < ServerAction
 
   def run
     storage_mount.detaching!
-    storage_phase_bindings.each do |phase, mounts|
-      unmount_storage!(phase) if binding_present?(mounts)
+    phases = storage_phase_bindings
+    validate_storage_scope!(phases)
+    phases.values.flatten.select { |mount| binding_present?([mount]) }.map { |mount| mount.fetch("entry_name") }.uniq.each do |name|
+      execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, entry_name: name, container_directory: container_path))
     end
     execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
     if storage_phase_bindings.values.any? { |mounts| mounts.any? { |mount| mount["container_path"] == container_path } }
@@ -42,11 +44,5 @@ class ServerActions::UnmountStorage < ServerAction
     raise
   else
     storage_mount.update!(status: restart ? :detached : :detach_configured)
-  end
-
-  private
-
-  def unmount_storage!(phase)
-    execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, host_directory: host_path, container_directory: container_path, phase: phase))
   end
 end

@@ -2,46 +2,29 @@ require "test_helper"
 require "shellwords"
 
 class Dokku::StorageCommandsTest < ActiveSupport::TestCase
-  test "storage commands encode every untrusted argument as a single shell token" do
+  test "named storage commands shell encode arguments and converge both phases in one mount" do
     app = "app; touch /tmp/no"
-    host = "/data/a file$(id)"
-    container = "/app/data;id"
-    [Dokku::Storage::Mount, Dokku::Storage::UnmountCommand].each do |klass|
-      command = klass.new(app: app, host_directory: host, container_directory: container)
-      tokens = nil
-      assert_nothing_raised { tokens = Shellwords.split(command.cmd) }
-      assert_equal ["dokku", (klass == Dokku::Storage::Mount) ? "storage:mount" : "storage:unmount", app, "#{host}:#{container}"], tokens
-      assert_includes command.cmd, "\\;"
-    end
-    assert_equal ["dokku", "storage:list", app, "--format", "json"], Shellwords.split(Dokku::Storage::ListCommand.new(app: app).cmd)
+    entry = "legacy-123"
+    container = "/app/a file$(id);'[]#.^$/"
+    assert_equal ["sudo", "-n", "dokku", "plugin:trigger", "storage-app-mounts", app, "run"], Shellwords.split(Dokku::Storage::ListCommand.new(app: app, phase: "run").cmd)
+    assert_equal ["dokku", "storage:mount", app, entry, "--container-dir", container, "--phase", "deploy", "--phase", "run"], Shellwords.split(Dokku::Storage::Mount.new(app: app, entry_name: entry, container_directory: container).cmd)
+    assert_equal ["dokku", "storage:unmount", app, entry, "--container-dir", container], Shellwords.split(Dokku::Storage::UnmountCommand.new(app: app, entry_name: entry, container_directory: container).cmd)
     assert_equal ["dokku", "ps:restart", app], Shellwords.split(Dokku::Ps::RestartCommand.new(app: app).cmd)
   end
 
-  test "phase commands read and change only the requested phase" do
-    assert_equal ["sudo", "-n", "dokku", "plugin:trigger", "storage-list", "app", "run", "json"], Shellwords.split(Dokku::Storage::ListCommand.new(app: "app", phase: "run").cmd)
-    assert_equal ["dokku", "docker-options:add", "app", "run", "-v /host:/app/data"], Shellwords.split(Dokku::Storage::Mount.new(app: "app", host_directory: "/host", container_directory: "/app/data", phase: "run").cmd)
-    assert_equal ["dokku", "docker-options:remove", "app", "deploy", "-v /host:/app/data"], Shellwords.split(Dokku::Storage::UnmountCommand.new(app: "app", host_directory: "/host", container_directory: "/app/data", phase: "deploy").cmd)
+  test "entry creation encodes ownership separately and never chowns a custom path" do
+    assert_equal ["dokku", "storage:create", "watergun-123", "--chown", "heroku"], Shellwords.split(Dokku::Storage::CreateEntry.new(name: "watergun-123", chown: "heroku").cmd)
+    assert_equal ["dokku", "storage:create", "watergun-123", "--chown", "false"], Shellwords.split(Dokku::Storage::CreateEntry.new(name: "watergun-123").cmd)
+    path = "/data/a file$(id);'[]#.^$"
+    assert_equal ["dokku", "storage:create", "watergun-123", path], Shellwords.split(Dokku::Storage::CreateEntry.new(name: "watergun-123", path: path, chown: "heroku").cmd)
+    assert_equal ["dokku", "storage:list-entries", "--scheduler", "docker-local", "--format", "json"], Shellwords.split(Dokku::Storage::ListEntriesCommand.new.cmd)
+    entries = [{"name" => "legacy-retained", "host_path" => path}]
+    assert_equal entries, Dokku::Storage::ListEntriesCommand.new.parse_output(0, entries.to_json)
   end
 
-  test "phase detach treats legacy paths as literal sed patterns and shell tokens" do
-    require "open3"
-    host = "/data/a file$(id);'[]#.^$"
-    container = "/app/uploads/"
-    command = Dokku::Storage::UnmountCommand.new(app: "app", host_directory: host, container_directory: container, phase: "run")
-    tokens = Shellwords.split(command.cmd)
-    assert_equal ["dokku", "docker-options:remove", "app", "run"], tokens.first(4)
-    binding = "-v #{host}:#{container}"
-    neighbor = "-v /data/other:/app/uploads/"
-    # Dokku 0.36.7 remove_passed_docker_option interpolates this argument into
-    # sed's basic regex, using # as the delimiter. Shell escaping alone is not enough.
-    output, error, status = Open3.capture3("sed", "s#^#{tokens[4]}$##", stdin_data: "#{binding}\n#{neighbor}\n")
-    assert status.success?, error
-    assert_equal "\n#{neighbor}\n", output
-  end
-
-  test "ensure directory uses real subcommand and separate ownership flag" do
-    command = Dokku::Storage::EnsureDirectory.new(directory: "watergun-123", chown: "heroku")
-    assert_equal ["dokku", "storage:ensure-directory", "--chown", "heroku", "watergun-123"], Shellwords.split(command.cmd)
-    assert_equal ["dokku", "storage:ensure-directory", "--chown", "false", "watergun-123"], Shellwords.split(Dokku::Storage::EnsureDirectory.new(directory: "watergun-123").cmd)
+  test "native phase JSON retains actual entry identity and attachment attributes" do
+    pair = {entry: {name: "legacy-abcd", host_path: "/data/old", scheduler: "docker-local"}, attachment: {entry_name: "legacy-abcd", container_path: "/app/data", phases: ["run"], process_type: "_default_"}}
+    result = Dokku::Storage::ListCommand.new(app: "app", phase: "run").parse_output(0, [pair].to_json)
+    assert_equal [{"entry_name" => "legacy-abcd", "host_path" => "/data/old", "container_path" => "/app/data", "phases" => ["run"], "process_type" => "_default_", "scheduler" => "docker-local"}], result
   end
 end
