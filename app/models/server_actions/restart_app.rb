@@ -11,14 +11,17 @@ class ServerActions::RestartApp < ServerAction
     self.dokku_app_id ||= app.dokku_id
   end
 
+  def on_failure
+    app.error! unless app.destroyed?
+  end
+
   private
 
   def run
     app.restarting!
     restart_dokku_app!
-    notify_user
-  ensure
     app.active!
+    notify_user
   end
 
   def restart_dokku_app!
