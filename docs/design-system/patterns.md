@@ -39,6 +39,18 @@ Use `projects/apps/deployments/_deployment.html.erb` as the canonical deployment
 
 Use settings layout + `page_header` + content card(s) + semantic actions.
 
+- Configuration Add/Save controls use `config_action` or `config_modal_trigger`.
+- Place `config_modal_footer` inside each Domain/Variable/Storage form; Cancel
+  closes the containing native dialog, never submits the form.
+- Place `row_actions` inside the replaceable row root. Menu items are native
+  buttons/links for existing routes only. Keep action dialogs in that same root
+  when broadcasts replace the row; never portal row dialogs outside it.
+- Keep General App Name, Repository and Builder forms independent, with a
+  `config-form-footer` at the end of each form. Do not add a global Save.
+- Mobile compact controls reserve their expanded hit areas in normal layout.
+  Do not remove margins, overlap targets, or scale text/SVGs.
+- See `components.md` for exact geometry, keyboard and Turbo contracts.
+
 ### Danger zone
 
 Use `danger_zone` and `button variant: :danger`.

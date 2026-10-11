@@ -16,5 +16,5 @@
         autofocus: form.object.persisted? %>
     <%= error_messages_for(form.object, :value) %>
   </fieldset>
-  <%= submit_button "Save" %>
+  <%= config_modal_footer submit: "Save" %>
 <% end %>

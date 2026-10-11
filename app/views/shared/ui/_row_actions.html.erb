@@ -1,0 +1,7 @@
+<%# locals: (id:, label:) -%>
+<div class="action-dropdown" data-controller="row-actions" data-action="click@window->row-actions#outside keydown->row-actions#keydown resize@window->row-actions#close scroll@window->row-actions#close turbo:before-cache@document->row-actions#close">
+  <%= config_action variant: :ghost, label: label, icon: tag.svg(tag.circle(cx: 4, cy: 8, r: 1) + tag.circle(cx: 8, cy: 8, r: 1) + tag.circle(cx: 12, cy: 8, r: 1), viewBox: "0 0 16 16", fill: "currentColor"), aria: {haspopup: "menu", expanded: false, controls: id}, data: {row_actions_target: "trigger", action: "click->row-actions#toggle"} %>
+  <div id="<%= id %>" class="row-actions-menu" role="menu" aria-label="<%= label %>" popover="manual" data-row-actions-target="menu" data-action="click->row-actions#choose">
+    <%= yield %>
+  </div>
+</div>

@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 //     </button>
 //   </div>
 export default class extends Controller {
-  static targets = ["display", "iconHidden", "iconRevealed"]
+  static targets = ["display", "iconHidden", "iconRevealed", "toggle"]
   static values = { value: String, mask: { type: String, default: "••••••••" } }
 
   toggle() {
@@ -24,6 +24,10 @@ export default class extends Controller {
   reveal() {
     this.displayTarget.textContent = this.valueValue
     this.element.dataset.revealed = "true"
+    if (this.hasToggleTarget) {
+      this.toggleTarget.textContent = "Hide value"
+      this.toggleTarget.setAttribute("aria-pressed", "true")
+    }
     if (this.hasIconHiddenTarget) this.iconHiddenTarget.classList.add("hidden")
     if (this.hasIconRevealedTarget) this.iconRevealedTarget.classList.remove("hidden")
   }
@@ -31,6 +35,10 @@ export default class extends Controller {
   hide() {
     this.displayTarget.textContent = this.maskValue
     this.element.dataset.revealed = "false"
+    if (this.hasToggleTarget) {
+      this.toggleTarget.textContent = "Reveal value"
+      this.toggleTarget.setAttribute("aria-pressed", "false")
+    }
     if (this.hasIconHiddenTarget) this.iconHiddenTarget.classList.remove("hidden")
     if (this.hasIconRevealedTarget) this.iconRevealedTarget.classList.add("hidden")
   }

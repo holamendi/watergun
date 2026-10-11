@@ -12,9 +12,8 @@
         title: "No environment variables",
         body: "Add variables to configure your app."
       ) do %>
-      <%= button "+ Add Variable",
+      <%= config_action "+ Add Variable",
           href: new_project_app_env_variable_path(project, app),
-          size: :sm,
           data: { turbo_frame: "env_variable_form" } %>
     <% end %>
   <% end %>

@@ -44,7 +44,7 @@ button(text = nil, href: nil, variant: :primary, size: :md, type: :button,
 ### `submit_button`
 
 ```ruby
-submit_button(text, variant: :primary, size: :md, **options)
+submit_button(text, variant: :primary, size: :sm, **options)
 ```
 
 - Delegates to `button`.
@@ -120,3 +120,39 @@ modal_trigger(text = nil, modal_id:, variant: :primary, size: :sm, **options, &b
 ## Guardrails
 
 Guardrails script and CI checks are added after P0 page migrations are complete.
+
+## Configuration controls
+
+Settings use `config_action(text, variant: :primary, icon: nil, label: nil,
+type: :button, **options)` rather than repeating button classes. Pass
+`type: :submit` for saves; links preserve `href`, Turbo method/confirmation
+and lazy-frame data. `config_modal_trigger(text, modal_id:)` opens inline
+dialogs. `config_close_button` retains native `form method="dialog"` closure.
+`config_modal_footer(submit:, variant: :primary)` renders an explicit Cancel
+button (`dialog#close`) and scoped submit aligned at the end of the form.
+
+Desktop configuration controls are explicitly 32px high; icon buttons are
+32px square with 16px SVGs, independent of glyph metrics. On mobile (≤640px),
+primary Save/Add controls are 44px high. Secondary, danger and icon controls
+remain visibly 32px high, with 6px reserved margin and a pointer-active
+pseudo-element extending 6px on every side: **44px hit area, 32px visible
+footprint**. No text/icon scaling or enlarged filled Cancel. Do not remove
+these margins or place overlapping controls in the reserved hit area.
+Menu items and restart-option labels use actual 44px row targets on mobile.
+
+`row_actions(id:, label:) { ... }` shares a native button trigger, unique
+`aria-controls`, `aria-haspopup="menu"`, and live `aria-expanded`. Its block
+contains buttons/links with `role="menuitem"` and `tabindex: -1`. A manual
+native popover places menus in the top layer (not clipped by rows/cards).
+The Stimulus controller handles Enter/Space, arrows, Home/End, Escape,
+Tab, outside click, resize/scroll, disconnect and Turbo before-cache.
+Opening focuses the first/last visible item; Escape and action selection
+restore trigger focus (a subsequently opened native dialog owns focus).
+Do not add unsupported Domain/Mount edit routes. Destructive links retain
+Turbo confirmations; storage detach requires its existing action dialog.
+
+Variable reveal/hide stays scoped to one row. Copy announces success only
+when clipboard writing resolves and announces failure when unavailable or
+denied. Existing lazy Turbo add/edit forms and successful close/replace
+responses remain unchanged. General settings retain three independent
+forms/saves, never a global Save or invented unsaved state.

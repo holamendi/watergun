@@ -3,9 +3,6 @@
   <%= form_with url: project_app_storage_mount_path(storage_mount.app.project_id, storage_mount.app_id, storage_mount), method: method, class: "storage-dialog-form" do %>
     <div class="storage-dialog-target"><%= storage_mount.container_path %></div>
     <%= render "projects/apps/storage_mounts/restart_option", id: dom_id(storage_mount, "#{action}_restart") %>
-    <div class="storage-dialog-footer">
-      <%= button "Cancel", variant: :secondary, data: {action: "dialog#close"} %>
-      <%= submit_button label %>
-    </div>
+    <%= config_modal_footer submit: label %>
   <% end %>
 <% end %>

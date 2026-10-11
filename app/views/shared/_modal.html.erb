@@ -6,11 +6,7 @@
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-text-primary"><%= title %></h3>
         <form method="dialog">
-          <%= icon_button(label: "Close dialog", type: :submit, size: :sm, class: "text-text-muted hover:text-text-primary") do %>
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
-          <% end %>
+          <%= config_close_button %>
         </form>
       </div>
     <% end %>

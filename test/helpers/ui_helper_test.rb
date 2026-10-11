@@ -1,6 +1,31 @@
 require "test_helper"
 
 class UiHelperTest < ActionView::TestCase
+  test "documentation reflects the actual compact submit default and configuration contract" do
+    %w[README.md components.md].each do |file|
+      doc = Rails.root.join("docs/design-system", file).read
+      assert_includes doc, "submit_button(text, variant: :primary, size: :sm, **options)"
+      assert_includes doc, "config_action"
+    end
+    patterns = Rails.root.join("docs/design-system/patterns.md").read
+    assert_includes patterns, "config_modal_footer"
+    assert_includes patterns, "row_actions"
+  end
+
+  test "configuration actions expose explicit geometry independent of glyphs" do
+    assert respond_to?(:config_action), "configuration action helper is missing"
+    html = config_action("Save", type: :submit)
+    assert_includes html, "config-action"
+    assert_includes html, "config-action-primary"
+    assert_includes html, 'type="submit"'
+    css = Rails.root.join("app/assets/stylesheets/application.css").read
+    assert_match(/\.config-action\s*\{[^}]*height: 32px/m, css)
+    assert_match(/\.config-icon\s*\{[^}]*width: 32px/m, css)
+    assert_match(/\.config-icon svg\s*\{[^}]*width: 16px/m, css)
+    assert_includes css, "config-action-compact::after"
+    assert_includes css, "inset: -6px"
+  end
+
   test "container generates div with correct classes" do
     result = container { "content" }
 

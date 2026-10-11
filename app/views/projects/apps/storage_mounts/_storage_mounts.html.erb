@@ -9,7 +9,7 @@
     <%= empty_state(
         title: "No storage mounts configured"
       ) do %>
-      <%= modal_trigger "+ Add Mount", modal_id: modal_id, size: :sm, class: "storage-add-action" %>
+      <%= config_modal_trigger "+ Add Mount", modal_id: modal_id %>
     <% end %>
   <% end %>
 </div>

@@ -1,17 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["source", "icon"]
+  static targets = ["source", "icon", "status"]
   static values = { text: String }
 
-  copy(event) {
+  async copy(event) {
     event.preventDefault()
-    event.stopPropagation()
-
     const text = this.hasTextValue ? this.textValue : this.sourceTarget.value
-    navigator.clipboard.writeText(text).then(() => {
-      this.showCopiedIcon()
-    })
+    try {
+      await navigator.clipboard.writeText(text)
+      if (this.hasIconTarget) this.showCopiedIcon()
+      if (this.hasStatusTarget) this.statusTarget.textContent = "Value copied."
+    } catch {
+      if (this.hasStatusTarget) this.statusTarget.textContent = "Copy failed. Try again or copy the revealed value."
+    }
   }
 
   showCopiedIcon() {

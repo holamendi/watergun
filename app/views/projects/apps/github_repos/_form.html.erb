@@ -1,4 +1,4 @@
-<%= form_with model: github_repo, url: project_app_github_repo_path(github_repo.app.project, github_repo.app), id: "github_repo_form" do |form| %>
+<%= form_with model: github_repo, url: project_app_github_repo_path(github_repo.app.project, github_repo.app), class: "config-settings-form", id: "github_repo_form" do |form| %>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Repository</legend>
@@ -16,7 +16,7 @@
       <p class="text-xs text-text-muted mt-0.5">Automatically deploy the app when a push is made to the <code class="font-mono bg-elevated px-1 py-0.5 rounded-sm text-xxs"><%= github_repo.branch %></code> branch.</p>
     </div>
   </label>
-  <div class="mt-4 flex justify-end">
-    <%= submit_button "Save repository" %>
+  <div class="config-form-footer">
+    <%= config_action "Save repository", type: :submit %>
   </div>
 <% end %>

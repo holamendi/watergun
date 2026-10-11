@@ -23,11 +23,10 @@
           title: "Delete Application",
           description: "Once you delete this application, there is no going back. This will permanently remove the app, its deployments, domains, and environment variables from the server."
         ) do %>
-        <%= button "Delete Application",
+        <%= config_action "Delete Application",
             href: project_app_path(@project, @app),
             method: :delete,
             variant: :danger,
-            size: :sm,
             data: { turbo_confirm: "Delete #{@app.name}? This cannot be undone." } %>
       <% end %>
     </div>
