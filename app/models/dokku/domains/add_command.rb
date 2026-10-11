@@ -7,7 +7,7 @@ module Dokku
       end
 
       def cmd
-        "dokku domains:add #{@app} #{@domain.join(" ")}"
+        Shellwords.join(["dokku", "domains:add", @app, *@domain])
       end
     end
   end

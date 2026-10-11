@@ -7,7 +7,7 @@ module Dokku
       end
 
       def cmd
-        "dokku domains:remove #{@app} #{@domain.join(" ")}"
+        Shellwords.join(["dokku", "domains:remove", @app, *@domain])
       end
     end
   end
