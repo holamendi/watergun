@@ -1099,7 +1099,7 @@
     }
 
     .nav-breadcrumb-item {
-      @apply px-2 max-w-[100px];
+      @apply px-2 max-w-[100px] min-w-0;
     }
 
     .nav-breadcrumb-item span {

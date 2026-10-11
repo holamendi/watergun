@@ -47,6 +47,10 @@ Use settings layout + `page_header` + content card(s) + semantic actions.
   when broadcasts replace the row; never portal row dialogs outside it.
 - Keep General App Name, Repository and Builder forms independent, with a
   `config-form-footer` at the end of each form. Do not add a global Save.
+- Service Settings retain a name-only form and `config-form-footer`; use the
+  exact `service_form` ID required by the existing Turbo replacement response.
+  Connection Copy is independently scoped, and Delete retains confirmation.
+  Use the shared `settings-section` spacing rather than a separate layout.
 - Mobile compact controls reserve their expanded hit areas in normal layout.
   Do not remove margins, overlap targets, or scale text/SVGs.
 - See `components.md` for exact geometry, keyboard and Turbo contracts.

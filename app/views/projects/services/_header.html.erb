@@ -3,8 +3,8 @@
 <% active_tab ||= nil %>
 
 <div class="app-tabs-wrapper">
-  <div class="app-tabs">
-    <nav class="scrollable-tabs flex items-center gap-0 -mb-px overflow-x-auto" aria-label="Service navigation">
+  <div class="app-tabs flex-col sm:flex-row">
+    <nav class="scrollable-tabs flex flex-wrap sm:flex-nowrap items-center gap-0 -mb-px overflow-x-auto" aria-label="Service navigation">
       <%= link_to "Overview", project_service_path(service.project, service),
           class: class_names("app-tab",
             "app-tab-active": active_tab == :overview,
@@ -28,7 +28,7 @@
           aria: { current: (active_tab == :edit ? "page" : nil) } %>
     </nav>
 
-    <div class="flex items-center shrink-0">
+    <div class="flex items-center shrink-0 pb-2 sm:pb-0">
       <span class="text-xxs text-text-muted">
         <span class="w-1.5 h-1.5 rounded-full bg-success inline-block mr-1"></span>
         <%= service.service_type.to_s.titleize %> · <%= service.version.presence || "latest" %>

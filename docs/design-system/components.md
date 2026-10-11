@@ -179,6 +179,13 @@ when clipboard writing resolves and announces failure when unavailable or
 denied. Existing lazy Turbo add/edit forms and successful close/replace
 responses remain unchanged. General settings retain three independent
 forms/saves, never a global Save or invented unsaved state.
+Service Settings use the same `config-settings-form`, section rhythm and
+name-only Save. The rendered form ID is exactly `service_form`, matching the
+existing controller's Turbo replacement target on both success and validation
+failure; no parameter scope or backend behavior is widened. Connection Copy
+uses the same square control and honest live status. Confirmed Delete remains
+compact. Service tabs wrap on mobile with type/version metadata on a separate
+row, preserving visibility of the active Settings tab.
 
 ### Rendered verification
 
@@ -195,8 +202,19 @@ Install Python Playwright in a scratch venv, then run:
 ```sh
 python test/system/settings_browser_test.py \
   --state /scratch/browser-state.json --output /scratch/screenshots \
-  --origin http://127.0.0.1:3138 --chromium /path/to/chrome
+  --origin http://127.0.0.1:3138 --chromium /path/to/chrome \
+  --service-settings-path '/projects/<project_id>/services/<service_id>/edit'
 ```
+
+The service path is optional. To exercise it, seed a service belonging to the
+signed-in fixture's project/server with the nonsecret DSN
+`postgresql://ui.example.test/example_database`; retain at least two fixture
+servers to test the breadcrumb/server-selector boundary. The harness checks
+service name-only Save, invalid and successful Turbo form replacement, Copy
+success/denial, and cancellation of Delete (never actual deletion). It also
+measures active-tab visibility and metadata/breadcrumb nonoverlap at all three
+viewports. Signed session JSON must stay private and outside the repository;
+remove it after QA. Only nonsecret rendered captures belong in the gallery.
 
 It verifies 1280/390/320px geometry, true expanded pointer hits, nonoverlap,
 keyboard/focus/outside-click behavior, native modal Cancel, independent
