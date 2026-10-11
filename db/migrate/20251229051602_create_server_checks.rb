@@ -1,4 +1,4 @@
-class CreateServerChecks < ActiveRecord::Migration[8.2]
+class CreateServerChecks < ActiveRecord::Migration[8.1]
   def change
     create_table :server_checks do |t|
       t.references :account, null: false, foreign_key: true

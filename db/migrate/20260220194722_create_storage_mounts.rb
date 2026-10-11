@@ -1,4 +1,4 @@
-class CreateStorageMounts < ActiveRecord::Migration[8.2]
+class CreateStorageMounts < ActiveRecord::Migration[8.1]
   def change
     create_table :storage_mounts do |t|
       t.references :account

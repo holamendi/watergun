@@ -1,7 +1,7 @@
 module Api
   module V1
     class ApplicationController < ActionController::Base
-      include Pagy::Backend
+      include Pagy::Method
 
       before_action :set_source
       before_action :authenticate
