@@ -11,7 +11,11 @@ class Domain < ApplicationRecord
   scope :ssl_enabled, -> { where(ssl_enabled: true) }
   scope :ssl_disabled, -> { where(ssl_enabled: false) }
 
-  validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}
+  # IDNs must be supplied in ASCII punycode; wildcards cover one leading label.
+  HOSTNAME_PATTERN = /\A(?:\*\.)?[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+\z/
+
+  validates :hostname, presence: true, uniqueness: {scope: :app_id, conditions: -> { undiscarded }},
+    format: {with: HOSTNAME_PATTERN}, length: {maximum: 253}
   validates :ssl_enabled, inclusion: {in: [true, false]}
 
   delegate :project, :server, to: :app
