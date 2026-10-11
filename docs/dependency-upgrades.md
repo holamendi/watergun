@@ -85,6 +85,32 @@ Vite 8 reported a real native-config warning for ESM syntax in the previous Comm
 | `vite` | 8.0.2 | 8.3.4 |
 | `vite-plugin-ruby` | 5.2.0 | 5.2.5 |
 
+## Compatible JavaScript transitives and remaining upstream bounds
+
+A separate genuine RED gate preceded `npm update` after an all-transitive check discovered four remaining compatible updates:
+
+| Transitive | Before | Verified after |
+| --- | --- | --- |
+| `@rails/actioncable` | 8.1.201 | 8.1.400 |
+| `hotkeys-js` | 4.0.2 | 4.0.8 |
+| `obug` (Vite Ruby dependency) | 2.1.1 | 2.2.1 |
+| `vite-plugin-environment` | 1.1.3 | 1.1.4 |
+
+The final `npm outdated --all --json` check finds no installed package whose current version is below npm's compatible `wanted` version. It does **not** mean every transitive package is at global latest. These installed packages remain bounded by their upstream owners' published dependency constraints; no overrides were introduced:
+
+| Transitive | Installed / compatible wanted | Global latest | Upstream constraint | Owning package(s) |
+| --- | --- | --- | --- | --- |
+| `@kurkle/color` | 0.3.4 | 0.6.4 | `^0.3.0` | `chart.js` |
+| `lightningcss` | 1.32.0 | 1.33.0 | `1.32.0` | `@tailwindcss/node` |
+| `lightningcss-linux-x64-gnu` | 1.32.0 | 1.33.0 | `1.32.0` | `lightningcss` |
+| `magic-string` | 0.30.21 | 1.4.3 | `^0.30.21` | `@tailwindcss/node` |
+| `nanoid` | 3.3.20 | 6.0.2 | `^3.3.19` | `postcss` |
+| `obug` | 2.2.1 | 3.0.0 | `^2.0` | `vite-plugin-ruby` |
+| `picomatch` | 2.3.2 | 4.0.7 | `^2.3.1` | `vite-plugin-full-reload` |
+| `stimulus-use` | 0.52.3 | 0.53.1 | `^0.52.2` | `@stimulus-components/dropdown`, `@stimulus-components/notification` |
+
+These are explicit upstream transitive bounds, not unattempted direct-major deferrals. npm also lists absent optional binaries for other platforms and optional peer integrations; their absence on Linux is not an installed-package upgrade failure. The full baseline-to-final npm lock-version diff is retained as `javascript-lock-version-diff.json` (65 changed locked entries, including optional platform artifacts, without claiming those platforms were exercised).
+
 ## Compatibility work and real tests
 
 Version/config acceptance gates were run and genuinely failed before each coherent dependency/config update. Runtime regressions, rather than invented incompatibilities, drove minimal compatibility fixes. Logs are retained outside Git. The Pagy migration was not deferred: the real API/controller/view integration exposed removed extras, Backend/Frontend modules, headers merge, previous-page, series and URL helpers. The resulting code preserves the existing custom markup, seven-slot pagination window, Page-Items/Current-Page/Total-Count/Total-Pages headers, previous/next Link semantics, empty pages and out-of-range rejection. The first API contract run also exposed the preexisting unqualified `AppResource` constant; qualification to `Api::V1::AppResource` preserves the existing serializer.
@@ -94,7 +120,7 @@ Solid Queue is still fork-supervised with threaded workers and the shared primar
 | Verification | Actual result |
 | --- | --- |
 | Original isolated full Rails suite | **288 runs, 1,877 assertions, 0 failures/errors/skips** |
-| Final full Rails suite | **311 runs, 2,127 assertions, 0 failures/errors/skips** |
+| Final full Rails suite | **312 runs, 2,131 assertions, 0 failures/errors/skips** |
 | Test and production Vite builds | Both pass; 343 transformed modules each |
 | Production Rails eager boot | Pass, synthetic keys and guarded isolated DB only |
 | Production Rails asset precompile | Pass |

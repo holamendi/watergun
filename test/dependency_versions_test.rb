@@ -77,6 +77,12 @@ class DependencyVersionsTest < Minitest::Test
     assert_equal "0.6.0", lock.dig("packages", "node_modules/vite-plugin-rails", "version")
   end
 
+  def test_latest_compatible_javascript_transitives
+    targets = {"@rails/actioncable" => "8.1.400", "hotkeys-js" => "4.0.8", "obug" => "2.2.1", "vite-plugin-environment" => "1.1.4"}
+    lock = JSON.parse(File.read(File.join(ROOT, "package-lock.json")))
+    targets.each { |name, version| assert_equal version, lock.dig("packages", "node_modules/#{name}", "version"), name }
+  end
+
   def test_latest_pagy
     assert_match(/^    pagy \(43\.7\.0\)/, File.read(File.join(ROOT, "Gemfile.lock")))
   end
