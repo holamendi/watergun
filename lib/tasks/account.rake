@@ -20,12 +20,12 @@ namespace :account do
     Current.server = server
 
     user = account.users.create!(email:, password: SecureRandom.hex(16))
-    project = account.projects.create!(name: "watergun")
+    project = account.projects.create!(name: "watergun", server:)
     app = project.apps.create!(name: "watergun", dokku_id: "watergun", status: :active, deployed_at: Time.current)
     app.domains.create!(hostname: domain, status: :active, is_default: true, ssl_enabled: true)
-    app.create_github_repo!(repo: "holamendi/watergun", branch: "main")
+    app.create_github_repo!(account:, repo: "holamendi/watergun", branch: "main")
 
-    token = user.signed_id(expires_at: 1.day.from_now, purpose: :first_run)
+    token = user.signed_id(expires_in: 1.day, purpose: :first_run_v2)
     public_key = server.ssh_key.public_key
     response = {token:, public_key:}
 
