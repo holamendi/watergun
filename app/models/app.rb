@@ -6,7 +6,7 @@ class App < ApplicationRecord
 
   has_secure_token :deploy_token, length: 32
 
-  TEMPORARY_STATUSES = %w[deploying restarting scaling stopping].freeze
+  TEMPORARY_STATUSES = %w[deploying restarting scaling stopping deleting].freeze
 
   belongs_to :account, default: -> { project.account }
   belongs_to :server, default: -> { project.server }
@@ -27,7 +27,7 @@ class App < ApplicationRecord
   has_many :services, through: :service_links
 
   enum :builder, Enum[:herokuish, :dockerfile, :nixpacks], default: :herokuish
-  enum :status, Enum[:pending, :active, :deploying, :restarting, :scaling, :stopping, :deleted, :error], default: :pending
+  enum :status, Enum[:pending, :active, :deploying, :restarting, :scaling, :stopping, :deleting, :deleted, :error], default: :pending
 
   scope :deployed, -> { where.not(deployed_at: nil) }
 
