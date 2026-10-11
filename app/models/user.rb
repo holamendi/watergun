@@ -1,6 +1,10 @@
 class User < ApplicationRecord
   has_secure_password
 
+  generates_token_for :first_run, expires_in: 1.day do
+    password_salt.last(10)
+  end
+
   has_many :memberships, dependent: :destroy
   has_many :accounts, through: :memberships
   has_many :projects, through: :accounts

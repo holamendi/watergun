@@ -9,8 +9,8 @@ class FirstRunsController < ApplicationController
 
   def update
     completed = @user.with_lock do
-      not_found! if @user.first_run_completed_at.present?
-      @user.assign_attributes(user_params.merge(first_run_completed_at: Time.current))
+      not_found! unless User.where(id: @user.id).find_by_token_for(:first_run, params[:signed_id])
+      @user.assign_attributes(user_params)
       @user.save(context: :first_run)
     end
 
@@ -25,8 +25,7 @@ class FirstRunsController < ApplicationController
   private
 
   def set_user
-    @user = User.find_signed!(params[:signed_id], purpose: :first_run_v2)
-    not_found! if @user.first_run_completed_at.present?
+    @user = User.find_by_token_for!(:first_run, params[:signed_id])
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     not_found!
   end

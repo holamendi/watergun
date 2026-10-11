@@ -4,7 +4,7 @@ require "rake"
 class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:bobby)
-    @token = @user.signed_id(expires_in: 1.day, purpose: :first_run_v2)
+    @token = @user.generate_token_for(:first_run)
     @user_params = {email: "onboarded@example.com", password: "new-password", password_confirmation: "new-password"}
   end
 
@@ -20,20 +20,34 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
       assert_response :not_found
     end
     assert_equal digest, @user.reload.password_digest
-    assert_nil @user.first_run_completed_at
+    assert_equal "bobby.tables@example.com", @user.email
   end
 
   test "completion is rechecked after locking a stale user" do
     stale_user = User.find(@user.id)
-    @user.update!(first_run_completed_at: Time.current)
+    @user.update!(password: "already-onboarded")
     digest = @user.password_digest
     # Model a request that resolved its token before another request completed.
-    User.stubs(:find_signed!).with(@token, purpose: :first_run_v2).returns(stale_user)
+    User.stubs(:find_by_token_for!).with(:first_run, @token).once.returns(stale_user)
 
     assert_no_difference "Session.count" do
       patch first_run_url, params: {signed_id: @token, user: @user_params}
     end
     assert_response :not_found
+    assert_equal digest, @user.reload.password_digest
+    assert_equal "bobby.tables@example.com", @user.email
+  end
+
+  test "expiry is rechecked after resolving a token" do
+    digest = @user.password_digest
+    User.stubs(:find_by_token_for!).with(:first_run, @token).once.returns(@user)
+
+    travel 1.day + 1.second do
+      assert_no_difference "Session.count" do
+        patch first_run_url, params: {signed_id: @token, user: @user_params}
+      end
+      assert_response :not_found
+    end
     assert_equal digest, @user.reload.password_digest
     assert_equal "bobby.tables@example.com", @user.email
   end
@@ -48,12 +62,27 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
     assert_equal digest, @user.reload.password_digest
   end
 
+  test "previous version signed-id tokens are rejected" do
+    token = @user.signed_id(expires_in: 1.day, purpose: :first_run_v2)
+    digest = @user.password_digest
+    get pretty_first_run_url(signed_id: token)
+    assert_response :not_found
+
+    assert_no_difference "Session.count" do
+      patch first_run_url, params: {signed_id: token, user: @user_params}
+    end
+    assert_response :not_found
+    assert_equal digest, @user.reload.password_digest
+    assert_equal "bobby.tables@example.com", @user.email
+  end
+
   test "onboarding requires a new password" do
     assert_no_difference "Session.count" do
       patch first_run_url, params: {signed_id: @token, user: {email: "onboarded@example.com"}}
     end
     assert_response :unprocessable_content
-    assert_nil @user.reload.first_run_completed_at
+    assert User.find_by_token_for(:first_run, @token)
+    @user.reload
     assert_equal "bobby.tables@example.com", @user.email
   end
 
@@ -86,7 +115,8 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
       patch first_run_url, params: {signed_id: @token, user: @user_params.merge(password_confirmation: "mismatch")}
     end
     assert_response :unprocessable_content
-    assert_nil @user.reload.first_run_completed_at
+    assert User.find_by_token_for(:first_run, @token)
+    @user.reload
     assert_equal digest, @user.password_digest
     assert_select "input[name=signed_id][value=?]", @token
 
