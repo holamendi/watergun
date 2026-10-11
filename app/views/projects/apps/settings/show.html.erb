@@ -9,7 +9,12 @@
 
     <div class="settings-section" id="repository">
       <h3 class="settings-section-title">Repository</h3>
-      <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo || @app.build_github_repo %>
+      <% if @app.github_repo.present? %>
+        <%= render "projects/apps/github_repos/form", github_repo: @app.github_repo %>
+      <% else %>
+        <p class="text-xs text-text-muted">Repositories are selected when creating an app.</p>
+        <%= button "Create App", href: new_project_app_path(@project), size: :sm %>
+      <% end %>
     </div>
 
     <div class="settings-section" id="builder">
