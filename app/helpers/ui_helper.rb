@@ -14,6 +14,37 @@ module UiHelper
     default: nil
   }.freeze
 
+  # Configuration controls keep their geometry separate from visual variants.
+  def config_action(text = nil, variant: :primary, icon: nil, label: nil, type: :button, class: nil, **options, &block)
+    css_class = binding.local_variable_get(:class)
+    compact = variant != :primary || icon.present?
+    classes = class_names("config-action", compact ? "config-action-compact" : "config-action-primary", ("config-icon" if icon.present?), css_class)
+    if icon.present?
+      icon_button(label: label, icon: icon, variant: variant, size: :md, type: type, class: classes, **options)
+    elsif type.to_sym == :submit
+      submit_button(text, variant: variant, class: classes, **options, &block)
+    else
+      button(text, variant: variant, size: :sm, class: classes, **options, &block)
+    end
+  end
+
+  def config_modal_trigger(text, modal_id:, **options)
+    modal_trigger(text, modal_id: modal_id, class: "config-action config-action-primary", **options)
+  end
+
+  def config_close_button
+    config_action(label: "Close dialog", variant: :ghost, type: :submit,
+      icon: tag.svg(tag.path(d: "M6 18 18 6M6 6l12 12", "stroke-linecap": "round", "stroke-linejoin": "round"), viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5"))
+  end
+
+  def config_modal_footer(submit:, variant: :primary)
+    render "shared/ui/config_modal_footer", submit: submit, variant: variant
+  end
+
+  def row_actions(id:, label:, &block)
+    render "shared/ui/row_actions", id: id, label: label, &block
+  end
+
   def container(&block)
     content_tag :div, class: "page-shell", &block
   end

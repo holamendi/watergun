@@ -66,6 +66,36 @@
 }
 
 @layer components {
+  .row-actions-menu {
+    @apply bg-surface border border-border rounded-lg p-1 shadow-lg shadow-black/40 text-text-secondary;
+    position: fixed; margin: 0; width: 192px; max-width: calc(100vw - 16px); max-height: calc(100vh - 16px); overflow-y: auto;
+  }
+  .row-actions-menu [role="menuitem"] { @apply flex items-center justify-start px-3 py-2 text-xs rounded w-full text-left; min-height: 32px; }
+  .row-actions-menu [role="menuitem"]:hover,
+  .row-actions-menu [role="menuitem"]:focus-visible { @apply bg-elevated text-text-primary; outline: 2px solid var(--color-accent-hover); outline-offset: -2px; }
+  @media (max-width: 640px) {
+    .row-actions-menu [role="menuitem"] { min-height: 44px; }
+  }
+
+  .variable-row-content { @apply flex items-center flex-1 min-w-0 gap-3; }
+  .variable-row-name { min-width: 160px; }
+  @media (max-width: 640px) {
+    .variable-row-content { @apply flex-wrap gap-x-2 gap-y-1; }
+    .variable-row-name { min-width: 0; max-width: calc(100% - 18px); overflow-wrap: anywhere; }
+    .variable-row-content [data-secret-field-target="display"] { @apply w-full pl-3.5; }
+  }
+
+  .config-modal-footer { @apply flex items-center justify-end gap-2 pt-4 border-t border-border; }
+
+  .config-settings-form { width: 100%; max-width: 576px; }
+  .config-settings-form .fieldset { @apply space-y-2; }
+  .config-settings-form .input,
+  .config-settings-form .select { min-height: 38px; }
+  .config-form-footer { @apply flex justify-end mt-4; }
+  @media (max-width: 640px) {
+    .config-settings-form .input, .config-settings-form .select { min-height: 44px; }
+  }
+
   /* Button component */
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
@@ -92,6 +122,19 @@
   .btn-square {
     @apply p-2 aspect-square;
   }
+
+  /* Configuration geometry: theme variants, fonts and radii stay unchanged. */
+  .config-action { height: 32px; min-height: 32px; position: relative; padding-block: 0; flex-shrink: 0; }
+  .config-icon { width: 32px; height: 32px; padding: 0; }
+  .config-icon > span { width: 16px; height: 16px; flex-shrink: 0; }
+  .config-icon svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .config-action:focus-visible { outline: 2px solid var(--color-accent-hover); outline-offset: 2px; }
+  @media (max-width: 640px) {
+    .config-action-primary { height: 44px; min-height: 44px; }
+    .config-action-compact { margin: 6px; }
+    .config-action-compact::after { content: ""; position: absolute; inset: -6px; }
+  }
+
 
   .btn-disabled {
     @apply opacity-50 cursor-not-allowed pointer-events-none;
@@ -250,8 +293,6 @@
   .storage-ownership { @apply text-xxs text-text-secondary; }
   .storage-mount-status { @apply flex items-center; }
   .storage-mount-status .badge { @apply whitespace-nowrap; }
-  .storage-actions-button { @apply w-8 h-8; }
-  .storage-actions-button span { font-size: 20px; }
   .storage-menu-action { @apply w-full justify-start text-left; }
   .storage-mount-row button:focus-visible,
   .storage-dialog-form button:focus-visible {
@@ -290,13 +331,10 @@
     .storage-mount-paths { grid-column: 1; }
     .storage-mount-status { grid-column: 1; grid-row: 2; }
     .storage-mount-actions { grid-column: 2; grid-row: 1 / 3; }
-    .storage-actions-button { @apply w-11 h-11; }
-    .storage-menu-action, .storage-dialog-form .btn, .restart-option { min-height: 44px; }
+    .storage-menu-action, .restart-option { min-height: 44px; }
     .storage-dialog-form .input { min-height: 44px; }
     dialog:has(.storage-dialog-form) { width: calc(100% - 24px); margin: 8vh auto; }
     dialog:has(.storage-dialog-form) .modal-box { @apply p-4; }
-    dialog:has(.storage-dialog-form) .modal-box > div button { min-width: 44px; min-height: 44px; }
-    .storage-add-action { min-height: 44px; }
   }
 
   /* Hero layout */
@@ -748,7 +786,7 @@
       @apply pt-0 pb-6;
     }
     .settings-layout > aside {
-      @apply -mx-5 bg-base border-b border-border;
+      @apply -mx-5 bg-base border-b border-border min-w-0;
     }
     .settings-nav {
       @apply flex-row overflow-x-auto gap-0 px-5;
@@ -1061,7 +1099,7 @@
     }
 
     .nav-breadcrumb-item {
-      @apply px-2 max-w-[100px];
+      @apply px-2 max-w-[100px] min-w-0;
     }
 
     .nav-breadcrumb-item span {

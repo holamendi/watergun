@@ -4,5 +4,5 @@
     <%= form.text_field :hostname, class: "input w-full", placeholder: "example.com", pattern: "^([a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$" %>
     <%= error_messages_for(form.object, :hostname) %>
   </fieldset>
-  <%= submit_button "Save domain" %>
+  <%= config_modal_footer submit: "Save domain" %>
 <% end %>

@@ -10,8 +10,5 @@
     <%= error_messages_for(form.object, :chown) %>
   </div>
   <%= render "projects/apps/storage_mounts/restart_option", id: "storage_mount_create_restart" %>
-  <div class="storage-dialog-footer">
-    <%= button "Cancel", variant: :secondary, data: {action: "dialog#close"} %>
-    <%= submit_button "Add mount" %>
-  </div>
+  <%= config_modal_footer submit: "Add mount" %>
 <% end %>

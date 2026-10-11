@@ -12,6 +12,12 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     sign_in @user
   end
 
+  test "storage actions use shared keyboard menu without losing action-local dialogs" do
+    get project_app_storage_mounts_path(@project, @app)
+    assert_select "[data-controller='row-actions'] button[aria-expanded='false'][aria-haspopup='menu']"
+    assert_select "[role='menu'][popover='manual'] button[role='menuitem'][data-controller='dialog-trigger']"
+  end
+
   describe "#index" do
     test "renders storage page with settings sidebar" do
       get project_app_storage_mounts_path(@project, @app)

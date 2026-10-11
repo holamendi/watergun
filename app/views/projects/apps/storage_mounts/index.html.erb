@@ -8,7 +8,7 @@
       title: "Storage",
       subtitle: "#{@storage_mounts.size} #{'mount'.pluralize(@storage_mounts.size)} configured"
     ) do %>
-    <%= modal_trigger "+ Add Mount", modal_id: modal_id, size: :sm, class: "storage-add-action" %>
+    <%= config_modal_trigger "+ Add Mount", modal_id: modal_id %>
   <% end %>
 
   <%= render "storage_mounts",

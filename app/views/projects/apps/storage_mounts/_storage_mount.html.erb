@@ -33,17 +33,14 @@ end %>
     <div class="storage-mount-status"><%= badge(status_label, color: status_color) %></div>
     <div class="storage-mount-actions">
       <% if resume_label || detach_label %>
-        <div class="action-dropdown">
-          <%= icon_button(label: "Actions for #{storage_mount.container_path}", icon: "⋯", class: "storage-actions-button", aria: {expanded: nil}) %>
-          <div class="action-dropdown-menu">
+        <%= row_actions(id: dom_id(storage_mount, :actions), label: "Actions for #{storage_mount.container_path}") do %>
             <% if resume_label %>
-              <%= modal_trigger resume_label, modal_id: dom_id(storage_mount, :resume_modal), variant: :ghost, class: "action-dropdown-item storage-menu-action" %>
+              <%= modal_trigger resume_label, modal_id: dom_id(storage_mount, :resume_modal), variant: :ghost, class: "storage-menu-action", role: "menuitem", tabindex: -1 %>
             <% end %>
             <% if detach_label %>
-              <%= modal_trigger detach_label, modal_id: dom_id(storage_mount, :detach_modal), variant: :ghost, class: "action-dropdown-item storage-menu-action" %>
+              <%= modal_trigger detach_label, modal_id: dom_id(storage_mount, :detach_modal), variant: :ghost, class: "storage-menu-action", role: "menuitem", tabindex: -1 %>
             <% end %>
-          </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>

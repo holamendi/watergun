@@ -1,10 +1,10 @@
-<%= form_with model: [service.project, service], id: dom_id(service, :form) do |form| %>
-  <div class="flex gap-4 items-end">
-    <fieldset class="fieldset flex-1">
-      <legend class="fieldset-legend">Service name</legend>
-      <%= form.text_field :name, class: "input w-full font-mono" %>
-      <%= error_messages_for service, :name %>
-    </fieldset>
-    <%= submit_button "Save" %>
+<%= form_with model: [service.project, service], class: "config-settings-form", id: "service_form" do |form| %>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Service name</legend>
+    <%= form.text_field :name, class: "input w-full font-mono" %>
+    <%= error_messages_for service, :name %>
+  </fieldset>
+  <div class="config-form-footer">
+    <%= config_action "Save", type: :submit %>
   </div>
 <% end %>

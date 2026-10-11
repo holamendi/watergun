@@ -1,0 +1,5 @@
+<%# locals: (submit:, variant: :primary) -%>
+<div class="config-modal-footer storage-dialog-footer">
+  <%= config_action "Cancel", variant: :ghost, data: {action: "dialog#close"} %>
+  <%= config_action submit, type: :submit, variant: variant %>
+</div>
