@@ -1,8 +1,8 @@
 <% if pagy.pages > 1 %>
   <div class="flex justify-center mt-6">
     <div class="join">
-      <% if pagy.prev %>
-        <%= icon_button(label: "Previous page", href: pagy_url_for(pagy, pagy.prev), variant: :secondary, size: :sm, class: "join-item") do %>
+      <% if pagy.previous %>
+        <%= icon_button(label: "Previous page", href: pagy.page_url(pagy.previous), variant: :secondary, size: :sm, class: "join-item") do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
@@ -15,9 +15,9 @@
         <% end %>
       <% end %>
 
-      <% pagy.series.each do |item| %>
+      <% pagy.data_hash(data_keys: [:series])[:series].each do |item| %>
         <% if item.is_a?(Integer) %>
-          <%= button item, href: pagy_url_for(pagy, item), variant: :secondary, size: :sm, class: "join-item" %>
+          <%= button item, href: pagy.page_url(item), variant: :secondary, size: :sm, class: "join-item" %>
         <% elsif item.is_a?(String) %>
           <%= button item, variant: :secondary, size: :sm, class: "join-item btn-active", disabled: true %>
         <% elsif item == :gap %>
@@ -26,7 +26,7 @@
       <% end %>
 
       <% if pagy.next %>
-        <%= icon_button(label: "Next page", href: pagy_url_for(pagy, pagy.next), variant: :secondary, size: :sm, class: "join-item") do %>
+        <%= icon_button(label: "Next page", href: pagy.page_url(pagy.next), variant: :secondary, size: :sm, class: "join-item") do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>

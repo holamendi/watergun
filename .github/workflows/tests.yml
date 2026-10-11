@@ -34,28 +34,29 @@ jobs:
       ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: ${{ secrets.ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check installer
         run: bash scripts/test-install-smoke.sh
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1
         with:
-          ruby-version: 3.4.7
+          ruby-version: 4.0.7
+          bundler: "4.0.22"
           bundler-cache: true
 
       - name: Set up node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: "24.2.0"
+          node-version: "24.21.0"
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libpq-dev
           bundle install --jobs 4 --retry 3
-          npm install
+          npm ci
 
       - name: Set up database
         run: |

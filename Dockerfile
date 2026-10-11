@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG RUBY_VERSION=3.4.7
+ARG RUBY_VERSION=4.0.7
 FROM registry.docker.com/library/ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /app
@@ -16,7 +16,7 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     build-essential curl git node-gyp libpq-dev libyaml-dev pkg-config python-is-python3 libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
-ARG NODE_VERSION=24.2.0
+ARG NODE_VERSION=24.21.0
 ENV PATH=/usr/local/node/bin:$PATH
 ENV LD_PRELOAD="libjemalloc.so.2" \
     MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
@@ -26,18 +26,17 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
     rm -rf /tmp/node-build-master /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock .ruby-version ./
-RUN bundle install && \
+RUN gem install bundler -v 4.0.22 --no-document && \
+    bundle _4.0.22_ install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-RUN rm -rf node_modules package-lock.json && \
-    npm install && \
-    SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
     bundle exec bootsnap precompile app/ lib/
 
 FROM base
