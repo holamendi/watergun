@@ -32,10 +32,18 @@ class Ssh::Session
     @commands << ssh_command
     ssh_command.start
 
-    @session.exec!(ssh_command.cmd, status:) do |_channel, stream, data|
+    decoders = Hash.new { |hash, stream| hash[stream] = Ssh::TextDecoder.new }
+    emit = lambda do |stream, data|
+      next if data.empty?
+
       ssh_command.append_output(stream, data) if save_output
       yield(stream, data) if block_given?
     end
+
+    @session.exec!(ssh_command.cmd, status:) do |_channel, stream, data|
+      emit.call(stream, decoders[stream].write(data))
+    end
+    decoders.each { |stream, decoder| emit.call(stream, decoder.finish) }
 
     ssh_command.finish(status[:exit_code])
     ssh_command
