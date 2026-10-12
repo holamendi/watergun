@@ -14,7 +14,9 @@ class ServerActions::CreateApp < ServerAction
   end
 
   def on_failure
-    app.error! unless app.destroyed?
+    return if app.destroyed? || (@creation_completed && app.reload.active?)
+
+    app.error!
   end
 
   private
@@ -23,10 +25,7 @@ class ServerActions::CreateApp < ServerAction
     create_dokku_app!
     create_domains!
     create_service_links!
-  rescue Ssh::CommandExecutionError
-    app.error!
-    raise
-  else
+    @creation_completed = true
     app.active!
   end
 
