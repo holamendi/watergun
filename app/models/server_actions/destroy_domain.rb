@@ -18,13 +18,13 @@ class ServerActions::DestroyDomain < ServerAction
     domain.app
   end
 
+  def on_failure
+    domain.error! unless domain.destroyed?
+  end
+
   def run
     domain.deleting!
     remove_dokku_domain!
-  rescue Ssh::CommandExecutionError
-    domain.error!
-    raise
-  else
     domain.destroy!
   end
 

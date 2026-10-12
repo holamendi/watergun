@@ -20,12 +20,17 @@ class ServerActions::CreateDomain < ServerAction
     app
   end
 
-  def run
-    add_dokku_domain!
-  rescue Ssh::CommandExecutionError
+  def on_failure
+    return if domain.destroyed?
+    return if @domain_added && domain.reload.active?
+
     domain.error!
-    raise
-  else
+  end
+
+  def run
+    @domain_added = false
+    add_dokku_domain!
+    @domain_added = true
     domain.active!
     schedule_enable_ssl!
   end
