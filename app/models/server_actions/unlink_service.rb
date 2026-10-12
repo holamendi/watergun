@@ -21,16 +21,16 @@ class ServerActions::UnlinkService < ServerAction
     service
   end
 
+  def on_failure
+    service_link.error! unless service_link.destroyed?
+  end
+
   private
 
   def run
     service_link.deleting!
     unlink_dokku_service!
     schedule_pull_env!
-  rescue Ssh::CommandExecutionError
-    service_link.error!
-    raise
-  else
     service_link.destroy!
   end
 
