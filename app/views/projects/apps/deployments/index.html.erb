@@ -24,11 +24,11 @@
     <% end %>
   <% else %>
     <%= empty_state(
-        title: "Connect a GitHub repository",
-        body: "Link a repository to enable deployments."
+        title: "No GitHub repository",
+        body: "Repositories are selected when creating an app."
       ) do %>
-      <%= button "Connect Repository",
-          href: new_project_app_github_repo_path(@project, @app),
+      <%= button "Create App",
+          href: new_project_app_path(@project),
           size: :sm %>
     <% end %>
   <% end %>
