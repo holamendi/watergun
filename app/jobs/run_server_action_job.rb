@@ -11,8 +11,10 @@ class RunServerActionJob < ApplicationJob
     end
 
     session = server_action.server.ssh_session do |ssh_session|
+      session = ssh_session
       server_action.with(ssh_session:) { server_action.send(:run) }
     rescue Ssh::CommandExecutionError
+      reconcile_failure(server_action)
     ensure
       stop_log_persistence
     end
@@ -26,7 +28,8 @@ class RunServerActionJob < ApplicationJob
     end
     server_action.status = session.status
   rescue => e
-    server_action.on_failure
+    persist_failure_logs(server_action, session)
+    reconcile_failure(server_action)
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
     server_action.failure_message = <<~ERROR
@@ -37,9 +40,7 @@ class RunServerActionJob < ApplicationJob
       #{e.backtrace.first(10).map { |line| "  #{line}" }.join("\n")}
       #{"\n  ... and #{e.backtrace.size - 10} more lines" if e.backtrace.size > 10}
     ERROR
-    raise if Rails.env.local?
-
-    server_action
+    raise
   else
     server_action.failure_message = nil
     server_action
@@ -50,6 +51,24 @@ class RunServerActionJob < ApplicationJob
   end
 
   private
+
+  def persist_failure_logs(server_action, session)
+    return unless session
+
+    if server_action.log.present?
+      server_action.log.update!(ssh_commands: session.commands)
+    else
+      server_action.create_log!(ssh_commands: session.commands)
+    end
+  rescue => log_error
+    Honeybadger.notify(log_error, context: {server_action_id: server_action.id})
+  end
+
+  def reconcile_failure(server_action)
+    server_action.on_failure
+  rescue => reconciliation_error
+    Honeybadger.notify(reconciliation_error, context: {server_action_id: server_action.id})
+  end
 
   def setup_log_persistence(server_action)
     @persisting_action = server_action
