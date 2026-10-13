@@ -4,8 +4,8 @@ class Project::DestroyProject
   end
 
   def destroy
-    ServerActions::DestroyProject.new(server: @project.server, actionable: @project).validate!
+    ServerAction::Enqueue.build(action: "projects.destroy", target: @project)
     @project.discard
-    ServerActions::DestroyProject.run_later!(@project.server, @project)
+    ServerAction::Enqueue.call(action: "projects.destroy", target: @project)
   end
 end

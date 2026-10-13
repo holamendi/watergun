@@ -96,7 +96,7 @@ class Ssh::OutputEncodingTest < ActiveSupport::TestCase
   end
 
   def persisted_output(command)
-    log = server_actions(:deploy_success).create_log!(ssh_commands: [command])
+    log = server_action_runs(:deploy_success).create_log!(ssh_commands: [command])
     log.reload.ssh_commands.first.fetch("output")
   end
 end

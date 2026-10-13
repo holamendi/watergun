@@ -1,0 +1,53 @@
+deploy_success:
+  account: default
+  server: arm
+  user: bobby
+  target: smol_roda (App)
+  action_key: apps.deploy
+  resource_key: "server:<%= ActiveRecord::FixtureSet.identify(:arm) %>"
+  status: success
+  source: web
+  payload: <%= ActiveRecord::Encryption.encryptor.encrypt({"dokku_app_id" => "smol-roda", "repo" => "git@github.com:test/repo.git", "sha" => "abc123"}.to_json).to_json %>
+  created_at: <%= 1.hour.ago %>
+  running_at: <%= 55.minutes.ago %>
+  finished_at: <%= 50.minutes.ago %>
+
+deploy_running:
+  account: default
+  server: arm
+  user: bobby
+  target: smol_roda (App)
+  action_key: apps.deploy
+  resource_key: "server:<%= ActiveRecord::FixtureSet.identify(:arm) %>"
+  status: running
+  source: web
+  payload: <%= ActiveRecord::Encryption.encryptor.encrypt({"dokku_app_id" => "smol-roda"}.to_json).to_json %>
+  created_at: <%= 5.minutes.ago %>
+  running_at: <%= 4.minutes.ago %>
+
+deploy_failed:
+  account: default
+  server: arm
+  user: bobby
+  target: smol_roda (App)
+  action_key: apps.deploy
+  resource_key: "server:<%= ActiveRecord::FixtureSet.identify(:arm) %>"
+  status: failure
+  source: web
+  payload: <%= ActiveRecord::Encryption.encryptor.encrypt({"dokku_app_id" => "smol-roda"}.to_json).to_json %>
+  failure_message: "Connection refused - check server connectivity"
+  created_at: <%= 2.hours.ago %>
+  running_at: <%= 115.minutes.ago %>
+  finished_at: <%= 110.minutes.ago %>
+
+other_account_action:
+  account: other
+  server: other_server
+  action_key: apps.deploy
+  resource_key: "server:<%= ActiveRecord::FixtureSet.identify(:arm) %>"
+  status: success
+  source: web
+  payload: <%= ActiveRecord::Encryption.encryptor.encrypt({"dokku_app_id" => "other-app"}.to_json).to_json %>
+  created_at: <%= 1.hour.ago %>
+  running_at: <%= 55.minutes.ago %>
+  finished_at: <%= 50.minutes.ago %>

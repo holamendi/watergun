@@ -14,7 +14,7 @@ class ServiceLink::CreateServiceLink
     ApplicationRecord.transaction do
       @env_variable.save!
       @service_link = ServiceLink.create!(service: @service, app: @app, env_variable: @env_variable)
-      ServerActions::LinkService.run_later!(@service.server, @service_link)
+      ServerAction::Enqueue.call(action: "services.link", target: @service_link)
     end
 
     true

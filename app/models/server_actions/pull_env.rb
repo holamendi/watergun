@@ -1,23 +1,32 @@
-class ServerActions::PullEnv < ServerAction
-  SLUG = "apps.pull_env"
+class ServerActions::PullEnv
+  KEY = "apps.pull_env"
 
-  actionable App
-
-  store_attribute :payload, :dokku_app_id, :string
-
-  validates :dokku_app_id, presence: true
-
-  before_validation on: :create do
-    self.dokku_app_id ||= app.dokku_id
+  def initialize(run)
+    @run = run
   end
 
-  def concurrency_key
-    app
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def app = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+
+  def self.default_payload(target)
+    app = target
+    {"dokku_app_id" => app.dokku_id}
   end
 
-  private
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: App, required: %w[dokku_app_id])
+  end
 
-  def run
+  def succeeded!
+  end
+
+  def failed!
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
     synced_at = Time.current
 
     upsert_env_variables = dokku_config_export.map do |env_variable|
@@ -36,7 +45,7 @@ class ServerActions::PullEnv < ServerAction
   end
 
   def dokku_config_export
-    @dokku_config_export ||= execute!(Dokku::Config::ExportCommand.new(app: dokku_app_id)).parsed_output
+    @dokku_config_export ||= ssh.execute!(Dokku::Config::ExportCommand.new(app: dokku_app_id)).parsed_output
   end
 
   def out_of_sync_env_variables

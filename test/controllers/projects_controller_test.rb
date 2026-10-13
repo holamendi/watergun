@@ -121,7 +121,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     test "does not expose another account project" do
       foreign = accounts(:other).projects.create!(name: "Other", server: servers(:other_server))
 
-      assert_no_difference -> { ServerAction.count } do
+      assert_no_difference -> { ServerActionRun.count } do
         delete project_path(foreign)
       end
       assert_response :not_found

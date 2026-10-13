@@ -31,7 +31,7 @@ class StorageMount < ApplicationRecord
   def save_and_mount(restart: false)
     self.class.transaction do
       if save
-        ServerActions::MountStorage.run_later!(server, self, restart: restart)
+        ServerAction::Enqueue.call(action: "apps.mount_storage", target: self, payload: {restart: restart})
         true
       else
         false
@@ -42,11 +42,11 @@ class StorageMount < ApplicationRecord
   def resume(restart: false)
     with_lock do
       return false unless detached? || detach_configured? || configured? || error? || detach_failed?
-      return false if server_actions.queued_or_running.exists?
+      return false if server_action_runs.queued_or_running.exists?
 
-      action_class = detach_failed? ? ServerActions::UnmountStorage : ServerActions::MountStorage
+      action_key = detach_failed? ? "apps.unmount_storage" : "apps.mount_storage"
       update!(status: detach_failed? ? :detaching : :pending)
-      action_class.run_later!(server, self, restart: restart)
+      ServerAction::Enqueue.call(action: action_key, target: self, payload: {restart: restart})
     end
     true
   end

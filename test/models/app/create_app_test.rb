@@ -35,9 +35,9 @@ class App::CreateAppTest < ActiveSupport::TestCase
       assert_equal false, github_repo.private
 
       assert_server_action_scheduled(
-        ServerActions::CreateApp,
+        "apps.create",
         server: @server,
-        actionable: app,
+        target: app,
         payload: {
           dokku_app_id: "test-app"
         }

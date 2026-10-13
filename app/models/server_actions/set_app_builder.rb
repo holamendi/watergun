@@ -1,21 +1,33 @@
-class ServerActions::SetAppBuilder < ServerAction
-  SLUG = "apps.set_builder"
+class ServerActions::SetAppBuilder
+  KEY = "apps.set_builder"
 
-  actionable App
-
-  store_attribute :payload, :dokku_app_id, :string
-  store_attribute :payload, :builder, :string
-
-  validates :dokku_app_id, presence: true
-
-  before_validation on: :create do
-    self.dokku_app_id ||= app.dokku_id
-    self.builder ||= app.builder
+  def initialize(run)
+    @run = run
   end
 
-  private
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def app = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+  def builder = payload.fetch("builder", nil)
 
-  def run
+  def self.default_payload(target)
+    app = target
+    {"dokku_app_id" => app.dokku_id, "builder" => app.builder}
+  end
+
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: App, required: %w[dokku_app_id])
+  end
+
+  def succeeded!
+  end
+
+  def failed!
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
     set_dokku_app_builder!
   end
 

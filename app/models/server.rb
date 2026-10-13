@@ -12,7 +12,7 @@ class Server < ApplicationRecord
   has_many :apps, dependent: :destroy
   has_many :checks, class_name: "ServerCheck", dependent: :delete_all
   has_many :containers, dependent: :destroy
-  has_many :actions, class_name: "ServerAction", dependent: :destroy
+  has_many :actions, class_name: "ServerActionRun", dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :services, dependent: :destroy
 

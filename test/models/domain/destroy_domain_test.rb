@@ -17,9 +17,9 @@ class Domain::DestroyDomainTest < ActiveSupport::TestCase
     Domain::DestroyDomain.new(@domain).destroy
 
     assert_server_action_scheduled(
-      ServerActions::DestroyDomain,
+      "apps.remove_domain",
       server: @server,
-      actionable: @domain
+      target: @domain
     )
   end
 end

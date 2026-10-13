@@ -23,7 +23,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = ServerActions::CreateDomain.run_now!(@server, @domain)
+    server_action = perform_server_action("apps.add_domain", @server, @domain)
 
     assert server_action.success?
     assert @domain.reload.active?
@@ -50,7 +50,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
 
     # Note: The job catches Ssh::CommandExecutionError internally and doesn't re-raise
     # So we just verify the domain was marked as error
-    server_action = ServerActions::CreateDomain.run_now!(@server, @domain)
+    server_action = perform_server_action("apps.add_domain", @server, @domain)
 
     assert server_action.failure?
     assert @domain.reload.error?
@@ -58,7 +58,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
 
   test "schedules enable ssl when app is deployed and all domains resolve" do
     @app.update!(deployed_at: Time.current)
-    @app.stubs(:all_domains_resolve_to_server?).returns(true)
+    App.any_instance.stubs(:all_domains_resolve_to_server?).returns(true)
 
     mock_ssh_session(
       host: @server.public_ip,
@@ -70,12 +70,12 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    ServerActions::CreateDomain.run_now!(@server, @domain)
+    perform_server_action("apps.add_domain", @server, @domain)
 
     assert_server_action_scheduled(
-      ServerActions::EnableSsl,
+      "apps.enable_ssl",
       server: @server,
-      actionable: @app
+      target: @app
     )
   end
 
@@ -92,8 +92,8 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    ServerActions::CreateDomain.run_now!(@server, @domain)
+    perform_server_action("apps.add_domain", @server, @domain)
 
-    assert_nil ServerAction.find_by(type: "ServerActions::EnableSsl", actionable: @app)
+    assert_nil ServerActionRun.find_by(action_key: "apps.enable_ssl", target: @app)
   end
 end

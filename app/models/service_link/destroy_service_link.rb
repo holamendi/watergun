@@ -5,6 +5,6 @@ class ServiceLink::DestroyServiceLink
 
   def destroy
     @service_link.discard
-    ServerActions::UnlinkService.run_later!(@service_link.server, @service_link)
+    ServerAction::Enqueue.call(action: "services.unlink", target: @service_link)
   end
 end

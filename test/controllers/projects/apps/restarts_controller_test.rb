@@ -14,9 +14,9 @@ class Projects::Apps::RestartsControllerTest < ActionDispatch::IntegrationTest
     post project_app_restarts_url(project_id: @project.id, app_id: @app.id)
 
     assert_server_action_scheduled(
-      ServerActions::RestartApp,
+      "apps.restart",
       server: @server,
-      actionable: @app,
+      target: @app,
       payload: {dokku_app_id: @app.dokku_id}
     )
   end

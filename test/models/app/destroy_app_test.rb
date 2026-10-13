@@ -8,7 +8,7 @@ class App::DestroyAppTest < ActiveSupport::TestCase
 
     assert_enqueued_with(job: RunServerActionJob) do
       action = App::DestroyApp.new(app).destroy
-      assert_equal app, action.actionable
+      assert_equal app, action.target
       assert action.queued?
     end
 

@@ -1,0 +1,27 @@
+module ServerAction::TargetValidation
+  def self.call(run, type:, required:)
+    target = run.target
+    raise ArgumentError, "Target required" unless target.is_a?(type) && target.persisted? && !target.destroyed?
+    ownership!(run, target)
+    ownership!(run, target.app) if target.respond_to?(:app)
+    ownership!(run, target.project) if target.respond_to?(:project)
+    raise ArgumentError, "Server ownership mismatch" unless run.server.account_id == run.account_id
+    raise ArgumentError, "Payload must be an object" unless run.payload.is_a?(Hash)
+    required.each { |key| raise ArgumentError, "Required payload missing" if run.payload[key].blank? }
+    defaults = ServerAction::Registry::ACTIONS.fetch(run.action_key).default_payload(target)
+    %w[dokku_app_id dokku_service_id hostname host_path container_path service_type project_id].each do |key|
+      next unless defaults.key?(key)
+      raise ArgumentError, "Target identifier changed" unless defaults[key].to_s == run.payload[key].to_s
+    end
+    if run.user && !run.user.memberships.exists?(account_id: run.account_id)
+      raise ArgumentError, "User ownership mismatch"
+    end
+  end
+
+  def self.ownership!(run, target)
+    server = target.respond_to?(:server) ? target.server : target.app.server
+    unless target.account_id == run.account_id && server.id == run.server_id
+      raise ArgumentError, "Target ownership mismatch"
+    end
+  end
+end

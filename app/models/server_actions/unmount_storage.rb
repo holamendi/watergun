@@ -1,48 +1,48 @@
-class ServerActions::UnmountStorage < ServerAction
+class ServerActions::UnmountStorage
   include StorageOperation
 
-  SLUG = "apps.unmount_storage"
+  KEY = "apps.unmount_storage"
 
-  actionable StorageMount
-
-  store_attribute :payload, :restart, :boolean, default: false
-  store_attribute :payload, :dokku_app_id, :string
-  store_attribute :payload, :host_path, :string
-  store_attribute :payload, :container_path, :string
-
-  validates :dokku_app_id, presence: true
-  validates :host_path, presence: true
-  validates :container_path, presence: true
-
-  before_validation on: :create do
-    self.dokku_app_id ||= storage_mount.app.dokku_id
-    self.host_path ||= storage_mount.host_path
-    self.container_path ||= storage_mount.container_path
+  def initialize(run)
+    @run = run
   end
 
-  def concurrency_key
-    storage_mount.app
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def storage_mount = target
+  def restart = payload.fetch("restart", false)
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+  def host_path = payload.fetch("host_path", nil)
+  def container_path = payload.fetch("container_path", nil)
+
+  def self.default_payload(target)
+    storage_mount = target
+    {"dokku_app_id" => storage_mount.app.dokku_id, "host_path" => storage_mount.host_path, "container_path" => storage_mount.container_path, "restart" => false}
   end
 
-  def on_failure
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: StorageMount, required: %w[dokku_app_id host_path container_path])
+  end
+
+  def succeeded!
+    storage_mount.update!(status: restart ? :detached : :detach_configured)
+  end
+
+  def failed!
     storage_mount.detach_failed!
   end
 
-  def run
+  def execute!(ssh)
+    @ssh = ssh
     storage_mount.detaching!
     phases = storage_phase_bindings
     validate_storage_scope!(phases)
     phases.values.flatten.select { |mount| binding_present?([mount]) }.map { |mount| mount.fetch("entry_name") }.uniq.each do |name|
-      execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, entry_name: name, container_directory: container_path))
+      ssh.execute!(Dokku::Storage::UnmountCommand.new(app: dokku_app_id, entry_name: name, container_directory: container_path))
     end
-    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
+    ssh.execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id)) if restart
     if storage_phase_bindings.values.any? { |mounts| mounts.any? { |mount| mount["container_path"] == container_path } }
       raise "Storage detach was not confirmed by Dokku in deploy and run"
     end
-  rescue
-    storage_mount.detach_failed!
-    raise
-  else
-    storage_mount.update!(status: restart ? :detached : :detach_configured)
   end
 end

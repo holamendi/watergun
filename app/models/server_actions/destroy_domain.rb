@@ -1,36 +1,43 @@
-class ServerActions::DestroyDomain < ServerAction
-  SLUG = "apps.remove_domain"
+class ServerActions::DestroyDomain
+  KEY = "apps.remove_domain"
 
-  actionable Domain
-
-  store_attribute :payload, :dokku_app_id, :string
-  store_attribute :payload, :hostname, :string
-
-  validates :dokku_app_id, presence: true
-  validates :hostname, presence: true
-
-  before_validation on: :create do
-    self.dokku_app_id ||= domain.app.dokku_id
-    self.hostname ||= domain.hostname
+  def initialize(run)
+    @run = run
   end
 
-  def concurrency_key
-    domain.app
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def domain = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+  def hostname = payload.fetch("hostname", nil)
+
+  def self.default_payload(target)
+    domain = target
+    target.app
+    {"dokku_app_id" => domain.app.dokku_id, "hostname" => domain.hostname}
   end
 
-  def on_failure
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Domain, required: %w[dokku_app_id hostname])
+  end
+
+  def succeeded!
+    domain.destroy!
+  end
+
+  def failed!
     domain.error! unless domain.destroyed?
   end
 
-  def run
+  def execute!(ssh)
+    @ssh = ssh
     domain.deleting!
     remove_dokku_domain!
-    domain.destroy!
   end
 
   private
 
   def remove_dokku_domain!
-    execute!(Dokku::Domains::RemoveCommand.new(app: dokku_app_id, domain: hostname))
+    ssh.execute!(Dokku::Domains::RemoveCommand.new(app: dokku_app_id, domain: hostname))
   end
 end

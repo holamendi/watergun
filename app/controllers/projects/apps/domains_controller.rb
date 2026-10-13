@@ -13,7 +13,7 @@ class Projects::Apps::DomainsController < Projects::Apps::BaseController
     @domain = @app.domains.new(domain_params)
 
     if @domain.save
-      ServerActions::CreateDomain.run_later!(@app.server, @domain)
+      ServerAction::Enqueue.call(action: "apps.add_domain", target: @domain)
       render turbo_stream: [
         stream_toast("Domain added"),
         stream_domains,

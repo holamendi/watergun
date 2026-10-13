@@ -1,33 +1,45 @@
-class ServerActions::RestartService < ServerAction
-  SLUG = "services.restart"
+class ServerActions::RestartService
+  KEY = "services.restart"
 
-  actionable Service
-
-  store_attribute :payload, :dokku_service_id, :string
-  store_attribute :payload, :service_type, :string
-
-  validates :dokku_service_id, presence: true
-
-  before_validation on: :create do
-    self.service_type ||= service.service_type
-    self.dokku_service_id ||= service.dokku_id
+  def initialize(run)
+    @run = run
   end
 
-  def on_failure
-    service.error!
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def service = target
+  def dokku_service_id = payload.fetch("dokku_service_id", nil)
+  def service_type = payload.fetch("service_type", nil)
+
+  def self.default_payload(target)
+    service = target
+    {"service_type" => service.service_type, "dokku_service_id" => service.dokku_id}
   end
 
-  private
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Service, required: %w[dokku_service_id])
+  end
 
-  def run
-    service.restarting!
-    restart_dokku_service!
+  def succeeded!
+    @restart_completed = true
     service.active!
     notify_user
   end
 
+  def failed!
+    return if service.destroyed? || (@restart_completed && service.reload.active?)
+
+    service.error!
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
+    service.restarting!
+    restart_dokku_service!
+  end
+
   def restart_dokku_service!
-    execute!(Dokku::Services::RestartCommand.new(plugin: service_type, service: dokku_service_id))
+    ssh.execute!(Dokku::Services::RestartCommand.new(plugin: service_type, service: dokku_service_id))
   end
 
   def notify_user

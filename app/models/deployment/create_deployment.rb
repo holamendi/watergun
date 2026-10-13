@@ -13,7 +13,7 @@ class Deployment::CreateDeployment
     validate!
 
     deployment = app.deployments.create!(github_event:, **deployment_attributes)
-    ServerActions::DeployApp.run_later!(app.server, deployment)
+    ServerAction::Enqueue.call(action: "apps.deploy", target: deployment)
     deployment
   end
 

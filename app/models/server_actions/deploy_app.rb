@@ -1,37 +1,52 @@
-class ServerActions::DeployApp < ServerAction
+class ServerActions::DeployApp
   include ActionView::RecordIdentifier
 
-  SLUG = "apps.deploy"
+  KEY = "apps.deploy"
 
-  actionable Deployment
+  def initialize(run)
+    @run = run
+  end
 
-  self.persist_logs_interval = 1.second
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def deployment = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+  def repo = payload.fetch("repo", nil)
+  def sha = payload.fetch("sha", nil)
 
-  store_attribute :payload, :dokku_app_id, :string
-  store_attribute :payload, :repo, :string
-  store_attribute :payload, :sha, :string
+  def self.default_payload(target)
+    deployment = target
+    app = target.app
+    {"dokku_app_id" => app.dokku_id, "repo" => deployment.repo, "sha" => deployment.sha}
+  end
 
-  validates :dokku_app_id, presence: true
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Deployment, required: %w[dokku_app_id])
+  end
 
-  delegate :app, :account, to: :deployment, allow_nil: true
+  def succeeded!
+    schedule_enable_ssl!
+    deployment.success!
+    app.active!
+    broadcast_deployment_update
+    notify_user
+    schedule_pull_env!
+  end
+
+  LOG_INTERVAL = 1.second
+
+  delegate :app, to: :deployment, allow_nil: true
 
   def on_logs_persisted(commands:)
     current_text = commands.map(&:text_output).join
     new_text = current_text[(@last_broadcast_length || 0)..]
-    @last_broadcast_length = current_text.length
-
     return if new_text.blank?
 
     broadcast_log_chunk(new_text)
+    @last_broadcast_length = current_text.length
   end
 
-  before_validation on: :create do
-    self.dokku_app_id ||= app.dokku_id
-    self.repo ||= deployment.repo
-    self.sha ||= deployment.sha
-  end
-
-  def on_failure
+  def failed!
     return if deployment.persisted? && deployment.reload.success?
 
     begin
@@ -43,35 +58,26 @@ class ServerActions::DeployApp < ServerAction
     notify_user
   end
 
-  def concurrency_key = app
-
-  private
-
-  def run
+  def execute!(ssh)
+    @ssh = ssh
     deployment.deploying!
     app.deploying!
     broadcast_deployment_update
     authenticate_github_account!
     sync_git_repo!
     rebuild_dokku_app!
-    schedule_enable_ssl!
-    deployment.success!
-    app.active!
-    broadcast_deployment_update
-    notify_user
-    schedule_pull_env!
   end
 
   def sync_git_repo!
-    execute!(Dokku::Git::SyncCommand.new(app: dokku_app_id, repo:, sha:))
+    ssh.execute!(Dokku::Git::SyncCommand.new(app: dokku_app_id, repo:, sha:))
   end
 
   def rebuild_dokku_app!
-    execute!(Dokku::Ps::RebuildCommand.new(app: dokku_app_id))
+    ssh.execute!(Dokku::Ps::RebuildCommand.new(app: dokku_app_id))
   end
 
   def authenticate_github_account!
-    execute!(Dokku::Git::AuthCommand.new(access_token: github_access_token))
+    ssh.execute!(Dokku::Git::AuthCommand.new(access_token: github_access_token))
   end
 
   def github_access_token
@@ -82,11 +88,11 @@ class ServerActions::DeployApp < ServerAction
     return unless app.domains.ssl_disabled.any?
     return unless app.all_domains_resolve_to_server?
 
-    ServerActions::EnableSsl.run_later!(app.server, app)
+    ServerAction::Enqueue.call(action: "apps.enable_ssl", target: app)
   end
 
   def schedule_pull_env!
-    ServerActions::PullEnv.run_later!(app.server, app)
+    ServerAction::Enqueue.call(action: "apps.pull_env", target: app)
   end
 
   def notify_user

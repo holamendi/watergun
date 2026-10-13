@@ -1,31 +1,44 @@
-class ServerActions::RestartApp < ServerAction
-  SLUG = "apps.restart"
+class ServerActions::RestartApp
+  KEY = "apps.restart"
 
-  actionable App
-
-  store_attribute :payload, :dokku_app_id, :string
-
-  validates :dokku_app_id, presence: true
-
-  before_validation on: :create do
-    self.dokku_app_id ||= app.dokku_id
+  def initialize(run)
+    @run = run
   end
 
-  def on_failure
-    app.error! unless app.destroyed?
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def app = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+
+  def self.default_payload(target)
+    app = target
+    {"dokku_app_id" => app.dokku_id}
   end
 
-  private
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: App, required: %w[dokku_app_id])
+  end
 
-  def run
-    app.restarting!
-    restart_dokku_app!
+  def succeeded!
+    @restart_completed = true
     app.active!
     notify_user
   end
 
+  def failed!
+    return if app.destroyed? || (@restart_completed && app.reload.active?)
+
+    app.error!
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
+    app.restarting!
+    restart_dokku_app!
+  end
+
   def restart_dokku_app!
-    execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id))
+    ssh.execute!(Dokku::Ps::RestartCommand.new(app: dokku_app_id))
   end
 
   def notify_user

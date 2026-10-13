@@ -14,9 +14,9 @@ class Projects::Services::RestartsControllerTest < ActionDispatch::IntegrationTe
     post project_service_restarts_url(project_id: @project.id, service_id: @service.id)
 
     assert_server_action_scheduled(
-      ServerActions::RestartService,
+      "services.restart",
       server: @server,
-      actionable: @service,
+      target: @service,
       payload: {dokku_service_id: @service.dokku_id, service_type: @service.service_type}
     )
   end

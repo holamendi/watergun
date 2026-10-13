@@ -20,6 +20,6 @@ class Service::DestroyService
 
   def destroy_service
     @service.discard
-    ServerActions::DestroyService.run_later!(@service.server, @service)
+    ServerAction::Enqueue.call(action: "services.destroy", target: @service)
   end
 end

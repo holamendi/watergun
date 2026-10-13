@@ -3,5 +3,5 @@ class CommandRun < ApplicationRecord
 
   validates :command, presence: true
 
-  delegate :started_at, :finished_at, :duration, to: :server_action
+  delegate :started_at, :finished_at, :duration, to: :server_action_run
 end

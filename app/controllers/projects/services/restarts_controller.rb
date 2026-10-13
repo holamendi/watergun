@@ -1,6 +1,6 @@
 class Projects::Services::RestartsController < Projects::Services::BaseController
   def create
-    ServerActions::RestartService.run_later!(@service.server, @service)
+    ServerAction::Enqueue.call(action: "services.restart", target: @service)
     render turbo_stream: stream_toast("Restart scheduled")
   end
 end

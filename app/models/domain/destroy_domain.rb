@@ -5,6 +5,6 @@ class Domain::DestroyDomain
 
   def destroy
     @domain.discard
-    ServerActions::DestroyDomain.run_later!(@domain.server, @domain)
+    ServerAction::Enqueue.call(action: "apps.remove_domain", target: @domain)
   end
 end

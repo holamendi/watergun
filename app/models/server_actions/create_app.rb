@@ -1,36 +1,44 @@
-class ServerActions::CreateApp < ServerAction
-  SLUG = "apps.create"
+class ServerActions::CreateApp
+  KEY = "apps.create"
 
-  actionable App
-
-  store_attribute :payload, :dokku_app_id, :string
-
-  validates :dokku_app_id, presence: true
-
-  before_validation on: :create do
-    self.account ||= app.account
-    self.server ||= app.server
-    self.dokku_app_id ||= app.dokku_id
+  def initialize(run)
+    @run = run
   end
 
-  def on_failure
-    return if app.destroyed? || (@creation_completed && app.reload.active?)
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def app = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
 
-    app.error!
+  def self.default_payload(target)
+    app = target
+    {"dokku_app_id" => app.dokku_id}
   end
 
-  private
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: App, required: %w[dokku_app_id])
+  end
 
-  def run
-    create_dokku_app!
+  def succeeded!
     create_domains!
     create_service_links!
     @creation_completed = true
     app.active!
   end
 
+  def failed!
+    return if app.destroyed? || (@creation_completed && app.reload.active?)
+
+    app.error!
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
+    create_dokku_app!
+  end
+
   def create_dokku_app!
-    execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
+    ssh.execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
   end
 
   def create_domains!
@@ -40,7 +48,7 @@ class ServerActions::CreateApp < ServerAction
   end
 
   def dokku_app_hostnames
-    execute!(Dokku::Domains::ReportCommand.new(app: dokku_app_id)).parsed_output.domains_app_vhosts
+    ssh.execute!(Dokku::Domains::ReportCommand.new(app: dokku_app_id)).parsed_output.domains_app_vhosts
   end
 
   def create_service_links!

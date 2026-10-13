@@ -1,28 +1,37 @@
-class ServerActions::DestroyService < ServerAction
-  SLUG = "services.destroy"
+class ServerActions::DestroyService
+  KEY = "services.destroy"
 
-  actionable Service
-
-  store_attribute :payload, :dokku_service_id, :string
-  store_attribute :payload, :service_type, :string
-
-  validates :dokku_service_id, presence: true
-
-  before_validation on: :create do
-    self.service_type ||= service.service_type
-    self.dokku_service_id ||= service.dokku_id
+  def initialize(run)
+    @run = run
   end
 
-  def on_failure
-    service.error!
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def service = target
+  def dokku_service_id = payload.fetch("dokku_service_id", nil)
+  def service_type = payload.fetch("service_type", nil)
+
+  def self.default_payload(target)
+    service = target
+    {"service_type" => service.service_type, "dokku_service_id" => service.dokku_id}
   end
 
-  private
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Service, required: %w[dokku_service_id])
+  end
 
-  def run
+  def succeeded!
+    service.destroy!
+  end
+
+  def failed!
+    service.error! unless service.destroyed?
+  end
+
+  def execute!(ssh)
+    @ssh = ssh
     service.deleting!
     destroy_dokku_service!
-    service.destroy!
   end
 
   def destroy_dokku_service!
