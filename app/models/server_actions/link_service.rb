@@ -26,15 +26,18 @@ class ServerActions::LinkService < ServerAction
     service
   end
 
+  def on_failure
+    return if @link_completed && service_link.reload.active?
+
+    service_link.error!
+  end
+
   private
 
   def run
     link_dokku_service!
     schedule_pull_env!
-  rescue Ssh::CommandExecutionError
-    service_link.error!
-    raise
-  else
+    @link_completed = true
     service_link.active!
   end
 
