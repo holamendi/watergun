@@ -116,7 +116,7 @@ class Api::Internal::SetupsController < ActionController::API
   end
 
   def first_run_token
-    @user.signed_id(purpose: :first_run)
+    @user.generate_token_for(:first_run)
   end
 
   def setup_token

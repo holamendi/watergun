@@ -27,19 +27,25 @@ class Server < ApplicationRecord
     DOKKU_BUILDERS.except("herokuish")
   end
 
-  def ssh_session(&)
+  def ssh_session
     connection_attempts = 0
+    connection_established = false
 
-    Ssh::Session.new(
-      host: public_ip,
-      user: SshKey::USER,
-      private_key: ssh_key.private_key,
-      port: ssh_port
-    ).connect(&)
-  rescue Net::SSH::ConnectionTimeout
-    connection_attempts += 1
-    retry if connection_attempts < 4
-    raise
+    begin
+      Ssh::Session.new(
+        host: public_ip,
+        user: SshKey::USER,
+        private_key: ssh_key.private_key,
+        port: ssh_port
+      ).connect do |session|
+        connection_established = true
+        yield(session)
+      end
+    rescue Net::SSH::ConnectionTimeout
+      connection_attempts += 1
+      retry if !connection_established && connection_attempts < 4
+      raise
+    end
   end
 
   def execute_ssh_commands(commands)

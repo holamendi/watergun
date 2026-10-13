@@ -17,8 +17,8 @@ class SettingsConsistencyTest < ActionDispatch::IntegrationTest
     assert_select "form[method='dialog'] button.config-icon"
   end
 
-  test "general settings preserve three independent scoped saves with consistent geometry" do
-    get project_app_settings_path(@project, @app)
+  test "general settings preserve three independent scoped saves with consistent geometry for a connected app" do
+    get project_app_settings_path(@project, apps(:smol_roda))
     assert_response :success
     %w[app_form github_repo_form builder_form].each do |id|
       assert_select "form##{id}.config-settings-form" do

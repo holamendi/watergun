@@ -13,6 +13,16 @@ module Dokku
         cmd
       end
 
+      def sensitive_output?
+        true
+      end
+
+      def redacted_cmd
+        cmd = "dokku config:set #{@app} [FILTERED] --encoded"
+        cmd += " --no-restart" unless @restart
+        cmd
+      end
+
       private
 
       def base64_encoded_variables
