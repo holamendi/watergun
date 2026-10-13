@@ -72,7 +72,8 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     end
 
     assert_predicate action.reload, :success?
-    assert_equal [set_command, unset_command], action.log.ssh_commands.map { |command| command.fetch("cmd") }
+    redacted_set_command = Dokku::Config::SetCommand.new(app: @app.dokku_id, env: {"NEW_NAME" => "new-example"}).redacted_cmd
+    assert_equal [redacted_set_command, unset_command], action.log.ssh_commands.map { |command| command.fetch("cmd") }
     refute action.restart
   end
 
