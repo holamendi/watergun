@@ -13,7 +13,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     mock_ssh_session(host: server.public_ip, user: SshKey::USER, port: server.ssh_port,
       private_key: server.ssh_key.private_key, commands: commands)
 
-    action = ServerActions::DestroyProject.run_now!(server, project)
+    action = perform_server_action(ServerActions::DestroyProject, server, project)
 
     assert action.reload.success?
     assert_not Project.exists?(project.id)
@@ -21,14 +21,14 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
 
   test "rejects a child server change after enqueue" do
     project = projects(:default)
-    action = ServerActions::DestroyProject.create!(server: project.server, actionable: project)
+    action = create_server_action_run(ServerActions::DestroyProject, server: project.server, target: project)
     services(:postgres).update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
     ssh.stubs(:commands).returns([])
     ssh.expects(:execute!).never
-    action.server.stubs(:ssh_session).yields(ssh)
+    Server.any_instance.stubs(:ssh_session).yields(ssh)
 
-    assert_raises(ActiveRecord::RecordInvalid) { RunServerActionJob.perform_now(action) }
+    assert_raises(RunServerActionJob::ExecutionError) { RunServerActionJob.perform_now(action.id, action.resource_key) }
     assert action.reload.error?
     assert Project.exists?(project.id)
   end
@@ -37,23 +37,23 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     project = projects(:default)
     apps(:smol_roda).update_columns(server_id: servers(:arm).id)
 
-    assert_no_difference -> { ServerAction.count } do
-      assert_raises(ActiveRecord::RecordInvalid) do
-        ServerActions::DestroyProject.run_later!(project.server, project)
+    assert_no_difference -> { ServerActionRun.count } do
+      assert_raises(ArgumentError) do
+        enqueue_server_action(ServerActions::DestroyProject, project.server, project)
       end
     end
   end
 
   test "records a failed job when the project server changes after enqueue" do
     project = projects(:default)
-    action = ServerActions::DestroyProject.create!(server: project.server, actionable: project)
+    action = create_server_action_run(ServerActions::DestroyProject, server: project.server, target: project)
     project.update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
     ssh.stubs(:commands).returns([])
     ssh.expects(:execute!).never
-    action.server.stubs(:ssh_session).yields(ssh)
+    Server.any_instance.stubs(:ssh_session).yields(ssh)
 
-    assert_raises(ActiveRecord::RecordInvalid) { RunServerActionJob.perform_now(action) }
+    assert_raises(RunServerActionJob::ExecutionError) { RunServerActionJob.perform_now(action.id, action.resource_key) }
     assert action.reload.error?
     assert Project.exists?(project.id)
   end
@@ -61,12 +61,8 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
   test "rejects an app from a different account before executing commands" do
     project = projects(:default)
     apps(:smol_roda).update_columns(account_id: accounts(:other).id)
-    action = ServerActions::DestroyProject.new(server: project.server, actionable: project)
-    ssh = mock("SSH session")
-    ssh.expects(:execute!).never
-    action.ssh_session = ssh
-
-    assert_raises(ActiveRecord::RecordInvalid) { action.send(:run) }
+    Net::SSH.expects(:start).never
+    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: project.server, target: project) }
     assert Project.exists?(project.id)
     assert Service.exists?(services(:postgres).id)
   end
@@ -74,24 +70,16 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
   test "rejects a mismatched service before deleting any apps" do
     project = projects(:default)
     services(:postgres).update_columns(server_id: servers(:arm).id)
-    action = ServerActions::DestroyProject.new(server: project.server, actionable: project)
-    ssh = mock("SSH session")
-    ssh.expects(:execute!).never
-    action.ssh_session = ssh
-
-    assert_raises(ActiveRecord::RecordInvalid) { action.send(:run) }
+    Net::SSH.expects(:start).never
+    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: project.server, target: project) }
     assert Project.exists?(project.id)
     assert App.exists?(apps(:smol_roda).id)
   end
 
   test "rejects destruction on a different server before executing commands" do
     project = projects(:default)
-    action = ServerActions::DestroyProject.new(server: servers(:arm), actionable: project)
-    ssh = mock("SSH session")
-    ssh.expects(:execute!).never
-    action.ssh_session = ssh
-
-    assert_raises(ActiveRecord::RecordInvalid) { action.send(:run) }
+    Net::SSH.expects(:start).never
+    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: servers(:arm), target: project) }
     assert Project.exists?(project.id)
     assert App.exists?(apps(:smol_roda).id)
   end

@@ -37,8 +37,8 @@
     <div class="deploy-info-item">
       <div class="deploy-info-label">Target</div>
       <div class="deploy-info-value mono">
-        <% if @server_action.actionable_type.present? %>
-          <%= "#{@server_action.actionable_type.underscore.split('/').last}:#{@server_action.actionable_id}" %>
+        <% if @server_action.target_type.present? %>
+          <%= "#{@server_action.target_type.underscore.split('/').last}:#{@server_action.target_id}" %>
         <% else %>
           <span class="text-text-muted">destroyed</span>
         <% end %>
@@ -52,7 +52,7 @@
       <div class="deploy-info-label">Duration</div>
       <div class="deploy-info-value mono">
         <% if @server_action.finished? %>
-          <%= @server_action.duration.round(2) %>s
+          <%= @server_action .duration.to_f.round(2) %>s
         <% else %>
           -
         <% end %>
@@ -69,7 +69,7 @@
   <div class="section-label">Payload</div>
   <div class="bg-surface rounded-lg border border-border mb-6">
     <div class="p-4">
-      <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
+      <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.filtered_payload) %></pre>
     </div>
   </div>
 

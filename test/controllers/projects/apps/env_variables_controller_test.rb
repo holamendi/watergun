@@ -25,7 +25,7 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
   test "name-only update queues replacement and removal of the old name" do
     variable = @app.env_variables.create!(name: "OLD_NAME", value: "example-only")
 
-    assert_difference "ServerActions::UpdateEnv.count", 1 do
+    assert_difference -> { ServerActionRun.where(action_key: "apps.update_env").count }, 1 do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: "NEW_NAME", value: variable.value}},
         as: :turbo_stream
@@ -33,17 +33,17 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
 
     assert_response :success
     assert_equal "NEW_NAME", variable.reload.name
-    action = ServerActions::UpdateEnv.order(:id).last
-    assert_equal @app, action.app
+    action = ServerActionRun.where(action_key: "apps.update_env").order(:id).last
+    assert_equal @app, action.target
     assert_equal @app.server, action.server
-    assert_equal({"NEW_NAME" => "example-only"}, action.set)
-    assert_equal ["OLD_NAME"], action.unset
+    assert_equal({"NEW_NAME" => "example-only"}, action.payload["set"])
+    assert_equal ["OLD_NAME"], action.payload["unset"]
   end
 
   test "name and value update executes the replacement before removing the old name" do
     variable = @app.env_variables.create!(name: "OLD_NAME", value: "example-only")
 
-    assert_difference "ServerActions::UpdateEnv.count", 1 do
+    assert_difference -> { ServerActionRun.where(action_key: "apps.update_env").count }, 1 do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: "NEW_NAME", value: "new-example"}},
         as: :turbo_stream
@@ -51,9 +51,9 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
 
     assert_response :success
     assert_equal "new-example", variable.reload.value
-    action = ServerActions::UpdateEnv.order(:id).last
-    assert_equal({"NEW_NAME" => "new-example"}, action.set)
-    assert_equal ["OLD_NAME"], action.unset
+    action = ServerActionRun.where(action_key: "apps.update_env").order(:id).last
+    assert_equal({"NEW_NAME" => "new-example"}, action.payload["set"])
+    assert_equal ["OLD_NAME"], action.payload["unset"]
 
     require_relative "../../../../app/models/ssh/session"
     set_command = Dokku::Config::SetCommand.new(app: @app.dokku_id, env: {"NEW_NAME" => "new-example"}).cmd
@@ -67,35 +67,35 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
       commands: [{cmd: set_command}, {cmd: unset_command}]
     )
 
-    assert_difference "ServerActions::PullEnv.count", 1 do
-      RunServerActionJob.perform_now(action.reload)
+    assert_difference -> { ServerActionRun.where(action_key: "apps.pull_env").count }, 1 do
+      RunServerActionJob.perform_now(action.reload.id, action.reload.resource_key)
     end
 
     assert_predicate action.reload, :success?
     redacted_set_command = Dokku::Config::SetCommand.new(app: @app.dokku_id, env: {"NEW_NAME" => "new-example"}).redacted_cmd
     assert_equal [redacted_set_command, unset_command], action.log.ssh_commands.map { |command| command.fetch("cmd") }
-    refute action.restart
+    refute action.payload["restart"]
   end
 
   test "value-only update does not unset the unchanged name" do
     variable = @app.env_variables.create!(name: "SAME_NAME", value: "example-only")
 
-    assert_difference "ServerActions::UpdateEnv.count", 1 do
+    assert_difference -> { ServerActionRun.where(action_key: "apps.update_env").count }, 1 do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: variable.name, value: "new-example"}},
         as: :turbo_stream
     end
 
     assert_response :success
-    action = ServerActions::UpdateEnv.order(:id).last
-    assert_equal({"SAME_NAME" => "new-example"}, action.set)
-    assert_empty action.unset
+    action = ServerActionRun.where(action_key: "apps.update_env").order(:id).last
+    assert_equal({"SAME_NAME" => "new-example"}, action.payload["set"])
+    assert_empty action.payload["unset"]
   end
 
   test "unchanged variable does not queue a remote update" do
     variable = @app.env_variables.create!(name: "SAME_NAME", value: "example-only")
 
-    assert_no_difference "ServerAction.count" do
+    assert_no_difference "ServerActionRun.count" do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: variable.name, value: variable.value}},
         as: :turbo_stream
@@ -107,7 +107,7 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
   test "invalid rename leaves the persisted variable and remote queue unchanged" do
     variable = @app.env_variables.create!(name: "OLD_NAME", value: "example-only")
 
-    assert_no_difference "ServerAction.count" do
+    assert_no_difference "ServerActionRun.count" do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: "INVALID-NAME", value: "new-example"}},
         as: :turbo_stream
@@ -122,7 +122,7 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     variable = @app.env_variables.create!(name: "OLD_NAME", value: "example-only")
     existing = @app.env_variables.create!(name: "EXISTING_NAME", value: "existing-example")
 
-    assert_no_difference "ServerAction.count" do
+    assert_no_difference "ServerActionRun.count" do
       patch project_app_env_variable_path(@project, @app, variable),
         params: {env_variable: {name: existing.name, value: "new-example"}},
         as: :turbo_stream

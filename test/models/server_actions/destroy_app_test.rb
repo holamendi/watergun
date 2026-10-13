@@ -14,7 +14,7 @@ class ServerActions::DestroyAppTest < ActiveSupport::TestCase
     action = App::DestroyApp.new(app).destroy
 
     assert_no_difference -> { App.count } do
-      RunServerActionJob.perform_now(action)
+      RunServerActionJob.perform_now(action.id, action.resource_key)
     end
 
     assert app.reload.kept?
@@ -49,7 +49,7 @@ class ServerActions::DestroyAppTest < ActiveSupport::TestCase
     action = App::DestroyApp.new(app).destroy
 
     assert_difference -> { App.count }, -1 do
-      RunServerActionJob.perform_now(action)
+      RunServerActionJob.perform_now(action.id, action.resource_key)
     end
 
     assert action.reload.success?

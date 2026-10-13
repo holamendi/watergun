@@ -11,7 +11,7 @@ class ServerActions::PullEnvTest < ActiveSupport::TestCase
     mock_ssh_session(host: app.server.public_ip, user: SshKey::USER, port: app.server.ssh_port, private_key: app.server.ssh_key.private_key,
       commands: [{cmd: command.cmd, stdout: values.to_json, stderr: "warning #{secret}"}])
 
-    action = ServerActions::PullEnv.run_now!(app.server, app)
+    action = perform_server_action(ServerActions::PullEnv, app.server, app)
 
     assert action.reload.success?
     variable = app.env_variables.find_by!(name: "API_KEY")

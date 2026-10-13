@@ -16,7 +16,7 @@ class Projects::Services::RestartsControllerTest < ActionDispatch::IntegrationTe
     assert_server_action_scheduled(
       ServerActions::RestartService,
       server: @server,
-      actionable: @service,
+      target: @service,
       payload: {dokku_service_id: @service.dokku_id, service_type: @service.service_type}
     )
   end

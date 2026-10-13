@@ -80,7 +80,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_server_action_scheduled(
         ServerActions::DeployApp,
         server: @server,
-        actionable: deployment,
+        target: deployment,
         payload: {
           dokku_app_id: @app.dokku_id,
           repo: deployment.repo,
@@ -110,7 +110,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_server_action_scheduled(
         ServerActions::DeployApp,
         server: @server,
-        actionable: deployment,
+        target: deployment,
         payload: {
           dokku_app_id: @app.dokku_id,
           repo: deployment.repo,

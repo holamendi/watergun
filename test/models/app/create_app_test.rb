@@ -37,7 +37,7 @@ class App::CreateAppTest < ActiveSupport::TestCase
       assert_server_action_scheduled(
         ServerActions::CreateApp,
         server: @server,
-        actionable: app,
+        target: app,
         payload: {
           dokku_app_id: "test-app"
         }

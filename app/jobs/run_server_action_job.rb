@@ -1,110 +1,15 @@
 class RunServerActionJob < ApplicationJob
-  limits_concurrency to: 1, key: ->(server_action) { server_action.concurrency_key }, duration: 30.minutes
+  class ExecutionError < StandardError; end
+  self.enqueue_after_transaction_commit = false
+  limits_concurrency to: 1, key: ->(_run_id, resource_key) { resource_key }, duration: 30.minutes
 
-  def perform(server_action)
-    server_action.running!
-
-    # Set up periodic log persistence if configured
-    if server_action.persist_logs_interval
-      server_action.create_log!(ssh_commands: [])
-      setup_log_persistence(server_action)
+  def perform(run_id, resource_key)
+    run = ServerActionRun.find(run_id)
+    raise ArgumentError, "Resource key mismatch" unless run.resource_key == resource_key
+    begin
+      ServerAction::Runner.new(run).call
+    rescue
+      raise ExecutionError, "Server action execution failed", cause: nil
     end
-
-    session = server_action.server.ssh_session do |ssh_session|
-      session = ssh_session
-      server_action.with(ssh_session:) { server_action.send(:run) }
-    rescue Ssh::CommandExecutionError
-      reconcile_failure(server_action)
-    ensure
-      stop_log_persistence
-    end
-
-    # Final save of logs
-    if server_action.log.present?
-      server_action.log.update!(ssh_commands: session.commands)
-      server_action.on_logs_persisted(commands: session.commands)
-    else
-      server_action.create_log!(ssh_commands: session.commands)
-    end
-    server_action.status = session.status
-  rescue => e
-    persist_failure_logs(server_action, session)
-    reconcile_failure(server_action)
-    Honeybadger.notify(e, context: {server_action_id: server_action.id})
-    server_action.status = :error
-    server_action.failure_message = <<~ERROR
-      Error: #{e.class}
-      Message: #{e.message}
-
-      Backtrace:
-      #{e.backtrace.first(10).map { |line| "  #{line}" }.join("\n")}
-      #{"\n  ... and #{e.backtrace.size - 10} more lines" if e.backtrace.size > 10}
-    ERROR
-    raise
-  else
-    server_action.failure_message = nil
-    server_action
-  ensure
-    stop_log_persistence
-    server_action.finished_at = Time.current
-    server_action.save!
-  end
-
-  private
-
-  def persist_failure_logs(server_action, session)
-    return unless session
-
-    if server_action.log.present?
-      server_action.log.update!(ssh_commands: session.commands)
-    else
-      server_action.create_log!(ssh_commands: session.commands)
-    end
-  rescue => log_error
-    Honeybadger.notify(log_error, context: {server_action_id: server_action.id})
-  end
-
-  def reconcile_failure(server_action)
-    server_action.on_failure
-  rescue => reconciliation_error
-    Honeybadger.notify(reconciliation_error, context: {server_action_id: server_action.id})
-  end
-
-  def setup_log_persistence(server_action)
-    @persisting_action = server_action
-    @persist_timer_running = true
-
-    @persist_timer = Thread.new do
-      while @persist_timer_running
-        sleep server_action.persist_logs_interval
-        persist_logs if @persist_timer_running
-      end
-    end
-  end
-
-  def stop_log_persistence
-    return unless @persist_timer
-
-    @persist_timer_running = false
-    @persist_timer.kill
-    @persist_timer = nil
-
-    # Final persist
-    persist_logs
-  end
-
-  def persist_logs
-    return unless @persisting_action
-
-    session = @persisting_action.ssh_session
-    return unless session
-
-    # Save current state to DB
-    @persisting_action.log&.update!(ssh_commands: session.commands)
-
-    # Notify the action
-    @persisting_action.on_logs_persisted(commands: session.commands)
-  rescue => e
-    Rails.logger.error("Failed to persist logs: #{e.message}")
   end
 end

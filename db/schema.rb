@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_10_121500) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -270,36 +270,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_10_121500) do
   create_table "server_action_logs", force: :cascade do |t|
     t.integer "account_id", null: false
     t.datetime "created_at", null: false
-    t.integer "server_action_id", null: false
+    t.integer "server_action_run_id", null: false
     t.json "ssh_commands", default: [], null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_server_action_logs_on_account_id"
-    t.index ["id", "server_action_id"], name: "index_server_action_logs_on_id_and_server_action_id", unique: true
-    t.index ["server_action_id"], name: "index_server_action_logs_on_server_action_id"
+    t.index ["id", "server_action_run_id"], name: "index_server_action_logs_on_id_and_server_action_run_id", unique: true
+    t.index ["server_action_run_id"], name: "index_server_action_logs_on_server_action_run_id"
   end
 
-  create_table "server_actions", force: :cascade do |t|
+  create_table "server_action_runs", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.integer "actionable_id"
-    t.string "actionable_type"
+    t.integer "target_id"
+    t.string "target_type"
     t.datetime "created_at", null: false
     t.string "failure_message"
     t.datetime "finished_at"
-    t.json "payload", default: {}, null: false
     t.datetime "running_at"
     t.integer "server_id", null: false
     t.string "source", null: false
     t.string "status"
-    t.string "type"
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.index "((payload ->> 'dokku_app_id'::text))", name: "index_server_actions_on_dokku_app_id"
-    t.index "((payload ->> 'dokku_service_id'::text))", name: "index_server_actions_on_dokku_service_id"
-    t.index ["account_id"], name: "index_server_actions_on_account_id"
-    t.index ["actionable_type", "actionable_id"], name: "index_server_events_on_actionable"
-    t.index ["server_id"], name: "index_server_actions_on_server_id"
-    t.index ["status"], name: "index_server_actions_on_status"
-    t.index ["user_id"], name: "index_server_actions_on_user_id"
+    t.text "payload"
+    t.string "action_key", null: false
+    t.string "resource_key", null: false
+    t.datetime "enqueued_at"
+    t.datetime "scheduling_failed_at"
+    t.index ["account_id"], name: "index_server_action_runs_on_account_id"
+    t.index ["server_id"], name: "index_server_action_runs_on_server_id"
+    t.index ["status"], name: "index_server_action_runs_on_status"
+    t.index ["target_type", "target_id"], name: "index_server_action_runs_on_target"
+    t.index ["user_id"], name: "index_server_action_runs_on_user_id"
   end
 
   create_table "server_checks", force: :cascade do |t|
@@ -588,10 +589,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_10_121500) do
   add_foreign_key "projects", "accounts"
   add_foreign_key "projects", "servers"
   add_foreign_key "server_action_logs", "accounts"
-  add_foreign_key "server_action_logs", "server_actions"
-  add_foreign_key "server_actions", "accounts"
-  add_foreign_key "server_actions", "servers"
-  add_foreign_key "server_actions", "users"
+  add_foreign_key "server_action_logs", "server_action_runs"
+  add_foreign_key "server_action_runs", "accounts"
+  add_foreign_key "server_action_runs", "servers"
+  add_foreign_key "server_action_runs", "users"
   add_foreign_key "server_checks", "accounts"
   add_foreign_key "server_checks", "servers"
   add_foreign_key "servers", "accounts"

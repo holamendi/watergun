@@ -37,20 +37,20 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
       post project_app_storage_mounts_path(@project, @app), params: {storage_mount: {container_path: "/app/preference_#{index}", restart: value}}, as: :turbo_stream
       assert_response :success
       mount = @app.storage_mounts.find_by!(container_path: "/app/preference_#{index}")
-      assert_restart_operation(mount.server_actions.last, preference)
-      mount.server_actions.update_all(status: :success)
+      assert_restart_operation(mount.server_action_runs.last, preference)
+      mount.server_action_runs.update_all(status: :success)
       mount.update!(status: :active)
       delete project_app_storage_mount_path(@project, @app, mount), params: {storage_mount: {restart: value}}, as: :turbo_stream
       assert_response :success
-      assert_restart_operation(mount.server_actions.last, preference)
+      assert_restart_operation(mount.server_action_runs.last, preference)
       [:detached, :error, :detach_failed].each do |status|
-        mount.server_actions.update_all(status: :success)
+        mount.server_action_runs.update_all(status: :success)
         mount.update!(status: status)
         patch project_app_storage_mount_path(@project, @app, mount), params: {storage_mount: {restart: value}}, as: :turbo_stream
         assert_response :success
-        action = mount.server_actions.last
+        action = mount.server_action_runs.last
         assert_restart_operation(action, preference)
-        assert_equal (status == :detach_failed) ? "ServerActions::UnmountStorage" : "ServerActions::MountStorage", action.type
+        assert_equal (status == :detach_failed) ? "apps.unmount_storage" : "apps.mount_storage", action.action_key
       end
     end
   end
@@ -67,7 +67,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     assert_response :success
     assert_not_includes response.body, "app will restart"
-    mount.server_actions.update_all(status: :success)
+    mount.server_action_runs.update_all(status: :success)
     mount.active!
     delete project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     assert_response :success
@@ -88,7 +88,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
       assert mount.host_path.present?
       assert_equal "pending", mount.status
 
-      server_action = ServerAction.find_by(type: "ServerActions::MountStorage", actionable: mount)
+      server_action = ServerActionRun.find_by(action_key: "apps.mount_storage", target: mount)
       assert server_action
     end
 
@@ -106,7 +106,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   test "reattaches retained mount with unchanged backing path" do
     mount = @app.storage_mounts.create!(container_path: "/app/retained", status: :detached, chown: "heroku")
     host_path = mount.host_path
-    assert_difference -> { ServerActions::MountStorage.count } do
+    assert_difference -> { ServerActionRun.where(action_key: "apps.mount_storage").count } do
       patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     end
     assert_response :success
@@ -118,12 +118,12 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   test "retries failed mount or detach according to retained intent" do
     {error: ServerActions::MountStorage, detach_failed: ServerActions::UnmountStorage}.each do |status, klass|
       mount = @app.storage_mounts.create!(container_path: "/app/#{status}", status: status)
-      assert_difference -> { klass.count } do
+      assert_difference -> { ServerActionRun.where(action_key: klass::KEY).count } do
         patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
       end
       assert_response :success
       assert_equal (status == :error) ? "pending" : "detaching", mount.reload.status
-      assert_no_difference -> { ServerAction.count } do
+      assert_no_difference -> { ServerActionRun.count } do
         patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
       end
       assert_response :conflict
@@ -134,24 +134,24 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     mount = @app.storage_mounts.create!(container_path: "/app/configured", status: :configured)
     delete project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     assert_response :success
-    assert_equal "ServerActions::UnmountStorage", mount.server_actions.last.type
-    mount.server_actions.update_all(status: :success)
+    assert_equal "apps.unmount_storage", mount.server_action_runs.last.action_key
+    mount.server_action_runs.update_all(status: :success)
     mount.update!(status: :detach_configured)
     patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     assert_response :success
-    assert_equal "ServerActions::MountStorage", mount.server_actions.last.type
-    mount.server_actions.update_all(status: :success)
+    assert_equal "apps.mount_storage", mount.server_action_runs.last.action_key
+    mount.server_action_runs.update_all(status: :success)
     mount.update!(status: :configured)
     patch project_app_storage_mount_path(@project, @app, mount), params: {storage_mount: {restart: "1"}}, as: :turbo_stream
     assert_response :success
-    assert_equal "ServerActions::MountStorage", mount.server_actions.last.type
-    assert_equal true, mount.server_actions.last.payload["restart"]
-    mount.server_actions.update_all(status: :success)
+    assert_equal "apps.mount_storage", mount.server_action_runs.last.action_key
+    assert_equal true, mount.server_action_runs.last.payload["restart"]
+    mount.server_action_runs.update_all(status: :success)
     mount.update!(status: :detach_configured)
     delete project_app_storage_mount_path(@project, @app, mount), params: {storage_mount: {restart: "1"}}, as: :turbo_stream
     assert_response :success
-    assert_equal "ServerActions::UnmountStorage", mount.server_actions.last.type
-    assert_equal true, mount.server_actions.last.payload["restart"]
+    assert_equal "apps.unmount_storage", mount.server_action_runs.last.action_key
+    assert_equal true, mount.server_action_runs.last.payload["restart"]
   end
 
   test "accepts Dockerfile ownership preset but ignores submitted host paths" do
@@ -233,7 +233,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     assert_response :success
     assert_select "turbo-stream[action='close_dialog'][target='#{dom_id(mount, :resume_modal)}']"
     assert_operator response.body.index('action="close_dialog"'), :<, response.body.index('target="storage_mounts"')
-    mount.server_actions.update_all(status: :success)
+    mount.server_action_runs.update_all(status: :success)
     mount.update!(status: :active)
     delete project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
     assert_response :success
@@ -250,7 +250,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     other_app = other_project.apps.create!(name: "Other app")
     other_mount = other_app.storage_mounts.create!(container_path: "/app/tenant", status: :detach_configured)
     sibling_mount = apps(:smol_roda).storage_mounts.create!(container_path: "/app/sibling", status: :configured)
-    assert_no_difference -> { ServerAction.count } do
+    assert_no_difference -> { ServerActionRun.count } do
       patch project_app_storage_mount_path(@project, @app, other_mount), as: :turbo_stream
       assert_response :not_found
       delete project_app_storage_mount_path(@project, @app, sibling_mount), as: :turbo_stream
@@ -265,7 +265,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   end
 
   test "create rolls back retained record when operation cannot be queued" do
-    ServerActions::MountStorage.stubs(:run_later!).raises(RuntimeError, "queue unavailable")
+    ServerAction::Enqueue.stubs(:call).with(has_entries(action: ServerActions::MountStorage)).raises(RuntimeError, "queue unavailable")
     assert_no_difference -> { StorageMount.count } do
       assert_raises(RuntimeError) do
         post project_app_storage_mounts_path(@project, @app), params: {storage_mount: {container_path: "/app/queue_failure"}}, as: :turbo_stream
@@ -275,10 +275,10 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
 
   private def assert_restart_operation(action, preference)
     assert_equal preference, action.payload["restart"]
-    attaching = action.is_a?(ServerActions::MountStorage)
-    session = storage_phase_session(action.actionable, attached: !attaching)
-    action.ssh_session = session
-    action.run
+    attaching = action.action_key == ServerActions::MountStorage::KEY
+    session = storage_phase_session(action.target, attached: !attaching)
+    action_operation = ServerAction::Registry.build(action)
+    perform_server_operation(action_operation, session)
     assert_equal preference ? 1 : 0, session.commands.count { |tokens| tokens.include?("ps:restart") }
     assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-app-mounts") }
     expected_status = if attaching
@@ -286,7 +286,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
     else
       preference ? "detached" : "detach_configured"
     end
-    assert_equal expected_status, action.actionable.reload.status
+    assert_equal expected_status, action.target.reload.status
   end
 
   describe "#destroy" do
@@ -299,10 +299,10 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
       assert_not mount.reload.discarded?
       assert_equal "detaching", mount.status
 
-      server_action = ServerAction.find_by(type: "ServerActions::UnmountStorage", actionable: mount)
+      server_action = ServerActionRun.find_by(action_key: "apps.unmount_storage", target: mount)
       assert server_action
       assert_includes response.body, "Detach queued"
-      assert_no_difference -> { ServerAction.count } do
+      assert_no_difference -> { ServerActionRun.count } do
         delete project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
       end
       assert_response :conflict

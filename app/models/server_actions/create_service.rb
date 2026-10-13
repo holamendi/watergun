@@ -1,32 +1,43 @@
-class ServerActions::CreateService < ServerAction
-  SLUG = "services.create"
+class ServerActions::CreateService
+  KEY = "services.create"
 
-  actionable Service
-
-  store_attribute :payload, :dokku_service_id, :string
-  store_attribute :payload, :service_type, :string
-
-  validates :dokku_service_id, presence: true
-  validates :service_type, presence: true
-
-  before_validation on: :create do
-    self.dokku_service_id ||= service.dokku_id
-    self.service_type ||= service.service_type
+  def initialize(run)
+    @run = run
   end
 
-  def on_failure
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def service = target
+  def dokku_service_id = payload.fetch("dokku_service_id", nil)
+  def service_type = payload.fetch("service_type", nil)
+
+  def self.default_payload(target)
+    service = target
+    {"dokku_service_id" => service.dokku_id, "service_type" => service.service_type}
+  end
+
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Service, required: %w[dokku_service_id service_type])
+  end
+
+  def succeeded!
+    service.data = dokku_service_info
+    create_service_links!
+    @creation_completed = true
+    service.active!
+  end
+
+  def failed!
+    return if service.destroyed? || (@creation_completed && service.reload.active?)
+
     service.error!
   end
 
-  private
-
-  def run
+  def execute!(ssh)
+    @ssh = ssh
     install_dokku_plugin! unless dokku_plugin_installed?
 
     create_dokku_service!
-    service.data = dokku_service_info
-    create_service_links!
-    service.active!
   end
 
   def create_dokku_service!

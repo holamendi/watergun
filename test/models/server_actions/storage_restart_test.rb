@@ -9,13 +9,13 @@ class ServerActions::StorageRestartTest < ActiveSupport::TestCase
       mount = app.storage_mounts.create!(container_path: "/app/#{status}")
       session = storage_phase_session(mount, attached: klass == ServerActions::UnmountStorage)
       session.ignore_run_change = true
-      action = klass.create!(server: app.server, actionable: mount)
-      action.ssh_session = session
-      assert_raises(RuntimeError) { action.run }
+      action = create_server_action_run(klass, server: app.server, target: mount)
+      action_operation = ServerAction::Registry.build(action)
+      assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
       assert_equal status, mount.reload.status
       assert_not session.commands.any? { |tokens| tokens.include?("ps:restart") }
       session.ignore_run_change = false
-      action.run
+      perform_server_operation(action_operation, session)
       assert_equal (klass == ServerActions::MountStorage) ? "configured" : "detach_configured", mount.reload.status
       assert_equal session.bindings["deploy"], session.bindings["run"]
       assert_not session.commands.any? { |tokens| tokens.include?("ps:restart") }
@@ -27,9 +27,9 @@ class ServerActions::StorageRestartTest < ActiveSupport::TestCase
       app = apps(:domain_test_app)
       mount = app.storage_mounts.create!(container_path: "/app/#{status}")
       session = storage_phase_session(mount, attached: klass == ServerActions::UnmountStorage)
-      action = klass.create!(server: app.server, actionable: mount)
-      action.ssh_session = session
-      action.run
+      action = create_server_action_run(klass, server: app.server, target: mount)
+      action_operation = ServerAction::Registry.build(action)
+      perform_server_operation(action_operation, session)
       assert_equal status, mount.reload.status
       assert_equal false, action.reload.payload["restart"]
       assert_equal 4, session.commands.count { |tokens| tokens.include?("storage-app-mounts") }

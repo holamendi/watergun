@@ -13,10 +13,10 @@ class StorageMountTest < ActiveSupport::TestCase
       mount.error!
       assert mount.resume
       assert_equal "pending", mount.reload.status
-      mount.server_actions.update_all(status: :failure)
+      mount.server_action_runs.update_all(status: :failure)
       mount.active!
       assert StorageMount::DestroyStorageMount.new(mount).destroy
-      mount.server_actions.update_all(status: :failure)
+      mount.server_action_runs.update_all(status: :failure)
       mount.detach_failed!
       assert mount.resume
       mount.detached!

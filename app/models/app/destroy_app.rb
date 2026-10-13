@@ -4,6 +4,6 @@ class App::DestroyApp
   end
 
   def destroy
-    ServerActions::DestroyApp.run_later!(@app.server, @app)
+    ServerAction::Enqueue.call(action: ServerActions::DestroyApp, target: @app)
   end
 end

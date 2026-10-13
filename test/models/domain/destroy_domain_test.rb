@@ -19,7 +19,7 @@ class Domain::DestroyDomainTest < ActiveSupport::TestCase
     assert_server_action_scheduled(
       ServerActions::DestroyDomain,
       server: @server,
-      actionable: @domain
+      target: @domain
     )
   end
 end

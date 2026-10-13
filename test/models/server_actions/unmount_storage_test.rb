@@ -1,6 +1,21 @@
 require "test_helper"
 
 class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
+  test "unmount command failure survives rejected reconciliation in the runner" do
+    run = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount)
+    command = stub(exit_code: 1, redacted_cmd: "storage report")
+    original = Ssh::CommandExecutionError.new(command)
+    session = mock("storage session")
+    session.stubs(:commands).returns([])
+    session.expects(:execute!).raises(original)
+    Server.any_instance.stubs(:ssh_session).yields(session)
+    StorageMount.any_instance.expects(:detach_failed!).once.raises(IOError, "reconciliation rejected")
+    run.expects(:update!).with(has_entries(status: :failure)).raises(IOError, "final write rejected")
+    Honeybadger.expects(:notify).with { |error, options| error.message.include?("reconciliation") }.once
+    Honeybadger.expects(:notify).with { |error, options| error.message.include?("final persistence") }.once
+
+    assert_same original, assert_raises(Ssh::CommandExecutionError) { ServerAction::Runner.new(run).call }
+  end
   include SshTestHelper
   include StoragePhaseTestHelper
 
@@ -11,9 +26,9 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
       session.bindings[phase].first["entry_name"] = "legacy-current"
       session.bindings[phase] << session.bindings[phase].first.merge("container_path" => "/app/neighbor")
     end
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount)
-    action.ssh_session = session
-    action.run
+    action = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount)
+    action_operation = ServerAction::Registry.build(action)
+    perform_server_operation(action_operation, session)
     assert_includes session.commands, ["dokku", "storage:unmount", @app.dokku_id, "legacy-current", "--container-dir", @storage_mount.container_path]
     assert_equal 1, session.commands.count { |tokens| tokens[1] == "storage:unmount" }
     assert_equal ["/app/neighbor"], session.bindings["run"].map { |binding| binding["container_path"] }
@@ -25,9 +40,9 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
     [ServerActions::MountStorage, ServerActions::UnmountStorage].each do |klass|
       session = storage_phase_session(@storage_mount, attached: true)
       session.bindings.each_value { |mounts| mounts.first["process_type"] = "worker" }
-      action = klass.create!(server: @server, actionable: @storage_mount)
-      action.ssh_session = session
-      assert_raises(RuntimeError) { action.run }
+      action = create_server_action_run(klass, server: @server, target: @storage_mount)
+      action_operation = ServerAction::Registry.build(action)
+      assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
       assert_not session.commands.any? { |tokens| %w[storage:mount storage:unmount storage:create].include?(tokens[1]) }
       assert_equal "worker", session.bindings["run"].first["process_type"]
       assert_equal (klass == ServerActions::MountStorage) ? "error" : "detach_failed", @storage_mount.reload.status
@@ -35,24 +50,24 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   end
 
   test "partial unmount failure reconciles run phase on retry" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
+    action = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: true)
     session.fail_run_once = true
-    action.ssh_session = session
-    assert_raises(RuntimeError) { action.run }
+    action_operation = ServerAction::Registry.build(action)
+    assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
     assert_equal "detach_failed", @storage_mount.reload.status
     assert_not_equal session.bindings["deploy"], session.bindings["run"]
-    action.run
+    perform_server_operation(action_operation, session)
     assert_equal session.bindings["deploy"], session.bindings["run"]
     assert_equal "detached", @storage_mount.reload.status
   end
 
   test "unmount verifies run phase before reporting success" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
+    action = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: true)
     session.ignore_run_change = true
-    action.ssh_session = session
-    assert_raises(RuntimeError) { action.run }
+    action_operation = ServerAction::Registry.build(action)
+    assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
     assert_equal "detach_failed", @storage_mount.reload.status
   end
 
@@ -82,7 +97,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
 
     path = @storage_mount.host_path
     assert_no_difference -> { StorageMount.count } do
-      action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
+      action = perform_server_action(ServerActions::UnmountStorage, @server, @storage_mount, restart: true)
       assert action.success?
     end
     assert_equal "detached", @storage_mount.reload.status
@@ -91,22 +106,22 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
   end
 
   test "detach retry skips absent binding and still restarts and verifies" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
+    action = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []))
     session.expects(:execute!).with(instance_of(Dokku::Ps::RestartCommand))
     session.expects(:execute!).with(instance_of(Dokku::Storage::UnmountCommand)).never
-    action.ssh_session = session
-    action.run
+    action_operation = ServerAction::Registry.build(action)
+    perform_server_operation(action_operation, session)
     assert_equal "detached", @storage_mount.reload.status
   end
 
   test "verification failure preserves record and failed detach intent" do
-    action = ServerActions::UnmountStorage.create!(server: @server, actionable: @storage_mount, restart: true)
+    action = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount, restart: true)
     session = mock
     session.stubs(:execute!).returns(stub(parsed_output: [{"entry_name" => File.basename(@storage_mount.host_path), "host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}]))
-    action.ssh_session = session
-    assert_raises(RuntimeError) { action.run }
+    action_operation = ServerAction::Registry.build(action)
+    assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
     assert_equal "detach_failed", @storage_mount.reload.status
     assert_not @storage_mount.discarded?
   end
@@ -120,7 +135,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
         {cmd: "dokku storage:unmount domain-test-app #{File.basename(@storage_mount.host_path)} --container-dir /app/uploads"},
         {cmd: "dokku ps:restart domain-test-app", exit_code: 1}
       ])
-    action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
+    action = perform_server_action(ServerActions::UnmountStorage, @server, @storage_mount, restart: true)
     assert action.failure?
     assert_equal "detach_failed", @storage_mount.reload.status
     assert_not @storage_mount.discarded?
@@ -145,7 +160,7 @@ class ServerActions::UnmountStorageTest < ActiveSupport::TestCase
         non_interactive: true)
       .yields(stub_session)
 
-    server_action = ServerActions::UnmountStorage.run_now!(@server, @storage_mount, restart: true)
+    server_action = perform_server_action(ServerActions::UnmountStorage, @server, @storage_mount, restart: true)
 
     assert server_action.failure?
     assert_equal "detach_failed", @storage_mount.reload.status

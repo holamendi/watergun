@@ -22,7 +22,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       Account.destroy_all
       User.destroy_all
 
-      assert_no_difference ["Project.count", "App.count", "Domain.count", "Service.count", "EnvVariable.count", "ServiceLink.count", "ServerAction.count"] do
+      assert_no_difference ["Project.count", "App.count", "Domain.count", "Service.count", "EnvVariable.count", "ServiceLink.count", "ServerActionRun.count"] do
         assert_difference ["Account.count", "Server.count", "User.count"], 1 do
           post api_internal_setups_url, params: @valid_params, headers: @headers
         end
@@ -90,7 +90,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
         }
       )
 
-      assert_no_difference "ServerAction.count" do
+      assert_no_difference "ServerActionRun.count" do
         assert_difference ["Account.count", "Server.count", "User.count", "Project.count", "App.count", "Domain.count", "Service.count", "EnvVariable.count", "ServiceLink.count"], 1 do
           post api_internal_setups_url, params:, headers: @headers
         end

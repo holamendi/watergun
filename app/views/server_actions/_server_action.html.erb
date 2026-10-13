@@ -1,3 +1,4 @@
+<% server_action = local_assigns.fetch(:server_action, local_assigns[:server_action_run]) %>
 <%= link_to server_action_path(server_action),
     id: dom_id(server_action),
     class: "activity-item" do %>
@@ -16,8 +17,8 @@
   <div class="activity-body">
     <div class="activity-title"><%= server_action.slug %></div>
     <div class="activity-slug">
-      <% if server_action.actionable_type.present? %>
-        <%= server_action.actionable_type.underscore.split("/").last %>:<%= server_action.actionable_id %>
+      <% if server_action.target_type.present? %>
+        <%= server_action.target_type.underscore.split("/").last %>:<%= server_action.target_id %>
       <% else %>
         destroyed
       <% end %>

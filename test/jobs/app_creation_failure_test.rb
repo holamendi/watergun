@@ -7,31 +7,22 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "activation broadcast failure preserves the persisted active app" do
     app = apps(:smol_roda)
-    app.define_singleton_method(:active!) do
-      super()
-      run_callbacks(:commit)
-    end
-    original_broadcast = app.method(:broadcast_replace_later_to)
-    app.define_singleton_method(:broadcast_replace_later_to) do |*args, **kwargs|
-      raise IOError, "broadcast unavailable" if active?
+    ServerActions::CreateApp.any_instance.stubs(:on_logs_persisted).raises(IOError, "broadcast unavailable")
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    successful_creation_transport(app).expects(:loop).at_least_once
 
-      original_broadcast.call(*args, **kwargs)
-    end
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
-    successful_creation_transport(app)
-
-    assert_raises(IOError) { action.run_now }
+    assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
 
     assert app.reload.active?, action.reload.failure_message
     assert action.error?
     assert_equal [0, 0], action.log.ssh_commands.map { it.fetch("exit_code") }
-    assert_includes action.failure_message, "broadcast unavailable"
+    assert_match(/Server action failed/, action.failure_message)
   end
 
   test "rejected creation reconciliation does not replace the command failure" do
     app = apps(:smol_roda)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
-    app.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    App.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
         {cmd: Dokku::Apps::CreateCommand.new(app: app.dokku_id).cmd, exit_code: 1, stderr: "creation rejected"}
@@ -39,7 +30,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
     failure = nil
     begin
-      action.run_now
+      perform_server_action_run(action)
     rescue => error
       failure = error
     end
@@ -53,33 +44,26 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "activation rollback reconciles the persisted app state" do
     app = apps(:smol_roda)
-    original_touch = app.project.method(:touch)
-    app.project.define_singleton_method(:touch) do |*args, **kwargs|
-      if app.active? && !@activation_touch_failed
-        @activation_touch_failed = true
-        raise IOError, "activation touch failed"
-      end
-      original_touch.call(*args, **kwargs)
-    end
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
+    fail_next_domain_update(App, app.id, "active", "activation touch failed")
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
     successful_creation_transport(app)
 
-    assert_raises(IOError) { action.run_now }
+    assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
 
     assert app.reload.error?
     assert action.reload.error?
-    assert_includes action.failure_message, "activation touch failed"
+    assert_match(/Server action failed/, action.failure_message)
   end
 
   test "failed remote creation reconciles a previously active app" do
     app = apps(:domain_test_app)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
         {cmd: Dokku::Apps::CreateCommand.new(app: app.dokku_id).cmd, exit_code: 1, stderr: "creation rejected"}
       ])
 
-    assert_no_enqueued_jobs(only: RunServerActionJob) { action.run_now }
+    assert_no_enqueued_jobs(only: RunServerActionJob) { perform_server_action_run(action) }
 
     assert app.reload.error?
     assert action.reload.failure?
@@ -88,14 +72,14 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "domain report command failure reconciles the partially created app" do
     app = apps(:smol_roda)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, ordered: true, commands: [
         {cmd: Dokku::Apps::CreateCommand.new(app: app.dokku_id).cmd, exit_code: 0},
         {cmd: Dokku::Domains::ReportCommand.new(app: app.dokku_id).cmd, exit_code: 1, stderr: "report failed"}
       ])
 
-    action.run_now
+    perform_server_action_run(action)
 
     assert app.reload.error?
     assert action.reload.failure?
@@ -105,43 +89,43 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "unexpected SSH failure survives rejected reconciliation" do
     app = apps(:smol_roda)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
-    app.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    App.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
     transport = mock("SSH transport")
     failure = IOError.new("connection lost")
     transport.expects(:exec!).raises(failure)
     Net::SSH.expects(:start).once.yields(transport)
 
-    assert_same failure, assert_raises(IOError) { action.run_now }
+    assert_same failure, assert_raises(IOError) { ServerAction::Runner.new(action).call }
 
     assert app.reload.pending?
     assert action.reload.error?
-    assert_includes action.failure_message, "connection lost"
+    assert_match(/Server action failed/, action.failure_message)
     assert_nil action.log.ssh_commands.first.fetch("exit_code")
   end
 
   test "SSH teardown failure preserves committed activation" do
     app = apps(:smol_roda)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
     transport = successful_creation_transport(app)
     transport.expects(:loop).once.raises(IOError, "teardown failed")
 
-    assert_raises(IOError) { action.run_now }
+    assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
 
     assert app.reload.active?
     assert action.reload.error?
-    assert_includes action.failure_message, "teardown failed"
+    assert_match(/Server action failed/, action.failure_message)
   end
 
   test "successful creation retains domains and service link scheduling" do
     app = apps(:smol_roda)
-    action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
+    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
     transport = successful_creation_transport(app)
     transport.expects(:loop).at_least_once
 
     assert_difference "app.domains.count", 1 do
       assert_enqueued_jobs app.project.services.kept.count, only: RunServerActionJob do
-        assert_equal action, action.run_now
+        assert_equal action, perform_server_action_run(action)
       end
     end
 

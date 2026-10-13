@@ -36,8 +36,8 @@ class PaginationCompatibilityTest < ActionDispatch::IntegrationTest
   end
 
   test "long pagination retains the seven-slot window" do
-    template = server_actions(:deploy_success).attributes.except("id")
-    ServerAction.insert_all!(201.times.map { template })
+    template = server_action_runs(:deploy_success).attributes.except("id")
+    ServerActionRun.insert_all!(201.times.map { template })
     sign_in users(:bobby)
     get server_actions_url
     assert_response :success
@@ -46,8 +46,8 @@ class PaginationCompatibilityTest < ActionDispatch::IntegrationTest
   end
 
   test "server action pagination retains custom buttons and query links" do
-    template = server_actions(:deploy_success).attributes.except("id")
-    ServerAction.insert_all!(26.times.map { template })
+    template = server_action_runs(:deploy_success).attributes.except("id")
+    ServerActionRun.insert_all!(26.times.map { template })
     sign_in users(:bobby)
     get server_actions_url
     assert_response :success

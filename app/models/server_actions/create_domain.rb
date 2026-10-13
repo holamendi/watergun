@@ -1,50 +1,57 @@
-class ServerActions::CreateDomain < ServerAction
-  SLUG = "apps.add_domain"
+class ServerActions::CreateDomain
+  KEY = "apps.add_domain"
 
-  actionable Domain
-
-  store_attribute :payload, :dokku_app_id, :string
-  store_attribute :payload, :hostname, :string
-
-  validates :dokku_app_id, presence: true
-  validates :hostname, presence: true
-
-  delegate :app, to: :actionable
-
-  before_validation on: :create do
-    self.dokku_app_id ||= app.dokku_id
-    self.hostname ||= domain.hostname
+  def initialize(run)
+    @run = run
   end
 
-  def concurrency_key
-    app
+  attr_reader :ssh
+  delegate :server, :account, :user, :payload, :target, to: :@run
+  def domain = target
+  def dokku_app_id = payload.fetch("dokku_app_id", nil)
+  def hostname = payload.fetch("hostname", nil)
+
+  def self.default_payload(target)
+    domain = target
+    app = target.app
+    {"dokku_app_id" => app.dokku_id, "hostname" => domain.hostname}
   end
 
-  def on_failure
+  def validate!
+    ServerAction::TargetValidation.call(@run, type: Domain, required: %w[dokku_app_id hostname])
+  end
+
+  def succeeded!
+    domain.active!
+    schedule_enable_ssl!
+  end
+
+  delegate :app, to: :target
+
+  def failed!
     return if domain.destroyed?
     return if @domain_added && domain.reload.active?
 
     domain.error!
   end
 
-  def run
+  def execute!(ssh)
+    @ssh = ssh
     @domain_added = false
     add_dokku_domain!
     @domain_added = true
-    domain.active!
-    schedule_enable_ssl!
   end
 
   private
 
   def add_dokku_domain!
-    execute!(Dokku::Domains::AddCommand.new(app: dokku_app_id, domain: hostname))
+    ssh.execute!(Dokku::Domains::AddCommand.new(app: dokku_app_id, domain: hostname))
   end
 
   def schedule_enable_ssl!
     return unless app.deployed?
     return unless app.all_domains_resolve_to_server?
 
-    ServerActions::EnableSsl.run_later!(server, app)
+    ServerAction::Enqueue.call(action: ServerActions::EnableSsl, target: app)
   end
 end

@@ -14,7 +14,7 @@ class Service::CreateService
 
     ApplicationRecord.transaction do
       create_service!
-      ServerActions::CreateService.run_later!(service.server, service)
+      ServerAction::Enqueue.call(action: ServerActions::CreateService, target: service)
     end
 
     true

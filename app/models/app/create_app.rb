@@ -23,7 +23,7 @@ class App::CreateApp
     App.transaction do
       create_app!
       create_github_repo!
-      ServerActions::CreateApp.run_later!(project.server, app)
+      ServerAction::Enqueue.call(action: ServerActions::CreateApp, target: app)
     end
 
     true
