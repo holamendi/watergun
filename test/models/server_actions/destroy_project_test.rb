@@ -24,6 +24,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     action = ServerActions::DestroyProject.create!(server: project.server, actionable: project)
     services(:postgres).update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
+    ssh.stubs(:commands).returns([])
     ssh.expects(:execute!).never
     action.server.stubs(:ssh_session).yields(ssh)
 
@@ -48,6 +49,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     action = ServerActions::DestroyProject.create!(server: project.server, actionable: project)
     project.update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
+    ssh.stubs(:commands).returns([])
     ssh.expects(:execute!).never
     action.server.stubs(:ssh_session).yields(ssh)
 

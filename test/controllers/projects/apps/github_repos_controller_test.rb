@@ -35,7 +35,9 @@ class Projects::Apps::GithubReposControllerTest < ActionDispatch::IntegrationTes
 
   test "returns not found for a foreign account app" do
     webhook_deploy = @github_repo.webhook_deploy
-    @project.update!(account: accounts(:other))
+    other_user = accounts(:other).users.create!(email: "other-account@example.com", password: "abc123456")
+    sign_out
+    sign_in other_user
 
     patch project_app_github_repo_path(@project, @app),
       params: {github_repo: {webhook_deploy: true}}, as: :turbo_stream
