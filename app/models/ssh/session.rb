@@ -37,7 +37,7 @@ class Ssh::Session
       next if data.empty?
 
       ssh_command.append_output(stream, data) if save_output
-      yield(stream, data) if block_given?
+      yield(stream, ssh_command.sensitive_output? ? "[FILTERED]" : data) if block_given?
     end
 
     @session.exec!(ssh_command.cmd, status:) do |_channel, stream, data|

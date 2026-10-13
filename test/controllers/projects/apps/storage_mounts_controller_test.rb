@@ -245,8 +245,8 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   end
 
   test "tenant and app scopes reject mount IDs and project IDs from outside request scope" do
-    other_account = Account.create!(name: "Other tenant")
-    other_project = other_account.projects.create!(name: "Other project", server: @app.server)
+    other_account = accounts(:other)
+    other_project = other_account.projects.create!(name: "Other project", server: servers(:other_server))
     other_app = other_project.apps.create!(name: "Other app")
     other_mount = other_app.storage_mounts.create!(container_path: "/app/tenant", status: :detach_configured)
     sibling_mount = apps(:smol_roda).storage_mounts.create!(container_path: "/app/sibling", status: :configured)

@@ -24,14 +24,16 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_select "form[action='#{project_app_deployments_path(@project, @app)}'] button", text: "Deploy Now"
     end
 
-    test "renders connect repository empty state when app has no github repo" do
+    test "guides apps without a repository to the supported app creation flow" do
       app = apps(:domain_test_app)
 
       get project_app_deployments_path(app.project, app)
 
       assert_response :success
       assert_select "[data-ui-component='empty-state']"
-      assert_select "a[data-ui-component='button'][href='#{new_project_app_github_repo_path(app.project, app)}']", text: "Connect Repository"
+      assert_select "a[data-ui-component='button'][href='#{new_project_app_path(app.project)}']", text: "Create App"
+      assert_select "body", /Repositories are selected when creating an app\./
+      assert_select "a[href$='/github_repo/new']", count: 0
     end
   end
 
