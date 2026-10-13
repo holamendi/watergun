@@ -101,7 +101,44 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  describe "#update" do
+    test "rejects a foreign server" do
+      patch project_path(@project), params: {project: {server_id: servers(:other_server).id}}
+
+      assert_response :success
+      assert_equal servers(:amd), @project.reload.server
+    end
+
+    test "rejects moving a populated project to another server" do
+      patch project_path(@project), params: {project: {server_id: servers(:arm).id}}
+
+      assert_response :success
+      assert_equal servers(:amd), @project.reload.server
+    end
+  end
+
+  describe "#destroy" do
+    test "does not expose another account project" do
+      foreign = accounts(:other).projects.create!(name: "Other", server: servers(:other_server))
+
+      assert_no_difference -> { ServerAction.count } do
+        delete project_path(foreign)
+      end
+      assert_response :not_found
+      assert foreign.reload.kept?
+    end
+  end
+
   describe "#create" do
+    test "rejects a server from another account" do
+      assert_no_difference -> { Project.count } do
+        post projects_url, params: {project: {name: "Foreign", server_id: servers(:other_server).id}}, as: :turbo_stream
+      end
+
+      assert_response :success
+      assert_includes response.body, "must belong to the project account"
+    end
+
     test "creates a project for the current account" do
       assert_difference -> { Project.count }, 1 do
         post projects_url, params: {project: {name: "Test"}}

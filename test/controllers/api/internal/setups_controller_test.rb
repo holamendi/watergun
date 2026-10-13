@@ -31,7 +31,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
 
       user_signed_id = json_response["first_run_url"].split("/").last
-      user = User.find_signed!(user_signed_id, purpose: :first_run)
+      user = User.find_by_token_for!(:first_run, user_signed_id)
 
       assert_equal "bobby.tables@example.com", user.email
 
@@ -41,6 +41,21 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       assert_equal "test.example.com", server.name
       assert_equal "127.0.0.1", server.public_ip
       assert_equal "arm64", server.cpu_type
+    end
+
+    test "first run url expires after one day" do
+      Account.destroy_all
+      User.destroy_all
+
+      freeze_time do
+        post api_internal_setups_url, params: @valid_params, headers: @headers
+        assert_response :success
+        token = json_response["first_run_url"].split("/").last
+        assert User.find_by_token_for(:first_run, token)
+
+        travel 1.day + 1.second
+        assert_nil User.find_by_token_for(:first_run, token)
+      end
     end
 
     test "imports installed watergun resources when installation params are provided" do
