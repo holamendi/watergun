@@ -3,6 +3,8 @@ class ServerActions::UpdateEnv < ServerAction
 
   actionable App
 
+  encrypts :payload, support_unencrypted_data: true
+
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :set, :json, default: {}
   store_attribute :payload, :unset, :json, default: []

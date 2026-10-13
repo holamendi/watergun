@@ -42,7 +42,7 @@ Rails.application.routes.draw do
 
           resources :env_variables, path: :env
           resources :storage_mounts, path: :storage, only: %i[index create update destroy]
-          resource :github_repo
+          resource :github_repo, only: :update
           resources :restarts, only: :create
 
           resource :settings, only: :show

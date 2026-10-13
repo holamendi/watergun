@@ -97,12 +97,17 @@ class RunServerActionJobTest < ActiveSupport::TestCase
   test "failed log persistence does not prevent failure reconciliation" do
     app = apps(:smol_roda)
     action = ServerActions::CreateApp.create!(server: app.server, actionable: app)
-    action.stubs(:create_log!).raises(ActiveRecord::RecordInvalid.new(action))
+    log_error = ActiveRecord::RecordInvalid.new(action)
+    ssh_error = IOError.new("connection lost")
+    action.stubs(:create_log!).raises(log_error)
     transport = mock("SSH transport")
-    transport.expects(:exec!).raises(IOError, "connection lost")
+    transport.expects(:exec!).raises(ssh_error)
     Net::SSH.expects(:start).once.yields(transport)
+    Honeybadger.stubs(:notify)
+    Honeybadger.expects(:notify).with(log_error, context: {server_action_id: action.id}).once
+    Honeybadger.expects(:notify).with(ssh_error, context: {server_action_id: action.id}).once
 
-    assert_raises(IOError) { action.run_now }
+    assert_same ssh_error, assert_raises(IOError) { action.run_now }
 
     assert app.reload.error?
     assert action.reload.error?
