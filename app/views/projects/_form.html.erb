@@ -1,4 +1,5 @@
 <%= form_with model: project, class: "space-y-4", id: "project_form" do |f| %>
+  <%= error_messages_for(f.object, :server) %>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Name</legend>
     <%= f.text_field :name, class: "input w-full font-mono", placeholder: "my-project" %>
