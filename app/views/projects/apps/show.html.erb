@@ -39,8 +39,9 @@
               <%= submit_button "Deploy now", size: :sm %>
             <% end %>
           <% else %>
-            <%= button "Connect GitHub repo",
-                href: new_project_app_github_repo_path(@project, @app),
+            <p class="text-xs text-text-muted">Repositories are selected when creating an app.</p>
+            <%= button "Create App",
+                href: new_project_app_path(@project),
                 size: :sm %>
           <% end %>
         <% end %>

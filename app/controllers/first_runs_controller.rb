@@ -8,18 +8,24 @@ class FirstRunsController < ApplicationController
   end
 
   def update
-    if @user.update(user_params)
+    completed = @user.with_lock do
+      not_found! unless User.where(id: @user.id).find_by_token_for(:first_run, params[:signed_id])
+      @user.assign_attributes(user_params)
+      @user.save(context: :first_run)
+    end
+
+    if completed
       sign_in(@user)
       redirect_to root_path, notice: "Account created"
     else
-      render :new, status: :unprocessable_content
+      render :edit, status: :unprocessable_content
     end
   end
 
   private
 
   def set_user
-    @user = User.find_signed!(params[:signed_id], purpose: :first_run)
+    @user = User.find_by_token_for!(:first_run, params[:signed_id])
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     not_found!
   end

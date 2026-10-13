@@ -14,7 +14,8 @@ class Github::EventsController < ApplicationController
   private
 
   def installation
-    @installation ||= github_app.installations.first
+    @installation ||= github_app.installations.where.not(installation_id: nil)
+      .find_by!(installation_id: event_payload.dig("installation", "id"))
   end
 
   def github_app

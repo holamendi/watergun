@@ -1,10 +1,89 @@
 require "test_helper"
+require "ostruct"
 
 class Github::ProcessEventJobTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @installation = github_installations(:default)
     @account = @installation.account
     @github_repo = github_repos(:smol_roda)
+  end
+
+  test "deploys the full slash-separated branch name" do
+    @github_repo.update!(branch: "feature/payments", webhook_deploy: true)
+    event = push_event("refs/heads/feature/payments")
+    stub_remote_commit
+
+    assert_difference -> { @github_repo.app.deployments.count }, 1 do
+      assert_enqueued_with(job: RunServerActionJob) do
+        Github::ProcessEventJob.perform_now(event)
+      end
+    end
+
+    assert_equal "abc123def456", @github_repo.app.deployments.last.sha
+    assert event.reload.processed?
+  end
+
+  test "ignores tag pushes even when their ref matches a configured branch" do
+    @github_repo.update!(branch: "refs/tags/main", webhook_deploy: true)
+    event = push_event("refs/tags/main")
+    Github::Installation.any_instance.expects(:api_client).never
+
+    assert_no_difference -> { Deployment.count } do
+      assert_no_enqueued_jobs(only: RunServerActionJob) do
+        Github::ProcessEventJob.perform_now(event)
+      end
+    end
+    assert event.reload.processed?
+  end
+
+  test "ignores deleted branch pushes" do
+    @github_repo.update!(webhook_deploy: true)
+    event = push_event("refs/heads/main", deleted: true)
+    Github::Installation.any_instance.expects(:api_client).never
+
+    assert_no_difference -> { Deployment.count } do
+      assert_no_enqueued_jobs(only: RunServerActionJob) do
+        Github::ProcessEventJob.perform_now(event)
+      end
+    end
+    assert event.reload.processed?
+  end
+
+  test "deploys an ordinary head ref" do
+    @github_repo.update!(webhook_deploy: true)
+    event = push_event("refs/heads/main")
+    stub_remote_commit
+
+    assert_difference -> { @github_repo.app.deployments.count }, 1 do
+      Github::ProcessEventJob.perform_now(event)
+    end
+    assert event.reload.processed?
+  end
+
+  test "does not deploy the trailing segment of a slash-separated branch" do
+    @github_repo.update!(branch: "payments", webhook_deploy: true)
+    event = push_event("refs/heads/feature/payments")
+    Github::Installation.any_instance.expects(:api_client).never
+
+    assert_no_difference -> { Deployment.count } do
+      Github::ProcessEventJob.perform_now(event)
+    end
+    assert event.reload.processed?
+  end
+
+  test "ignores missing and non-head refs" do
+    @github_repo.update!(webhook_deploy: true)
+    Github::Installation.any_instance.expects(:api_client).never
+
+    [nil, 123, "main", "refs/tags/main", "refs/pull/1/head"].each do |ref|
+      event = push_event(ref)
+      assert_no_difference -> { Deployment.count } do
+        Github::ProcessEventJob.perform_now(event)
+      end
+      assert event.reload.processed?
+    end
   end
 
   test "processes push event and creates deployments" do
@@ -143,5 +222,32 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
 
     assert event.reload.processed?
     assert event.processed_at.present?
+  end
+
+  private
+
+  def push_event(ref, deleted: false)
+    Github::Event.create!(
+      installation: @installation,
+      headers: {"HTTP_X_GITHUB_EVENT" => "push"},
+      payload: {
+        "ref" => ref,
+        "deleted" => deleted,
+        "after" => "abc123def456",
+        "repository" => {"full_name" => @github_repo.repo}
+      }
+    )
+  end
+
+  def stub_remote_commit
+    commit = OpenStruct.new(
+      sha: "abc123def456",
+      author: nil,
+      commit: OpenStruct.new(author: nil, message: "Test commit"),
+      html_url: "https://github.com/holamendi/smol-roda/commit/abc123def456"
+    )
+    client = mock("GitHub API")
+    client.expects(:commit).with(@github_repo.repo, "abc123def456").returns(commit)
+    Github::Installation.any_instance.stubs(:api_client).returns(client)
   end
 end

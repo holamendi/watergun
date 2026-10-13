@@ -30,7 +30,10 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
 
   def update
     if @env_variable.update(env_variable_params)
-      ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h) if @env_variable.saved_change_to_value?
+      if @env_variable.saved_change_to_name? || @env_variable.saved_change_to_value?
+        unset = @env_variable.saved_change_to_name? ? [@env_variable.name_before_last_save] : []
+        ServerActions::UpdateEnv.run_later!(@app.server, @app, set: @env_variable.to_h, unset:)
+      end
       render turbo_stream: [
         stream_env_variables,
         close_modal_stream,

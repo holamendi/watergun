@@ -28,17 +28,7 @@ class RunServerActionJob < ApplicationJob
     end
     server_action.status = session.status
   rescue => e
-    begin
-      if session
-        if server_action.log.present?
-          server_action.log.update!(ssh_commands: session.commands)
-        else
-          server_action.create_log!(ssh_commands: session.commands)
-        end
-      end
-    rescue => log_error
-      Honeybadger.notify(log_error, context: {server_action_id: server_action.id})
-    end
+    persist_failure_logs(server_action, session)
     reconcile_failure(server_action)
     Honeybadger.notify(e, context: {server_action_id: server_action.id})
     server_action.status = :error
@@ -61,6 +51,18 @@ class RunServerActionJob < ApplicationJob
   end
 
   private
+
+  def persist_failure_logs(server_action, session)
+    return unless session
+
+    if server_action.log.present?
+      server_action.log.update!(ssh_commands: session.commands)
+    else
+      server_action.create_log!(ssh_commands: session.commands)
+    end
+  rescue => log_error
+    Honeybadger.notify(log_error, context: {server_action_id: server_action.id})
+  end
 
   def reconcile_failure(server_action)
     server_action.on_failure

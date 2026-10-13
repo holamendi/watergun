@@ -1,15 +1,5 @@
 class Projects::Apps::GithubReposController < Projects::Apps::BaseController
-  before_action :set_github_repo, only: %i[edit update]
-
-  def new
-    @github_repo = @app.build_github_repo
-  end
-
-  def create
-  end
-
-  def edit
-  end
+  before_action :set_github_repo, only: :update
 
   def update
     if @github_repo.update(update_github_repo_params)
@@ -23,6 +13,7 @@ class Projects::Apps::GithubReposController < Projects::Apps::BaseController
 
   def set_github_repo
     @github_repo = @app.github_repo
+    raise ActiveRecord::RecordNotFound unless @github_repo
   end
 
   def update_github_repo_params
