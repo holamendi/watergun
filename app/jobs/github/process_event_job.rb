@@ -25,8 +25,13 @@ class Github::ProcessEventJob < ApplicationJob
   private
 
   def create_deployments!
+    return if @github_event.payload["deleted"]
+
+    ref = @github_event.payload["ref"]
+    return unless ref.is_a?(String) && ref.start_with?("refs/heads/")
+
     repo = @github_event.payload.dig("repository", "full_name")
-    branch = @github_event.payload["ref"].split("/").last
+    branch = ref.delete_prefix("refs/heads/")
     commit_sha = @github_event.payload["after"]
 
     @account.github_repos.where(repo:, branch:, webhook_deploy: true).each do |github_repo|
