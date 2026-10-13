@@ -9,7 +9,7 @@ class StorageMount::DestroyStorageMount
       return false if @storage_mount.server_action_runs.queued_or_running.exists?
 
       @storage_mount.detaching!
-      ServerAction::Enqueue.call(action: ServerActions::UnmountStorage, target: @storage_mount, payload: {restart: restart})
+      ServerAction::Enqueue.call(action: "apps.unmount_storage", target: @storage_mount, payload: {restart: restart})
     end
     true
   end

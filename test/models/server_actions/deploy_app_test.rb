@@ -31,7 +31,7 @@ class ServerActions::DeployAppTest < ActiveSupport::TestCase
     assert_turbo_stream_broadcasts [@app, :deployments], count: 2 do
       # Verify broadcasts to show page stream
       assert_turbo_stream_broadcasts @deployment, count: 2 do
-        @server_action = perform_server_action(ServerActions::DeployApp, @server, @deployment)
+        @server_action = perform_server_action("apps.deploy", @server, @deployment)
       end
     end
 
@@ -42,7 +42,7 @@ class ServerActions::DeployAppTest < ActiveSupport::TestCase
   test "broadcasts deploying status when deployment starts" do
     streams = capture_turbo_stream_broadcasts [@app, :deployments] do
       capture_turbo_stream_broadcasts @deployment do
-        @server_action = perform_server_action(ServerActions::DeployApp, @server, @deployment)
+        @server_action = perform_server_action("apps.deploy", @server, @deployment)
       end
     end
 
@@ -57,7 +57,7 @@ class ServerActions::DeployAppTest < ActiveSupport::TestCase
 
     index_streams = capture_turbo_stream_broadcasts [@app, :deployments] do
       show_streams = capture_turbo_stream_broadcasts @deployment do
-        @server_action = perform_server_action(ServerActions::DeployApp, @server, @deployment)
+        @server_action = perform_server_action("apps.deploy", @server, @deployment)
       end
     end
 

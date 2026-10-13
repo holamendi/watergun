@@ -116,9 +116,9 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   end
 
   test "retries failed mount or detach according to retained intent" do
-    {error: ServerActions::MountStorage, detach_failed: ServerActions::UnmountStorage}.each do |status, klass|
+    {error: "apps.mount_storage", detach_failed: "apps.unmount_storage"}.each do |status, action_key|
       mount = @app.storage_mounts.create!(container_path: "/app/#{status}", status: status)
-      assert_difference -> { ServerActionRun.where(action_key: klass::KEY).count } do
+      assert_difference -> { ServerActionRun.where(action_key: action_key).count } do
         patch project_app_storage_mount_path(@project, @app, mount), as: :turbo_stream
       end
       assert_response :success
@@ -265,7 +265,7 @@ class Projects::Apps::StorageMountsControllerTest < ActionDispatch::IntegrationT
   end
 
   test "create rolls back retained record when operation cannot be queued" do
-    ServerAction::Enqueue.stubs(:call).with(has_entries(action: ServerActions::MountStorage)).raises(RuntimeError, "queue unavailable")
+    ServerAction::Enqueue.stubs(:call).with(has_entries(action: "apps.mount_storage")).raises(RuntimeError, "queue unavailable")
     assert_no_difference -> { StorageMount.count } do
       assert_raises(RuntimeError) do
         post project_app_storage_mounts_path(@project, @app), params: {storage_mount: {container_path: "/app/queue_failure"}}, as: :turbo_stream

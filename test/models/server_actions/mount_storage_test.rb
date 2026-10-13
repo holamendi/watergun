@@ -2,7 +2,7 @@ require "test_helper"
 
 class ServerActions::MountStorageTest < ActiveSupport::TestCase
   test "mount command failure survives rejected reconciliation in the runner" do
-    run = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    run = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     command = stub(exit_code: 1, redacted_cmd: "storage report")
     original = Ssh::CommandExecutionError.new(command)
     session = mock("storage session")
@@ -22,7 +22,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
 
   test "new storage uses one native named attachment and retains its generated host path" do
     session = storage_phase_session(@storage_mount)
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     assert_nothing_raised { perform_server_operation(action_operation, session) }
     name = File.basename(@storage_mount.host_path)
@@ -37,7 +37,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     session.bindings["deploy"].first["entry_name"] = "legacy-migrated"
     session.entries.first["name"] = "legacy-migrated"
     session.bindings["run"] = []
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     perform_server_operation(action_operation, session)
     assert_equal "legacy-migrated", session.bindings["run"].first.fetch("entry_name")
@@ -48,7 +48,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   test "detached migrated storage reuses registered entry instead of creating or relocating data" do
     session = storage_phase_session(@storage_mount)
     session.entries << {"name" => "legacy-retained", "host_path" => @storage_mount.host_path, "scheduler" => "docker-local"}
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     perform_server_operation(action_operation, session)
     assert_equal "legacy-retained", session.bindings["deploy"].first.fetch("entry_name")
@@ -59,7 +59,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   test "unregistered custom path is checked and registered without chown or relocation" do
     @storage_mount.update_column(:host_path, "/data/old directory$(id)")
     session = storage_phase_session(@storage_mount)
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     perform_server_operation(action_operation, session)
     assert_includes session.commands, ["test", "-d", @storage_mount.host_path]
@@ -72,7 +72,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     @storage_mount.update_column(:host_path, "/data/retained custom")
     session = storage_phase_session(@storage_mount)
     session.entries << {"name" => "legacy-kept", "host_path" => @storage_mount.host_path, "scheduler" => "docker-local"}
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     perform_server_operation(action_operation, session)
     assert_includes session.commands, ["test", "-d", @storage_mount.host_path]
@@ -89,7 +89,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
       end
       result
     end
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     action_operation = ServerAction::Registry.build(action)
     assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
     assert @storage_mount.reload.error?
@@ -98,7 +98,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   test "entry name collision never redefines an unrelated retained path" do
     session = storage_phase_session(@storage_mount)
     session.entries << {"name" => File.basename(@storage_mount.host_path), "host_path" => "/data/unrelated", "scheduler" => "docker-local"}
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount)
     action_operation = ServerAction::Registry.build(action)
     assert_raises(RuntimeError) { perform_server_operation(action_operation, session) }
     assert_not session.commands.any? { |tokens| %w[storage:create storage:mount].include?(tokens[1]) }
@@ -110,7 +110,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     @storage_mount.update_columns(container_path: "/app/a file$(id);'[]#.^$/", host_path: "/var/lib/dokku/data/storage/old file$(id);'[]#.^$")
     path = @storage_mount.host_path
     session = storage_phase_session(@storage_mount)
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     action_operation = ServerAction::Registry.build(action)
     perform_server_operation(action_operation, session)
     assert @storage_mount.reload.active?
@@ -118,7 +118,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     assert_includes session.commands, ["dokku", "storage:mount", @app.dokku_id, "watergun-#{Digest::SHA256.hexdigest(path).first(32)}", "--container-dir", @storage_mount.container_path, "--phase", "deploy", "--phase", "run"]
     ServerAction::Registry.build(action).failed!
     assert @storage_mount.reload.error?
-    detach = create_server_action_run(ServerActions::UnmountStorage, server: @server, target: @storage_mount, restart: true)
+    detach = create_server_action_run("apps.unmount_storage", server: @server, target: @storage_mount, restart: true)
     detach_operation = ServerAction::Registry.build(detach)
     perform_server_operation(detach_operation, session)
     assert @storage_mount.reload.detached?
@@ -128,7 +128,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "partial mount failure reconciles run phase on retry" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: false)
     session.fail_run_once = true
     action_operation = ServerAction::Registry.build(action)
@@ -141,7 +141,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "mount verifies run phase before reporting success" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = storage_phase_session(@storage_mount, attached: false)
     session.ignore_run_change = true
     action_operation = ServerAction::Registry.build(action)
@@ -176,7 +176,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = perform_server_action(ServerActions::MountStorage, @server, @storage_mount, restart: true)
+    server_action = perform_server_action("apps.mount_storage", @server, @storage_mount, restart: true)
 
     assert server_action.success?
     assert @storage_mount.reload.active?
@@ -201,14 +201,14 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
         non_interactive: true)
       .yields(stub_session)
 
-    server_action = perform_server_action(ServerActions::MountStorage, @server, @storage_mount, restart: true)
+    server_action = perform_server_action("apps.mount_storage", @server, @storage_mount, restart: true)
 
     assert server_action.failure?
     assert @storage_mount.reload.error?
   end
 
   test "mount retry skips already configured binding and retries restart and verification" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = mock
     list = stub(parsed_output: [{"entry_name" => File.basename(@storage_mount.host_path), "host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}])
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(list)
@@ -221,7 +221,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "does not claim active when verification returns different mount" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = mock
     session.stubs(:execute!).returns(stub(parsed_output: [{"host_path" => "/other", "container_path" => "/app/uploads"}]))
     action_operation = ServerAction::Registry.build(action)
@@ -240,25 +240,25 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
         {cmd: "dokku storage:mount domain-test-app #{File.basename(@storage_mount.host_path)} --container-dir /app/uploads --phase deploy --phase run"},
         {cmd: "dokku ps:restart domain-test-app", exit_code: 1}
       ])
-    action = perform_server_action(ServerActions::MountStorage, @server, @storage_mount, restart: true)
+    action = perform_server_action("apps.mount_storage", @server, @storage_mount, restart: true)
     assert action.failure?
     assert @storage_mount.reload.error?
   end
 
   test "connection failures before run leave storage retryable" do
-    [ServerActions::MountStorage, ServerActions::UnmountStorage].each do |klass|
-      @storage_mount.update!(status: (klass == ServerActions::MountStorage) ? :pending : :detaching)
-      action = create_server_action_run(klass, server: @server, target: @storage_mount, restart: true)
+    ["apps.mount_storage", "apps.unmount_storage"].each do |action_key|
+      @storage_mount.update!(status: (action_key == "apps.mount_storage") ? :pending : :detaching)
+      action = create_server_action_run(action_key, server: @server, target: @storage_mount, restart: true)
       Server.any_instance.stubs(:ssh_session).raises(Net::SSH::ConnectionTimeout, "unreachable")
       assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
-      assert_equal (klass == ServerActions::MountStorage) ? "error" : "detach_failed", @storage_mount.reload.status
+      assert_equal (action_key == "apps.mount_storage") ? "error" : "detach_failed", @storage_mount.reload.status
       assert action.reload.finished?
     end
   end
 
   test "reattaching legacy backing paths checks exact directory without creating a different one" do
     @storage_mount.update_column(:host_path, "/var/lib/dokku/data/storage/domain-test-app/app_uploads")
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []), stub(parsed_output: []), stub(parsed_output: [{"entry_name" => File.basename(@storage_mount.host_path), "host_path" => @storage_mount.host_path, "container_path" => @storage_mount.container_path}]))
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListEntriesCommand)).returns(stub(parsed_output: []))
@@ -272,7 +272,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "successful mount command is not active until final verification confirms exact binding" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = mock
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListCommand)).times(4).returns(stub(parsed_output: []))
     session.expects(:execute!).with(instance_of(Dokku::Storage::ListEntriesCommand)).returns(stub(parsed_output: []))
@@ -285,7 +285,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
   end
 
   test "malformed verification JSON leaves operation retryable" do
-    action = create_server_action_run(ServerActions::MountStorage, server: @server, target: @storage_mount, restart: true)
+    action = create_server_action_run("apps.mount_storage", server: @server, target: @storage_mount, restart: true)
     session = mock
     result = mock
     result.expects(:parsed_output).raises(JSON::ParserError, "invalid JSON")
@@ -314,7 +314,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = perform_server_action(ServerActions::MountStorage, @server, @storage_mount, restart: true)
+    server_action = perform_server_action("apps.mount_storage", @server, @storage_mount, restart: true)
 
     assert_equal "domain-test-app", server_action.payload["dokku_app_id"]
     assert_equal @storage_mount.host_path, server_action.payload["host_path"]

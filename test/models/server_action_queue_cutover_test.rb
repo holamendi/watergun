@@ -8,7 +8,7 @@ class ServerActionQueueCutoverTest < ActiveSupport::TestCase
 
   test "simultaneous deliveries atomically execute only one remote mutation" do
     app = apps(:domain_test_app)
-    run = create_server_action_run(ServerActions::RestartApp, server: app.server, target: app)
+    run = create_server_action_run("apps.restart", server: app.server, target: app)
     transport = mock("SSH transport")
     transport.expects(:exec!).once.with do |command, options|
       options[:status][:exit_code] = 0
@@ -36,8 +36,8 @@ class ServerActionQueueCutoverTest < ActiveSupport::TestCase
     RunServerActionJob.queue_adapter = :solid_queue
     before_ids = SolidQueue::Job.pluck(:id)
     app = apps(:domain_test_app)
-    first = ServerAction::Enqueue.call(action: ServerActions::RestartApp, target: app)
-    second = ServerAction::Enqueue.call(action: ServerActions::DestroyDomain, target: domains(:domain_test_secondary))
+    first = ServerAction::Enqueue.call(action: "apps.restart", target: app)
+    second = ServerAction::Enqueue.call(action: "apps.remove_domain", target: domains(:domain_test_secondary))
     jobs = SolidQueue::Job.where(class_name: "RunServerActionJob").where.not(id: before_ids)
     assert_equal 2, jobs.count
     assert_equal 1, jobs.distinct.count(:concurrency_key)
@@ -58,7 +58,7 @@ class ServerActionQueueCutoverTest < ActiveSupport::TestCase
     mock_ssh_session(host: app.server.public_ip, user: SshKey::USER, port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key,
       commands: [{cmd: Dokku::Config::ExportCommand.new(app: app.dokku_id).cmd, stdout: [{name: "TEST_ONLY", value: "queue-read-value"}].to_json}])
-    run = ServerAction::Enqueue.call(action: ServerActions::PullEnv, target: app)
+    run = ServerAction::Enqueue.call(action: "apps.pull_env", target: app)
     worker = SolidQueue::Process.register(kind: "Worker", name: "cutover-test", pid: Process.pid)
     execution = SolidQueue::ReadyExecution.claim(["default"], 1, worker.id).sole
     execution.perform

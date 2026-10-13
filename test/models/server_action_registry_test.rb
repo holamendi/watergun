@@ -12,7 +12,7 @@ class ServerActionRegistryTest < ActiveSupport::TestCase
     assert_instance_of Module, ServerAction
     assert_equal 18, ServerAction::Registry::ACTIONS.size
     ServerAction::Registry::ACTIONS.each do |key, klass|
-      assert_equal key, ServerAction::Registry.key_for(klass)
+      assert_same klass, ServerAction::Registry.fetch(key)
       refute klass < ActiveRecord::Base
       %i[validate! execute! succeeded! failed!].each { |method| assert klass.method_defined?(method) }
     end

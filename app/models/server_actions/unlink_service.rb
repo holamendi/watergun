@@ -52,6 +52,6 @@ class ServerActions::UnlinkService
   end
 
   def schedule_pull_env!
-    ServerAction::Enqueue.call(action: ServerActions::PullEnv, target: app)
+    ServerAction::Enqueue.call(action: "apps.pull_env", target: app)
   end
 end

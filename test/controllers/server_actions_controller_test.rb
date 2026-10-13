@@ -10,7 +10,7 @@ class ServerActionsControllerTest < ActionDispatch::IntegrationTest
   test "history payload display redacts environment values" do
     project = @server.projects.create!(name: "History test")
     app = project.apps.create!(name: "History app", server: @server)
-    run = ServerAction::Enqueue.call(action: ServerActions::UpdateEnv, target: app, payload: {set: {"API_KEY" => "history-test-secret"}})
+    run = ServerAction::Enqueue.call(action: "apps.update_env", target: app, payload: {set: {"API_KEY" => "history-test-secret"}})
     get server_action_url(run)
     assert_response :success
     refute_includes response.body, "history-test-secret"

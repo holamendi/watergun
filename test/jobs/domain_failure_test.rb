@@ -9,7 +9,7 @@ class DomainFailureTest < ActiveSupport::TestCase
     domain = domains(:domain_test_secondary)
     domain.pending!
     ServerActions::CreateDomain.any_instance.stubs(:on_logs_persisted).raises(IOError, "broadcast unavailable")
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     transport = mock("SSH transport")
     transport.expects(:exec!).with do |command, options|
       options[:status][:exit_code] = 0
@@ -31,8 +31,8 @@ class DomainFailureTest < ActiveSupport::TestCase
     domain.pending!
     App.any_instance.stubs(:deployed?).returns(true)
     App.any_instance.stubs(:all_domains_resolve_to_server?).returns(true)
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
-    ServerAction::Enqueue.expects(:call).with(has_entries(action: ServerActions::EnableSsl, target: domain.app)).raises(IOError, "queue unavailable")
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
+    ServerAction::Enqueue.expects(:call).with(has_entries(action: "apps.enable_ssl", target: domain.app)).raises(IOError, "queue unavailable")
     transport = mock("SSH transport")
     transport.expects(:exec!).with do |command, options|
       options[:status][:exit_code] = 0
@@ -50,7 +50,7 @@ class DomainFailureTest < ActiveSupport::TestCase
 
   test "deletion reconciliation rejection does not replace a command failure" do
     domain = domains(:domain_test_secondary)
-    action = create_server_action_run(ServerActions::DestroyDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.remove_domain", server: domain.server, target: domain)
     Domain.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(domain))
     mock_domain_command(domain, Dokku::Domains::RemoveCommand, exit_code: 1)
 
@@ -72,7 +72,7 @@ class DomainFailureTest < ActiveSupport::TestCase
   test "creation reconciliation rejection does not replace a command failure" do
     domain = domains(:domain_test_secondary)
     domain.pending!
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     Domain.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(domain))
     mock_domain_command(domain, Dokku::Domains::AddCommand, exit_code: 1)
 
@@ -92,7 +92,7 @@ class DomainFailureTest < ActiveSupport::TestCase
 
   test "interrupted domain deletion preserves the record with an error status" do
     domain = domains(:domain_test_secondary)
-    action = create_server_action_run(ServerActions::DestroyDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.remove_domain", server: domain.server, target: domain)
     transport = mock("SSH transport")
     transport.expects(:exec!).with(Dokku::Domains::RemoveCommand.new(app: domain.app.dokku_id, domain: domain.hostname).cmd, anything).raises(IOError, "connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -113,7 +113,7 @@ class DomainFailureTest < ActiveSupport::TestCase
   test "connection failure reconciles a pending domain creation" do
     domain = domains(:domain_test_secondary)
     domain.pending!
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed, "authentication rejected")
 
     assert_no_enqueued_jobs(only: RunServerActionJob) do
@@ -131,7 +131,7 @@ class DomainFailureTest < ActiveSupport::TestCase
     domain.pending!
     App.any_instance.stubs(:deployed?).returns(true)
     App.any_instance.stubs(:all_domains_resolve_to_server?).returns(true)
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     mock_domain_command(domain, Dokku::Domains::AddCommand, exit_code: 0)
 
     assert_enqueued_jobs 1, only: RunServerActionJob do
@@ -148,7 +148,7 @@ class DomainFailureTest < ActiveSupport::TestCase
 
   test "successful deletion removes the domain only after the remote command" do
     domain = domains(:domain_test_secondary)
-    action = create_server_action_run(ServerActions::DestroyDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.remove_domain", server: domain.server, target: domain)
     transport = mock("SSH transport")
     transport.expects(:exec!).with do |command, options|
       assert Domain.exists?(domain.id)
@@ -168,12 +168,12 @@ class DomainFailureTest < ActiveSupport::TestCase
     assert_equal 0, action.log.ssh_commands.first.fetch("exit_code")
   end
 
-  [ServerActions::CreateDomain, ServerActions::DestroyDomain].each do |action_class|
-    test "ordinary command failure reconciles #{action_class.name}" do
+  ["apps.add_domain", "apps.remove_domain"].each do |action_key|
+    test "ordinary command failure reconciles #{action_key}" do
       domain = domains(:domain_test_secondary)
-      domain.pending! if action_class == ServerActions::CreateDomain
-      action = create_server_action_run(action_class, server: domain.server, target: domain)
-      command_class = (action_class == ServerActions::CreateDomain) ? Dokku::Domains::AddCommand : Dokku::Domains::RemoveCommand
+      domain.pending! if action_key == "apps.add_domain"
+      action = create_server_action_run(action_key, server: domain.server, target: domain)
+      command_class = (action_key == "apps.add_domain") ? Dokku::Domains::AddCommand : Dokku::Domains::RemoveCommand
       mock_domain_command(domain, command_class, exit_code: 1)
 
       assert_no_enqueued_jobs(only: RunServerActionJob) { perform_server_action_run(action) }
@@ -189,7 +189,7 @@ class DomainFailureTest < ActiveSupport::TestCase
   test "connection failure preserves a domain queued for deletion" do
     domain = domains(:domain_test_secondary)
     domain.deleting!
-    action = create_server_action_run(ServerActions::DestroyDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.remove_domain", server: domain.server, target: domain)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed, "authentication rejected")
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -204,7 +204,7 @@ class DomainFailureTest < ActiveSupport::TestCase
     domain = domains(:domain_test_secondary)
     domain.pending!
     fail_next_domain_update(Domain, domain.id, "active", "activation touch failed")
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     transport = mock("SSH transport")
     transport.expects(:exec!).with do |command, options|
       options[:status][:exit_code] = 0
@@ -222,7 +222,7 @@ class DomainFailureTest < ActiveSupport::TestCase
   test "failed remote add does not preserve a preexisting active status" do
     domain = domains(:domain_test_secondary)
     assert domain.active?
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     mock_domain_command(domain, Dokku::Domains::AddCommand, exit_code: 1)
 
     perform_server_action_run(action)
@@ -234,7 +234,7 @@ class DomainFailureTest < ActiveSupport::TestCase
   test "creation reconciliation rejection preserves an unexpected SSH exception" do
     domain = domains(:domain_test_secondary)
     domain.pending!
-    action = create_server_action_run(ServerActions::CreateDomain, server: domain.server, target: domain)
+    action = create_server_action_run("apps.add_domain", server: domain.server, target: domain)
     Domain.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(domain))
     transport = mock("SSH transport")
     transport.expects(:exec!).raises(IOError, "connection lost")

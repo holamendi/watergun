@@ -17,7 +17,7 @@ class ServerActions::RestartAppTest < ActiveSupport::TestCase
   end
 
   test "restarts the dokku app" do
-    server_action = perform_server_action(ServerActions::RestartApp, @server, @app)
+    server_action = perform_server_action("apps.restart", @server, @app)
 
     assert server_action.success?
     assert @app.reload.active?
@@ -29,6 +29,6 @@ class ServerActions::RestartAppTest < ActiveSupport::TestCase
 
     Toast.expects(:append_to_user).with(user, "#{@app.name}: restart finished")
 
-    perform_server_action(ServerActions::RestartApp, @server, @app)
+    perform_server_action("apps.restart", @server, @app)
   end
 end

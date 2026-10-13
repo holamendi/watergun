@@ -88,11 +88,11 @@ class ServerActions::DeployApp
     return unless app.domains.ssl_disabled.any?
     return unless app.all_domains_resolve_to_server?
 
-    ServerAction::Enqueue.call(action: ServerActions::EnableSsl, target: app)
+    ServerAction::Enqueue.call(action: "apps.enable_ssl", target: app)
   end
 
   def schedule_pull_env!
-    ServerAction::Enqueue.call(action: ServerActions::PullEnv, target: app)
+    ServerAction::Enqueue.call(action: "apps.pull_env", target: app)
   end
 
   def notify_user

@@ -5,7 +5,7 @@ require "stringio"
 class ServerActionExceptionBoundaryTest < ActiveSupport::TestCase
   test "secret bearing SSH exceptions stay inside the runner boundary through framework logging and queue storage" do
     app = apps(:smol_roda)
-    run = create_server_action_run(ServerActions::RestartApp, server: app.server, target: app)
+    run = create_server_action_run("apps.restart", server: app.server, target: app)
     secret = "test-only-github-token"
     encoded = Base64.strict_encode64("test-only-environment-value")
     original = IOError.new("could not execute command: git clone https://#{secret}@github.com/example/repo && echo #{encoded}")

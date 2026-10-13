@@ -52,6 +52,6 @@ class ServerActions::CreateDomain
     return unless app.deployed?
     return unless app.all_domains_resolve_to_server?
 
-    ServerAction::Enqueue.call(action: ServerActions::EnableSsl, target: app)
+    ServerAction::Enqueue.call(action: "apps.enable_ssl", target: app)
   end
 end

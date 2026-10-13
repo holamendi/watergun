@@ -23,7 +23,7 @@ class App::CreateApp
     App.transaction do
       create_app!
       create_github_repo!
-      ServerAction::Enqueue.call(action: ServerActions::CreateApp, target: app)
+      ServerAction::Enqueue.call(action: "apps.create", target: app)
     end
 
     true

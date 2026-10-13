@@ -18,8 +18,8 @@ class StorageMountEnqueueTest < ActiveSupport::TestCase
   test "different action targets on a server share a concurrency key" do
     app = apps(:domain_test_app)
     mount = app.storage_mounts.create!(container_path: "/app/concurrency")
-    storage = ServerAction::Enqueue.build(action: ServerActions::MountStorage, target: mount)
-    restart = ServerAction::Enqueue.build(action: ServerActions::RestartApp, target: app)
+    storage = ServerAction::Enqueue.build(action: "apps.mount_storage", target: mount)
+    restart = ServerAction::Enqueue.build(action: "apps.restart", target: app)
     assert_equal storage.resource_key, restart.resource_key
     assert_equal RunServerActionJob.new(storage.id, storage.resource_key).concurrency_key,
       RunServerActionJob.new(restart.id, restart.resource_key).concurrency_key

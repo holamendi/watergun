@@ -23,7 +23,7 @@ class ServerActions::DestroyDomainTest < ActiveSupport::TestCase
     )
 
     assert_difference -> { Domain.count }, -1 do
-      perform_server_action(ServerActions::DestroyDomain, @server, @domain)
+      perform_server_action("apps.remove_domain", @server, @domain)
     end
   end
 
@@ -48,7 +48,7 @@ class ServerActions::DestroyDomainTest < ActiveSupport::TestCase
 
     # Note: The job catches Ssh::CommandExecutionError internally and doesn't re-raise
     # So we just verify the domain was marked as error
-    server_action = perform_server_action(ServerActions::DestroyDomain, @server, @domain)
+    server_action = perform_server_action("apps.remove_domain", @server, @domain)
 
     assert server_action.failure?
     assert @domain.reload.error?
@@ -65,7 +65,7 @@ class ServerActions::DestroyDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = perform_server_action(ServerActions::DestroyDomain, @server, @domain)
+    server_action = perform_server_action("apps.remove_domain", @server, @domain)
 
     assert server_action.success?
     assert_nil Domain.find_by(id: @domain.id)

@@ -31,7 +31,7 @@ class ServerActions::CreateAppTest < ActiveSupport::TestCase
       -> { @app.domains.count } => 1,
       -> { @app.services.count } => @project.services.count
     ) do
-      @server_action = perform_server_action(ServerActions::CreateApp, @app.server, @app)
+      @server_action = perform_server_action("apps.create", @app.server, @app)
     end
 
     # creates dokku app
@@ -50,7 +50,7 @@ class ServerActions::CreateAppTest < ActiveSupport::TestCase
     # schedules server actions to link services
     @app.service_links.each do |service_link|
       assert_server_action_scheduled(
-        ServerActions::LinkService,
+        "services.link",
         server: @server,
         target: service_link,
         payload: {

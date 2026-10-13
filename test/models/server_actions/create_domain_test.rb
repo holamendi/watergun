@@ -23,7 +23,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    server_action = perform_server_action(ServerActions::CreateDomain, @server, @domain)
+    server_action = perform_server_action("apps.add_domain", @server, @domain)
 
     assert server_action.success?
     assert @domain.reload.active?
@@ -50,7 +50,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
 
     # Note: The job catches Ssh::CommandExecutionError internally and doesn't re-raise
     # So we just verify the domain was marked as error
-    server_action = perform_server_action(ServerActions::CreateDomain, @server, @domain)
+    server_action = perform_server_action("apps.add_domain", @server, @domain)
 
     assert server_action.failure?
     assert @domain.reload.error?
@@ -70,10 +70,10 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    perform_server_action(ServerActions::CreateDomain, @server, @domain)
+    perform_server_action("apps.add_domain", @server, @domain)
 
     assert_server_action_scheduled(
-      ServerActions::EnableSsl,
+      "apps.enable_ssl",
       server: @server,
       target: @app
     )
@@ -92,7 +92,7 @@ class ServerActions::CreateDomainTest < ActiveSupport::TestCase
       ]
     )
 
-    perform_server_action(ServerActions::CreateDomain, @server, @domain)
+    perform_server_action("apps.add_domain", @server, @domain)
 
     assert_nil ServerActionRun.find_by(action_key: "apps.enable_ssl", target: @app)
   end

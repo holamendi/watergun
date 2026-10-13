@@ -7,7 +7,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "unexpected restart failure reconciles a restarting service" do
     service = services(:redis)
-    action = create_server_action_run(ServerActions::RestartService, server: service.server, target: service)
+    action = create_server_action_run("services.restart", server: service.server, target: service)
     transport = mock("SSH transport")
     transport.expects(:exec!).with(Dokku::Services::RestartCommand.new(plugin: service.service_type, service: service.dokku_id).cmd, anything).raises(IOError, "restart connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -25,7 +25,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "unexpected deletion failure preserves an errored service" do
     service = services(:redis)
-    action = create_server_action_run(ServerActions::DestroyService, server: service.server, target: service)
+    action = create_server_action_run("services.destroy", server: service.server, target: service)
     transport = mock("SSH transport")
     transport.expects(:exec!).with(Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.dokku_id).cmd, anything).raises(IOError, "deletion connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -43,7 +43,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "unexpected SSL failure restores enabling domains without reporting SSL success" do
     app = apps(:domain_test_app)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
     transport = mock("SSH transport")
     transport.expects(:exec!).with(Dokku::Letsencrypt::EnableCommand.new(app: app.dokku_id).cmd, anything).raises(IOError, "SSL connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -63,7 +63,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "creation reconciliation rejection preserves a command-exit failure" do
     service = services(:postgres)
-    action = create_server_action_run(ServerActions::CreateService, server: service.server, target: service)
+    action = create_server_action_run("services.create", server: service.server, target: service)
     Service.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(service))
 
     assert_command_failure_preserved(action, Dokku::Plugin::ListCommand.new.cmd)
@@ -71,7 +71,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "restart reconciliation rejection preserves a command-exit failure" do
     service = services(:redis)
-    action = create_server_action_run(ServerActions::RestartService, server: service.server, target: service)
+    action = create_server_action_run("services.restart", server: service.server, target: service)
     Service.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(service))
 
     assert_command_failure_preserved(action, Dokku::Services::RestartCommand.new(plugin: service.service_type, service: service.dokku_id).cmd)
@@ -79,7 +79,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "deletion reconciliation rejection preserves a command-exit failure" do
     service = services(:redis)
-    action = create_server_action_run(ServerActions::DestroyService, server: service.server, target: service)
+    action = create_server_action_run("services.destroy", server: service.server, target: service)
     Service.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(service))
 
     assert_command_failure_preserved(action, Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.dokku_id).cmd)
@@ -88,7 +88,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "SSL reconciliation rejection preserves a command-exit failure" do
     app = apps(:domain_test_app)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
     Domain.any_instance.stubs(:active!).raises(ActiveRecord::RecordInvalid.new(domains(:domain_test_default)))
 
     assert_command_failure_preserved(action, Dokku::Letsencrypt::EnableCommand.new(app: app.dokku_id).cmd)
@@ -97,7 +97,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "connection failure reconciles a pending service creation" do
     service = services(:postgres)
-    action = create_server_action_run(ServerActions::CreateService, server: service.server, target: service)
+    action = create_server_action_run("services.create", server: service.server, target: service)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed, "authentication rejected")
 
     assert_no_enqueued_jobs(only: RunServerActionJob) do
@@ -111,10 +111,10 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
   end
 
   test "connection failures reconcile queued service restart and deletion" do
-    [ServerActions::RestartService, ServerActions::DestroyService].each do |klass|
+    ["services.restart", "services.destroy"].each do |action_key|
       service = services(:redis)
-      service.update!(status: (klass == ServerActions::RestartService) ? :restarting : :deleting)
-      action = create_server_action_run(klass, server: service.server, target: service)
+      service.update!(status: (action_key == "services.restart") ? :restarting : :deleting)
+      action = create_server_action_run(action_key, server: service.server, target: service)
       Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed)
 
       assert_no_enqueued_jobs(only: RunServerActionJob) do
@@ -134,7 +134,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
     enabling.enabling_ssl!
     untouched = domains(:domain_test_secondary)
     untouched.update!(status: :error, ssl_enabled: true)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed)
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -147,13 +147,13 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
   end
 
   test "ordinary command failures reconcile service lifecycles" do
-    [ServerActions::CreateService, ServerActions::RestartService, ServerActions::DestroyService].each do |klass|
+    ["services.create", "services.restart", "services.destroy"].each do |action_key|
       service = services(:redis)
-      action = create_server_action_run(klass, server: service.server, target: service)
-      command = case klass.name
-      when "ServerActions::CreateService" then Dokku::Plugin::ListCommand.new
-      when "ServerActions::RestartService" then Dokku::Services::RestartCommand.new(plugin: service.service_type, service: service.dokku_id)
-      when "ServerActions::DestroyService" then Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.dokku_id)
+      action = create_server_action_run(action_key, server: service.server, target: service)
+      command = case action_key
+      when "services.create" then Dokku::Plugin::ListCommand.new
+      when "services.restart" then Dokku::Services::RestartCommand.new(plugin: service.service_type, service: service.dokku_id)
+      when "services.destroy" then Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.dokku_id)
       end
 
       assert_command_failure_preserved(action, command.cmd)
@@ -164,7 +164,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "ordinary SSL command failure restores domains without enabling SSL" do
     app = apps(:domain_test_app)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
 
     assert_command_failure_preserved(action, Dokku::Letsencrypt::EnableCommand.new(app: app.dokku_id).cmd)
 
@@ -177,7 +177,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
   test "SSL already enabled is a no op that preserves domain error status" do
     app = apps(:domain_test_app)
     app.domains.update_all(ssl_enabled: true, status: :error)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
     session = mock("no op SSL session")
     session.stubs(:commands).returns([])
     session.expects(:execute!).never
@@ -194,7 +194,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "successful SSL execution enables domains" do
     app = apps(:domain_test_app)
-    action = create_server_action_run(ServerActions::EnableSsl, server: app.server, target: app)
+    action = create_server_action_run("apps.enable_ssl", server: app.server, target: app)
     server = action.server
     command = Dokku::Letsencrypt::EnableCommand.new(app: app.dokku_id).cmd
     mock_ssh_session(host: server.public_ip, user: "watergun", port: server.ssh_port,
@@ -212,7 +212,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "successful service deletion removes the record after remote success" do
     service = services(:redis)
-    action = create_server_action_run(ServerActions::DestroyService, server: service.server, target: service)
+    action = create_server_action_run("services.destroy", server: service.server, target: service)
     server = action.server
     command = Dokku::Services::DestroyCommand.new(plugin: service.service_type, name: service.dokku_id).cmd
     mock_ssh_session(host: server.public_ip, user: "watergun", port: server.ssh_port,
@@ -229,7 +229,7 @@ class ServiceSslFailureTest < ActiveSupport::TestCase
 
   test "successful service creation preserves parsed data and link enqueue" do
     service = services(:postgres)
-    action = create_server_action_run(ServerActions::CreateService, server: service.server, target: service)
+    action = create_server_action_run("services.create", server: service.server, target: service)
     server = action.server
     commands = [
       {cmd: Dokku::Plugin::ListCommand.new.cmd, stdout: "postgres 1.0 enabled\n"},

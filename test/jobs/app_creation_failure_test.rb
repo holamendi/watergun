@@ -8,7 +8,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
   test "activation broadcast failure preserves the persisted active app" do
     app = apps(:smol_roda)
     ServerActions::CreateApp.any_instance.stubs(:on_logs_persisted).raises(IOError, "broadcast unavailable")
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     successful_creation_transport(app).expects(:loop).at_least_once
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -21,7 +21,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "rejected creation reconciliation does not replace the command failure" do
     app = apps(:smol_roda)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     App.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
@@ -45,7 +45,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
   test "activation rollback reconciles the persisted app state" do
     app = apps(:smol_roda)
     fail_next_domain_update(App, app.id, "active", "activation touch failed")
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     successful_creation_transport(app)
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -57,7 +57,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "failed remote creation reconciles a previously active app" do
     app = apps(:domain_test_app)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
         {cmd: Dokku::Apps::CreateCommand.new(app: app.dokku_id).cmd, exit_code: 1, stderr: "creation rejected"}
@@ -72,7 +72,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "domain report command failure reconciles the partially created app" do
     app = apps(:smol_roda)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, ordered: true, commands: [
         {cmd: Dokku::Apps::CreateCommand.new(app: app.dokku_id).cmd, exit_code: 0},
@@ -89,7 +89,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "unexpected SSH failure survives rejected reconciliation" do
     app = apps(:smol_roda)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     App.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(app))
     transport = mock("SSH transport")
     failure = IOError.new("connection lost")
@@ -106,7 +106,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "SSH teardown failure preserves committed activation" do
     app = apps(:smol_roda)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     transport = successful_creation_transport(app)
     transport.expects(:loop).once.raises(IOError, "teardown failed")
 
@@ -119,7 +119,7 @@ class AppCreationFailureTest < ActiveSupport::TestCase
 
   test "successful creation retains domains and service link scheduling" do
     app = apps(:smol_roda)
-    action = create_server_action_run(ServerActions::CreateApp, server: app.server, target: app)
+    action = create_server_action_run("apps.create", server: app.server, target: app)
     transport = successful_creation_transport(app)
     transport.expects(:loop).at_least_once
 

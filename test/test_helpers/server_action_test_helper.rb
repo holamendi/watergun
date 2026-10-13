@@ -51,8 +51,8 @@ module ServerActionTestHelper
     ServerAction::Enqueue.call(action: action, server: server, target: target, payload: payload)
   end
 
-  def assert_server_action_scheduled(klass, server:, target:, payload: nil)
-    run = ServerActionRun.find_by(action_key: klass::KEY, account: server.account, server: server, target: target)
+  def assert_server_action_scheduled(action_key, server:, target:, payload: nil)
+    run = ServerActionRun.find_by(action_key: action_key, account: server.account, server: server, target: target)
     assert run
     return unless payload.present?
     payload.each { |key, value| assert_equal value, run.payload[key.to_s] }

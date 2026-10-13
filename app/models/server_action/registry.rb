@@ -34,9 +34,9 @@ module ServerAction::Registry
     ServerActions::UpdateEnv
   ])
 
-  def self.key_for(action)
-    raise ArgumentError, "Unregistered action" unless ACTIONS.value?(action)
-    action::KEY
+  def self.fetch(key)
+    raise ArgumentError, "Unregistered action" unless key.is_a?(String) && ACTIONS.key?(key)
+    ACTIONS.fetch(key)
   end
 
   def self.build(run)

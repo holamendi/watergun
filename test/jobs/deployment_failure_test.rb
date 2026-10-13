@@ -9,7 +9,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
 
   test "failure broadcasts the reconciled deployment status" do
     deployment = deployments(:pending_deployment)
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     transport = mock("SSH transport")
     transport.expects(:exec!).raises(IOError, "deployment connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -25,7 +25,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "interrupted deployment leaves the app in error rather than active" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     transport = mock("SSH transport")
     transport.expects(:exec!).raises(IOError, "deployment connection lost")
     Net::SSH.expects(:start).once.yields(transport)
@@ -43,7 +43,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
 
   test "deployment reconciliation rejection preserves the original transport failure" do
     deployment = deployments(:pending_deployment)
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     Deployment.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(deployment))
     original = IOError.new("deployment connection lost")
     transport = mock("SSH transport")
@@ -61,7 +61,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "failed deployment never attempts the successful app transition" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     App.any_instance.expects(:active!).never
     original = IOError.new("deployment connection lost")
     transport = mock("SSH transport")
@@ -76,7 +76,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "command exit failure is terminal without follow-up mutations" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
         {cmd: Dokku::Git::AuthCommand.new(access_token: app.account.github_installation.access_token.token).cmd, exit_code: 0},
@@ -96,7 +96,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "successful deployment retains app activation and environment refresh" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     mock_ssh_session(host: app.server.public_ip, user: "watergun", port: app.server.ssh_port,
       private_key: app.server.ssh_key.private_key, commands: [
         {cmd: Dokku::Git::AuthCommand.new(access_token: app.account.github_installation.access_token.token).cmd},
@@ -120,7 +120,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "environment refresh failure does not overwrite a completed deployment" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     transport = mock("SSH transport")
     order = sequence("successful deployment commands")
     [
@@ -134,7 +134,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
       end.in_sequence(order)
     end
     Net::SSH.expects(:start).once.yields(transport)
-    ServerAction::Enqueue.expects(:call).with(has_entries(action: ServerActions::PullEnv)).raises(ActiveJob::EnqueueError, "refresh enqueue failed")
+    ServerAction::Enqueue.expects(:call).with(has_entries(action: "apps.pull_env")).raises(ActiveJob::EnqueueError, "refresh enqueue failed")
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
 
@@ -149,7 +149,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
   test "rolled back deployment success is still reconciled after app touch fails" do
     deployment = deployments(:pending_deployment)
     app = deployment.app
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     transport = mock("SSH transport")
     order = sequence("deployment commands before failed success transaction")
     [
@@ -174,7 +174,7 @@ class DeploymentFailureTest < ActiveSupport::TestCase
 
   test "connection failure finishes a pending deployment as error" do
     deployment = deployments(:pending_deployment)
-    action = create_server_action_run(ServerActions::DeployApp, server: deployment.server, target: deployment)
+    action = create_server_action_run("apps.deploy", server: deployment.server, target: deployment)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed, "authentication rejected")
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }

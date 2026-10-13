@@ -7,7 +7,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "connection failure reconciles a pending service link" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed, "authentication rejected")
 
     assert_no_enqueued_jobs(only: RunServerActionJob) do
@@ -22,7 +22,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "interrupted unlink preserves an errored service link" do
     link = create_link(status: :active)
-    action = create_server_action_run(ServerActions::UnlinkService, server: link.server, target: link)
+    action = create_server_action_run("services.unlink", server: link.server, target: link)
     command = Dokku::Services::UnlinkCommand.new(plugin: link.service.service_type, service: link.service.dokku_id, app: link.app.dokku_id).cmd
     transport = mock("SSH transport")
     transport.expects(:exec!).with(command, anything).raises(IOError, "unlink connection lost")
@@ -43,7 +43,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "link reconciliation rejection preserves the command failure" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     ServiceLink.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(link))
 
     assert_command_failure(action, link_command(link))
@@ -51,7 +51,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "unlink reconciliation rejection preserves the command failure" do
     link = create_link(status: :active)
-    action = create_server_action_run(ServerActions::UnlinkService, server: link.server, target: link)
+    action = create_server_action_run("services.unlink", server: link.server, target: link)
     ServiceLink.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(link))
 
     assert_command_failure(action, unlink_command(link))
@@ -60,7 +60,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "SSH teardown failure preserves committed link activation" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     transport = successful_transport(link_command(link))
     transport.expects(:loop).once.raises(IOError, "teardown failed")
 
@@ -76,7 +76,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "connection failure reconciles a queued unlink" do
     link = create_link(status: :deleting)
-    action = create_server_action_run(ServerActions::UnlinkService, server: link.server, target: link)
+    action = create_server_action_run("services.unlink", server: link.server, target: link)
     Net::SSH.expects(:start).once.raises(Net::SSH::AuthenticationFailed)
 
     assert_no_enqueued_jobs(only: RunServerActionJob) do
@@ -90,9 +90,9 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "ordinary command failures reconcile service links" do
     link = create_link
-    [ServerActions::LinkService, ServerActions::UnlinkService].each do |klass|
-      action = create_server_action_run(klass, server: link.server, target: link)
-      command = (klass == ServerActions::LinkService) ? link_command(link) : unlink_command(link)
+    ["services.link", "services.unlink"].each do |action_key|
+      action = create_server_action_run(action_key, server: link.server, target: link)
+      command = (action_key == "services.link") ? link_command(link) : unlink_command(link)
 
       assert_command_failure(action, command)
 
@@ -103,7 +103,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "unexpected link failure survives rejected reconciliation" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     ServiceLink.any_instance.stubs(:error!).raises(ActiveRecord::RecordInvalid.new(link))
     transport = mock("SSH transport")
     failure = IOError.new("connection lost")
@@ -123,7 +123,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
   test "activation callback failure preserves the persisted active link" do
     link = create_link
     ServerActions::LinkService.any_instance.stubs(:on_logs_persisted).raises(IOError, "broadcast unavailable")
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     successful_transport(link_command(link)).expects(:loop).at_least_once
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -136,7 +136,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
   test "activation rollback reconciles the persisted link state" do
     link = create_link
     fail_next_domain_update(ServiceLink, link.id, "active", "activation touch failed")
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     successful_transport(link_command(link))
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -148,8 +148,8 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "refresh enqueue exception reconciles a partially linked target" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
-    ServerAction::Enqueue.stubs(:call).with(has_entries(action: ServerActions::PullEnv)).raises(IOError, "refresh enqueue failed")
+    action = create_server_action_run("services.link", server: link.server, target: link)
+    ServerAction::Enqueue.stubs(:call).with(has_entries(action: "apps.pull_env")).raises(IOError, "refresh enqueue failed")
     successful_transport(link_command(link))
 
     assert_raises(RunServerActionJob::ExecutionError) { perform_server_action_run(action) }
@@ -161,7 +161,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "failed remote link reconciles a previously active target" do
     link = create_link(status: :active)
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
 
     assert_command_failure(action, link_command(link))
 
@@ -170,7 +170,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "successful link retains activation and refresh scheduling" do
     link = create_link
-    action = create_server_action_run(ServerActions::LinkService, server: link.server, target: link)
+    action = create_server_action_run("services.link", server: link.server, target: link)
     successful_transport(link_command(link)).expects(:loop).at_least_once
 
     assert_enqueued_jobs 1, only: RunServerActionJob do
@@ -187,7 +187,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "successful unlink removes the record and schedules refresh" do
     link = create_link(status: :active)
-    action = create_server_action_run(ServerActions::UnlinkService, server: link.server, target: link)
+    action = create_server_action_run("services.unlink", server: link.server, target: link)
     command = unlink_command(link)
     successful_transport(command).expects(:loop).at_least_once
 
@@ -206,7 +206,7 @@ class ServiceLinkFailureTest < ActiveSupport::TestCase
 
   test "unlink teardown failure does not attempt reconciliation of a destroyed target" do
     link = create_link(status: :active)
-    action = create_server_action_run(ServerActions::UnlinkService, server: link.server, target: link)
+    action = create_server_action_run("services.unlink", server: link.server, target: link)
     transport = successful_transport(unlink_command(link))
     transport.expects(:loop).once.raises(IOError, "teardown failed")
     ServiceLink.any_instance.expects(:error!).never

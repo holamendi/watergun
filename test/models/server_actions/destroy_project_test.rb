@@ -13,7 +13,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     mock_ssh_session(host: server.public_ip, user: SshKey::USER, port: server.ssh_port,
       private_key: server.ssh_key.private_key, commands: commands)
 
-    action = perform_server_action(ServerActions::DestroyProject, server, project)
+    action = perform_server_action("projects.destroy", server, project)
 
     assert action.reload.success?
     assert_not Project.exists?(project.id)
@@ -21,7 +21,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
 
   test "rejects a child server change after enqueue" do
     project = projects(:default)
-    action = create_server_action_run(ServerActions::DestroyProject, server: project.server, target: project)
+    action = create_server_action_run("projects.destroy", server: project.server, target: project)
     services(:postgres).update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
     ssh.stubs(:commands).returns([])
@@ -39,14 +39,14 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
 
     assert_no_difference -> { ServerActionRun.count } do
       assert_raises(ArgumentError) do
-        enqueue_server_action(ServerActions::DestroyProject, project.server, project)
+        enqueue_server_action("projects.destroy", project.server, project)
       end
     end
   end
 
   test "records a failed job when the project server changes after enqueue" do
     project = projects(:default)
-    action = create_server_action_run(ServerActions::DestroyProject, server: project.server, target: project)
+    action = create_server_action_run("projects.destroy", server: project.server, target: project)
     project.update_columns(server_id: servers(:arm).id)
     ssh = mock("SSH session")
     ssh.stubs(:commands).returns([])
@@ -62,7 +62,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     project = projects(:default)
     apps(:smol_roda).update_columns(account_id: accounts(:other).id)
     Net::SSH.expects(:start).never
-    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: project.server, target: project) }
+    assert_raises(ArgumentError) { build_server_action_run("projects.destroy", server: project.server, target: project) }
     assert Project.exists?(project.id)
     assert Service.exists?(services(:postgres).id)
   end
@@ -71,7 +71,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
     project = projects(:default)
     services(:postgres).update_columns(server_id: servers(:arm).id)
     Net::SSH.expects(:start).never
-    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: project.server, target: project) }
+    assert_raises(ArgumentError) { build_server_action_run("projects.destroy", server: project.server, target: project) }
     assert Project.exists?(project.id)
     assert App.exists?(apps(:smol_roda).id)
   end
@@ -79,7 +79,7 @@ class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
   test "rejects destruction on a different server before executing commands" do
     project = projects(:default)
     Net::SSH.expects(:start).never
-    assert_raises(ArgumentError) { build_server_action_run(ServerActions::DestroyProject, server: servers(:arm), target: project) }
+    assert_raises(ArgumentError) { build_server_action_run("projects.destroy", server: servers(:arm), target: project) }
     assert Project.exists?(project.id)
     assert App.exists?(apps(:smol_roda).id)
   end

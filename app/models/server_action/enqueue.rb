@@ -1,8 +1,8 @@
 class ServerAction::Enqueue
   def self.build(action:, target:, payload: {}, user: Current.user, server: target.server, account: target.account, source: Current.source.presence || "web")
-    key = ServerAction::Registry.key_for(action)
-    run = ServerActionRun.new(action_key: key, target: target, server: server, account: account,
-      user: user, source: source, payload: action.default_payload(target).merge(payload.deep_stringify_keys),
+    action_class = ServerAction::Registry.fetch(action)
+    run = ServerActionRun.new(action_key: action, target: target, server: server, account: account,
+      user: user, source: source, payload: action_class.default_payload(target).merge(payload.deep_stringify_keys),
       resource_key: "server:#{server.id}")
     ServerAction::Registry.build(run).validate!
     run

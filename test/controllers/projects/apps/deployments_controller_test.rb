@@ -78,7 +78,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert deployment.sha.present?
 
       assert_server_action_scheduled(
-        ServerActions::DeployApp,
+        "apps.deploy",
         server: @server,
         target: deployment,
         payload: {
@@ -108,7 +108,7 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       assert_equal sha, deployment.short_sha
 
       assert_server_action_scheduled(
-        ServerActions::DeployApp,
+        "apps.deploy",
         server: @server,
         target: deployment,
         payload: {
