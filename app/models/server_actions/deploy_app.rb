@@ -31,6 +31,18 @@ class ServerActions::DeployApp < ServerAction
     self.sha ||= deployment.sha
   end
 
+  def on_failure
+    return if deployment.persisted? && deployment.reload.success?
+
+    begin
+      deployment.error! unless deployment.destroyed?
+    ensure
+      app.error! unless app.destroyed?
+    end
+    broadcast_deployment_update
+    notify_user
+  end
+
   def concurrency_key = app
 
   private
@@ -43,12 +55,7 @@ class ServerActions::DeployApp < ServerAction
     sync_git_repo!
     rebuild_dokku_app!
     schedule_enable_ssl!
-  rescue
-    deployment.error!
-    raise
-  else
     deployment.success!
-  ensure
     app.active!
     broadcast_deployment_update
     notify_user
