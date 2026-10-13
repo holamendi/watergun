@@ -14,6 +14,10 @@ class ServerActions::CreateService < ServerAction
     self.service_type ||= service.service_type
   end
 
+  def on_failure
+    service.error!
+  end
+
   private
 
   def run
@@ -22,10 +26,6 @@ class ServerActions::CreateService < ServerAction
     create_dokku_service!
     service.data = dokku_service_info
     create_service_links!
-  rescue Ssh::CommandExecutionError
-    service.error!
-    raise
-  else
     service.active!
   end
 

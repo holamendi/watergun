@@ -13,15 +13,15 @@ class ServerActions::DestroyService < ServerAction
     self.dokku_service_id ||= service.dokku_id
   end
 
+  def on_failure
+    service.error!
+  end
+
   private
 
   def run
     service.deleting!
     destroy_dokku_service!
-  rescue Ssh::CommandExecutionError
-    service.error!
-    raise
-  else
     service.destroy!
   end
 

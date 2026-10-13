@@ -11,6 +11,10 @@ class ServerActions::EnableSsl < ServerAction
     self.dokku_app_id ||= app.dokku_id
   end
 
+  def on_failure
+    app.domains.enabling_ssl.each(&:active!)
+  end
+
   private
 
   def run
@@ -18,10 +22,6 @@ class ServerActions::EnableSsl < ServerAction
 
     app.domains.ssl_disabled.each(&:enabling_ssl!)
     enable_ssl!
-  rescue Ssh::CommandExecutionError
-    app.domains.enabling_ssl.each(&:active!)
-    raise
-  else
     update_domains
   end
 
