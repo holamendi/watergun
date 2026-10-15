@@ -78,7 +78,9 @@ run = ServerAction::Enqueue.call(action: "apps.restart", target: app)
 
 `ServerAction::Enqueue.build` resolves the registered action key, merges default and supplied payload, validates, and returns an unsaved run. `.call` saves it and schedules after all transactions commit. `.schedule` locks and revalidates a queued, unscheduled run, enqueues `RunServerActionJob` with the run ID and resource key, then records `enqueued_at`. Scheduling errors record failure metadata on a persisted run that is still queued and unscheduled, and are re-raised.
 
-The resource key is `"server:#{server.id}"`. `RunServerActionJob` limits concurrency to one job per server, not per app or service, and verifies the supplied resource key before invoking `ServerAction::Runner`. The runner also holds a per-server PostgreSQL advisory lock, atomically claims queued runs as running, invokes the action lifecycle, persists logs, and records the terminal status. SSH command failures become `failure`; other execution errors become `error`. There is no predecessor-action chaining API.
+Resource keys follow the operation's resource: `app:<id>` for apps, deployments, domains, and storage mounts; `service:<id>` for services and service links; `project:<id>` for project operations. `RunServerActionJob` limits concurrency to one job per resource, so unrelated apps or services on the same server can run independently. It verifies the supplied resource key before invoking `ServerAction::Runner`. The runner holds an advisory lock scoped to the same resource, atomically claims queued runs as running, invokes the action lifecycle, persists logs, and records the terminal status. SSH command failures become `failure`; other execution errors become `error`. There is no predecessor-action chaining API.
+
+Scheduling an unscheduled legacy run refreshes its resource key. Already-enqueued legacy jobs retain their original queue key, but the runner resolves their target to the app/service lock so they coordinate with new deliveries. Drain old workers before switching runner versions; their former per-server locks do not coordinate with resource-scoped locks.
 
 ### Dokku Command Objects
 

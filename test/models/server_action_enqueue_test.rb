@@ -23,10 +23,10 @@ class ServerActionEnqueueTest < ActiveSupport::TestCase
       end
     end
   end
-  test "string caller API encrypts every payload and queues only IDs with per server key" do
+  test "string caller API encrypts every payload and queues only IDs with per app key" do
     app = apps(:smol_roda)
     run = nil
-    assert_enqueued_with(job: RunServerActionJob, args: ->(args) { args == [run.id, "server:#{app.server_id}"] }) do
+    assert_enqueued_with(job: RunServerActionJob, args: ->(args) { args == [run.id, "app:#{app.id}"] }) do
       run = ServerAction::Enqueue.call(action: "apps.restart", target: app, payload: {note: "private-value"})
     end
     assert_equal "apps.restart", run.action_key

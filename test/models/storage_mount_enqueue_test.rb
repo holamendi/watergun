@@ -15,7 +15,21 @@ class StorageMountEnqueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "different action targets on a server share a concurrency key" do
+  test "independent apps and services on a server have independent concurrency keys" do
+    first = ServerAction::Enqueue.build(action: "apps.restart", target: apps(:domain_test_app))
+    second = ServerAction::Enqueue.build(action: "apps.restart", target: apps(:smol_roda))
+    service = ServerAction::Enqueue.build(action: "services.restart", target: services(:postgres))
+    other_service = ServerAction::Enqueue.build(action: "services.restart", target: services(:redis))
+
+    assert_equal first.server, second.server
+    assert_equal first.server, service.server
+    assert_equal "app:#{first.target_id}", first.resource_key
+    assert_equal "service:#{service.target_id}", service.resource_key
+    assert_equal 4, [first, second, service, other_service].map(&:resource_key).uniq.size
+    assert_equal 4, [first, second, service, other_service].map { |run| RunServerActionJob.new(run.id, run.resource_key).concurrency_key }.uniq.size
+  end
+
+  test "different action targets on the same app share a concurrency key" do
     app = apps(:domain_test_app)
     mount = app.storage_mounts.create!(container_path: "/app/concurrency")
     storage = ServerAction::Enqueue.build(action: "apps.mount_storage", target: mount)
@@ -23,6 +37,16 @@ class StorageMountEnqueueTest < ActiveSupport::TestCase
     assert_equal storage.resource_key, restart.resource_key
     assert_equal RunServerActionJob.new(storage.id, storage.resource_key).concurrency_key,
       RunServerActionJob.new(restart.id, restart.resource_key).concurrency_key
+  end
+
+  test "rescheduling a legacy server-scoped run uses its app concurrency key" do
+    app = apps(:domain_test_app)
+    run = create_server_action_run("apps.restart", server: app.server, target: app)
+    run.update!(resource_key: "server:#{app.server_id}")
+    key = "app:#{app.id}"
+
+    assert_enqueued_with(job: RunServerActionJob, args: [run.id, key]) { ServerAction::Enqueue.schedule(run) }
+    assert_equal key, run.reload.resource_key
   end
 
   test "after commit scheduling failure is surfaced and retained for explicit repair" do

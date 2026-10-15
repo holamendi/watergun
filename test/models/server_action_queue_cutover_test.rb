@@ -31,20 +31,25 @@ class ServerActionQueueCutoverTest < ActiveSupport::TestCase
     run&.destroy!
   end
 
-  test "Solid Queue serializes different targets on the same server" do
+  test "Solid Queue serializes each app or service without blocking unrelated resources" do
     original = RunServerActionJob.queue_adapter
     RunServerActionJob.queue_adapter = :solid_queue
     before_ids = SolidQueue::Job.pluck(:id)
     app = apps(:domain_test_app)
-    first = ServerAction::Enqueue.call(action: "apps.restart", target: app)
-    second = ServerAction::Enqueue.call(action: "apps.remove_domain", target: domains(:domain_test_secondary))
+    runs = [
+      ServerAction::Enqueue.call(action: "apps.restart", target: app),
+      ServerAction::Enqueue.call(action: "apps.remove_domain", target: domains(:domain_test_secondary)),
+      ServerAction::Enqueue.call(action: "apps.restart", target: apps(:smol_roda)),
+      ServerAction::Enqueue.call(action: "services.restart", target: services(:postgres)),
+      ServerAction::Enqueue.call(action: "services.restart", target: services(:postgres)),
+      ServerAction::Enqueue.call(action: "services.restart", target: services(:redis))
+    ]
     jobs = SolidQueue::Job.where(class_name: "RunServerActionJob").where.not(id: before_ids)
-    assert_equal 2, jobs.count
-    assert_equal 1, jobs.distinct.count(:concurrency_key)
-    assert_equal 1, SolidQueue::ReadyExecution.where(job_id: jobs.select(:id)).count
-    assert_equal 1, SolidQueue::BlockedExecution.where(job_id: jobs.select(:id)).count
-    assert first.reload.enqueued_at
-    assert second.reload.enqueued_at
+    assert_equal 6, jobs.count
+    assert_equal 4, jobs.distinct.count(:concurrency_key)
+    assert_equal 4, SolidQueue::ReadyExecution.where(job_id: jobs.select(:id)).count
+    assert_equal 2, SolidQueue::BlockedExecution.where(job_id: jobs.select(:id)).count
+    runs.each { |run| assert run.reload.enqueued_at }
   ensure
     SolidQueue::Job.where.not(id: before_ids || []).where(class_name: "RunServerActionJob").each(&:destroy!) if before_ids
     RunServerActionJob.queue_adapter = original

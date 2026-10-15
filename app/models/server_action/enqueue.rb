@@ -3,7 +3,7 @@ class ServerAction::Enqueue
     action_class = ServerAction::Registry.fetch(action)
     run = ServerActionRun.new(action_key: action, target: target, server: server, account: account,
       user: user, source: source, payload: action_class.default_payload(target).merge(payload.deep_stringify_keys),
-      resource_key: "server:#{server.id}")
+      resource_key: ServerAction::ResourceKey.for(target))
     ServerAction::Registry.build(run).validate!
     run
   end
@@ -19,6 +19,7 @@ class ServerAction::Enqueue
     run.with_lock do
       raise ArgumentError, "Run has already started or been scheduled" unless run.queued? && run.enqueued_at.nil?
       ServerAction::Registry.build(run).validate!
+      run.update!(resource_key: ServerAction::ResourceKey.for(run.target))
       job = RunServerActionJob.new(run.id, run.resource_key)
       result = job.enqueue
       raise(job.enqueue_error || ActiveJob::EnqueueError.new("Action was not enqueued")) unless result && job.successfully_enqueued?
