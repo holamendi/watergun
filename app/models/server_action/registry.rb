@@ -3,7 +3,7 @@ module ServerAction::Registry
 
   def self.register(classes)
     classes.each_with_object({}) do |klass, actions|
-      unless klass.is_a?(Class) && !(klass < ActiveRecord::Base) && klass.const_defined?(:KEY, false)
+      unless klass.is_a?(Class) && !(klass < ActiveRecord::Base) && klass.const_defined?(:KEY, false) && klass.respond_to?(:default_payload)
         raise ArgumentError, "Invalid action contract"
       end
       key = klass::KEY
