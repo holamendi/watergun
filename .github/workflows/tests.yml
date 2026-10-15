@@ -63,6 +63,9 @@ jobs:
           bundle exec rails db:create
           bundle exec rails db:schema:load
 
+      - name: Check Rails autoloading
+        run: bundle exec rails zeitwerk:check
+
       - name: Check UI consistency
         run: script/check-ui-consistency
 

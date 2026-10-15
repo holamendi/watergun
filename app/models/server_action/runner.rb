@@ -11,10 +11,12 @@ class ServerAction::Runner
   end
 
   def call
-    # Solid Queue's lease is finite. A session-level advisory lock also protects
-    # overlapping server mutations when a queue concurrency lease expires.
+    # Keep the same resource scope as the queue even after its finite lease
+    # expires. Resolve legacy server-scoped runs to their app/service as well.
+    resource_key = @run.target ? ServerAction::ResourceKey.for(@run.target) : @run.resource_key
+    lock_key = Digest::SHA256.digest(resource_key).unpack1("q>")
     ServerActionRun.connection_pool.with_connection do |connection|
-      connection.execute("SELECT pg_advisory_lock(1464288082, #{@run.server_id.to_i})")
+      connection.execute("SELECT pg_advisory_lock(#{lock_key})")
       primary = nil
       begin
         perform_claimed
@@ -23,9 +25,9 @@ class ServerAction::Runner
         raise
       ensure
         begin
-          connection.execute("SELECT pg_advisory_unlock(1464288082, #{@run.server_id.to_i})")
+          connection.execute("SELECT pg_advisory_unlock(#{lock_key})")
         rescue => unlock_error
-          self.class.report(unlock_error, @run.id, phase: "server lock release")
+          self.class.report(unlock_error, @run.id, phase: "resource lock release")
           raise unlock_error unless primary
         end
       end

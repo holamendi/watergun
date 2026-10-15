@@ -66,38 +66,21 @@ bin/vite dev
 
 `Current` extends `ActiveSupport::CurrentAttributes` with `session`, `user`, `membership`, `account`, `server`, `api_token`, `source`. Setting `user` auto-cascades to `membership`, `account`, and `server`.
 
-### ServerAction Pattern
+### Server Action Pattern
 
-Server operations are modeled as `ServerAction` subclasses (STI) in `app/models/server_actions/`. Each action:
-- Inherits from `ServerAction` base class
-- Defines a `SLUG` constant for identification
-- Uses `actionable` macro to specify the polymorphic target type
-- Implements a private `run` method containing the operation logic
-- Executes Dokku commands via SSH using `execute!` with command objects
-- Can chain via `preceding_server_action_id` (cancelled if predecessor failed)
+`ServerActionRun` is the ActiveRecord execution record, with a polymorphic `target`, encrypted payload, scheduling timestamps, status, and log association. `ServerAction` is an infrastructure namespace under `app/models/server_action/`. Concrete operations are plain classes under `app/models/server_actions/`, explicitly registered by their `KEY` string in `ServerAction::Registry`.
+
+Each action receives a run in its initializer and implements public `.default_payload(target)` and instance `#validate!`, `#execute!(ssh)`, `#succeeded!`, and `#failed!` methods. Actions use the run's target and payload, execute Dokku command objects through the supplied SSH session, and reconcile target state. The runner owns execution status, SSH lifetime, and log persistence.
 
 ```ruby
-class ServerActions::CreateApp < ServerAction
-  SLUG = "apps.create"
-  actionable App
-
-  store_attribute :payload, :dokku_app_id, :string
-
-  private
-
-  def run
-    execute!(Dokku::Apps::CreateCommand.new(app: dokku_app_id))
-    app.active!
-  rescue Ssh::CommandExecutionError
-    app.error!
-    raise
-  end
-end
+run = ServerAction::Enqueue.call(action: "apps.restart", target: app)
 ```
 
-Class-level helpers: `ServerActions::DeployApp.run_now!(server, deployment)` and `.run_later!(server, deployment, depends_on: preceding_action)`.
+`ServerAction::Enqueue.build` resolves the registered action key, merges default and supplied payload, validates, and returns an unsaved run. `.call` saves it and schedules after all transactions commit. `.schedule` locks and revalidates a queued, unscheduled run, enqueues `RunServerActionJob` with the run ID and resource key, then records `enqueued_at`. Scheduling errors record failure metadata on a persisted run that is still queued and unscheduled, and are re-raised.
 
-`RunServerActionJob` enforces 1 concurrent job per `concurrency_key` (usually the App or Service).
+Resource keys follow the operation's resource: `app:<id>` for apps, deployments, domains, and storage mounts; `service:<id>` for services and service links; `project:<id>` for project operations. `RunServerActionJob` limits concurrency to one job per resource, so unrelated apps or services on the same server can run independently. It verifies the supplied resource key before invoking `ServerAction::Runner`. The runner holds an advisory lock scoped to the same resource, atomically claims queued runs as running, invokes the action lifecycle, persists logs, and records the terminal status. SSH command failures become `failure`; other execution errors become `error`. There is no predecessor-action chaining API.
+
+Scheduling an unscheduled legacy run refreshes its resource key. Already-enqueued legacy jobs retain their original queue key, but the runner resolves their target to the app/service lock so they coordinate with new deliveries. Drain old workers before switching runner versions; their former per-server locks do not coordinate with resource-scoped locks.
 
 ### Dokku Command Objects
 
@@ -117,7 +100,7 @@ Located in `app/models/<model>/` (e.g., `App::CreateApp`, `Deployment::CreateDep
 ### Background Jobs
 
 Uses Solid Queue backed by the primary PostgreSQL database. Jobs in `app/jobs/`:
-- `RunServerActionJob`: Executes server actions via SSH, handles log persistence
+- `RunServerActionJob`: Loads a `ServerActionRun`, verifies its resource key, and delegates execution and log persistence to `ServerAction::Runner`
 - `FetchContainerMetricsJob`: Runs every 30s, collects docker stats from all servers
 - `StartLogStreamJob`/`StopLogStreamJob`: Real-time log streaming via Turbo
 - `Github::ProcessEventJob`: Processes webhook events, auto-deploys on push
@@ -181,5 +164,5 @@ Prefer vanilla Rails patterns over external dependencies.
 - Test helpers in `test/test_helpers/`:
   - `SessionTestHelper`: `sign_in(user)` / `sign_out`
   - `SshTestHelper`: `mock_ssh_session(host:, user:, port:, private_key:, commands:)`
-  - `ServerActionTestHelper`: `assert_server_action_scheduled(klass, server:, actionable:, payload:)`
+  - `ServerActionTestHelper`: `assert_server_action_scheduled(action_key, server:, target:, payload: nil)`
   - `GithubWebhookTestHelper`: HMAC signature helpers
