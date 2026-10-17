@@ -68,6 +68,38 @@ class ServerActionConflictTest < ActiveSupport::TestCase
     assert project_run.reload.error?
   end
 
+  test "shared env batch excludes create deploy restart delete and project deletion in both directions" do
+    project = Project.create!(server: @app.server, account: @app.account, name: "batch-conflicts")
+    @app = project.apps.create!(name: "batch-conflicts")
+    deployment = deployments(:pending_deployment)
+    deployment.update!(app: @app, account: @app.account)
+    %w[queued running].each do |status|
+      %w[apps.create apps.deploy apps.restart apps.destroy apps.update_env].each do |action|
+        target = (action == "apps.deploy") ? deployment : @app
+        run = ServerAction::Enqueue.call(action: action, target: target)
+        run.update!(status: status)
+        assert_raises(ServerAction::Conflict::Error) do
+          EnvVariable::WriteEnvVariables.new(app: @app, mode: "replace", values: {"BLOCKED" => "no"}).save
+        end
+        assert_empty @app.env_variables.kept
+        run.update!(status: :success)
+      end
+    end
+    command = EnvVariable::WriteEnvVariables.new(app: @app, mode: "merge", values: {"WINNER" => "yes"})
+    assert command.save
+    %w[apps.create apps.deploy apps.restart apps.destroy].each do |action|
+      target = (action == "apps.deploy") ? deployment : @app
+      assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: action, target: target) }
+    end
+    assert_raises(ServerAction::Conflict::Error) { Project::DestroyProject.new(@app.project).destroy }
+    independent = @app.project.apps.create!(name: "independent-batch")
+    assert EnvVariable::WriteEnvVariables.new(app: independent, mode: "merge", values: {}).save
+    command.server_action_run.update!(status: :success)
+    independent.server_action_runs.update_all(status: :success)
+    ServerAction::Enqueue.call(action: "projects.destroy", target: @app.project)
+    assert_raises(ServerAction::Conflict::Error) { EnvVariable::WriteEnvVariables.new(app: @app, mode: "merge", values: {}).save }
+  end
+
   test "ownership changing after initial resolution is revalidated under the acceptance lock" do
     stale = App.find(@app.id)
     App.where(id: @app.id).update_all(account_id: accounts(:other).id)

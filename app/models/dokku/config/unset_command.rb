@@ -12,6 +12,10 @@ module Dokku
         cmd += " --no-restart" unless @restart
         cmd
       end
+
+      def sensitive_output?
+        true
+      end
     end
   end
 end

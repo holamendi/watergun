@@ -19,7 +19,8 @@ class EnvVariable < ApplicationRecord
   validates :name, presence: true
   validates :name, format: {with: NAME_REGEX}, allow_blank: true
   validates :name, uniqueness: {scope: :app_id, conditions: -> { undiscarded }}, allow_blank: true
-  validates :value, presence: true
+  validates :value, presence: true, unless: -> { validation_context == :batch }
+  validates :value, exclusion: {in: [nil]}, on: :batch
 
   delegate :project, to: :app
 

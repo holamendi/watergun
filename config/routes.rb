@@ -96,6 +96,7 @@ Rails.application.routes.draw do
         resources :apps, only: %i[index create]
       end
       resources :apps, only: %i[index show destroy] do
+        put :env, on: :member, to: "env#update"
         post :restart, path: :restarts, on: :member
         resources :deployments, only: %i[index show create]
         resource :ping, only: :show

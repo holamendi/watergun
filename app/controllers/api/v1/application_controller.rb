@@ -51,7 +51,7 @@ module Api
         raise ServerAction::Accept::Error, "invalid_request" unless body.is_a?(Hash)
         body
       rescue JSON::ParserError
-        raise ServerAction::Accept::Error, "invalid_request"
+        raise ServerAction::Accept::Error, "invalid_request", cause: nil
       end
 
       def accept_operation(target, endpoint:, scope:, body: {}, prepare: nil, &block)
