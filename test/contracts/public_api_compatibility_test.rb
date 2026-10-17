@@ -66,7 +66,7 @@ class PublicApiCompatibilityTest < ActionDispatch::IntegrationTest
   test "persisted internal mutations do not become public resource fields" do
     app = apps(:smol_roda)
     variable = app.env_variables.new(name: "PRIVATE_EXAMPLE", value: "serialization-secret-only")
-    assert variable.save_and_sync
+    assert EnvVariable::CreateEnvVariable.new(variable).save
     run = app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
     assert_equal "serialization-secret-only", run.reload.payload.dig("set", "PRIVATE_EXAMPLE")
     get "/api/v1/apps/#{app.id}", headers: @headers
