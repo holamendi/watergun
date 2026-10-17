@@ -156,7 +156,7 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
     end
   end
 
-  %i[create update unset].each do |mutation|
+  %i[create update unset batch].each do |mutation|
     test "pull env reconciliation cannot invert #{mutation} preparation app and child locks" do
       variable = @app.env_variables.create!(name: "PULL_RACE", value: "original")
       exported = (mutation == :unset) ? [] : [{"name" => "REMOTE_RACE", "value" => "pull-reconciliation-secret"}]
@@ -193,6 +193,8 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
         elsif mutation == :update
           variable.value = "changed"
           assert EnvVariable::UpdateEnvVariable.new(variable).save
+        elsif mutation == :batch
+          assert EnvVariable::WriteEnvVariables.new(app: @app, mode: "replace", values: {"BATCH_RACE" => "batch"}).save
         else
           EnvVariable::DestroyEnvVariable.new(variable).destroy
           assert variable.reload.discarded?

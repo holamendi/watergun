@@ -8,8 +8,11 @@ requires the complete release; #78 must prove it against isolated real Dokku.
 
 At #75, project/app/deployment reads and create/deploy/restart/delete HTTP
 mutations are implemented, along with GET /api/v1/operations/:id from #74.
-Environment batches (#76), deployment diagnostics/rate limits (#77), and real
-release verification (#78) remain separate gates. Their shared Ruby boundary
+At #76, PUT /api/v1/apps/:id/env accepts write-only environment batches through
+EnvVariable::WriteEnvVariables and the existing apps.update_env action; the UI's
+single-variable service interfaces remain unchanged. Deployment diagnostics/rate
+limits (#77) and real release verification (#78) remain separate gates.
+The shared Ruby boundary
 is ServerAction::Accept.call(token:, endpoint:, target:, key:, request:,
 request_id:, scope:) { |locked_target| ... }, returning exactly one newly
 enqueued ServerActionRun from the existing domain call. Pass validated logical
