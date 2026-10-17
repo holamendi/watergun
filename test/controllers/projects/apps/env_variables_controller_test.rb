@@ -141,6 +141,12 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     run = @app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
     assert_equal({"SHARED_EXAMPLE" => "example-only"}, run.payload["set"])
 
+    # Configuration cannot overlap its own still-pending remote application.
+    delete project_app_env_variable_path(@project, @app, variable), as: :turbo_stream
+    assert_response :conflict
+    assert variable.reload.kept?
+    run.update!(status: :success, finished_at: Time.current)
+
     delete project_app_env_variable_path(@project, @app, variable), as: :turbo_stream
     assert_response :success
     assert variable.reload.discarded?

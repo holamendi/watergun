@@ -6,6 +6,21 @@ already implemented. At the #71 milestone only GET /api/v1/apps, GET
 No production rollout is authorized by this document. The executable workflow
 requires the complete release; #78 must prove it against isolated real Dokku.
 
+At #74, GET /api/v1/operations/:id is implemented for accepted public operations.
+Mutation HTTP controllers remain deferred to #75/#76. Their shared Ruby boundary
+is ServerAction::Accept.call(token:, endpoint:, target:, key:, request:,
+request_id:, scope:) { |locked_target| ... }, returning exactly one newly
+enqueued ServerActionRun from the existing domain call. Pass validated logical
+JSON with defaults expanded, a fixed method/route identity, a Project/App reference
+and the server-generated request ID; never pass raw controller parameters. The
+boundary owns commit (no enclosing caller transaction), locks/revalidates token,
+membership and target context, and atomically stores the domain preparation,
+encrypted run, HMAC fingerprint/key identity, audit IDs and dispatch obligation.
+An App.new(id: id) reference allows replay before resolving a deleted target;
+only an original authorized acceptance can replay, and fresh work must resolve a
+live owned target. render_operation(run, status: :accepted) supplies the shared
+202 envelope/Location; it does not itself perform or accept work.
+
 ## Reference and validation
 
 openapi.yml is the machine-readable OpenAPI 3.1 reference. All paths include
@@ -215,9 +230,13 @@ local resource, deployment or remote command. Reuse with different payload yield
 409 idempotency_conflict. Atomic unique constraints/locking must enforce this for
 independent database connections, not just a process-local mutex.
 
-Idempotency records and full operation diagnostics remain at least 30 days after
-terminal completion; queued/running keys never expire. After expiry the key may
-create new work: clients must NOT reuse old keys. Operations survive successful
+Idempotency records and operation metadata are currently retained indefinitely,
+including terminal keys. There is no expiry task or key recycling, so a restart
+or the passage of 30 days cannot authorize a duplicate mutation. This conservative
+policy exceeds the minimum 30-day terminal retention; clients must still never
+reuse keys. A future bounded-retention change must preserve permanent key
+tombstones or introduce a reviewed race-safe expiry protocol before recycling.
+Queued/running keys never expire. Operations survive successful
 app/deployment deletion with original numeric resource references and no dangling
 credential payloads. Resource reads then yield 404; operation polling remains
 available through retention. Owner-scoped operation tombstones may return 410 for
@@ -229,6 +248,34 @@ not permission to automatically replay a destructive SSH command. Reconcile or
 require explicit operator recovery; retain conflict protection until uncertainty
 is resolved. A crash/restart test must distinguish unsent from uncertain work.
 No generic automatic job/HTTP retry may execute a second remote mutation.
+
+The current configuration has no separate queue database: Solid Queue shares
+the primary connection pool. Nevertheless acceptance stores dispatch_pending_at
+on the same run transaction rather than depending on an after_commit callback.
+The every-minute recover_server_actions recurring task invokes
+ServerAction::Recovery.call after queue availability returns (also callable by
+an operator after restart). A queued, unsent run is dispatched; a queued delivery
+older than five minutes can be redelivered, with the existing atomic claim
+preventing duplicate execution. Scheduling holds a transactional run lock; a
+process death while scheduling rolls back uncommitted queue insertion and
+enqueued_at together in the current shared-pool configuration. No standalone
+dispatching state or lease is trusted as proof of remote completion.
+
+Recovery takes the same resource advisory lock nonblocking. A live worker keeps
+its lock, regardless of elapsed time. A stranded running run without a persisted
+remote-completion marker becomes failed/outcome_unknown and retains app conflict
+exclusion. It is never requeued; an operator must verify/reconcile remote state
+before explicitly resolving uncertainty. This API does not provide an unsafe
+"retry uncertain operation" endpoint. A persisted marker is written only after
+the action's primary remote execution returns successfully, never at acceptance,
+queueing or claim. A subsequent bookkeeping/notification/log/SSH-drain failure
+cannot erase that evidence: terminal public status is succeeded (internal
+diagnostics may record the bookkeeping error). A crash before the completion
+marker commits remains unknown, not a guessed success. Failed pre-execution token
+revalidation yields failed/authorization_failed; terminal dispatch validation
+failure yields dispatch_failed. No exception text or command output is public.
+Drain old workers before this migration/runner cutover: old binaries do not
+participate in these acceptance/recovery guarantees. No rollout is authorized.
 
 ## Write-only configuration
 

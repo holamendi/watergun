@@ -5,6 +5,10 @@ class ApplicationController < ActionController::Base
   before_action :authenticate
   before_action :set_source
 
+  rescue_from ServerAction::Conflict::Error do
+    render turbo_stream: stream_toast("App has conflicting work; wait for its operation to finish"), status: :conflict
+  end
+
   private
 
   def stream_toast(message, title: nil, type: :notice, link_text: nil, link_url: nil)
