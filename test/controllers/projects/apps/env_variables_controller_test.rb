@@ -104,6 +104,21 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     assert_response :success
   end
 
+  test "enqueue validation failure does not save an environment edit" do
+    variable = @app.env_variables.create!(name: "BEFORE", value: "before-only")
+    ServerAction::Enqueue.stubs(:build).raises(ArgumentError, "Rejected action")
+
+    assert_no_difference "ServerActionRun.count" do
+      assert_raises(ArgumentError) do
+        patch project_app_env_variable_path(@project, @app, variable),
+          params: {env_variable: {name: "AFTER", value: "after-only"}}, as: :turbo_stream
+      end
+    end
+
+    assert_equal "BEFORE", variable.reload.name
+    assert_equal "before-only", variable.value
+  end
+
   test "invalid rename leaves the persisted variable and remote queue unchanged" do
     variable = @app.env_variables.create!(name: "OLD_NAME", value: "example-only")
 
@@ -116,6 +131,36 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     assert_response :unprocessable_content
     assert_equal "OLD_NAME", variable.reload.name
     assert_equal "example-only", variable.value
+  end
+
+  test "create and delete use the shared environment lifecycle" do
+    post project_app_env_variables_path(@project, @app),
+      params: {env_variable: {name: "SHARED_EXAMPLE", value: "example-only"}}, as: :turbo_stream
+    assert_response :created
+    variable = @app.env_variables.find_by!(name: "SHARED_EXAMPLE")
+    run = @app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
+    assert_equal({"SHARED_EXAMPLE" => "example-only"}, run.payload["set"])
+
+    delete project_app_env_variable_path(@project, @app, variable), as: :turbo_stream
+    assert_response :success
+    assert variable.reload.discarded?
+    run = @app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
+    assert_equal ["SHARED_EXAMPLE"], run.payload["unset"]
+  end
+
+  test "enqueue validation failure rolls back environment creation and deletion" do
+    variable = @app.env_variables.create!(name: "EXISTING", value: "example-only")
+    ServerAction::Enqueue.stubs(:build).raises(ArgumentError, "Rejected action")
+    assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
+      assert_raises(ArgumentError) do
+        post project_app_env_variables_path(@project, @app),
+          params: {env_variable: {name: "NEW_EXAMPLE", value: "new-only"}}, as: :turbo_stream
+      end
+      assert_raises(ArgumentError) do
+        delete project_app_env_variable_path(@project, @app, variable), as: :turbo_stream
+      end
+    end
+    assert variable.reload.kept?
   end
 
   test "duplicate rename leaves both variables and remote queue unchanged" do

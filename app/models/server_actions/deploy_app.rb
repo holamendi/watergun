@@ -22,6 +22,7 @@ class ServerActions::DeployApp
 
   def validate!
     ServerAction::TargetValidation.call(@run, type: Deployment, required: %w[dokku_app_id])
+    ServerAction::TargetValidation.app_context!(app, account:, user:)
   end
 
   def succeeded!

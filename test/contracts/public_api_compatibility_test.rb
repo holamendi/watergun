@@ -62,4 +62,18 @@ class PublicApiCompatibilityTest < ActionDispatch::IntegrationTest
     assert_not env.valid?({"mode" => "merge", "values" => {"VALID" => "ok\n\u0000secret"}})
     assert_not @contract.schema("DeploymentCreate").valid?({"sha" => "#{"a" * 40}\nignored"})
   end
+
+  test "persisted internal mutations do not become public resource fields" do
+    app = apps(:smol_roda)
+    variable = app.env_variables.new(name: "PRIVATE_EXAMPLE", value: "serialization-secret-only")
+    assert variable.save_and_sync
+    run = app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
+    assert_equal "serialization-secret-only", run.reload.payload.dig("set", "PRIVATE_EXAMPLE")
+    get "/api/v1/apps/#{app.id}", headers: @headers
+    assert_response :success
+    assert @contract.schema("AppEnvelope").valid?(json_response)
+    %w[payload action_key failure_message ssh_commands serialization-secret-only deploy_token].each do |internal|
+      refute_includes response.body, internal
+    end
+  end
 end

@@ -1,4 +1,19 @@
 module ServerAction::TargetValidation
+  def self.app_context!(target, account: Current.account || target.account, user: Current.user)
+    project = target.is_a?(Project) ? target : target.project
+    server = project.server
+    available = target.persisted? && project.persisted? && target.kept? && project.kept? &&
+      (!target.is_a?(App) || !target.deleted?) && !server.deleted?
+    raise ArgumentError, "App or project is unavailable" unless available
+
+    owned = target.account_id == account.id && project.account_id == account.id &&
+      server.account_id == account.id && (!target.is_a?(App) || target.server_id == server.id)
+    raise ArgumentError, "Target ownership mismatch" unless owned
+    if user && !user.memberships.exists?(account_id: account.id)
+      raise ArgumentError, "User ownership mismatch"
+    end
+  end
+
   def self.call(run, type:, required:)
     target = run.target
     raise ArgumentError, "Target required" unless target.is_a?(type) && target.persisted? && !target.destroyed?

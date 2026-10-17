@@ -56,6 +56,18 @@ class App < ApplicationRecord
     status.in?(TEMPORARY_STATUSES)
   end
 
+  def update_builder_and_sync(builder)
+    ServerAction::TargetValidation.app_context!(self)
+    self.builder = builder
+    return false unless valid?
+
+    transaction do
+      save!
+      ServerAction::Enqueue.call(action: "apps.set_builder", target: self)
+    end
+    true
+  end
+
   private
 
   def set_dokku_id

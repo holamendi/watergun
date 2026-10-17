@@ -12,9 +12,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   def create
     @env_variable = @app.env_variables.new(env_variable_params)
 
-    if @env_variable.save
-      ServerAction::Enqueue.call(action: "apps.update_env", target: @app, payload: {set: @env_variable.to_h})
-
+    if @env_variable.save_and_sync
       render turbo_stream: [
         stream_env_variables,
         close_modal_stream,
@@ -29,11 +27,8 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   end
 
   def update
-    if @env_variable.update(env_variable_params)
-      if @env_variable.saved_change_to_name? || @env_variable.saved_change_to_value?
-        unset = @env_variable.saved_change_to_name? ? [@env_variable.name_before_last_save] : []
-        ServerAction::Enqueue.call(action: "apps.update_env", target: @app, payload: {set: @env_variable.to_h, unset:})
-      end
+    @env_variable.assign_attributes(env_variable_params)
+    if @env_variable.save_and_sync
       render turbo_stream: [
         stream_env_variables,
         close_modal_stream,
@@ -45,8 +40,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   end
 
   def destroy
-    @env_variable.discard!
-    ServerAction::Enqueue.call(action: "apps.update_env", target: @app, payload: {unset: [@env_variable.name]})
+    @env_variable.discard_and_sync!
     render turbo_stream: [
       stream_env_variables,
       stream_toast("Environment variable deleted successfully.")
