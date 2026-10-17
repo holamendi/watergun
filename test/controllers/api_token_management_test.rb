@@ -108,6 +108,26 @@ class ApiTokenManagementTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
+  test "malformed token envelopes return safe request errors" do
+    sign_in users(:bobby)
+    ["not an object", ["not an object"]].each do |envelope|
+      assert_no_difference ["ApiToken.count", "ApiTokenAudit.count"] do
+        post "/account/api_tokens", params: {api_token: envelope}, as: :json
+        assert_response :bad_request
+        assert_equal "invalid_request", json_response.dig("error", "code")
+      end
+    end
+  end
+
+  test "null read-only input returns safe validation error without issuing a token" do
+    sign_in users(:bobby)
+    assert_no_difference ["ApiToken.count", "ApiTokenAudit.count"] do
+      post "/account/api_tokens", params: {api_token: {name: "invalid", scopes: ["apps:read"], read_only: nil}}, as: :json
+      assert_response :unprocessable_content
+      assert_equal "validation_failed", json_response.dig("error", "code")
+    end
+  end
+
   test "browser CSRF protection remains enforced for token issuance" do
     sign_in users(:bobby)
     original = ActionController::Base.allow_forgery_protection

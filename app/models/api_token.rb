@@ -13,6 +13,7 @@ class ApiToken < ApplicationRecord
   attribute :expires_at, :datetime, default: -> { 1.year.from_now }
 
   validates :token_digest, :expires_at, presence: true
+  validates :read_only, inclusion: {in: [true, false]}
   validate :valid_scopes
   validate :owner_membership
   validates :user, presence: true, on: :issue

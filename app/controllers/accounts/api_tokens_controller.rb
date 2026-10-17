@@ -74,7 +74,9 @@ module Accounts
     end
 
     def issue_attributes
-      attributes = params.require(:api_token).permit(:name, :expires_at, :read_only, scopes: []).to_h
+      envelope = params.require(:api_token)
+      raise ActionController::ParameterMissing, :api_token unless envelope.is_a?(ActionController::Parameters)
+      attributes = envelope.permit(:name, :expires_at, :read_only, scopes: []).to_h
       raise ActionController::ParameterMissing, :scopes unless attributes["scopes"].is_a?(Array)
       attributes
     end

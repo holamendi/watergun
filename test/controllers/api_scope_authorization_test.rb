@@ -58,6 +58,57 @@ class ApiScopeAuthorizationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "deployment reads require both account and parent ownership even for inconsistent rows" do
+    foreign = Account.create!(name: "foreign")
+    deployment = deployments(:success_deployment)
+    deployment.update!(account: foreign)
+    token = accounts(:default).api_tokens.create!
+    headers = {"Authorization" => "Bearer #{token.token}"}
+    app = apps(:smol_roda)
+
+    get "/api/v1/apps/#{app.id}/deployments", headers: headers
+    assert_response :success
+    assert_not_includes json_response.fetch("deployments").map { |row| row.fetch("id") }, deployment.id
+    get "/api/v1/apps/#{app.id}/deployments/#{deployment.id}", headers: headers
+    assert_response :not_found
+    foreign_token = foreign.api_tokens.create!
+    with_routing do |routes|
+      routes.draw { get "/deployment-probe/:id", to: "api/v1/deployments#show" }
+      get "/deployment-probe/#{deployment.id}", headers: headers
+      assert_response :not_found
+      get "/deployment-probe/#{deployment.id}", headers: {"Authorization" => "Bearer #{foreign_token.token}"}
+      assert_response :not_found
+    end
+  end
+
+  test "embedded deployments also require the app account ownership" do
+    foreign = Account.create!(name: "foreign")
+    deployments(:success_deployment).update!(account: foreign)
+    token = accounts(:default).api_tokens.create!
+    headers = {"Authorization" => "Bearer #{token.token}"}
+    app = apps(:smol_roda)
+
+    get "/api/v1/apps/#{app.id}", headers: headers
+    assert_response :success
+    assert_nil json_response.fetch("app").fetch("deployment")
+    get "/api/v1/apps", headers: headers
+    assert_response :success
+    assert_nil json_response.fetch("apps").find { |row| row.fetch("id") == app.id }.fetch("deployment")
+  end
+
+  test "embedded repository metadata requires matching account ownership" do
+    app = apps(:smol_roda)
+    app.github_repo.update!(account: Account.create!(name: "foreign"))
+    token = accounts(:default).api_tokens.create!
+    headers = {"Authorization" => "Bearer #{token.token}"}
+    get "/api/v1/apps/#{app.id}", headers: headers
+    assert_response :success
+    assert_nil json_response.fetch("app").fetch("github_repo")
+    get "/api/v1/apps", headers: headers
+    assert_response :success
+    assert_nil json_response.fetch("apps").find { |row| row.fetch("id") == app.id }.fetch("github_repo")
+  end
+
   test "error request IDs are generated and do not trust caller input" do
     get "/api/v1/apps", headers: {"X-Request-ID" => "caller-controlled"}
     assert_response :unauthorized

@@ -6,16 +6,16 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
 
   def index
     set_app
-    deployments = @app.deployments.kept
+    deployments = account_deployments.where(app_id: @app.id)
     render json: Api::V1::DeploymentResource.new(deployments)
   end
 
   def show
     deployment = if params[:app_id].present?
       set_app
-      @app.deployments.kept.find(params[:id])
+      account_deployments.where(app_id: @app.id).find(params[:id])
     else
-      Current.account.deployments.kept.find(params[:id])
+      account_deployments.find(params[:id])
     end
 
     render json: Api::V1::DeploymentResource.new(deployment)
@@ -29,6 +29,10 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   end
 
   private
+
+  def account_deployments
+    Current.account.deployments.kept.where(apps: {account_id: Current.account.id})
+  end
 
   def set_app
     @app = Current.account.apps.kept.find(params[:app_id])
