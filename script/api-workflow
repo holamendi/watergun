@@ -1,0 +1,148 @@
+#!/usr/bin/env ruby
+# Target-contract example: run only against an authorized isolated test environment.
+require "net/http"
+require "json"
+require "securerandom"
+
+class WatergunApiWorkflow
+  class Failure < StandardError; end
+
+  def initialize(base_url:, token:, transport: nil, output: $stdout, sleeper: ->(seconds) { sleep seconds })
+    @uri = URI(base_url)
+    local_http = @uri.scheme == "http" && %w[localhost 127.0.0.1 ::1].include?(@uri.host)
+    valid_origin = (@uri.scheme == "https" || local_http) && @uri.host && !@uri.userinfo && !@uri.query && !@uri.fragment && ["", "/"].include?(@uri.path)
+    unless valid_origin
+      raise Failure, "API_URL must be an HTTPS origin (HTTP allowed only on loopback)"
+    end
+    raise Failure, "API_TOKEN is required" if token.to_s.empty? || token.match?(/[\r\n]/)
+    @token, @transport, @output, @sleeper = token, transport, output, sleeper
+    @prefix = SecureRandom.uuid
+  end
+
+  def run(project_id:, name:, repo:, branch:, env:, builder: "herokuish")
+    project_id = Integer(project_id)
+    raise Failure, "PROJECT_ID must be positive" unless project_id.positive?
+    @output.puts "run_key=#{@prefix}"
+    created = mutate("POST", "/api/v1/projects/#{project_id}/apps", {name: name, source: {type: "github", repo: repo, branch: branch}, builder: builder}, "create")
+    app_id = positive_id(created.fetch("app_id"))
+    @output.puts "app_id=#{app_id} run_key=#{@prefix}"
+    poll(created)
+    poll(mutate("PUT", "/api/v1/apps/#{app_id}/env", {mode: "merge", values: env}, "env"))
+    deployment = mutate("POST", "/api/v1/apps/#{app_id}/deployments", {}, "deploy")
+    duplicate = mutate("POST", "/api/v1/apps/#{app_id}/deployments", {}, "deploy")
+    raise Failure, "idempotency mismatch" unless duplicate.fetch("id") == deployment.fetch("id")
+    poll(deployment)
+    deployment_id = positive_id(deployment.fetch("deployment_id"))
+    read("/api/v1/apps/#{app_id}/deployments/#{deployment_id}")
+    inspect_logs(app_id, deployment_id)
+    app = read("/api/v1/apps/#{app_id}").fetch("app")
+    # Deployment/public HTTP verification is a separate release gate, not inferred here.
+    @output.puts "app_url=#{app.fetch("url")}"
+    poll(mutate("POST", "/api/v1/apps/#{app_id}/restarts", nil, "restart"))
+    poll(mutate("DELETE", "/api/v1/apps/#{app_id}", nil, "delete"))
+    @output.puts "workflow complete; verify public URL content and remote cleanup separately"
+    app_id
+  end
+
+  private
+
+  def positive_id(value)
+    raise Failure, "invalid response identifier" unless value.is_a?(Integer) && value.positive?
+    value
+  end
+
+  def mutate(method, path, body, suffix)
+    response = request(method, path, body, key: "#{@prefix}:#{suffix}")
+    raise Failure, "expected durable acceptance" unless response.code == "202"
+    operation = parse(response).fetch("operation")
+    id = positive_id(operation.fetch("id"))
+    raise Failure, "invalid operation Location" unless response["Location"] == "/api/v1/operations/#{id}"
+    operation
+  end
+
+  def poll(operation)
+    id = positive_id(operation.fetch("id"))
+    300.times do
+      state = read("/api/v1/operations/#{id}").fetch("operation")
+      return state if state.fetch("status") == "succeeded"
+      raise Failure, "operation #{id} failed; inspect safe API diagnostics" if state.fetch("status") == "failed"
+      raise Failure, "invalid operation state" unless %w[queued running].include?(state.fetch("status"))
+      @sleeper.call(2)
+    end
+    raise Failure, "operation #{id} polling timed out; do not blindly retry"
+  end
+
+  def read(path)
+    parse(request("GET", path))
+  end
+
+  def inspect_logs(app_id, deployment_id)
+    cursor = 0
+    300.times do
+      logs = read("/api/v1/apps/#{app_id}/deployments/#{deployment_id}/logs?after=#{cursor}&limit=100")
+      # Do not delete evidence before final capture, or silently stop at a page bound.
+      if logs["next_cursor"]
+        next_cursor = positive_id(logs.fetch("next_cursor"))
+        raise Failure, "non-advancing log cursor" unless next_cursor > cursor
+        cursor = next_cursor
+      elsif logs.fetch("complete") == true
+        return
+      else
+        cursor = logs.fetch("logs").map { |entry| positive_id(entry.fetch("id")) }.max || cursor
+        @sleeper.call(2)
+      end
+    end
+    raise Failure, "logs inspection limit reached; app retained for inspection"
+  end
+
+  def request(method, path, body = nil, key: nil)
+    request = Net::HTTPGenericRequest.new(method, !body.nil?, true, path)
+    request["Authorization"] = "Bearer #{@token}"
+    request["Accept"] = "application/json"
+    request["Idempotency-Key"] = key if key
+    if body
+      request["Content-Type"] = "application/json"
+      request.body = JSON.generate(body)
+    end
+    response = if @transport
+      @transport.call(request)
+    else
+      http = Net::HTTP.new(@uri.host, @uri.port, nil)
+      http.use_ssl = @uri.scheme == "https"
+      http.open_timeout = 10
+      http.read_timeout = 30
+      http.write_timeout = 30
+      http.max_retries = 0
+      http.start { |connection| connection.request(request) }
+    end
+    raise Failure, "HTTP #{response.code}" unless %w[200 202].include?(response.code)
+    response
+  rescue Failure
+    raise
+  rescue
+    # Suppress transport exception messages/causes that might contain headers or body.
+    raise Failure, "transport failed; outcome may be uncertain; do not blindly retry", cause: nil
+  end
+
+  def parse(response)
+    JSON.parse(response.body)
+  rescue JSON::ParserError
+    raise Failure, "invalid JSON response", cause: nil
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  begin
+    WatergunApiWorkflow.new(base_url: ENV.fetch("API_URL"), token: ENV.fetch("API_TOKEN")).run(
+      project_id: ENV.fetch("PROJECT_ID"), name: ENV.fetch("APP_NAME"), repo: ENV.fetch("GITHUB_REPO"),
+      branch: ENV.fetch("GITHUB_BRANCH", "main"), builder: ENV.fetch("APP_BUILDER", "herokuish"),
+      env: JSON.parse(ENV.fetch("APP_ENV_JSON", "{}"))
+    )
+  rescue WatergunApiWorkflow::Failure => error
+    warn error.message
+    exit 1
+  rescue
+    warn "workflow failed; check required configuration or inspect the retained app/operation; no automatic cleanup or mutation retry"
+    exit 1
+  end
+end
