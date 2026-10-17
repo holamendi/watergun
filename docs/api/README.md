@@ -6,8 +6,10 @@ already implemented. At the #71 milestone only GET /api/v1/apps, GET
 No production rollout is authorized by this document. The executable workflow
 requires the complete release; #78 must prove it against isolated real Dokku.
 
-At #74, GET /api/v1/operations/:id is implemented for accepted public operations.
-Mutation HTTP controllers remain deferred to #75/#76. Their shared Ruby boundary
+At #75, project/app/deployment reads and create/deploy/restart/delete HTTP
+mutations are implemented, along with GET /api/v1/operations/:id from #74.
+Environment batches (#76), deployment diagnostics/rate limits (#77), and real
+release verification (#78) remain separate gates. Their shared Ruby boundary
 is ServerAction::Accept.call(token:, endpoint:, target:, key:, request:,
 request_id:, scope:) { |locked_target| ... }, returning exactly one newly
 enqueued ServerActionRun from the existing domain call. Pass validated logical
@@ -20,6 +22,13 @@ An App.new(id: id) reference allows replay before resolving a deleted target;
 only an original authorized acceptance can replay, and fresh work must resolve a
 live owned target. render_operation(run, status: :accepted) supplies the shared
 202 envelope/Location; it does not itself perform or accept work.
+
+Optional prepare: resolves source metadata before row locks, only when no
+committed key exists. Acceptance rechecks the key and authorization, and the
+controller compares prepared repository/installation/server/builder context with
+the locked target before calling the same domain service. Simultaneous initial
+requests may both read GitHub; only one can commit. Committed retries never
+resolve a new branch HEAD or require GitHub availability.
 
 ## Reference and validation
 
@@ -123,7 +132,8 @@ endpoint in the first release. A member must provision an accessible Dokku serve
 and project plus an authorized GitHub App installation before using this API.
 
 AppCreate supports only source.type=github and a repository owner/name plus a
-full branch name (including slashes). Public/private repositories are supported
+full Git-compatible branch name (including slashes, excluding control characters,
+option-like refs and invalid Git ref syntax). Public/private repositories are supported
 only when accessible through the account's installation. Raw Git URLs, Docker
 image sources, arbitrary SSH/Dokku commands, custom classes and caller-supplied
 server credentials are not supported. App creation validates repository/branch
@@ -186,7 +196,9 @@ collection. Existing apps already paginates; existing deployment reads are
 unbounded. The completed release explicitly changes deployment listing to these
 bounds as a resource-safety compatibility change: clients must follow Link.
 No pagination wrapper is added around existing JSON arrays. This change must be
-covered by existing-consumer tests and called out in release evidence.
+covered by existing-consumer tests and called out in release evidence. At #75,
+valid pages beyond the collection also return 200 with an empty array rather
+than the former Pagy range exception; the requested page is never clamped.
 
 New project/operation/log timestamps are RFC 3339 UTC strings ending in Z, with
 optional fractional seconds; not epoch numbers or local time. Existing Alba

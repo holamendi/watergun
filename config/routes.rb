@@ -92,8 +92,12 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :operations, only: :show
-      resources :apps, only: %i[index show] do
-        resources :deployments, only: %i[index show]
+      resources :projects, only: :index do
+        resources :apps, only: %i[index create]
+      end
+      resources :apps, only: %i[index show destroy] do
+        post :restart, path: :restarts, on: :member
+        resources :deployments, only: %i[index show create]
         resource :ping, only: :show
       end
     end

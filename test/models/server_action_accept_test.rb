@@ -23,8 +23,8 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     assert_equal @token.user_id, run.user_id
     assert_equal "acceptance-request", run.request_id
     assert_equal @app.id, run.operation_app_id
-    assert_equal "queued", run.public_operation.fetch(:status)
-    refute_includes run.public_operation.to_json, "private"
+    assert_equal "queued", Api::V1::OperationResource.new(run).to_h.fetch("status")
+    refute_includes Api::V1::OperationResource.new(run).serialize, "private"
   end
 
   test "canonical replay returns original operation before invoking domain code and different input conflicts" do
@@ -89,6 +89,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
   end
 
   test "the boundary composes shared creation and pins deployment without mutation controllers" do
+    @app.server.update!(cpu_type: :x86)
     create = lambda do
       ServerAction::Accept.call(token: @token, endpoint: "POST /projects/:id/apps", target: @app.project,
         key: "create-domain", request: {source: {type: "github", repo: "holamendi/smol-roda", branch: "main"}},
@@ -99,7 +100,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
       end
     end
     created = VCR.use_cassette("github/valid_repo_and_branch") { create.call }
-    assert_equal "app.create", created.public_operation.fetch(:kind)
+    assert_equal "app.create", Api::V1::OperationResource.new(created).to_h.fetch("kind")
     assert_equal created.id, create.call.id
     created.update!(status: :success, finished_at: Time.current)
     @token.update!(scopes: ["deployments:write"])
@@ -109,7 +110,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
         Deployment::CreateDeployment.new(app: app).save!.server_action_run
       end
     end
-    assert_equal "deployment.create", run.public_operation.fetch(:kind)
+    assert_equal "deployment.create", Api::V1::OperationResource.new(run).to_h.fetch("kind")
     assert_equal created.operation_app_id, run.operation_app_id
     assert_equal run.target.id, run.operation_deployment_id
     assert_equal run.target.sha, run.reload.payload["sha"]
@@ -156,12 +157,12 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
       app.server_action_runs.order(:id).last
     end
     refute_equal first.id, run.id
-    assert_equal "app.env", run.public_operation.fetch(:kind)
+    assert_equal "app.env", Api::V1::OperationResource.new(run).to_h.fetch("kind")
     assert_equal "env-acceptance-sentinel", run.reload.payload.fetch("set").fetch("PRIVATE_VALUE")
     raw = ServerActionRun.connection.select_one("SELECT * FROM server_action_runs WHERE id = #{run.id}").to_json
     refute_includes raw, "env-acceptance-sentinel"
     refute_includes raw, @token.token
-    refute_includes run.public_operation.to_json, "env-acceptance-sentinel"
+    refute_includes Api::V1::OperationResource.new(run).serialize, "env-acceptance-sentinel"
   end
 
   test "acceptance cannot attach to unrelated existing work or leave extra undispatched mutations" do

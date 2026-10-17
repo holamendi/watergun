@@ -20,14 +20,6 @@ class ApiToken < ApplicationRecord
   validates :name, presence: true, length: {maximum: 100}, on: :issue
   validate :issuance_expiry, on: :issue
 
-  def public_metadata
-    {
-      id: id, name: name, scopes: scopes, read_only: read_only,
-      created_at: created_at&.utc&.iso8601, expires_at: expires_at&.utc&.iso8601,
-      revoked_at: revoked_at&.utc&.iso8601, last_used_at: last_used_at&.utc&.iso8601
-    }
-  end
-
   def permits?(scope)
     scopes.is_a?(Array) && scopes.include?(scope)
   end

@@ -76,7 +76,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     end
     assert run.reload.error?
     assert run.outcome_uncertain?
-    assert_equal "outcome_unknown", run.public_operation.dig(:error, :code)
+    assert_equal "outcome_unknown", Api::V1::OperationResource.new(run).to_h.deep_symbolize_keys.dig(:error, :code)
     assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.destroy", target: @app) }
     assert_equal run.id, accept.id
   end
@@ -99,7 +99,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     ServerAction::Recovery.recover(run)
     assert run.reload.success?
     refute run.outcome_uncertain?
-    assert_equal "succeeded", run.public_operation.fetch(:status)
+    assert_equal "succeeded", Api::V1::OperationResource.new(run).to_h.fetch("status")
   end
 
   test "a real delete action crash after remote completion reports success without replaying local hooks" do
@@ -128,8 +128,8 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     assert_equal "deleting", @app.reload.status
     Net::SSH.expects(:start).never
     ServerAction::Recovery.recover(run)
-    assert_equal "succeeded", run.reload.public_operation.fetch(:status)
-    assert_nil run.public_operation.fetch(:error)
+    assert_equal "succeeded", Api::V1::OperationResource.new(run.reload).to_h.fetch("status")
+    assert_nil Api::V1::OperationResource.new(run).to_h.fetch("error")
     assert App.exists?(@app.id), "Local repair is explicit; recovery must not replay arbitrary success hooks"
   end
 

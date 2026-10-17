@@ -25,7 +25,7 @@ class ServerAction::Accept
     end
   end
 
-  def self.call(token:, endpoint:, target:, key:, request:, request_id:, scope:)
+  def self.call(token:, endpoint:, target:, key:, request:, request_id:, scope:, prepare: nil)
     connection = ServerActionRun.connection
     if connection.transaction_open?
       raise ArgumentError, "Acceptance must own its commit"
@@ -34,6 +34,10 @@ class ServerAction::Accept
     raise Error, "invalid_request" unless request_id.is_a?(String) && request_id.match?(/\A[A-Za-z0-9._:-]{1,128}\z/) && request.is_a?(Hash)
     identity = digest([endpoint, target.class.base_class.name, target.id, key])
     fingerprint = digest(request)
+    # Slow source resolution happens without row locks, and committed retries
+    # never consult GitHub again. The transaction below rechecks the winner and
+    # authorization; callers compare their prepared source with the locked target.
+    prepared = prepare.call if prepare && !ServerActionRun.exists?(account_id: token.account_id, api_token_id: token.id, idempotency_digest: identity)
     replay = false
     accepted_id = nil
     accepted_runs = []
@@ -66,7 +70,7 @@ class ServerAction::Accept
             replay = true
             next existing
           end
-          accepted = yield(target)
+          accepted = yield(target, prepared)
           unless accepted.is_a?(ServerActionRun) && accepted.persisted? && accepted_runs.size == 1 && accepted_runs.first.id == accepted.id
             raise ArgumentError, "Expected exactly one newly enqueued server action run"
           end

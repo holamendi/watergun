@@ -5,6 +5,7 @@ class Deployment::CreateDeployment
   attribute :app
   attribute :commit_sha
   attribute :github_event
+  attribute :builder
 
   validates :app, presence: true
   validate :validate_prerequisites
@@ -15,7 +16,8 @@ class Deployment::CreateDeployment
 
     ServerAction::Conflict.with_app_lock(app) do
       deployment = app.deployments.create!(github_event:, **deployment_attributes)
-      ServerAction::Enqueue.call(action: "apps.deploy", target: deployment)
+      selected_builder = builder || app.builder
+      ServerAction::Enqueue.call(action: "apps.deploy", target: deployment, payload: selected_builder ? {builder: selected_builder} : {})
       deployment
     end
   end
@@ -62,7 +64,7 @@ class Deployment::CreateDeployment
   end
 
   def validate_commit_sha
-    return if remote_commit.present?
+    return if remote_commit.present? && remote_commit.sha.is_a?(String) && remote_commit.sha.match?(/\A[0-9a-fA-F]{40}\z/)
 
     errors.add(:commit_sha, "does not exist")
   end

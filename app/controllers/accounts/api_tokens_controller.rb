@@ -8,16 +8,16 @@ module Accounts
     rescue_from ActiveRecord::RecordInvalid, with: -> { token_error("validation_failed", :unprocessable_content) }
 
     def index
-      render json: {api_tokens: owned_tokens.order(:id).map(&:public_metadata)}
+      render json: Api::ApiTokenResource.new(owned_tokens.order(:id))
     end
 
     def show
-      render json: {api_token: @token.public_metadata}
+      render json: Api::ApiTokenResource.new(@token)
     end
 
     def create
       token = ApiToken.transaction { issue_token! }
-      render json: {api_token: token.public_metadata, secret: token.token}, status: :created
+      render json: Api::ApiTokenResource.new(token).as_json.merge(secret: token.token), status: :created
     end
 
     def destroy
@@ -27,7 +27,7 @@ module Accounts
           audit!(@token, "revoked")
         end
       end
-      render json: {api_token: @token.public_metadata}
+      render json: Api::ApiTokenResource.new(@token)
     end
 
     def rotate
@@ -38,7 +38,7 @@ module Accounts
         audit!(@token, "rotated")
         issued
       end
-      render json: {api_token: replacement.public_metadata, secret: replacement.token}, status: :created
+      render json: Api::ApiTokenResource.new(replacement).as_json.merge(secret: replacement.token), status: :created
     end
 
     def claim
@@ -49,7 +49,7 @@ module Accounts
         token.update!(user: Current.user)
         audit!(token, "claimed")
       end
-      render json: {api_token: token.public_metadata}
+      render json: Api::ApiTokenResource.new(token)
     end
 
     private

@@ -7,6 +7,7 @@ class App::CreateApp
   attribute :repo
   attribute :branch
   attribute :webhook_deploy, :boolean, default: false
+  attribute :builder, :string, default: "herokuish"
 
   attribute :app
   attribute :create_app_server_action
@@ -43,6 +44,7 @@ class App::CreateApp
   def create_app!
     self.app = project.apps.create!(
       server: project.server,
+      builder: builder,
       name: app_name
     )
   end

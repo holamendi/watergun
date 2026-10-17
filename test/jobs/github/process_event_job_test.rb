@@ -21,7 +21,7 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal "abc123def456", @github_repo.app.deployments.last.sha
+    assert_equal "a" * 40, @github_repo.app.deployments.last.sha
     assert event.reload.processed?
   end
 
@@ -241,10 +241,10 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
 
   def stub_remote_commit
     commit = OpenStruct.new(
-      sha: "abc123def456",
+      sha: "a" * 40,
       author: nil,
       commit: OpenStruct.new(author: nil, message: "Test commit"),
-      html_url: "https://github.com/holamendi/smol-roda/commit/abc123def456"
+      html_url: "https://github.com/holamendi/smol-roda/commit/#{"a" * 40}"
     )
     client = mock("GitHub API")
     client.expects(:commit).with(@github_repo.repo, "abc123def456").returns(commit)
