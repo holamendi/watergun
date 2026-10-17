@@ -27,7 +27,7 @@ class SharedAppDispatchTest < ActiveSupport::TestCase
     RunServerActionJob.queue_adapter = FailingAdapter.new
     app = apps(:smol_roda)
     @variable = app.env_variables.new(name: "SHARED_QUEUE", value: "queue-secret-only")
-    assert_raises(ActiveJob::EnqueueError) { @variable.save_and_sync }
+    assert_raises(ActiveJob::EnqueueError) { EnvVariable::CreateEnvVariable.new(@variable).save }
     assert @variable.reload.persisted?
     run = app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
     @run_ids = [run.id]

@@ -12,7 +12,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   def create
     @env_variable = @app.env_variables.new(env_variable_params)
 
-    if @env_variable.save_and_sync
+    if EnvVariable::CreateEnvVariable.new(@env_variable).save
       render turbo_stream: [
         stream_env_variables,
         close_modal_stream,
@@ -28,7 +28,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
 
   def update
     @env_variable.assign_attributes(env_variable_params)
-    if @env_variable.save_and_sync
+    if EnvVariable::UpdateEnvVariable.new(@env_variable).save
       render turbo_stream: [
         stream_env_variables,
         close_modal_stream,
@@ -40,7 +40,7 @@ class Projects::Apps::EnvVariablesController < Projects::Apps::BaseController
   end
 
   def destroy
-    @env_variable.discard_and_sync!
+    EnvVariable::DestroyEnvVariable.new(@env_variable).destroy
     render turbo_stream: [
       stream_env_variables,
       stream_toast("Environment variable deleted successfully.")

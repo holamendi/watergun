@@ -69,7 +69,7 @@ class SharedAppLifecycleTest < ActiveSupport::TestCase
   test "shared environment save rejects mismatched variable ownership" do
     variable = @app.env_variables.new(account: Account.create!(name: "Other"), name: "EXAMPLE", value: "example-only")
     assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
-      assert_raises(ArgumentError) { variable.save_and_sync }
+      assert_raises(ArgumentError) { EnvVariable::CreateEnvVariable.new(variable).save }
     end
   end
 
@@ -80,9 +80,9 @@ class SharedAppLifecycleTest < ActiveSupport::TestCase
     ].each do |attributes|
       variable = @app.env_variables.create!(**attributes, value: "example-only")
       variable.assign_attributes(name: "RENAMED", value: "new-only")
-      refute variable.save_and_sync
+      refute EnvVariable::UpdateEnvVariable.new(variable).save
       assert_equal "example-only", variable.reload.value
-      assert_raises(ArgumentError) { variable.discard_and_sync! }
+      assert_raises(ArgumentError) { EnvVariable::DestroyEnvVariable.new(variable).destroy }
       assert variable.reload.kept?
     end
   end
@@ -105,7 +105,7 @@ class SharedAppLifecycleTest < ActiveSupport::TestCase
     Current.source = "api_v1"
     Current.user = nil
     variable = @app.env_variables.new(name: "SHARED_SECRET", value: "shared-secret-only")
-    assert variable.save_and_sync
+    assert EnvVariable::CreateEnvVariable.new(variable).save
     run = @app.server_action_runs.where(action_key: "apps.update_env").order(:id).last
     assert run.reload.api_v1?
     assert_nil run.user
