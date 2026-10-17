@@ -1,18 +1,21 @@
 class Api::V1::DeploymentsController < Api::V1::ApplicationController
+  api_scope "apps:read", only: %i[index show]
+  api_scope "deployments:write", only: :create
+
   before_action :set_app, :set_github_repo, only: [:create]
 
   def index
-    deployments = Current.account.deployments.kept
-    deployments = deployments.where(app_id: params[:app_id]) if params[:app_id].present?
+    set_app
+    deployments = account_deployments.where(app_id: @app.id)
     render json: Api::V1::DeploymentResource.new(deployments)
   end
 
   def show
     deployment = if params[:app_id].present?
       set_app
-      @app.deployments.kept.find(params[:id])
+      account_deployments.where(app_id: @app.id).find(params[:id])
     else
-      Current.account.deployments.kept.find(params[:id])
+      account_deployments.find(params[:id])
     end
 
     render json: Api::V1::DeploymentResource.new(deployment)
@@ -26,6 +29,10 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   end
 
   private
+
+  def account_deployments
+    Current.account.deployments.kept.where(apps: {account_id: Current.account.id})
+  end
 
   def set_app
     @app = Current.account.apps.kept.find(params[:app_id])

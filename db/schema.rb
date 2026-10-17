@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,16 +20,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "api_token_audits", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "api_token_id", null: false
+    t.string "action", null: false
+    t.string "request_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_api_token_audits_on_account_id"
+    t.index ["api_token_id"], name: "index_api_token_audits_on_api_token_id"
+    t.index ["user_id"], name: "index_api_token_audits_on_user_id"
+  end
+
   create_table "api_tokens", force: :cascade do |t|
     t.integer "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
     t.string "name"
     t.boolean "read_only", default: false, null: false
-    t.string "token", null: false
     t.datetime "updated_at", null: false
+    t.string "token_digest", null: false
+    t.bigint "user_id"
+    t.jsonb "scopes", default: ["apps:read"], null: false
+    t.datetime "revoked_at"
+    t.datetime "last_used_at"
     t.index ["account_id"], name: "index_api_tokens_on_account_id"
-    t.index ["token"], name: "index_api_tokens_on_token", unique: true
+    t.index ["token_digest"], name: "index_api_tokens_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
   create_table "apps", force: :cascade do |t|
@@ -556,7 +574,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000000) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "api_token_audits", "accounts"
+  add_foreign_key "api_token_audits", "api_tokens"
+  add_foreign_key "api_token_audits", "users"
   add_foreign_key "api_tokens", "accounts"
+  add_foreign_key "api_tokens", "users"
   add_foreign_key "apps", "accounts"
   add_foreign_key "apps", "projects"
   add_foreign_key "apps", "servers"

@@ -1,4 +1,6 @@
 class Api::V1::AppsController < Api::V1::ApplicationController
+  api_scope "apps:read", only: %i[index show]
+
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
 
   def index
