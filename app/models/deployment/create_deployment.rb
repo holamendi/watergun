@@ -7,17 +7,33 @@ class Deployment::CreateDeployment
   attribute :github_event
 
   validates :app, presence: true
-  validate :validate_commit_sha, if: -> { commit_sha.present? }
+  validate :validate_prerequisites
+  validate :validate_commit_sha, if: -> { errors.empty? }
 
   def save!
     validate!
 
-    deployment = app.deployments.create!(github_event:, **deployment_attributes)
-    ServerAction::Enqueue.call(action: "apps.deploy", target: deployment)
-    deployment
+    Deployment.transaction do
+      deployment = app.deployments.create!(github_event:, **deployment_attributes)
+      ServerAction::Enqueue.call(action: "apps.deploy", target: deployment)
+      deployment
+    end
   end
 
   private
+
+  def validate_prerequisites
+    return unless app
+
+    ServerAction::TargetValidation.app_context!(app)
+    repository = app.github_repo
+    if !repository || repository.repo.blank? || repository.branch.blank?
+      errors.add(:base, "GitHub repository is required")
+    elsif repository.account_id != app.account_id
+      errors.add(:base, "GitHub repository ownership mismatch")
+    end
+    errors.add(:base, "GitHub installation is required") unless app.account.github_installation
+  end
 
   def remote_commit
     @remote_commit ||= if commit_sha.present?
@@ -25,7 +41,7 @@ class Deployment::CreateDeployment
     else
       github_api_client.branch(app.github_repo.repo, app.github_repo.branch).commit
     end
-  rescue Octokit::UnprocessableEntity
+  rescue Octokit::UnprocessableEntity, Octokit::NotFound, Octokit::InvalidRepository
     nil
   end
 

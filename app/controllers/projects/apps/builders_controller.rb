@@ -1,7 +1,6 @@
 class Projects::Apps::BuildersController < Projects::Apps::BaseController
   def update
-    if @app.update(app_params)
-      ServerAction::Enqueue.call(action: "apps.set_builder", target: @app)
+    if @app.update_builder_and_sync(app_params.fetch(:builder, @app.builder))
       render turbo_stream: stream_toast("Builder updated to #{@app.builder}")
     else
       turbo_stream_errors

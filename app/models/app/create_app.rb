@@ -14,8 +14,9 @@ class App::CreateApp
   validates :project, :repo, :branch, presence: true
   validates :webhook_deploy, inclusion: {in: [true, false]}
 
-  validate :validate_remote_repo_exists, if: -> { repo.present? }
-  validate :validate_remote_branch_exists, if: -> { branch.present? }
+  validate :validate_prerequisites
+  validate :validate_remote_repo_exists, if: -> { errors.empty? }
+  validate :validate_remote_branch_exists, if: -> { errors.empty? }
 
   def save
     return false unless valid?
@@ -30,6 +31,13 @@ class App::CreateApp
   end
 
   private
+
+  def validate_prerequisites
+    return unless project
+
+    ServerAction::TargetValidation.app_context!(project)
+    errors.add(:base, "GitHub installation is required") unless account.github_installation
+  end
 
   def create_app!
     self.app = project.apps.create!(

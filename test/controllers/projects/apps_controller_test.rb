@@ -35,6 +35,32 @@ class Projects::AppsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "create uses the shared domain command and registered run" do
+    VCR.use_cassette("github/valid_repo_and_branch") do
+      assert_difference "App.count", 1 do
+        post project_apps_path(@project), params: {create_app: {name: "Shared App", repo: "holamendi/smol-roda", branch: "main"}}
+      end
+    end
+    app = @project.apps.find_by!(name: "Shared App")
+    assert_redirected_to project_app_deployments_path(@project, app)
+    assert_server_action_scheduled("apps.create", server: @project.server, target: app)
+  end
+
+  test "create without installation renders a validation response" do
+    Github::Installation.where(account: @account).destroy_all
+    assert_no_difference ["App.count", "ServerActionRun.count"] do
+      post project_apps_path(@project), params: {create_app: {repo: "example/app", branch: "main"}}
+    end
+    assert_response :unprocessable_content
+  end
+
+  test "delete schedules the shared domain command without premature removal" do
+    delete project_app_path(@project, @app)
+    assert_redirected_to @project
+    assert @app.reload.kept?
+    assert_server_action_scheduled("apps.destroy", server: @app.server, target: @app)
+  end
+
   describe "#index" do
     test "renders app list with project-scoped links" do
       get project_apps_path(@project)
