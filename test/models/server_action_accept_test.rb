@@ -1,6 +1,14 @@
 require "test_helper"
 
 class ServerActionAcceptTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
+  teardown do
+    EnvVariable.delete_all
+    ApiTokenAudit.delete_all
+    ApiToken.delete_all
+  end
+
   setup do
     @app = apps(:domain_test_app)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write", "operations:read"])
@@ -68,6 +76,18 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordNotFound, ServerAction::Accept::Error) { accept(key: "fresh-key") }
   end
 
+  test "a replay rechecks live target and parent ownership without disclosing transferred work" do
+    original = accept
+    @app.update_columns(account_id: accounts(:other).id)
+    error = assert_raises(ServerAction::Accept::Error) { accept }
+    assert_equal "not_found", error.code
+    @app.update_columns(account_id: @token.account_id)
+    @app.project.update_columns(account_id: accounts(:other).id)
+    error = assert_raises(ServerAction::Accept::Error) { accept }
+    assert_equal "not_found", error.code
+    assert_equal original.id, ServerActionRun.where(api_token_id: @token.id).sole.id
+  end
+
   test "the boundary composes shared creation and pins deployment without mutation controllers" do
     create = lambda do
       ServerAction::Accept.call(token: @token, endpoint: "POST /projects/:id/apps", target: @app.project,
@@ -123,6 +143,25 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     @app = @app.project.apps.create!(name: "key-namespace")
     refute_equal first.id, accept(request: {value: nil}).id
     assert_raises(ServerAction::Accept::Error) { accept(key: "invalid key") }
+  end
+
+  test "endpoint namespaces are distinct and shared env services retain encrypted acceptance" do
+    first = accept
+    first.update!(status: :success, finished_at: Time.current)
+    @token.update!(scopes: ["env:write"])
+    run = ServerAction::Accept.call(token: @token, endpoint: "PUT /apps/:id/env", target: @app,
+      key: "test-key", request: {values: {PRIVATE_VALUE: "env-acceptance-sentinel"}}, request_id: "env-request", scope: "env:write") do |app|
+      variable = app.env_variables.new(name: "PRIVATE_VALUE", value: "env-acceptance-sentinel")
+      assert EnvVariable::CreateEnvVariable.new(variable).save
+      app.server_action_runs.order(:id).last
+    end
+    refute_equal first.id, run.id
+    assert_equal "app.env", run.public_operation.fetch(:kind)
+    assert_equal "env-acceptance-sentinel", run.reload.payload.fetch("set").fetch("PRIVATE_VALUE")
+    raw = ServerActionRun.connection.select_one("SELECT * FROM server_action_runs WHERE id = #{run.id}").to_json
+    refute_includes raw, "env-acceptance-sentinel"
+    refute_includes raw, @token.token
+    refute_includes run.public_operation.to_json, "env-acceptance-sentinel"
   end
 
   test "acceptance cannot attach to unrelated existing work or leave extra undispatched mutations" do

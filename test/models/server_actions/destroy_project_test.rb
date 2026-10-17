@@ -5,6 +5,11 @@ require Rails.root.join("app/models/ssh/session")
 class ServerActions::DestroyProjectTest < ActiveSupport::TestCase
   include SshTestHelper
 
+  setup do
+    # These tests exercise deletion/ownership, not overlapping fixture work.
+    server_action_runs(:deploy_running).update!(status: :success, finished_at: Time.current)
+  end
+
   test "destroys a project on its owning server through the job" do
     project = projects(:default)
     server = project.server

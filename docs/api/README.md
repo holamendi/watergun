@@ -146,7 +146,13 @@ no success response implying prerequisites have been established externally.
 
 Mutations require no other in-flight mutation on that app, including UI-driven
 work. Pending app creation, deploy/restart/delete and env changes cannot overlap
-incompatibly. Independent apps remain usable. A not-ready/busy app yields 409
+incompatibly. Parent project deletion cannot bypass child app in-flight or
+uncertain work, and a pending project deletion excludes new child lifecycle work.
+UI and API preparation lock app -> project before writing child rows, matching
+worker status changes that touch the project. Parent deletion locks only the
+project and rejects pending child work; app creation locks its project before
+inserting the new child. No database row locks are retained during SSH execution.
+Independent apps remain usable. A not-ready/busy app yields 409
 operation_conflict; retrying a previously accepted identical key takes precedence
 over this busy check. Restart requires a deployed, usable app. Delete may remove
 a failed app for recovery; no delete during uncertain/in-flight remote work.
@@ -274,6 +280,10 @@ diagnostics may record the bookkeeping error). A crash before the completion
 marker commits remains unknown, not a guessed success. Failed pre-execution token
 revalidation yields failed/authorization_failed; terminal dispatch validation
 failure yields dispatch_failed. No exception text or command output is public.
+Remote success does not guarantee local reconciliation completed before a crash.
+Recovery never blindly reruns success hooks: some perform additional remote reads
+or enqueue related work. A remote-completed delete can require operator repair
+of a retained local app; inspect the run/target before permitting further work.
 Drain old workers before this migration/runner cutover: old binaries do not
 participate in these acceptance/recovery guarantees. No rollout is authorized.
 

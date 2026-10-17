@@ -27,7 +27,7 @@ class ServerAction::Accept
 
   def self.call(token:, endpoint:, target:, key:, request:, request_id:, scope:)
     connection = ServerActionRun.connection
-    if connection.transaction_open? && connection.current_transaction.joinable?
+    if connection.transaction_open?
       raise ArgumentError, "Acceptance must own its commit"
     end
     raise Error, "invalid_request" unless key.is_a?(String) && key.match?(/\A[A-Za-z0-9._:-]{1,128}\z/)
@@ -45,17 +45,26 @@ class ServerAction::Accept
           existing = ServerActionRun.find_by(account_id: token.account_id, api_token_id: token.id, idempotency_digest: identity)
           if existing
             raise Error, "idempotency_conflict" unless existing.request_fingerprint == fingerprint
+          end
+          target = target.class.find_by(id: target.id)
+          if target
+            target.lock! unless target.is_a?(Project)
+            project = target.is_a?(Project) ? target : target.project
+            project.lock!
+            raise Error, "not_found" unless target.is_a?(Project) || target.project_id == project.id
+            raise Error, "not_found" unless target.account_id == token.account_id
+            target.server.lock!
+            begin
+              ServerAction::TargetValidation.app_context!(target, account: token.account, user: token.user)
+            rescue ArgumentError
+              raise Error, "not_found"
+            end
+          elsif !existing
+            raise Error, "not_found"
+          end
+          if existing
             replay = true
             next existing
-          end
-          target = target.class.lock.find(target.id)
-          raise Error, "not_found" unless target.account_id == token.account_id
-          target.project.lock! unless target.is_a?(Project)
-          target.server.lock!
-          begin
-            ServerAction::TargetValidation.app_context!(target, account: token.account, user: token.user)
-          rescue ArgumentError
-            raise Error, "not_found"
           end
           accepted = yield(target)
           unless accepted.is_a?(ServerActionRun) && accepted.persisted? && accepted_runs.size == 1 && accepted_runs.first.id == accepted.id

@@ -60,7 +60,9 @@ class ServerAction::Runner
       @run.server.ssh_session do |session|
         @logs.start(session)
         @action.execute!(session)
-        @run.update_columns(remote_completed_at: Time.current)
+        unless @run.update_columns(remote_completed_at: Time.current)
+          raise ActiveRecord::RecordNotSaved, "Remote completion was not recorded"
+        end
         @action.succeeded!
       end
     rescue Ssh::CommandExecutionError => error
@@ -90,6 +92,9 @@ class ServerAction::Runner
     end
 
     begin
+      # update_columns mutates and clears the attribute before executing SQL.
+      # Only a fresh persisted marker can release uncertain-work exclusion.
+      @run.reload
       @run.update!(status: status, finished_at: Time.current,
         outcome_uncertain: validated && status == :error && !@run.remote_completed_at,
         dispatch_pending_at: nil, public_error_code: public_error(primary, status),

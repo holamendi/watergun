@@ -18,6 +18,7 @@ class ServerActions::DestroyProject
   def validate!
     ServerAction::TargetValidation.call(@run, type: Project, required: %w[project_id])
     (project.apps.to_a + project.services.to_a).each { |child| ServerAction::TargetValidation.ownership!(@run, child) }
+    ServerAction::Conflict.check_project!(project, excluding: @run.id)
   end
 
   def succeeded!

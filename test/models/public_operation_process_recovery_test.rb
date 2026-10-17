@@ -16,8 +16,10 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     connection = ServerActionRun.connection
     connection.execute("DROP TRIGGER IF EXISTS public_operation_queue_unavailable ON solid_queue_jobs")
     connection.execute("DROP FUNCTION IF EXISTS public_operation_queue_unavailable()")
-    SolidQueue::Job.where(class_name: "RunServerActionJob").destroy_all
+    # Release the killed worker's claims before deleting its jobs, so Solid Queue
+    # can release their concurrency semaphores rather than leaking test leases.
     SolidQueue::Process.where(name: "public-operation-crash-#{@app.id}").destroy_all
+    SolidQueue::Job.where(class_name: "RunServerActionJob").destroy_all
     runs = ServerActionRun.where(operation_app_id: @app.id)
     ServerActionLog.where(server_action_run_id: runs.select(:id)).delete_all
     runs.delete_all
@@ -100,6 +102,37 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     assert_equal "succeeded", run.public_operation.fetch(:status)
   end
 
+  test "a real delete action crash after remote completion reports success without replaying local hooks" do
+    run = ServerAction::Accept.call(token: @token, endpoint: "delete", target: @app, key: "delete-crash",
+      request: {}, request_id: "delete-request", scope: "apps:write") do
+      App::DestroyApp.new(@app).destroy
+    end
+    in_process(kill: true) do |pipe|
+      transport = Object.new
+      transport.define_singleton_method(:commands) { [] }
+      transport.define_singleton_method(:execute!) { |_command| }
+      Server.any_instance.stubs(:ssh_session).yields(transport)
+      ServerActionRun.prepend(Module.new do
+        define_method(:update_columns) do |attributes|
+          result = super(attributes)
+          if attributes.key?(:remote_completed_at)
+            pipe.puts("delete-remote-completed")
+            sleep 60
+          end
+          result
+        end
+      end)
+      RunServerActionJob.perform_now(run.id, run.resource_key)
+    end
+    assert run.reload.remote_completed_at
+    assert_equal "deleting", @app.reload.status
+    Net::SSH.expects(:start).never
+    ServerAction::Recovery.recover(run)
+    assert_equal "succeeded", run.reload.public_operation.fetch(:status)
+    assert_nil run.public_operation.fetch(:error)
+    assert App.exists?(@app.id), "Local repair is explicit; recovery must not replay arbitrary success hooks"
+  end
+
   test "after commit notification failure cannot hide committed acceptance or lose dispatch" do
     ServerActionRun.any_instance.stubs(:broadcast_action_later_to).raises(IOError, "private-notification")
     run = accept
@@ -109,9 +142,11 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
   end
 
   test "acceptance refuses an enclosing caller transaction which could roll back a returned result" do
-    ServerActionRun.transaction do
-      assert_raises(ArgumentError) { accept }
-      assert_equal 0, ServerActionRun.where(operation_app_id: @app.id).count
+    [true, false].each do |joinable|
+      ServerActionRun.transaction(joinable: joinable) do
+        assert_raises(ArgumentError) { accept }
+        assert_equal 0, ServerActionRun.where(operation_app_id: @app.id).count
+      end
     end
   end
 

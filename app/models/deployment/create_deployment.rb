@@ -13,7 +13,7 @@ class Deployment::CreateDeployment
   def save!
     validate!
 
-    Deployment.transaction do
+    ServerAction::Conflict.with_app_lock(app) do
       deployment = app.deployments.create!(github_event:, **deployment_attributes)
       ServerAction::Enqueue.call(action: "apps.deploy", target: deployment)
       deployment

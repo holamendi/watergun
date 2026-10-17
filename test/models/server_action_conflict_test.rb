@@ -31,10 +31,41 @@ class ServerActionConflictTest < ActiveSupport::TestCase
     @app.update!(builder: :herokuish)
     ServerAction::Enqueue.call(action: "apps.restart", target: @app)
     assert_no_difference "EnvVariable.count" do
-      assert_raises(ServerAction::Conflict::Error) { @app.env_variables.new(name: "BUSY_TEST", value: "private").save_and_sync }
+      assert_raises(ServerAction::Conflict::Error) { EnvVariable::CreateEnvVariable.new(@app.env_variables.new(name: "BUSY_TEST", value: "private")).save }
     end
-    assert_raises(ServerAction::Conflict::Error) { @app.update_builder_and_sync("dockerfile") }
+    assert_raises(ServerAction::Conflict::Error) { App::SetAppBuilder.new(app: @app, builder: "dockerfile").save }
     assert_equal "herokuish", @app.reload.builder
+    variable = @app.env_variables.create!(name: "BUSY_EXISTING", value: "original")
+    variable.value = "changed"
+    assert_raises(ServerAction::Conflict::Error) { EnvVariable::UpdateEnvVariable.new(variable).save }
+    assert_equal "original", variable.reload.value
+    assert_raises(ServerAction::Conflict::Error) { EnvVariable::DestroyEnvVariable.new(variable).destroy }
+    assert variable.reload.kept?
+  end
+
+  test "project deletion cannot bypass pending running or uncertain child app exclusion" do
+    project = Project.create!(server: @app.server, account: @app.account, name: "isolated-project-exclusion")
+    @app = project.apps.create!(server: project.server, name: "child-app")
+    %w[queued running error].each do |status|
+      run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+      run.update!(status: status, outcome_uncertain: status == "error")
+      assert_raises(ServerAction::Conflict::Error) { Project::DestroyProject.new(@app.project).destroy }
+      assert @app.project.reload.kept?
+      run.update!(status: :success, outcome_uncertain: false)
+    end
+  end
+
+  test "queued project deletion rejects new app work and legacy project work cannot run over a busy app" do
+    project = Project.create!(server: @app.server, account: @app.account, name: "isolated-project-queue")
+    @app = project.apps.create!(server: project.server, name: "child-app")
+    project_run = ServerAction::Enqueue.call(action: "projects.destroy", target: @app.project)
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
+    project_run.update!(status: :success)
+    ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+    project_run.update!(status: :queued)
+    Net::SSH.expects(:start).never
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Runner.new(project_run).call }
+    assert project_run.reload.error?
   end
 
   test "ownership changing after initial resolution is revalidated under the acceptance lock" do

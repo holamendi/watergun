@@ -1,7 +1,15 @@
 require "test_helper"
 
 class ServerActionRecoveryTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
   setup { @app = apps(:domain_test_app) }
+
+  teardown do
+    ServerActionLog.delete_all
+    ApiTokenAudit.delete_all
+    ApiToken.delete_all
+  end
 
   test "durable unsent obligation is dispatched after queue recovery and terminal invalid dispatch is visible" do
     run = Current.set(accepting_server_action: true) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
@@ -45,6 +53,31 @@ class ServerActionRecoveryTest < ActiveSupport::TestCase
     ServerAction::Recovery.call
     assert run.reload.success?
     refute run.outcome_uncertain?
+  end
+
+  test "completion marker SQL failure keeps durable uncertainty despite dirty in memory evidence" do
+    run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+    connection = ServerActionRun.connection
+    connection.execute(<<~SQL)
+      CREATE FUNCTION public_operation_marker_unavailable() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.remote_completed_at IS NOT NULL AND OLD.remote_completed_at IS NULL THEN
+          RAISE EXCEPTION 'test completion marker unavailable';
+        END IF;
+        RETURN NEW;
+      END $$
+    SQL
+    connection.execute("CREATE TRIGGER public_operation_marker_unavailable BEFORE UPDATE ON server_action_runs FOR EACH ROW EXECUTE FUNCTION public_operation_marker_unavailable()")
+    Server.any_instance.stubs(:ssh_session).yields(stub(commands: [], execute!: nil))
+    assert_raises(ActiveRecord::StatementInvalid) { ServerAction::Runner.new(run).call }
+    assert_nil run.reload.remote_completed_at
+    assert run.error?
+    assert run.outcome_uncertain?
+    assert_equal "outcome_unknown", run.public_operation.dig(:error, :code)
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
+  ensure
+    connection&.execute("DROP TRIGGER IF EXISTS public_operation_marker_unavailable ON server_action_runs")
+    connection&.execute("DROP FUNCTION IF EXISTS public_operation_marker_unavailable()")
   end
 
   test "revocation of a queued API operation prevents SSH" do

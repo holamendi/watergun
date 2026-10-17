@@ -9,7 +9,7 @@ class App::SetAppBuilder
     @app.builder = @builder
     return false unless @app.valid?
 
-    App.transaction do
+    ServerAction::Conflict.with_app_lock(@app) do
       @app.save!
       ServerAction::Enqueue.call(action: "apps.set_builder", target: @app)
     end

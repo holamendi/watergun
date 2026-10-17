@@ -4,8 +4,11 @@ class Project::DestroyProject
   end
 
   def destroy
-    ServerAction::Enqueue.build(action: "projects.destroy", target: @project)
-    @project.discard
-    ServerAction::Enqueue.call(action: "projects.destroy", target: @project)
+    Project.transaction do
+      @project.lock!
+      run = ServerAction::Enqueue.call(action: "projects.destroy", target: @project)
+      @project.discard!
+      run
+    end
   end
 end

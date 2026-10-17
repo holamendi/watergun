@@ -2,6 +2,13 @@ require "test_helper"
 require "json_schemer"
 
 class Api::V1::OperationsControllerTest < ActionDispatch::IntegrationTest
+  self.use_transactional_tests = false
+
+  teardown do
+    ApiTokenAudit.delete_all
+    ApiToken.delete_all
+  end
+
   setup do
     @app = apps(:domain_test_app)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write", "operations:read"])
