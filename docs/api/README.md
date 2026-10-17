@@ -60,6 +60,36 @@ Check current authorization even on idempotent replays, before returning stored
 results. Revocation before execution must prevent not-yet-started API work;
 revocation cannot undo work already running remotely.
 
+Token management uses the existing signed browser session and Rails CSRF
+protection, never bearer-only authentication. JSON routes (not `/api/v1`) are:
+GET/POST /account/api_tokens, GET/DELETE /account/api_tokens/:id, POST
+/account/api_tokens/:id/rotate, and POST /account/api_tokens/claim. Issuance and
+rotation accept {"api_token":{"name":"automation","scopes":["apps:read"],
+"read_only":true,"expires_at":"2027-01-01T00:00:00Z"}}; name and explicit scopes
+are required. Omitted expiry defaults to one year, with issuance bounded to a
+future instant within one year. Responses use api_token/api_tokens metadata;
+only a successful 201 issuance/rotation also returns secret. Responses are
+no-store. DELETE revokes instead of destroying history; repeating it is safe.
+An invalid/failed rotation leaves the old token usable and creates no replacement.
+Creation, claim, rotation and revocation audit rows commit with their mutation.
+
+Historical tokens have no recorded owner. The migration leaves user_id NULL
+rather than assigning an arbitrary account member. A signed-in account member
+who already possesses the exact legacy secret can claim it with {"token":"..."}
+at the claim endpoint, then list/revoke/rotate it. Claim returns metadata only,
+preserves expiry/read_only/read-only scopes, and cannot transfer an owned token
+or a foreign-account token. Newly issued tokens belong to the signed-in user;
+other account members cannot list or manage them. Removing an owner's membership
+invalidates their owned tokens. New bearer secrets use a high-entropy wg_ prefix;
+legacy secrets are hashed as-is rather than normalized or regenerated.
+
+Rollout prerequisite: drain/stop old application and worker processes before the
+digest migration and restart only the new revision. Old code expects the removed
+plaintext column. Digest conversion is intentionally irreversible: rollback
+cannot recover original secrets, and no secret-bearing backup is created by the
+migration. Historical backups/logs are not retroactively sanitized. This is a
+deployment requirement, not authorization to deploy or alter production.
+
 Every lookup starts at the authenticated account, including operation IDs,
 log cursors and nested parent-child relationships. A wrong-account, missing,
 deleted or wrong-parent ID yields indistinguishable 404. An authenticated token

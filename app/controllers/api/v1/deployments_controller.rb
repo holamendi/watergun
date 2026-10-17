@@ -1,9 +1,12 @@
 class Api::V1::DeploymentsController < Api::V1::ApplicationController
+  api_scope "apps:read", only: %i[index show]
+  api_scope "deployments:write", only: :create
+
   before_action :set_app, :set_github_repo, only: [:create]
 
   def index
-    deployments = Current.account.deployments.kept
-    deployments = deployments.where(app_id: params[:app_id]) if params[:app_id].present?
+    set_app
+    deployments = @app.deployments.kept
     render json: Api::V1::DeploymentResource.new(deployments)
   end
 

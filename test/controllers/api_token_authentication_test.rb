@@ -41,4 +41,24 @@ class ApiTokenAuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :unauthorized
   end
+
+  test "revoked tokens and insufficient scopes are rejected through HTTP" do
+    token = accounts(:default).api_tokens.create!(scopes: [])
+    headers = {"Authorization" => "Bearer #{token.token}"}
+    get api_v1_app_ping_url(apps(:smol_roda)), headers: headers
+    assert_response :forbidden
+    assert_equal "forbidden", json_response.dig("error", "code")
+
+    token.update!(scopes: ["apps:read"], revoked_at: Time.current)
+    get api_v1_app_ping_url(apps(:smol_roda)), headers: headers
+    assert_response :unauthorized
+    assert_equal "unauthorized", json_response.dig("error", "code")
+  end
+
+  test "removed owner membership invalidates owned token authentication" do
+    token = accounts(:default).api_tokens.create!(user: users(:bobby))
+    Membership.where(user: users(:bobby), account: accounts(:default)).delete_all
+    get "/api/v1/apps", headers: {"Authorization" => "Bearer #{token.token}"}
+    assert_response :unauthorized
+  end
 end
