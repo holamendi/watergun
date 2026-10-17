@@ -23,6 +23,9 @@ class ServerActions::DeployApp
   def validate!
     ServerAction::TargetValidation.call(@run, type: Deployment, required: %w[dokku_app_id])
     ServerAction::TargetValidation.app_context!(app, account:, user:)
+    if payload.key?("builder") && !server.available_dokku_builders.key?(payload["builder"])
+      raise ArgumentError, "Unsupported builder"
+    end
   end
 
   def succeeded!
@@ -64,6 +67,7 @@ class ServerActions::DeployApp
     deployment.deploying!
     app.deploying!
     broadcast_deployment_update
+    ssh.execute!(Dokku::Builder::SetCommand.new(app: dokku_app_id, builder: payload.fetch("builder"))) if payload.key?("builder")
     authenticate_github_account!
     sync_git_repo!
     rebuild_dokku_app!

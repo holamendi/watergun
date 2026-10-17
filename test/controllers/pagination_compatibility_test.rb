@@ -28,11 +28,12 @@ class PaginationCompatibilityTest < ActionDispatch::IntegrationTest
     assert_empty json_response.fetch("apps")
   end
 
-  test "out-of-range API pages still raise rather than silently clamp" do
+  test "public contract returns an empty valid page without silently clamping" do
     token = accounts(:default).api_tokens.create!
-    assert_raises(Pagy::RangeError) do
-      get "/api/v1/apps", params: {page: 999}, headers: {"Authorization" => "Bearer #{token.token}"}
-    end
+    get "/api/v1/apps", params: {page: 999}, headers: {"Authorization" => "Bearer #{token.token}"}
+    assert_response :ok
+    assert_equal "999", response.headers["Current-Page"]
+    assert_empty json_response.fetch("apps")
   end
 
   test "long pagination retains the seven-slot window" do

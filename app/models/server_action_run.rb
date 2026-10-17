@@ -25,21 +25,14 @@ class ServerActionRun < ApplicationRecord
 
   PUBLIC_ERRORS = %w[dispatch_failed remote_failed outcome_unknown authorization_failed].freeze
 
-  def public_operation
-    public_status = if (remote_completed_at && finished_at) || success?
+  def public_status
+    if (remote_completed_at && finished_at) || success?
       "succeeded"
     elsif queued? || running?
       status
     else
       "failed"
     end
-    code = public_error_code || "remote_failed"
-    code = "outcome_unknown" unless PUBLIC_ERRORS.include?(code)
-    {id: id, kind: PUBLIC_KINDS.fetch(action_key), status: public_status,
-     app_id: operation_app_id, deployment_id: operation_deployment_id, request_id: request_id,
-     created_at: created_at.utc.iso8601(6), started_at: running_at&.utc&.iso8601(6),
-     finished_at: finished_at&.utc&.iso8601(6),
-     error: (public_status == "failed") ? {code: code, message: code.humanize} : nil}
   end
 
   def filtered_payload

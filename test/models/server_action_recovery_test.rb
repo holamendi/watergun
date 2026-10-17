@@ -47,8 +47,8 @@ class ServerActionRecoveryTest < ActiveSupport::TestCase
     Server.any_instance.stubs(:ssh_session).yields(stub(commands: [])).raises(IOError, "private-bookkeeping")
     assert_raises(IOError) { ServerAction::Runner.new(run).call }
     assert run.reload.remote_completed_at
-    assert_equal "succeeded", run.public_operation.fetch(:status)
-    assert_nil run.public_operation.fetch(:error)
+    assert_equal "succeeded", Api::V1::OperationResource.new(run).to_h.fetch("status")
+    assert_nil Api::V1::OperationResource.new(run).to_h.fetch("error")
     run.update!(status: :running, finished_at: nil)
     ServerAction::Recovery.call
     assert run.reload.success?
@@ -73,7 +73,7 @@ class ServerActionRecoveryTest < ActiveSupport::TestCase
     assert_nil run.reload.remote_completed_at
     assert run.error?
     assert run.outcome_uncertain?
-    assert_equal "outcome_unknown", run.public_operation.dig(:error, :code)
+    assert_equal "outcome_unknown", Api::V1::OperationResource.new(run).to_h.deep_symbolize_keys.dig(:error, :code)
     assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
   ensure
     connection&.execute("DROP TRIGGER IF EXISTS public_operation_marker_unavailable ON server_action_runs")

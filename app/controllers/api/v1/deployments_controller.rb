@@ -2,12 +2,10 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   api_scope "apps:read", only: %i[index show]
   api_scope "deployments:write", only: :create
 
-  before_action :set_app, :set_github_repo, only: [:create]
-
   def index
     set_app
-    deployments = account_deployments.where(app_id: @app.id)
-    render json: Api::V1::DeploymentResource.new(deployments)
+    deployments = page_records(account_deployments.where(app_id: @app.id))
+    render json: Api::V1::DeploymentResource.new(deployments) unless performed?
   end
 
   def show
@@ -22,10 +20,37 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   end
 
   def create
-    deployment = Deployment::Creator.new(app: @app, commit_sha: params[:sha]).create!
-    render json: Api::V1::DeploymentResource.new(deployment), status: :created
-  rescue ActiveModel::ValidationError => e
-    render json: {errors: e.model.errors.messages}, status: :unprocessable_content
+    body = mutation_body
+    return if performed?
+    raise ServerAction::Accept::Error, "invalid_request" unless (body.keys - %w[sha]).empty?
+    if body.key?("sha") && !(body["sha"].is_a?(String) && body["sha"].match?(/\A[0-9a-fA-F]{40}\z/))
+      raise ServerAction::Accept::Error, "validation_failed"
+    end
+    prepare = lambda do
+      app = account_apps.find(request.path_parameters[:app_id])
+      usable_app!(app)
+      source_prerequisites!(app)
+      snapshot = source_snapshot(app)
+      begin
+        app.account.github_installation.api_client.repo(app.github_repo.repo)
+      rescue Octokit::NotFound, Octokit::InvalidRepository
+        raise ServerAction::Accept::Error, "prerequisite_missing"
+      end
+      command = Deployment::CreateDeployment.new(app: app, commit_sha: body["sha"], builder: app.builder)
+      raise ServerAction::Accept::Error, "validation_failed" unless command.valid?
+      [command, snapshot]
+    end
+    accept_operation(App.new(id: request.path_parameters[:app_id]), endpoint: "POST /api/v1/apps/:app_id/deployments",
+      body: body, scope: "deployments:write", prepare: prepare) do |app, prepared|
+      command, snapshot = prepared
+      usable_app!(app)
+      source_prerequisites!(app)
+      raise ServerAction::Conflict::Error unless source_snapshot(app) == snapshot
+      command.app = app
+      command.save!.server_action_run
+    end
+  rescue Octokit::Error, Faraday::Error
+    raise ServerAction::Accept::Error, "unavailable"
   end
 
   private
@@ -35,14 +60,14 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
   end
 
   def set_app
-    @app = Current.account.apps.kept.find(params[:app_id])
+    @app = account_apps.find(params[:app_id])
   end
 
-  def set_github_repo
-    @github_repo = @app.github_repo
-
-    unless @github_repo.present?
-      render json: {errors: ["Github repo not found"]}, status: :not_found
+  def source_snapshot(app)
+    repo = app.github_repo
+    unless repo && repo.account_id == Current.account.id && repo.repo.present? && repo.branch.present? && app.server.available_dokku_builders.key?(app.builder)
+      raise ServerAction::Accept::Error, "prerequisite_missing"
     end
+    [repo.id, repo.repo, repo.branch, app.builder, app.account.github_installation.id]
   end
 end
