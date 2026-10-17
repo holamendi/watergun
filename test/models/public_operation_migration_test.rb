@@ -3,8 +3,15 @@ require Rails.root.join("db/migrate/20261017134000_add_public_operation_acceptan
 
 class PublicOperationMigrationTest < ActiveSupport::TestCase
   test "populated upgrade preserves encrypted history and enforces atomic key uniqueness" do
+    # Exercise the same cold model-schema boundary regardless of test order.
+    ServerActionRun.reset_column_information
     connection = ActiveRecord::Base.connection
     original = connection.schema_search_path
+    # Resolve the real encrypted type before exposing a deliberately minimal
+    # historical table to this connection. It has no runtime enum columns.
+    payload_type = ServerActionRun.type_for_attribute("payload")
+    payload = {"set" => {"PRIVATE_KEY" => "migration-test-secret"}}
+    ciphertext = payload_type.serialize(payload)
     schema = "public_operation_migration_#{Process.pid}_#{SecureRandom.hex(4)}"
     connection.execute("CREATE SCHEMA #{schema}")
     connection.schema_search_path = schema
@@ -15,11 +22,11 @@ class PublicOperationMigrationTest < ActiveSupport::TestCase
       t.string :status
       t.text :payload
     end
-    ciphertext = ServerActionRun.type_for_attribute("payload").serialize({"set" => {"PRIVATE_KEY" => "migration-test-secret"}})
     connection.execute("INSERT INTO server_action_runs (id, account_id, action_key, status, payload) VALUES (7, 1, 'apps.update_env', 'success', #{connection.quote(ciphertext)})")
     AddPublicOperationAcceptanceToServerActionRuns.new.migrate(:up)
     row = connection.select_one("SELECT * FROM server_action_runs WHERE id = 7")
     assert_equal ciphertext, row.fetch("payload")
+    assert_equal payload, payload_type.deserialize(row.fetch("payload"))
     refute_includes row.fetch("payload"), "migration-test-secret"
     assert_equal "success", row.fetch("status")
     assert_equal false, row.fetch("outcome_uncertain")
@@ -39,5 +46,6 @@ class PublicOperationMigrationTest < ActiveSupport::TestCase
     connection.schema_search_path = original
     connection.execute("DROP SCHEMA IF EXISTS #{schema} CASCADE")
     connection.schema_cache.clear!
+    ServerActionRun.reset_column_information
   end
 end

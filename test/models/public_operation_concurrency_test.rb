@@ -156,6 +156,60 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
     end
   end
 
+  %i[create update unset].each do |mutation|
+    test "pull env reconciliation cannot invert #{mutation} preparation app and child locks" do
+      variable = @app.env_variables.create!(name: "PULL_RACE", value: "original")
+      exported = (mutation == :unset) ? [] : [{"name" => "REMOTE_RACE", "value" => "pull-reconciliation-secret"}]
+      entered = Queue.new
+      worker = nil
+      @app.with_lock do
+        connection = ServerActionRun.connection
+        connection.execute("SET LOCAL lock_timeout = '500ms'")
+        worker = Thread.new do
+          ServerActionRun.connection_pool.with_connection do |other|
+            run = ServerAction::Enqueue.build(action: "apps.pull_env", target: App.find(@app.id))
+            transport = Object.new
+            transport.define_singleton_method(:execute!) do |_command|
+              raise "SSH held database locks" if other.transaction_open?
+              entered << other.select_value("SELECT pg_backend_pid()")
+              Struct.new(:parsed_output).new(exported)
+            end
+            ServerActions::PullEnv.new(run).execute!(transport)
+          end
+        end
+        pid = Timeout.timeout(10) { entered.pop }
+        refute_equal pid, connection.select_value("SELECT pg_backend_pid()")
+        Timeout.timeout(10) do
+          loop do
+            connection.execute("SELECT pg_stat_clear_snapshot()")
+            break if connection.select_value("SELECT wait_event_type = 'Lock' FROM pg_stat_activity WHERE pid = #{pid.to_i}")
+            worker.value unless worker.alive?
+            Thread.pass
+          end
+        end
+        if mutation == :create
+          created = @app.env_variables.new(name: "CREATED_RACE", value: "created")
+          assert EnvVariable::CreateEnvVariable.new(created).save
+        elsif mutation == :update
+          variable.value = "changed"
+          assert EnvVariable::UpdateEnvVariable.new(variable).save
+        else
+          EnvVariable::DestroyEnvVariable.new(variable).destroy
+          assert variable.reload.discarded?
+        end
+      end
+      worker.value
+      assert_equal 1, ServerActionRun.where(target: @app, action_key: "apps.update_env").count
+      if exported.any?
+        synced = @app.env_variables.find_by!(name: "REMOTE_RACE")
+        assert_equal "pull-reconciliation-secret", synced.value
+        refute_includes synced.value_before_type_cast, "pull-reconciliation-secret"
+      end
+    ensure
+      worker&.join(10) || worker&.kill
+    end
+  end
+
   test "live running resource is not recovered while its real worker advisory lock is held" do
     run = accept
     run.update!(status: :running, running_at: Time.current)
