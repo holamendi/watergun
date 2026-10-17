@@ -148,6 +148,17 @@ class Projects::Apps::EnvVariablesControllerTest < ActionDispatch::IntegrationTe
     assert_equal ["SHARED_EXAMPLE"], run.payload["unset"]
   end
 
+  test "invalid creation renders record errors and retains the submitted form" do
+    assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
+      post project_app_env_variables_path(@project, @app),
+        params: {env_variable: {name: "INVALID-NAME", value: ""}}, as: :turbo_stream
+    end
+    assert_response :unprocessable_content
+    assert_select "input[name='env_variable[name]'][value='INVALID-NAME']"
+    assert_includes response.body, "is invalid"
+    assert_includes response.body, "can&#39;t be blank"
+  end
+
   test "enqueue validation failure rolls back environment creation and deletion" do
     variable = @app.env_variables.create!(name: "EXISTING", value: "example-only")
     ServerAction::Enqueue.stubs(:build).raises(ArgumentError, "Rejected action")
