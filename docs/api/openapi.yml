@@ -1,0 +1,455 @@
+openapi: 3.1.0
+info:
+  title: Watergun public API
+  version: 1.0.0
+  description: >-
+    First-release target contract. Only app/deployment reads and nested ping exist
+    at the contract milestone (#71); mutations and policy are delivered by #72–#78.
+    See README.md for compatibility and normative lifecycle/security rules.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/projects:
+    get:
+      operationId: listProjects
+      summary: List account projects across servers
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      parameters: &pages
+        - {$ref: '#/components/parameters/Page'}
+        - {$ref: '#/components/parameters/Limit'}
+      responses:
+        '200':
+          description: Projects ordered by ascending numeric ID
+          headers: &listHeaders
+            X-Request-ID: {$ref: '#/components/headers/RequestId'}
+            Link: {$ref: '#/components/headers/Link'}
+            Total-Pages: {$ref: '#/components/headers/TotalPages'}
+            Current-Page: {$ref: '#/components/headers/CurrentPage'}
+            Page-Items: {$ref: '#/components/headers/PageItems'}
+            Total-Count: {$ref: '#/components/headers/TotalCount'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Projects'}
+        '400': &badRequest {$ref: '#/components/responses/BadRequest'}
+        '401': &unauthorized {$ref: '#/components/responses/Unauthorized'}
+        '403': &forbidden {$ref: '#/components/responses/Forbidden'}
+        '404': &notFound {$ref: '#/components/responses/NotFound'}
+        '429': &rateLimited {$ref: '#/components/responses/RateLimited'}
+  /api/v1/projects/{id}/apps:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: listProjectApps
+      summary: List apps on the project's explicit server
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      parameters: *pages
+      responses:
+        '200': &appsResponse
+          description: Apps ordered by ascending numeric ID
+          headers: *listHeaders
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Apps'}
+        '400': *badRequest
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+    post:
+      operationId: createApp
+      summary: Create a GitHub-backed app, not a deployment
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:write
+      parameters: &mutationParameters [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AppCreate'}
+      responses: &mutationResponses
+        '202':
+          description: Durably accepted, NOT confirmation of remote completion
+          headers:
+            Location: {description: Relative URL of the accepted operation, schema: {type: string, pattern: '^/api/v1/operations/[0-9]+$'}}
+            Retry-After: {$ref: '#/components/headers/RetryAfter'}
+            X-Request-ID: {$ref: '#/components/headers/RequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/OperationEnvelope'}
+        '400': *badRequest
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '409': {$ref: '#/components/responses/Conflict'}
+        '413': {$ref: '#/components/responses/TooLarge'}
+        '415': {$ref: '#/components/responses/UnsupportedMedia'}
+        '422': {$ref: '#/components/responses/Validation'}
+        '429': *rateLimited
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /api/v1/apps:
+    get:
+      operationId: listApps
+      summary: Compatible account-wide app listing
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      parameters: *pages
+      responses:
+        '200': *appsResponse
+        '400': *badRequest
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+  /api/v1/apps/{id}:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: getApp
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      responses:
+        '200':
+          description: App metadata; no deploy token or environment values
+          headers: &requestHeader {X-Request-ID: {$ref: '#/components/headers/RequestId'}}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AppEnvelope'}
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+    delete:
+      operationId: deleteApp
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:write
+      parameters: *mutationParameters
+      responses: *mutationResponses
+  /api/v1/apps/{id}/ping:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: ping
+      summary: Compatible authentication probe; does not resolve the app ID
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      responses:
+        '200':
+          description: Token authenticated; not an app readiness check
+          headers: *requestHeader
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Pong'}
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+  /api/v1/apps/{id}/env:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    put:
+      operationId: writeEnv
+      summary: Atomically accept a write-only configuration batch
+      security: [{bearerAuth: []}]
+      x-required-scope: env:write
+      parameters: *mutationParameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/EnvWrite'}
+      responses: *mutationResponses
+  /api/v1/apps/{app_id}/deployments:
+    parameters: [{$ref: '#/components/parameters/AppId'}]
+    get:
+      operationId: listDeployments
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      parameters: *pages
+      responses:
+        '200':
+          description: Deployments ordered by ascending numeric ID
+          headers: *listHeaders
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Deployments'}
+        '400': *badRequest
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+    post:
+      operationId: createDeployment
+      summary: Deploy configured branch HEAD or a specified GitHub commit
+      security: [{bearerAuth: []}]
+      x-required-scope: deployments:write
+      parameters: *mutationParameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DeploymentCreate'}
+      responses: *mutationResponses
+  /api/v1/apps/{app_id}/deployments/{id}:
+    parameters: &deploymentIds
+      - {$ref: '#/components/parameters/AppId'}
+      - {$ref: '#/components/parameters/Id'}
+    get:
+      operationId: getDeployment
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:read
+      responses:
+        '200':
+          description: Deployment with existing numeric ID and status vocabulary
+          headers: *requestHeader
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/DeploymentEnvelope'}
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '429': *rateLimited
+  /api/v1/apps/{app_id}/deployments/{id}/logs:
+    parameters: *deploymentIds
+    get:
+      operationId: getDeploymentLogs
+      security: [{bearerAuth: []}]
+      x-required-scope: logs:read
+      parameters:
+        - {name: after, in: query, schema: {type: integer, minimum: 0, default: 0}, description: Exclusive monotonically increasing log-entry cursor}
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 50}}
+      responses:
+        '200':
+          description: Bounded retained redacted log entries; complete=false while incomplete
+          headers: *requestHeader
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Logs'}
+        '400': *badRequest
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '410': {$ref: '#/components/responses/Gone'}
+        '429': *rateLimited
+  /api/v1/apps/{id}/restarts:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: restartApp
+      security: [{bearerAuth: []}]
+      x-required-scope: apps:write
+      parameters: *mutationParameters
+      responses: *mutationResponses
+  /api/v1/operations/{id}:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: getOperation
+      security: [{bearerAuth: []}]
+      x-required-scope: operations:read
+      responses:
+        '200':
+          description: Retained operation including after successful app deletion
+          headers:
+            X-Request-ID: {$ref: '#/components/headers/RequestId'}
+            Retry-After: {$ref: '#/components/headers/RetryAfter'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/OperationEnvelope'}
+        '401': *unauthorized
+        '403': *forbidden
+        '404': *notFound
+        '410': {$ref: '#/components/responses/Gone'}
+        '429': *rateLimited
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, description: 'Opaque personal/service token, transmitted only over HTTPS'}
+  parameters:
+    Id: {name: id, in: path, required: true, schema: {type: integer, minimum: 1}}
+    AppId: {name: app_id, in: path, required: true, schema: {type: integer, minimum: 1}}
+    Page: {name: page, in: query, schema: {type: integer, minimum: 1, default: 1}}
+    Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Owner-token and method/target scoped opaque key retained at least 30 days after terminal completion
+      schema: {type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9._:-]+$'}
+  headers:
+    RequestId: {description: Server-generated correlation ID, schema: {type: string, minLength: 1, maxLength: 128}}
+    RetryAfter: {description: Minimum seconds before the next poll or retry (default polling interval 2 seconds), schema: {type: integer, minimum: 1}}
+    Link: {description: RFC 8288 pagination links, schema: {type: string}}
+    TotalPages: {description: Number of available pages, schema: {type: integer, minimum: 1}}
+    CurrentPage: {description: Current page, schema: {type: integer, minimum: 1}}
+    PageItems: {description: Requested page size, schema: {type: integer, minimum: 1, maximum: 100}}
+    TotalCount: {description: Number of available resources, schema: {type: integer, minimum: 0}}
+  responses:
+    BadRequest:
+      description: Malformed JSON, query, header or unknown request field (invalid_request)
+      headers: *requestHeader
+      content: &errorContent
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorEnvelope'}
+    Unauthorized: {description: 'Missing/invalid/expired/revoked token (unauthorized); legacy empty or plain-text 401 bodies remain accepted by compatibility clients', headers: {X-Request-ID: {$ref: '#/components/headers/RequestId'}, WWW-Authenticate: {schema: {type: string}}}, content: *errorContent}
+    Forbidden: {description: 'Valid token lacks scope or is read-only (forbidden)', headers: *requestHeader, content: *errorContent}
+    NotFound: {description: 'Absent, deleted, foreign-account or wrong-parent resource (not_found)', headers: *requestHeader, content: *errorContent}
+    Conflict: {description: 'Resource busy/not ready (operation_conflict), missing prerequisites (prerequisite_missing), or key reused with different payload (idempotency_conflict)', headers: *requestHeader, content: *errorContent}
+    TooLarge: {description: Request body exceeds 64 KiB (request_too_large), headers: *requestHeader, content: *errorContent}
+    UnsupportedMedia: {description: Mutation body is not application/json (unsupported_media_type), headers: *requestHeader, content: *errorContent}
+    Validation: {description: Well-formed but invalid values (validation_failed), headers: *requestHeader, content: *errorContent}
+    RateLimited: {description: Rate exceeded (rate_limited), headers: {X-Request-ID: {$ref: '#/components/headers/RequestId'}, Retry-After: {$ref: '#/components/headers/RetryAfter'}}, content: *errorContent}
+    Unavailable: {description: Durable acceptance could not be committed (unavailable); no 202 claim, headers: *requestHeader, content: *errorContent}
+    Gone: {description: Owner-scoped retained tombstone with expired diagnostics (expired); unknown/foreign IDs remain 404, headers: *requestHeader, content: *errorContent}
+  schemas:
+    Id: {type: integer, minimum: 1}
+    Timestamp: {type: string, format: date-time, pattern: 'Z$'}
+    NullableTimestamp: {anyOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+    LegacyTimestamp:
+      description: Existing Alba UTC time strings remain supported without silent format changes
+      anyOf:
+        - {$ref: '#/components/schemas/Timestamp'}
+        - {type: string, pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)? UTC$'}
+    NullableLegacyTimestamp: {anyOf: [{$ref: '#/components/schemas/LegacyTimestamp'}, {type: 'null'}]}
+    GithubRepo:
+      type: object
+      additionalProperties: false
+      required: [repo, branch, private]
+      properties:
+        repo: {type: string}
+        branch: {type: string}
+        private: {type: boolean}
+    App:
+      type: object
+      additionalProperties: false
+      required: [id, name, dokku_id, created_at, updated_at, github_repo, deployment]
+      properties:
+        id: {$ref: '#/components/schemas/Id'}
+        name: {type: string}
+        dokku_id: {type: string}
+        created_at: {$ref: '#/components/schemas/LegacyTimestamp'}
+        updated_at: {$ref: '#/components/schemas/LegacyTimestamp'}
+        github_repo: {anyOf: [{$ref: '#/components/schemas/GithubRepo'}, {type: 'null'}]}
+        deployment: {anyOf: [{$ref: '#/components/schemas/Deployment'}, {type: 'null'}]}
+        status: {type: string, enum: [pending, active, deploying, restarting, scaling, stopping, deleting, deleted, error]}
+        project_id: {$ref: '#/components/schemas/Id'}
+        server_id: {$ref: '#/components/schemas/Id'}
+        url: {type: [string, 'null'], format: uri}
+        env_names: {type: array, items: {type: string}, uniqueItems: true}
+    Apps: {type: object, required: [apps], properties: {apps: {type: array, maxItems: 100, items: {$ref: '#/components/schemas/App'}}}}
+    AppEnvelope: {type: object, required: [app], properties: {app: {$ref: '#/components/schemas/App'}}}
+    Project:
+      type: object
+      additionalProperties: false
+      required: [id, name, server_id, created_at, updated_at]
+      properties:
+        id: {$ref: '#/components/schemas/Id'}
+        name: {type: string}
+        server_id: {$ref: '#/components/schemas/Id'}
+        created_at: {$ref: '#/components/schemas/Timestamp'}
+        updated_at: {$ref: '#/components/schemas/Timestamp'}
+    Projects: {type: object, required: [projects], properties: {projects: {type: array, maxItems: 100, items: {$ref: '#/components/schemas/Project'}}}}
+    Deployment:
+      type: object
+      additionalProperties: false
+      required: [id, app_id, repo, sha, status, source, queued_at, started_at, finished_at]
+      properties:
+        id: {$ref: '#/components/schemas/Id'}
+        app_id: {$ref: '#/components/schemas/Id'}
+        repo: {type: [string, 'null']}
+        sha: {type: [string, 'null']}
+        status: {type: string, enum: [pending, deploying, success, error]}
+        source: {type: [string, 'null'], enum: [web, api_v1, github_webhook, null]}
+        queued_at: {$ref: '#/components/schemas/LegacyTimestamp'}
+        started_at: {$ref: '#/components/schemas/NullableLegacyTimestamp'}
+        finished_at: {$ref: '#/components/schemas/NullableLegacyTimestamp'}
+    Deployments: {type: object, required: [deployments], properties: {deployments: {type: array, maxItems: 100, items: {$ref: '#/components/schemas/Deployment'}}}}
+    DeploymentEnvelope: {type: object, required: [deployment], properties: {deployment: {$ref: '#/components/schemas/Deployment'}}}
+    Pong: {type: object, required: [pong], properties: {pong: {const: true}}}
+    AppCreate:
+      type: object
+      additionalProperties: false
+      required: [name, source]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9][A-Za-z0-9 _-]*$'}
+        source:
+          type: object
+          additionalProperties: false
+          required: [type, repo, branch]
+          properties:
+            type: {const: github}
+            repo: {type: string, pattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'}
+            branch: {type: string, minLength: 1, maxLength: 255}
+        builder: {type: string, enum: [herokuish, dockerfile, nixpacks], default: herokuish}
+    DeploymentCreate:
+      type: object
+      additionalProperties: false
+      description: Empty object resolves configured branch HEAD once; SHA pins a commit in the configured repository
+      properties:
+        sha: {type: string, pattern: '^[0-9a-fA-F]{40}$'}
+    EnvWrite:
+      type: object
+      additionalProperties: false
+      required: [mode, values]
+      properties:
+        mode: {type: string, enum: [merge, replace]}
+        values:
+          type: object
+          maxProperties: 100
+          propertyNames: {type: string, maxLength: 128, pattern: '^(?!DOKKU_)[A-Za-z_][A-Za-z0-9_]*$'}
+          additionalProperties: {type: [string, 'null'], maxLength: 16384, pattern: '^[^\u0000]*$'}
+    SafeError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: {type: string, enum: [invalid_request, unauthorized, forbidden, not_found, validation_failed, prerequisite_missing, operation_conflict, idempotency_conflict, request_too_large, unsupported_media_type, rate_limited, unavailable, expired, dispatch_failed, remote_failed, outcome_unknown, internal_error]}
+        message: {type: string, maxLength: 512}
+        details:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, code]
+            properties:
+              field: {type: string, maxLength: 128}
+              code: {type: string, maxLength: 64}
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error, request_id]
+      properties:
+        error: {$ref: '#/components/schemas/SafeError'}
+        request_id: {type: string, minLength: 1, maxLength: 128}
+    Operation:
+      type: object
+      additionalProperties: false
+      required: [id, kind, status, app_id, deployment_id, request_id, created_at, started_at, finished_at, error]
+      properties:
+        id: {$ref: '#/components/schemas/Id'}
+        kind: {type: string, enum: [app.create, app.delete, app.restart, app.env, deployment.create]}
+        status: {type: string, enum: [queued, running, succeeded, failed]}
+        app_id: {$ref: '#/components/schemas/Id'}
+        deployment_id: {anyOf: [{$ref: '#/components/schemas/Id'}, {type: 'null'}]}
+        request_id: {type: string, minLength: 1, maxLength: 128}
+        created_at: {$ref: '#/components/schemas/Timestamp'}
+        started_at: {$ref: '#/components/schemas/NullableTimestamp'}
+        finished_at: {$ref: '#/components/schemas/NullableTimestamp'}
+        error: {anyOf: [{$ref: '#/components/schemas/SafeError'}, {type: 'null'}]}
+    OperationEnvelope: {type: object, additionalProperties: false, required: [operation], properties: {operation: {$ref: '#/components/schemas/Operation'}}}
+    Logs:
+      type: object
+      additionalProperties: false
+      required: [logs, next_cursor, complete, expires_at]
+      properties:
+        logs:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, stream, text]
+            properties:
+              id: {$ref: '#/components/schemas/Id'}
+              stream: {type: string, enum: [stdout, stderr, system]}
+              text: {type: string, maxLength: 16384}
+        next_cursor: {type: [integer, 'null'], minimum: 1}
+        complete: {type: boolean}
+        expires_at: {$ref: '#/components/schemas/Timestamp'}

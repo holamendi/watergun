@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+require "bundler/setup"
+require "json"
+require "yaml"
+require "json_schemer"
+
+# Do not boot Rails, read application credentials, or fetch remote schemas.
+contract = YAML.safe_load_file(File.expand_path("../docs/api/openapi.yml", __dir__), aliases: true)
+document = JSONSchemer.openapi(contract, regexp_resolver: "ecma")
+unless document.valid?
+  warn "invalid OpenAPI document"
+  exit 1
+end
+if ARGV.empty?
+  puts "OpenAPI document valid"
+else
+  name = ARGV.fetch(0)
+  unless ARGV.length == 1 && contract.fetch("components").fetch("schemas").key?(name)
+    warn "invalid schema name; pass one component name and JSON on stdin"
+    exit 1
+  end
+  # Never print instance data, including validation error objects containing it.
+  begin
+    valid = document.schema(name).valid?(JSON.parse($stdin.read))
+  rescue JSON::ParserError
+    valid = false
+  end
+  unless valid
+    warn "invalid JSON instance"
+    exit 1
+  end
+  puts "JSON instance valid"
+end

@@ -40,6 +40,7 @@ group :development do
 end
 
 group :test do
+  gem "json_schemer", "~> 2.5"
   gem "minitest-spec-rails"
   gem "mocha"
   gem "selenium-webdriver"
