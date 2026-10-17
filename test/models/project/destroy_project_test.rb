@@ -5,6 +5,7 @@ class Project::DestroyProjectTest < ActiveSupport::TestCase
 
   test "discards an owned project and queues destruction" do
     project = projects(:default)
+    server_action_runs(:deploy_running).update!(status: :success, finished_at: Time.current)
 
     assert_enqueued_with(job: RunServerActionJob) do
       assert_difference -> { ServerActionRun.count }, 1 do

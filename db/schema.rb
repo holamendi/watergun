@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_134000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -314,7 +314,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_000001) do
     t.string "resource_key", null: false
     t.datetime "enqueued_at"
     t.datetime "scheduling_failed_at"
+    t.bigint "api_token_id"
+    t.string "request_id"
+    t.bigint "operation_app_id"
+    t.bigint "operation_deployment_id"
+    t.string "idempotency_digest"
+    t.string "request_fingerprint"
+    t.datetime "dispatch_pending_at"
+    t.datetime "remote_completed_at"
+    t.string "public_error_code"
+    t.boolean "outcome_uncertain", default: false, null: false
+    t.index ["account_id", "api_token_id", "idempotency_digest"], name: "index_server_action_runs_on_idempotency", unique: true, where: "(idempotency_digest IS NOT NULL)"
     t.index ["account_id"], name: "index_server_action_runs_on_account_id"
+    t.index ["dispatch_pending_at"], name: "index_server_action_runs_on_dispatch_pending_at"
+    t.index ["operation_app_id"], name: "index_server_action_runs_on_operation_app_id"
     t.index ["server_id"], name: "index_server_action_runs_on_server_id"
     t.index ["status"], name: "index_server_action_runs_on_status"
     t.index ["target_type", "target_id"], name: "index_server_action_runs_on_target"

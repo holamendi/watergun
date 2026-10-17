@@ -10,8 +10,10 @@ class ServerAction::Enqueue
 
   def self.call(**attributes)
     run = build(**attributes)
-    run.save!
-    ActiveRecord.after_all_transactions_commit { schedule(run) }
+    run.dispatch_pending_at = Time.current
+    ServerAction::Conflict.guard(run) { run.save! }
+    Current.accepting_server_action << run if Current.accepting_server_action.is_a?(Array)
+    ActiveRecord.after_all_transactions_commit { schedule(run) } unless Current.accepting_server_action
     run
   end
 
@@ -23,7 +25,7 @@ class ServerAction::Enqueue
       job = RunServerActionJob.new(run.id, run.resource_key)
       result = job.enqueue
       raise(job.enqueue_error || ActiveJob::EnqueueError.new("Action was not enqueued")) unless result && job.successfully_enqueued?
-      run.update!(enqueued_at: Time.current, scheduling_failed_at: nil, failure_message: nil)
+      run.update!(enqueued_at: Time.current, dispatch_pending_at: nil, scheduling_failed_at: nil, failure_message: nil)
     end
     run
   rescue => error

@@ -399,7 +399,7 @@ components:
       additionalProperties: false
       required: [code, message]
       properties:
-        code: {type: string, enum: [invalid_request, unauthorized, forbidden, not_found, validation_failed, prerequisite_missing, operation_conflict, idempotency_conflict, request_too_large, unsupported_media_type, rate_limited, unavailable, expired, dispatch_failed, remote_failed, outcome_unknown, internal_error]}
+        code: {type: string, enum: [invalid_request, unauthorized, forbidden, not_found, validation_failed, prerequisite_missing, operation_conflict, idempotency_conflict, request_too_large, unsupported_media_type, rate_limited, unavailable, expired, dispatch_failed, remote_failed, outcome_unknown, authorization_failed, internal_error]}
         message: {type: string, maxLength: 512}
         details:
           type: array

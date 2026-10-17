@@ -22,6 +22,7 @@ class App::CreateApp
     return false unless valid?
 
     App.transaction do
+      project.lock!
       create_app!
       create_github_repo!
       ServerAction::Enqueue.call(action: "apps.create", target: app)

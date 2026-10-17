@@ -38,10 +38,12 @@ class ServerActions::PullEnv
       )
     end
 
-    # sync env variables
-    EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
-    # delete out of sync env variables
-    out_of_sync_env_variables.destroy_all
+    # SSH has finished. Match preparation's app -> project -> env row order
+    # only while reconciling locally; child destruction touches its app.
+    ServerAction::Conflict.with_app_lock(app) do
+      EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
+      out_of_sync_env_variables.destroy_all
+    end
   end
 
   def dokku_config_export

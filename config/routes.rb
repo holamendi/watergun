@@ -91,6 +91,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resources :operations, only: :show
       resources :apps, only: %i[index show] do
         resources :deployments, only: %i[index show]
         resource :ping, only: :show

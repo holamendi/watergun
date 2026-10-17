@@ -20,6 +20,16 @@ module Api
 
       private
 
+      # Shared by subsequent mutation controllers; acceptance itself never waits
+      # for a worker or SSH. Polls preserve the original acceptance identity.
+      def render_operation(run, status: :ok)
+        raise ActiveRecord::RecordNotFound unless run.account_id == Current.account.id && run.request_id
+        response.headers["Location"] = api_v1_operation_path(run)
+        response.headers["Retry-After"] = "2"
+        response.headers["Cache-Control"] = "no-store"
+        render json: {operation: run.public_operation}, status: status
+      end
+
       def authenticate
         authenticated = authenticate_with_http_token { |token, _| Current.api_token = ApiToken.authenticate(token) }
         unless authenticated
