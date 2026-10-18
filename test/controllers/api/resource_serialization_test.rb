@@ -36,7 +36,7 @@ class Api::ResourceSerializationTest < ActionDispatch::IntegrationTest
       ["queued", nil, nil, nil, nil, "queued", nil],
       ["running", at, nil, nil, nil, "running", nil],
       ["success", at, at, nil, nil, "succeeded", nil],
-      ["error", at, at, at, "outcome_unknown", "succeeded", nil],
+      ["error", at, at, at, "outcome_unknown", "failed", "repair_required"],
       ["failure", at, at, nil, "remote_failed", "failed", "remote_failed"],
       ["cancelled", nil, at, nil, "authorization_failed", "failed", "authorization_failed"],
       ["error", at, at, nil, "dispatch_failed", "failed", "dispatch_failed"],
@@ -58,7 +58,8 @@ class Api::ResourceSerializationTest < ActionDispatch::IntegrationTest
       assert_equal [expected_error], [row.fetch("error")]
       refute_match(/sentinel|payload|token|fingerprint|digest|failure_message|target_type|server_id|user_id|account_id/, response.body)
     end
-    ServerActionRun::PUBLIC_KINDS.each do |action, kind|
+    {"apps.create" => "app.create", "apps.destroy" => "app.delete", "apps.restart" => "app.restart",
+     "apps.update_env" => "app.env", "apps.deploy" => "deployment.create"}.each do |action, kind|
       run.update!(action_key: action, operation_deployment_id: 123)
       get "/api/v1/operations/#{run.id}", headers: @headers
       assert_response :ok

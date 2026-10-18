@@ -25,7 +25,7 @@ class Api::V1::OperationResource < Api::ApplicationResource
 
   attribute :error do |run|
     if run.public_status == "failed"
-      code = run.public_error_code || "remote_failed"
+      code = run.repair_required? ? "repair_required" : (run.public_error_code || "remote_failed")
       code = "outcome_unknown" unless ServerActionRun::PUBLIC_ERRORS.include?(code)
       {code: code, message: code.humanize}
     end

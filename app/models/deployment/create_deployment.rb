@@ -28,7 +28,9 @@ class Deployment::CreateDeployment
       self.app = locked_app
       raise ServerAction::Conflict::Error unless source_identity == @prepared_source
       ServerAction::TargetValidation.app_context!(app)
-      deployment = app.deployments.create!(github_event:, **deployment_attributes)
+      attributes = deployment_attributes
+      attributes[:source] = :github_webhook if github_event
+      deployment = app.deployments.create!(github_event:, **attributes)
       selected_builder = builder || app.builder
       @server_action_run = ServerAction::Enqueue.build(action: "apps.deploy", target: deployment, payload: selected_builder ? {builder: selected_builder} : {})
       ServerAction::Enqueue.persist(server_action_run) if enqueue

@@ -2,15 +2,20 @@ require "test_helper"
 require "json_schemer"
 
 class Api::V1::OperationsControllerTest < ActionDispatch::IntegrationTest
+  include SshTestHelper
+
   self.use_transactional_tests = false
 
   teardown do
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    ServerActionRun.where(id: @run.id).destroy_all
+    App.find_by(id: @app.id)&.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   setup do
-    @app = apps(:domain_test_app)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "operations", status: :active)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write", "operations:read"])
     @secret = @token.token
     @run = ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "http-op",
@@ -34,6 +39,26 @@ class Api::V1::OperationsControllerTest < ActionDispatch::IntegrationTest
     refute_match(/sentinel|payload|dokku|token|failure_message/, response.body)
     schema = JSONSchemer.openapi(YAML.safe_load_file(Rails.root.join("docs/api/openapi.yml"), aliases: true), regexp_resolver: "ecma")
     assert schema.ref("#/components/schemas/OperationEnvelope").valid?(json_response)
+  end
+
+  test "required finalization failure has a literal repair response through the HTTP boundary" do
+    fail_next_domain_update(App, @app.id, "active", "test activation unavailable")
+    transport = mock("SSH transport")
+    transport.expects(:exec!).with do |command, options|
+      options[:status][:exit_code] = 0
+      command == "dokku ps:restart #{@app.dokku_id}"
+    end
+    Net::SSH.expects(:start).yields(transport)
+    assert_raises(IOError) { ServerAction::Runner.new(@run).call }
+    get "/api/v1/operations/#{@run.id}", headers: auth
+    assert_response :ok
+    assert_equal "failed", json_response.dig("operation", "status")
+    assert_equal({"code" => "repair_required", "message" => "Repair required"}, json_response.dig("operation", "error"))
+    schema = JSONSchemer.openapi(YAML.safe_load_file(Rails.root.join("docs/api/openapi.yml"), aliases: true), regexp_resolver: "ecma")
+    assert_empty schema.schema("OperationEnvelope").validate(json_response).to_a
+    assert @run.reload.remote_completed_at
+    assert_nil @run.finalized_at
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
   end
 
   test "missing foreign and nonpublic runs are indistinguishable and scopes fail closed" do

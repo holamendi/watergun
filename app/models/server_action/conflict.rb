@@ -46,7 +46,7 @@ module ServerAction::Conflict
   end
 
   def self.pending
-    ServerActionRun.where("status IN ('queued', 'running') OR outcome_uncertain = TRUE")
+    ServerActionRun.where("status IN ('queued', 'running') OR outcome_uncertain = TRUE OR (remote_completed_at IS NOT NULL AND finalized_at IS NULL)")
   end
 
   def self.for_apps(runs, apps)

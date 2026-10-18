@@ -87,6 +87,7 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
   end
 
   test "processes push event and creates deployments" do
+    @github_repo.update!(webhook_deploy: true)
     event = Github::Event.create!(
       account: @account,
       installation: @installation,
@@ -98,12 +99,12 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
       }
     )
 
-    # Stub the CreateDeployment service to avoid API calls
-    Deployment::CreateDeployment.any_instance.stubs(:save!).returns(true)
-
-    Github::ProcessEventJob.perform_now(event)
-
+    stub_remote_commit
+    assert_difference ["Deployment.count", "ServerActionRun.count"], 1 do
+      Github::ProcessEventJob.perform_now(event)
+    end
     assert event.reload.processed?
+    assert_equal event.id, @github_repo.app.deployments.last.github_event_id
   end
 
   test "does not create deployment when webhook_deploy is false" do
@@ -173,6 +174,8 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
   end
 
   test "creates multiple deployments for matching repos" do
+    @github_repo.update!(webhook_deploy: true)
+    servers(:amd).update!(cpu_type: :x86)
     app2 = App.create!(
       name: "App 2",
       account: @account,
@@ -200,12 +203,12 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
       }
     )
 
-    # Stub the CreateDeployment service to avoid API calls
-    Deployment::CreateDeployment.any_instance.stubs(:save!).returns(true)
-
-    Github::ProcessEventJob.perform_now(event)
-
+    stub_remote_commit(times: 2)
+    assert_difference ["Deployment.count", "ServerActionRun.count"], 2 do
+      Github::ProcessEventJob.perform_now(event)
+    end
     assert event.reload.processed?
+    assert_equal [@github_repo.app_id, app2.id].sort, event.deployments.pluck(:app_id).sort
   end
 
   test "marks event as processed at the end" do
@@ -239,7 +242,7 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
     )
   end
 
-  def stub_remote_commit
+  def stub_remote_commit(times: 1)
     commit = OpenStruct.new(
       sha: "a" * 40,
       author: nil,
@@ -247,7 +250,7 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
       html_url: "https://github.com/holamendi/smol-roda/commit/#{"a" * 40}"
     )
     client = mock("GitHub API")
-    client.expects(:commit).with(@github_repo.repo, "abc123def456").returns(commit)
+    client.expects(:commit).with(@github_repo.repo, "abc123def456").times(times).returns(commit)
     Github::Installation.any_instance.stubs(:api_client).returns(client)
   end
 end

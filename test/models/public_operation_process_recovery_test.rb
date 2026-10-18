@@ -81,7 +81,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     assert_equal run.id, accept.id
   end
 
-  test "worker death after persisted remote completion recovers success without replay" do
+  test "worker death before required finalization becomes visible repair without replay" do
     run = accept
     in_process(kill: true) do |pipe|
       action = ServerActions::RestartApp.new(ServerActionRun.find(run.id))
@@ -97,12 +97,14 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     assert run.reload.running?
     assert run.remote_completed_at
     ServerAction::Recovery.recover(run)
-    assert run.reload.success?
+    assert run.reload.error?
     refute run.outcome_uncertain?
-    assert_equal "succeeded", Api::V1::OperationResource.new(run).to_h.fetch("status")
+    assert_equal "failed", Api::V1::OperationResource.new(run).to_h.fetch("status")
+    assert_equal "repair_required", run.public_error_code
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
   end
 
-  test "a real delete action crash after remote completion reports success without replaying local hooks" do
+  test "a real delete crash retains evidence and exclusion until explicit local repair" do
     run = ServerAction::Accept.call(token: @token, endpoint: "delete", target: @app, key: "delete-crash",
       request: {}, request_id: "delete-request", scope: "apps:write") do
       App::DestroyApp.new(@app).destroy(enqueue: false)
@@ -128,9 +130,20 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     assert_equal "deleting", @app.reload.status
     Net::SSH.expects(:start).never
     ServerAction::Recovery.recover(run)
-    assert_equal "succeeded", Api::V1::OperationResource.new(run.reload).to_h.fetch("status")
-    assert_nil Api::V1::OperationResource.new(run).to_h.fetch("error")
+    assert_equal "failed", Api::V1::OperationResource.new(run.reload).to_h.fetch("status")
+    assert_equal "repair_required", run.public_error_code
     assert App.exists?(@app.id), "Local repair is explicit; recovery must not replay arbitrary success hooks"
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
+    original_id = @app.dokku_id
+    @app.update_columns(dokku_id: "changed-since-remote-deletion")
+    assert_raises(ArgumentError) { ServerAction::Recovery.repair_delete!(run) }
+    assert App.exists?(@app.id)
+    @app.update_columns(dokku_id: original_id)
+    ServerAction::Recovery.repair_delete!(run)
+    refute App.exists?(@app.id)
+    assert_equal "succeeded", run.reload.public_status
+    assert run.finalized_at
+    assert_equal run.id, ServerAction::Recovery.repair_delete!(run).id
   end
 
   test "after commit notification failure cannot hide committed acceptance or lose dispatch" do

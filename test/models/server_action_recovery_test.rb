@@ -93,7 +93,9 @@ class ServerActionRecoveryTest < ActiveSupport::TestCase
 
   test "unexpected interruption after starting execution retains app exclusion without replay" do
     run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
-    Server.any_instance.stubs(:ssh_session).raises(IOError, "private-disconnect")
+    transport = mock("SSH transport")
+    transport.expects(:exec!).raises(IOError, "private-disconnect-after-send")
+    Net::SSH.expects(:start).yields(transport)
     assert_raises(IOError) { ServerAction::Runner.new(run).call }
     assert run.reload.outcome_uncertain?
     assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }

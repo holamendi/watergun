@@ -23,6 +23,9 @@ class ServerActions::RestartApp
   def succeeded!
     @restart_completed = true
     app.active!
+  end
+
+  def notify!
     notify_user
   end
 

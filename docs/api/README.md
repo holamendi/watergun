@@ -295,16 +295,34 @@ exclusion. It is never requeued; an operator must verify/reconcile remote state
 before explicitly resolving uncertainty. This API does not provide an unsafe
 "retry uncertain operation" endpoint. A persisted marker is written only after
 the action's primary remote execution returns successfully, never at acceptance,
-queueing or claim. A subsequent bookkeeping/notification/log/SSH-drain failure
-cannot erase that evidence: terminal public status is succeeded (internal
-diagnostics may record the bookkeeping error). A crash before the completion
+queueing or claim. A subsequent failure cannot erase that evidence, but remote
+completion alone is not full workflow success. A crash before the completion
 marker commits remains unknown, not a guessed success. Failed pre-execution token
 revalidation yields failed/authorization_failed; terminal dispatch validation
 failure yields dispatch_failed. No exception text or command output is public.
 Remote success does not guarantee local reconciliation completed before a crash.
-Recovery never blindly reruns success hooks: some perform additional remote reads
-or enqueue related work. A remote-completed delete can require operator repair
-of a retained local app; inspect the run/target before permitting further work.
+The corrective runner records finalized_at only after required succeeded! work
+returns. A known remote completion without this evidence is failed/repair_required,
+not succeeded; it retains conflicting-work exclusion, even on legacy success rows.
+Optional toast/log notification failure after finalization is not required repair.
+Known failures before entering the SSH session are failed/execution_failed (or
+authorization_failed for token checks) and permit a new explicit request. Death
+after claim without completion evidence remains outcome_unknown: no guessed replay.
+Recovery never blindly reruns success hooks. An operator may explicitly invoke
+ServerAction::Recovery.repair_delete!(run) for a confirmed remote apps.destroy:
+it verifies action/ownership/identifier evidence under the resource lock and
+atomically deletes only the retained local app plus records finalization, without
+SSH. It rejects unsent/unknown/non-delete runs. Other repairs require inspected,
+action-specific reconciliation, not setting a generic success flag.
+
+For example, an incomplete remote-completed operation returns the existing
+terminal status vocabulary with a distinct safe code:
+
+    {"operation":{"id":42,"kind":"app.delete","status":"failed","app_id":7,"deployment_id":null,"request_id":"original-acceptance","created_at":"2026-10-18T09:00:00Z","started_at":"2026-10-18T09:00:01Z","finished_at":"2026-10-18T09:00:02Z","error":{"code":"repair_required","message":"Repair required"}}}
+
+No create success proves that separately queued service-link jobs finished;
+required local domains/link preparation and durable follow-up acceptance must
+finish, while each service-link run retains its own inspectable outcome.
 Drain old workers before this migration/runner cutover: old binaries do not
 participate in these acceptance/recovery guarantees. No rollout is authorized.
 
@@ -321,6 +339,14 @@ JSON object keys and a mixed-validity batch are rejected before any local/remote
 change. The complete HTTP body is limited to 64 KiB, with at most 100 keys, 128
 characters per name and 16,384 per value. No partial validation acceptance.
 
+Ownership is explicit: managed defaults to false for every legacy/imported row.
+An allowed explicit UI save or API string write claims only that key; a named
+null may delete an editable unknown key. Replace omission never claims/deletes
+unknown keys. Pulls preserve provenance and protection; absence/"synced" does
+not prove ownership. Each desired writer increments the app env_generation under
+app→project→env locks. An older export is ignored, without SSH under row locks;
+pending mismatched desired values and discard tombstones are not overwritten.
+
 Acceptance atomically records the whole desired batch in encrypted storage.
 Remote application is one shared ordered command path; a remote failure is not
 claimed to roll back Dokku atomically. Mark the operation failed with inspectable
@@ -331,6 +357,22 @@ existing pending-restart indication, and use no implicit remote restart; client
 must deploy/restart explicitly. Plaintext values and reversible encodings must be
 absent from persisted operations, logs, audit, diagnostics, instrumentation and
 escaping exception causes, not just absent from JSON responses.
+
+## Deferred webhook delivery
+
+Each routed push snapshots pending_app_ids on its existing event. Each app's
+deployment, github_event linkage, run and removal from that list commit together.
+A busy app remains pending while idle apps continue; duplicate event deliveries
+cannot reaccept completed targets. This is per-event delivery, not latest-push
+coalescing. Removed/discarded/retargeted apps settle without deploying to a new
+source. Event preparation resolves GitHub outside locks, then the service checks
+the source identity under the app lock before accepting it.
+
+A scheduled retry is only a wake-up: the retained event is authoritative. The
+recover_deferred_pushes scheduler requeues routed pending events after queue or
+worker failure. Legacy pending_app_ids=NULL events are not automatically replayed;
+old deployments without event linkage cannot be retrospectively deduplicated.
+See corrective-rollout.md for compatibility and cutover constraints.
 
 ## Logs, audit and limits
 

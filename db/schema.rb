@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_092000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -209,6 +209,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_090000) do
     t.json "payload"
     t.datetime "processed_at"
     t.datetime "updated_at", null: false
+    t.jsonb "pending_app_ids"
     t.index ["account_id"], name: "index_github_events_on_account_id"
     t.index ["github_installation_id"], name: "index_github_events_on_github_installation_id"
   end
@@ -326,6 +327,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_090000) do
     t.datetime "remote_completed_at"
     t.string "public_error_code"
     t.boolean "outcome_uncertain", default: false, null: false
+    t.datetime "finalized_at"
     t.index ["account_id", "api_token_id", "idempotency_digest"], name: "index_server_action_runs_on_idempotency", unique: true, where: "(idempotency_digest IS NOT NULL)"
     t.index ["account_id"], name: "index_server_action_runs_on_account_id"
     t.index ["dispatch_pending_at"], name: "index_server_action_runs_on_dispatch_pending_at"

@@ -32,9 +32,12 @@ class ServerActions::DeployApp
     schedule_enable_ssl!
     deployment.success!
     app.active!
+    schedule_pull_env!
+  end
+
+  def notify!
     broadcast_deployment_update
     notify_user
-    schedule_pull_env!
   end
 
   LOG_INTERVAL = 1.second

@@ -23,13 +23,17 @@ class ServerActionRun < ApplicationRecord
   PUBLIC_KINDS = {"apps.create" => "app.create", "apps.destroy" => "app.delete",
                   "apps.restart" => "app.restart", "apps.update_env" => "app.env", "apps.deploy" => "deployment.create"}.freeze
 
-  PUBLIC_ERRORS = %w[dispatch_failed remote_failed outcome_unknown authorization_failed].freeze
+  PUBLIC_ERRORS = %w[dispatch_failed remote_failed outcome_unknown authorization_failed execution_failed repair_required].freeze
+
+  def repair_required?
+    remote_completed_at.present? && finalized_at.nil?
+  end
 
   def public_status
-    if (remote_completed_at && finished_at) || success?
-      "succeeded"
-    elsif queued? || running?
+    if queued? || running?
       status
+    elsif !repair_required? && (success? || (finalized_at && finished_at))
+      "succeeded"
     else
       "failed"
     end

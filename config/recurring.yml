@@ -2,6 +2,9 @@ default: &default
   recover_server_actions:
     command: "ServerAction::Recovery.call"
     schedule: every minute
+  recover_deferred_pushes:
+    command: "Github::ProcessEventJob.recover_pending"
+    schedule: every minute
   fetch_container_metrics:
     class: FetchContainerMetricsJob
     schedule: every 30 seconds
