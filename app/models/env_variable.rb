@@ -28,6 +28,10 @@ class EnvVariable < ApplicationRecord
     name.start_with?(RESERVED_PREFIX)
   end
 
+  def editable?
+    !internal? && !reserved? && !service_link
+  end
+
   def to_h
     {name => value}
   end

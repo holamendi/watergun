@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_134000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_134000) do
     t.integer "server_id", null: false
     t.string "status"
     t.datetime "updated_at", null: false
+    t.bigint "env_generation", default: 0, null: false
     t.index ["account_id"], name: "index_apps_on_account_id"
     t.index ["deploy_token"], name: "index_apps_on_deploy_token", unique: true
     t.index ["discarded_at"], name: "index_apps_on_discarded_at"
@@ -176,6 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_134000) do
     t.datetime "synced_at"
     t.datetime "updated_at", null: false
     t.text "value", null: false
+    t.boolean "managed", default: false, null: false
     t.index ["account_id"], name: "index_env_variables_on_account_id"
     t.index ["app_id", "name"], name: "index_env_variables_on_app_id_and_name", unique: true, where: "(discarded_at IS NULL)"
     t.index ["app_id"], name: "index_env_variables_on_app_id"

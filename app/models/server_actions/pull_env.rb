@@ -27,30 +27,32 @@ class ServerActions::PullEnv
 
   def execute!(ssh)
     @ssh = ssh
-    synced_at = Time.current
+    generation = App.where(id: app.id).pick(:env_generation)
+    observed = dokku_config_export
 
-    upsert_env_variables = dokku_config_export.map do |env_variable|
-      env_variable.merge(
-        account_id: app.account_id,
-        app_id: app.id,
-        status: :synced,
-        synced_at:
-      )
-    end
+    # No row locks during SSH. An export begun before a desired write is not
+    # evidence about that intent, even when its remote output arrives later.
+    ServerAction::Conflict.with_app_lock(app) do |locked_app|
+      next unless locked_app.env_generation == generation
 
-    # SSH has finished. Match preparation's app -> project -> env row order
-    # only while reconciling locally; child destruction touches its app.
-    ServerAction::Conflict.with_app_lock(app) do
-      EnvVariable.upsert_all(upsert_env_variables, unique_by: %i[app_id name]) if upsert_env_variables.any?
-      out_of_sync_env_variables.destroy_all
+      records = app.env_variables.lock.includes(:service_link).to_a
+      observed.each do |attributes|
+        record = records.find { |existing| existing.name == attributes.fetch("name") }
+        next if record && (record.discarded? || record.account_id != app.account_id)
+        next if record&.pending? && record.editable? && record.value != attributes.fetch("value")
+
+        record ||= app.env_variables.new(name: attributes.fetch("name"))
+        record.assign_attributes(value: attributes.fetch("value"), status: :synced, synced_at: Time.current)
+        record.save!(context: :batch)
+      end
+      names = observed.pluck("name")
+      records.each do |record|
+        record.destroy! if record.kept? && record.synced? && record.account_id == app.account_id && record.editable? && !names.include?(record.name)
+      end
     end
   end
 
   def dokku_config_export
     @dokku_config_export ||= ssh.execute!(Dokku::Config::ExportCommand.new(app: dokku_app_id)).parsed_output
-  end
-
-  def out_of_sync_env_variables
-    app.env_variables.kept.where.not(name: dokku_config_export.pluck("name"))
   end
 end

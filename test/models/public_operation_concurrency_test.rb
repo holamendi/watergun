@@ -202,10 +202,18 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
       end
       worker.value
       assert_equal 1, ServerActionRun.where(target: @app, action_key: "apps.update_env").count
-      if exported.any?
-        synced = @app.env_variables.find_by!(name: "REMOTE_RACE")
-        assert_equal "pull-reconciliation-secret", synced.value
-        refute_includes synced.value_before_type_cast, "pull-reconciliation-secret"
+      assert_nil @app.env_variables.find_by(name: "REMOTE_RACE"), "export predates desired intent"
+      if mutation == :create
+        desired = @app.env_variables.kept.find_by!(name: "CREATED_RACE")
+        assert_equal "created", desired.value
+        assert desired.pending?
+      elsif mutation == :update
+        assert_equal "changed", variable.reload.value
+        assert variable.pending?
+      elsif mutation == :batch
+        assert_equal "batch", @app.env_variables.kept.find_by!(name: "BATCH_RACE").value
+      else
+        assert variable.reload.discarded?
       end
     ensure
       worker&.join(10) || worker&.kill

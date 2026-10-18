@@ -42,7 +42,7 @@ module ServerAction::Conflict
       locked_app = App.lock.find(app.id)
       raise Error unless locked_app.project_id == app.project_id
       Project.lock.find(locked_app.project_id)
-      yield
+      yield locked_app
     end
   end
 
