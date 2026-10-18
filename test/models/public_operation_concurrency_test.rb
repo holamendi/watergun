@@ -123,8 +123,9 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
       end
       record = EnvVariable.find(variable.id)
       record.value = "api"
-      assert EnvVariable::UpdateEnvVariable.new(record).save
-      app.server_action_runs.order(:id).last
+      command = EnvVariable::UpdateEnvVariable.new(record)
+      assert command.save(enqueue: false)
+      command.server_action_run
     end
     assert run.persisted?
     assert_equal :conflict, ui.value
@@ -247,7 +248,7 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
   def accept(key: "concurrent-key", request: {}, token: @token)
     ServerAction::Accept.call(token: token.clone, endpoint: "restart", target: App.find(@app.id), key: key,
       request: request, request_id: "concurrency-request", scope: "apps:write") do
-      ServerAction::Enqueue.call(action: "apps.restart", target: App.find(@app.id))
+      ServerAction::Enqueue.build(action: "apps.restart", target: App.find(@app.id))
     end
   end
 

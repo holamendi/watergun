@@ -105,7 +105,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
   test "a real delete action crash after remote completion reports success without replaying local hooks" do
     run = ServerAction::Accept.call(token: @token, endpoint: "delete", target: @app, key: "delete-crash",
       request: {}, request_id: "delete-request", scope: "apps:write") do
-      App::DestroyApp.new(@app).destroy
+      App::DestroyApp.new(@app).destroy(enqueue: false)
     end
     in_process(kill: true) do |pipe|
       transport = Object.new
@@ -179,7 +179,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
   def accept
     ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "process-key",
       request: {}, request_id: "process-request", scope: "apps:write") do
-      ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+      ServerAction::Enqueue.build(action: "apps.restart", target: @app)
     end
   end
 

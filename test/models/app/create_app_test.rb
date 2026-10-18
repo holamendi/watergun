@@ -44,6 +44,18 @@ class App::CreateAppTest < ActiveSupport::TestCase
       )
     end
 
+    test "caller can own the exact unsaved run without changing the save return convention" do
+      VCR.use_cassette("github/valid_repo_and_branch") do
+        assert_no_difference "ServerActionRun.count" do
+          assert_equal true, @create_app.save(enqueue: false)
+        end
+      end
+      run = @create_app.server_action_run
+      assert run.new_record?
+      assert_equal @create_app.app, run.target
+      assert_equal "apps.create", run.action_key
+    end
+
     test "fails when the repo does not exist" do
       @create_app.repo = "holamendi/not-a-repo-123"
 

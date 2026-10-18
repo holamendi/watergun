@@ -99,19 +99,24 @@ module Api
         return api_error("invalid_request", :bad_request) unless valid
         page = query.fetch("page", "1").to_i
         limit = query.fetch("limit", "20").to_i
-        unless valid && limit.between?(1, 100)
+        unless limit.between?(1, 100)
           api_error("invalid_request", :bad_request)
           return
         end
-        count = records.count
-        pages = [(count.to_f / limit).ceil, 1].max
-        response.headers.merge!("Current-Page" => page.to_s, "Page-Items" => limit.to_s,
-          "Total-Pages" => pages.to_s, "Total-Count" => count.to_s)
-        links = {first: 1, last: pages}
-        links[:prev] = page - 1 if page > 1
-        links[:next] = page + 1 if page < pages
-        response.headers["Link"] = links.map { |rel, number| "<#{request.path}?#{{page: number, limit: limit}.to_query}>; rel=\"#{rel}\"" }.join(", ")
-        records.order(:id).limit(limit).offset((page - 1) * limit)
+        pagination, page_records = pagy(records.order(:id), page: page, limit: limit, client_limit: 100, raise_range_error: false)
+        headers = pagination.headers_hash(headers_map: {page: "Current-Page", limit: "Page-Items", pages: "Total-Pages", count: "Total-Count"})
+        response.headers.merge!(headers.except("link"))
+        # Retain the public relative links, explicit first page and overflow's
+        # previous requested page. Pagy owns counting, offsets and empty pages.
+        url_options = {absolute: false, querify: ->(params) {
+          params["page"] ||= 1
+          params.replace(params.sort.to_h)
+        }}
+        urls = pagination.urls_hash(**url_options)
+        urls[:previous] = pagination.page_url(page - 1, **url_options) if page > pagination.last
+        response.headers["Link"] = {first: urls[:first], last: urls[:last], prev: urls[:previous], next: urls[:next]}.compact
+          .map { |rel, url| "<#{url}>; rel=\"#{rel}\"" }.join(", ")
+        page_records
       end
 
       # Shared by subsequent mutation controllers; acceptance itself never waits

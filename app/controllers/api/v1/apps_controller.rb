@@ -38,22 +38,19 @@ class Api::V1::AppsController < Api::V1::ApplicationController
       source_prerequisites!(project)
       raise ServerAction::Accept::Error, "prerequisite_missing" unless project.server.available_dokku_builders.key?(builder)
       command = App::CreateApp.new(project: project, name: body["name"], repo: source["repo"], branch: branch, builder: builder)
-      unless command.valid?
+      unless command.prepare
         code = command.errors.include?(:repo) ? "prerequisite_missing" : "validation_failed"
         raise ServerAction::Accept::Error, code
       end
-      [command, project.server_id, project.account.github_installation.id]
+      command
     end
     accept_operation(Project.new(id: request.path_parameters[:project_id]), endpoint: "POST /api/v1/projects/:id/apps",
-      body: body, scope: "apps:write", prepare: prepare) do |project, prepared|
-      command, server_id, installation_id = prepared
+      body: body, scope: "apps:write", prepare: prepare) do |project, command|
       source_prerequisites!(project)
-      unless project.server_id == server_id && project.account.github_installation.id == installation_id && project.server.available_dokku_builders.key?(builder)
-        raise ServerAction::Conflict::Error
-      end
+      raise ServerAction::Conflict::Error unless project.server.available_dokku_builders.key?(builder)
       command.project = project
-      raise ServerAction::Accept::Error, "validation_failed" unless command.save
-      command.app.server_action_run
+      raise ServerAction::Accept::Error, "validation_failed" unless command.save(enqueue: false)
+      command.server_action_run
     end
   rescue Octokit::Error, Faraday::Error
     raise ServerAction::Accept::Error, "unavailable"
@@ -63,7 +60,7 @@ class Api::V1::AppsController < Api::V1::ApplicationController
     return api_error("invalid_request", :bad_request) unless request.raw_post.empty? && request.query_parameters.empty?
     accept_operation(App.new(id: params[:id]), endpoint: "POST /api/v1/apps/:id/restarts", scope: "apps:write") do |app|
       usable_app!(app, deployed: true)
-      ServerAction::Enqueue.call(action: "apps.restart", target: app)
+      ServerAction::Enqueue.build(action: "apps.restart", target: app)
     end
   end
 
@@ -71,7 +68,7 @@ class Api::V1::AppsController < Api::V1::ApplicationController
     return api_error("invalid_request", :bad_request) unless request.raw_post.empty? && request.query_parameters.empty?
     accept_operation(App.new(id: params[:id]), endpoint: "DELETE /api/v1/apps/:id", scope: "apps:write") do |app|
       usable_app!(app)
-      App::DestroyApp.new(app).destroy
+      App::DestroyApp.new(app).destroy(enqueue: false)
     end
   end
 end

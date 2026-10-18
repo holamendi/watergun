@@ -4,7 +4,7 @@ class EnvVariable::WriteEnvVariables
   attr_accessor :app, :mode, :values
   attr_reader :server_action_run
 
-  def save
+  def save(enqueue: true)
     valid = mode.in?(%w[merge replace]) && values.is_a?(Hash) && values.size <= 100 && values.all? do |name, value|
       name.is_a?(String) && name.length <= 128 && name.match?(EnvVariable::NAME_REGEX) &&
         !name.start_with?(EnvVariable::RESERVED_PREFIX) &&
@@ -35,8 +35,9 @@ class EnvVariable::WriteEnvVariables
       unset.each(&:discard!)
       locked_app.increment!(:env_generation) if set.any? || unset.any?
       app.pending_restart! if set.any? || unset.any?
-      @server_action_run = ServerAction::Enqueue.call(action: "apps.update_env", target: app,
+      @server_action_run = ServerAction::Enqueue.build(action: "apps.update_env", target: app,
         payload: {set: set, unset: unset.map(&:name)})
+      ServerAction::Enqueue.persist(server_action_run) if enqueue
     end
     true
   end

@@ -8,12 +8,14 @@ class ServerAction::Enqueue
     run
   end
 
-  def self.call(**attributes)
-    run = build(**attributes)
+  def self.call(dispatch: true, executing_run: nil, **attributes)
+    persist(build(**attributes), dispatch: dispatch, executing_run: executing_run)
+  end
+
+  def self.persist(run, dispatch: true, executing_run: nil)
     run.dispatch_pending_at = Time.current
-    ServerAction::Conflict.guard(run) { run.save! }
-    Current.accepting_server_action << run if Current.accepting_server_action.is_a?(Array)
-    ActiveRecord.after_all_transactions_commit { schedule(run) } unless Current.accepting_server_action
+    ServerAction::Conflict.guard(run, excluding: executing_run&.id) { run.save! }
+    ActiveRecord.after_all_transactions_commit { schedule(run) } if dispatch
     run
   end
 

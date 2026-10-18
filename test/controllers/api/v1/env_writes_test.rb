@@ -6,20 +6,20 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
   self.use_transactional_tests = false
 
   setup do
-    @app = apps(:domain_test_app)
-    @app.env_variables.destroy_all
-    ServerActionRun.where(target: @app).delete_all
-    @app.update!(status: :active, pending_restart: false)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "env-write", status: :active)
     @app.server.update!(status: :active)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["env:write", "apps:read", "operations:read"])
     @secret = @token.token
   end
 
   teardown do
-    @app.env_variables.destroy_all
-    ServerActionLog.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    runs = ServerActionRun.where(target: @app)
+    ServerActionLog.where(server_action_run_id: runs.select(:id)).delete_all
+    runs.delete_all
+    @app.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "merge durably accepts one encrypted batch and actual job applies set then unset without restart" do
@@ -79,7 +79,7 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
   end
 
   test "replacement affects only locally managed keys and empty merge is a durable no-op" do
-    managed = @app.env_variables.create!(name: "MANAGED", value: "old")
+    managed = @app.env_variables.create!(name: "MANAGED", value: "old", managed: true)
     internal = @app.env_variables.create!(name: "SYSTEM", value: "private", internal: true)
     reserved = @app.env_variables.create!(name: "DOKKU_SYSTEM", value: "private")
     linked = @app.env_variables.create!(name: "DATABASE_URL", value: "private")
@@ -238,17 +238,18 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
   end
 
   test "queue outage is accepted durably while failure to commit batch rolls back all writes" do
-    existing = @app.env_variables.create!(name: "EXISTING", value: "original")
-    ServerActionRun.any_instance.stubs(:update!).raises(ActiveRecord::StatementInvalid, "secret-rollback")
-    assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
-      write({mode: "replace", values: {NEW: "secret"}})
-      assert_response :service_unavailable
+    existing = @app.env_variables.create!(name: "EXISTING", value: "original", managed: true)
+    with_public_acceptance_storage_failure(@token) do
+      assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
+        write({mode: "replace", values: {NEW: "secret"}})
+        assert_response :service_unavailable
+      end
     end
     assert_equal "original", existing.reload.value
     refute existing.discarded?
     refute @app.reload.pending_restart?
     refute_includes response.body, "secret"
-    ServerActionRun.any_instance.unstub(:update!)
+
     RunServerActionJob.any_instance.stubs(:enqueue).raises(ActiveJob::EnqueueError, "secret-queue")
     write({mode: "replace", values: {NEW: "secret"}})
     assert_response :accepted
@@ -283,7 +284,7 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
   end
 
   test "boundary names values and key count are supported and replacement executes empty set and omitted deletions" do
-    @app.env_variables.create!(name: "OMITTED", value: "old")
+    @app.env_variables.create!(name: "OMITTED", value: "old", managed: true)
     @app.env_variables.create!(name: "UNMANAGED_SYSTEM", value: "private", internal: true)
     name = "N" * 128
     value = "v" * 16_384

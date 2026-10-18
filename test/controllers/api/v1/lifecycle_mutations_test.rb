@@ -84,14 +84,15 @@ class Api::V1::LifecycleMutationsTest < ActionDispatch::IntegrationTest
   end
 
   test "HTTP acceptance audit failure returns unavailable and rolls back while queue outage remains durable" do
-    ServerActionRun.any_instance.stubs(:update!).raises(ActiveRecord::StatementInvalid, "private-database-sentinel")
-    assert_no_difference "ServerActionRun.count" do
-      post restart_path, headers: auth("audit-failed")
-      assert_response :service_unavailable
-      assert_equal "unavailable", json_response.dig("error", "code")
-      refute_includes response.body, "private-database-sentinel"
+    with_public_acceptance_storage_failure(@token) do
+      assert_no_difference "ServerActionRun.count" do
+        post restart_path, headers: auth("audit-failed")
+        assert_response :service_unavailable
+        assert_equal "unavailable", json_response.dig("error", "code")
+        refute_includes response.body, "test acceptance storage unavailable"
+      end
     end
-    ServerActionRun.any_instance.unstub(:update!)
+
     RunServerActionJob.any_instance.stubs(:enqueue).raises(ActiveJob::EnqueueError, "private-queue-sentinel")
     post restart_path, headers: auth("queue-failed")
     assert_response :accepted

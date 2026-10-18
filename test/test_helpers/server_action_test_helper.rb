@@ -1,4 +1,22 @@
 module ServerActionTestHelper
+  # Exercise the actual atomic INSERT, not a stub of Accept/Enqueue or its caller.
+  # Only the test-owned token is rejected; callers must use committed tests.
+  def with_public_acceptance_storage_failure(token)
+    connection = ServerActionRun.connection
+    connection.execute(<<~SQL)
+      CREATE FUNCTION reject_public_acceptance_test() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.api_token_id = #{token.id.to_i} THEN RAISE EXCEPTION 'test acceptance storage unavailable'; END IF;
+        RETURN NEW;
+      END $$;
+      CREATE TRIGGER reject_public_acceptance_test BEFORE INSERT ON server_action_runs
+      FOR EACH ROW EXECUTE FUNCTION reject_public_acceptance_test();
+    SQL
+    yield
+  ensure
+    connection&.execute("DROP TRIGGER IF EXISTS reject_public_acceptance_test ON server_action_runs; DROP FUNCTION IF EXISTS reject_public_acceptance_test()")
+  end
+
   def perform_server_operation(operation, ssh)
     operation.validate!
     operation.execute!(ssh)

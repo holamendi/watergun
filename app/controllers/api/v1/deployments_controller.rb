@@ -30,24 +30,24 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
       app = account_apps.find(request.path_parameters[:app_id])
       usable_app!(app)
       source_prerequisites!(app)
-      snapshot = source_snapshot(app)
+      source_prerequisites_for_deployment!(app)
       begin
         app.account.github_installation.api_client.repo(app.github_repo.repo)
       rescue Octokit::NotFound, Octokit::InvalidRepository
         raise ServerAction::Accept::Error, "prerequisite_missing"
       end
       command = Deployment::CreateDeployment.new(app: app, commit_sha: body["sha"], builder: app.builder)
-      raise ServerAction::Accept::Error, "validation_failed" unless command.valid?
-      [command, snapshot]
+      raise ServerAction::Accept::Error, "validation_failed" unless command.prepare
+      command
     end
     accept_operation(App.new(id: request.path_parameters[:app_id]), endpoint: "POST /api/v1/apps/:app_id/deployments",
-      body: body, scope: "deployments:write", prepare: prepare) do |app, prepared|
-      command, snapshot = prepared
+      body: body, scope: "deployments:write", prepare: prepare) do |app, command|
       usable_app!(app)
       source_prerequisites!(app)
-      raise ServerAction::Conflict::Error unless source_snapshot(app) == snapshot
+      source_prerequisites_for_deployment!(app)
       command.app = app
-      command.save!.server_action_run
+      command.save!(enqueue: false)
+      command.server_action_run
     end
   rescue Octokit::Error, Faraday::Error
     raise ServerAction::Accept::Error, "unavailable"
@@ -63,11 +63,10 @@ class Api::V1::DeploymentsController < Api::V1::ApplicationController
     @app = account_apps.find(params[:app_id])
   end
 
-  def source_snapshot(app)
+  def source_prerequisites_for_deployment!(app)
     repo = app.github_repo
     unless repo && repo.account_id == Current.account.id && repo.repo.present? && repo.branch.present? && app.server.available_dokku_builders.key?(app.builder)
       raise ServerAction::Accept::Error, "prerequisite_missing"
     end
-    [repo.id, repo.repo, repo.branch, app.builder, app.account.github_installation.id]
   end
 end

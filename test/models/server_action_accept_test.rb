@@ -95,8 +95,8 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
         key: "create-domain", request: {source: {type: "github", repo: "holamendi/smol-roda", branch: "main"}},
         request_id: "domain-create", scope: "apps:write") do |project|
         command = App::CreateApp.new(project: project, repo: "holamendi/smol-roda", branch: "main")
-        assert command.save
-        command.app.server_action_run
+        assert command.save(enqueue: false)
+        command.server_action_run
       end
     end
     created = VCR.use_cassette("github/valid_repo_and_branch") { create.call }
@@ -107,7 +107,9 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     run = VCR.use_cassette("github/valid_commit") do
       ServerAction::Accept.call(token: @token, endpoint: "POST /apps/:id/deployments", target: created.target,
         key: "deployment-domain", request: {}, request_id: "domain-deploy", scope: "deployments:write") do |app|
-        Deployment::CreateDeployment.new(app: app).save!.server_action_run
+        command = Deployment::CreateDeployment.new(app: app)
+        command.save!(enqueue: false)
+        command.server_action_run
       end
     end
     assert_equal "deployment.create", Api::V1::OperationResource.new(run).to_h.fetch("kind")
@@ -119,15 +121,16 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
   end
 
   test "failure storing acceptance audit rolls back domain preparation and dispatch" do
-    ServerActionRun.any_instance.stubs(:update!).raises(ActiveRecord::RecordInvalid)
-    assert_no_difference ["App.count", "Github::Repo.count", "ServerActionRun.count"] do
-      VCR.use_cassette("github/valid_repo_and_branch") do
-        assert_raises(ActiveRecord::RecordInvalid) do
-          ServerAction::Accept.call(token: @token, endpoint: "create", target: @app.project, key: "rollback-create",
-            request: {}, request_id: "rollback-request", scope: "apps:write") do |project|
-            command = App::CreateApp.new(project: project, repo: "holamendi/smol-roda", branch: "main")
-            assert command.save
-            command.app.server_action_run
+    with_public_acceptance_storage_failure(@token) do
+      assert_no_difference ["App.count", "Github::Repo.count", "ServerActionRun.count"] do
+        VCR.use_cassette("github/valid_repo_and_branch") do
+          assert_raises(ActiveRecord::StatementInvalid) do
+            ServerAction::Accept.call(token: @token, endpoint: "create", target: @app.project, key: "rollback-create",
+              request: {}, request_id: "rollback-request", scope: "apps:write") do |project|
+                command = App::CreateApp.new(project: project, repo: "holamendi/smol-roda", branch: "main")
+                assert command.save(enqueue: false)
+                command.server_action_run
+              end
           end
         end
       end
@@ -153,8 +156,9 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     run = ServerAction::Accept.call(token: @token, endpoint: "PUT /apps/:id/env", target: @app,
       key: "test-key", request: {values: {PRIVATE_VALUE: "env-acceptance-sentinel"}}, request_id: "env-request", scope: "env:write") do |app|
       variable = app.env_variables.new(name: "PRIVATE_VALUE", value: "env-acceptance-sentinel")
-      assert EnvVariable::CreateEnvVariable.new(variable).save
-      app.server_action_runs.order(:id).last
+      command = EnvVariable::CreateEnvVariable.new(variable)
+      assert command.save(enqueue: false)
+      command.server_action_run
     end
     refute_equal first.id, run.id
     assert_equal "app.env", Api::V1::OperationResource.new(run).to_h.fetch("kind")
@@ -165,7 +169,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     refute_includes Api::V1::OperationResource.new(run).serialize, "env-acceptance-sentinel"
   end
 
-  test "acceptance cannot attach to unrelated existing work or leave extra undispatched mutations" do
+  test "acceptance owns a new run and rejects persisted or mismatched work" do
     existing = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
     assert_raises(ArgumentError) do
       ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "existing",
@@ -178,8 +182,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
       assert_raises(ArgumentError) do
         ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "extra",
           request: {}, request_id: "extra-request", scope: "apps:write") do
-          ServerAction::Enqueue.call(action: "apps.restart", target: other)
-          ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+          ServerAction::Enqueue.build(action: "apps.restart", target: other)
         end
       end
     end
@@ -190,7 +193,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
   def accept(key: "test-key", request: {})
     ServerAction::Accept.call(token: @token, endpoint: "POST /apps/:id/restarts", target: @app,
       key: key, request: request, request_id: "acceptance-request", scope: "apps:write") do
-      ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+      ServerAction::Enqueue.build(action: "apps.restart", target: @app)
     end
   end
 end

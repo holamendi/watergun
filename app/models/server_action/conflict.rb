@@ -11,12 +11,12 @@ module ServerAction::Conflict
     end
   end
 
-  def self.guard(run)
+  def self.guard(run, excluding: nil)
     if run.action_key == "projects.destroy"
       return Project.transaction do
         run.target.lock!
         ServerAction::Registry.build(run).validate!
-        check_project!(run.target)
+        check_project!(run.target, excluding: excluding)
         yield
       end
     end
@@ -27,10 +27,9 @@ module ServerAction::Conflict
     with_app_lock(app) do
       run.target.reload
       ServerAction::Registry.build(run).validate!
-      raise Error if pending.where(action_key: "projects.destroy", target: app.project).exists?
-      candidates = pending.where(account_id: run.account_id, server_id: run.server_id, action_key: ACTIONS)
-      busy = candidates.any? { |candidate| app_for(candidate)&.id == app.id || candidate.operation_app_id == app.id }
-      raise Error if busy
+      candidates = pending.where.not(id: excluding)
+      raise Error if candidates.where(action_key: "projects.destroy", target: app.project).exists?
+      raise Error if for_apps(candidates.where(account_id: run.account_id, server_id: run.server_id, action_key: ACTIONS), App.where(id: app.id)).exists?
       yield
     end
   end
@@ -48,16 +47,17 @@ module ServerAction::Conflict
 
   def self.pending
     ServerActionRun.where("status IN ('queued', 'running') OR outcome_uncertain = TRUE")
-      .where.not(id: Current.executing_server_action&.id)
+  end
+
+  def self.for_apps(runs, apps)
+    runs.where(operation_app_id: apps.select(:id))
+      .or(runs.where(target_type: "App", target_id: apps.select(:id)))
+      .or(runs.where(target_type: "Deployment", target_id: Deployment.where(app_id: apps.select(:id)).select(:id)))
   end
 
   def self.check_project!(project, excluding: nil)
-    ids = project.apps.pluck(:id)
     candidates = pending.where.not(id: excluding)
     raise Error if candidates.where(action_key: "projects.destroy", target: project).exists?
-    busy = candidates.where(account_id: project.account_id, action_key: ACTIONS).any? do |candidate|
-      ids.include?(app_for(candidate)&.id) || ids.include?(candidate.operation_app_id)
-    end
-    raise Error if busy
+    raise Error if for_apps(candidates.where(account_id: project.account_id, action_key: ACTIONS), project.apps).exists?
   end
 end

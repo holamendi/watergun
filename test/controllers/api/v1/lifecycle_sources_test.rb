@@ -140,12 +140,13 @@ class Api::V1::LifecycleSourcesTest < ActionDispatch::IntegrationTest
   test "create audit failure rolls back app repository and run through the real HTTP boundary" do
     @client.expects(:repo).returns(stub(private?: false))
     @client.expects(:branch).returns(stub(name: "feature/full-branch"))
-    ServerActionRun.any_instance.stubs(:update!).raises(ActiveRecord::StatementInvalid, "private-audit-sentinel")
-    assert_no_difference ["App.count", "Github::Repo.count", "ServerActionRun.count"] do
-      post create_path, params: create_body, as: :json, headers: auth("create-audit-rollback")
-      assert_response :service_unavailable
-      assert_equal "unavailable", json_response.dig("error", "code")
-      refute_includes response.body, "private-audit-sentinel"
+    with_public_acceptance_storage_failure(@token) do
+      assert_no_difference ["App.count", "Github::Repo.count", "ServerActionRun.count"] do
+        post create_path, params: create_body, as: :json, headers: auth("create-audit-rollback")
+        assert_response :service_unavailable
+        assert_equal "unavailable", json_response.dig("error", "code")
+        refute_includes response.body, "test acceptance storage unavailable"
+      end
     end
   end
 

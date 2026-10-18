@@ -36,6 +36,21 @@ class PaginationCompatibilityTest < ActionDispatch::IntegrationTest
     assert_empty json_response.fetch("apps")
   end
 
+  test "API retains literal relative overflow links and ascending IDs" do
+    token = accounts(:default).api_tokens.create!
+    headers = {"Authorization" => "Bearer #{token.token}"}
+    get "/api/v1/apps", params: {page: 1, limit: 1}, headers: headers
+    assert_response :ok
+    assert_equal [accounts(:default).apps.kept.order(:id).first.id], json_response.fetch("apps").pluck("id")
+    assert_equal '</api/v1/apps?limit=1&page=1>; rel="first", </api/v1/apps?limit=1&page=2>; rel="last", </api/v1/apps?limit=1&page=2>; rel="next"', response.headers["Link"]
+    get "/api/v1/apps", params: {page: 999, limit: 1}, headers: headers
+    assert_response :ok
+    assert_equal "999", response.headers["Current-Page"]
+    assert_equal "1", response.headers["Page-Items"]
+    assert_equal '</api/v1/apps?limit=1&page=1>; rel="first", </api/v1/apps?limit=1&page=2>; rel="last", </api/v1/apps?limit=1&page=998>; rel="prev"', response.headers["Link"]
+    assert_empty json_response.fetch("apps")
+  end
+
   test "long pagination retains the seven-slot window" do
     template = server_action_runs(:deploy_success).attributes.except("id")
     ServerActionRun.insert_all!(201.times.map { template })

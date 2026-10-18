@@ -15,7 +15,7 @@ class Api::V1::OperationsControllerTest < ActionDispatch::IntegrationTest
     @secret = @token.token
     @run = ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "http-op",
       request: {}, request_id: "original-request", scope: "apps:write") do
-      ServerAction::Enqueue.call(action: "apps.restart", target: @app, payload: {note: "sentinel-operation-secret"})
+      ServerAction::Enqueue.build(action: "apps.restart", target: @app, payload: {note: "sentinel-operation-secret"})
     end
   end
 

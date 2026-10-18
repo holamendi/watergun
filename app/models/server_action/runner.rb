@@ -19,7 +19,7 @@ class ServerAction::Runner
       connection.execute("SELECT pg_advisory_lock(#{lock_key})")
       primary = nil
       begin
-        Current.set(executing_server_action: @run) { perform_claimed }
+        perform_claimed
       rescue => error
         primary = error
         raise

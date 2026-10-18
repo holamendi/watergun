@@ -1,9 +1,11 @@
 class EnvVariable::CreateEnvVariable
+  attr_reader :server_action_run
+
   def initialize(env_variable)
     @env_variable = env_variable
   end
 
-  def save
+  def save(enqueue: true)
     raise ArgumentError, "Environment variable is already persisted" unless @env_variable.new_record?
     return false unless @env_variable.valid?
     ServerAction::TargetValidation.app_context!(@env_variable.app)
@@ -19,8 +21,9 @@ class EnvVariable::CreateEnvVariable
       @env_variable.status = :pending
       @env_variable.save!
       app.increment!(:env_generation)
-      ServerAction::Enqueue.call(action: "apps.update_env", target: @env_variable.app,
+      @server_action_run = ServerAction::Enqueue.build(action: "apps.update_env", target: @env_variable.app,
         payload: {set: @env_variable.to_h, unset: []})
+      ServerAction::Enqueue.persist(server_action_run) if enqueue
     end
     true
   end

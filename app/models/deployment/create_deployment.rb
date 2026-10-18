@@ -7,22 +7,45 @@ class Deployment::CreateDeployment
   attribute :github_event
   attribute :builder
 
+  attr_reader :server_action_run
+
   validates :app, presence: true
   validate :validate_prerequisites
   validate :validate_commit_sha, if: -> { errors.empty? }
 
-  def save!
-    validate!
+  def prepare
+    identity = source_identity
+    return false unless valid?
 
-    ServerAction::Conflict.with_app_lock(app) do
+    @prepared_source = identity
+    true
+  end
+
+  def save!(enqueue: true)
+    raise ActiveModel::ValidationError, self unless @prepared_source || prepare
+
+    ServerAction::Conflict.with_app_lock(app) do |locked_app|
+      self.app = locked_app
+      raise ServerAction::Conflict::Error unless source_identity == @prepared_source
+      ServerAction::TargetValidation.app_context!(app)
       deployment = app.deployments.create!(github_event:, **deployment_attributes)
       selected_builder = builder || app.builder
-      ServerAction::Enqueue.call(action: "apps.deploy", target: deployment, payload: selected_builder ? {builder: selected_builder} : {})
+      @server_action_run = ServerAction::Enqueue.build(action: "apps.deploy", target: deployment, payload: selected_builder ? {builder: selected_builder} : {})
+      ServerAction::Enqueue.persist(server_action_run) if enqueue
       deployment
     end
   end
 
   private
+
+  def source_identity
+    return unless app
+
+    repository = app.github_repo
+    {server_id: app.server_id, installation_id: app.account.github_installation&.id,
+     repository_id: repository&.id, repo: repository&.repo, branch: repository&.branch,
+     builder: app.builder, selected_builder: builder, commit_sha: commit_sha}
+  end
 
   def validate_prerequisites
     return unless app

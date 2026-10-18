@@ -10,7 +10,7 @@ class App::CreateApp
   attribute :builder, :string, default: "herokuish"
 
   attribute :app
-  attribute :create_app_server_action
+  attr_reader :server_action_run
 
   validates :project, :repo, :branch, presence: true
   validates :webhook_deploy, inclusion: {in: [true, false]}
@@ -19,20 +19,38 @@ class App::CreateApp
   validate :validate_remote_repo_exists, if: -> { errors.empty? }
   validate :validate_remote_branch_exists, if: -> { errors.empty? }
 
-  def save
+  def prepare
+    identity = source_identity
     return false unless valid?
+
+    @prepared_source = identity
+    true
+  end
+
+  def save(enqueue: true)
+    return false unless @prepared_source || prepare
 
     App.transaction do
       project.lock!
+      raise ServerAction::Conflict::Error unless source_identity == @prepared_source
+      ServerAction::TargetValidation.app_context!(project)
       create_app!
       create_github_repo!
-      ServerAction::Enqueue.call(action: "apps.create", target: app)
+      @server_action_run = ServerAction::Enqueue.build(action: "apps.create", target: app)
+      ServerAction::Enqueue.persist(server_action_run) if enqueue
     end
 
     true
   end
 
   private
+
+  def source_identity
+    return unless project
+
+    {project_id: project.id, server_id: project.server_id, installation_id: project.account.github_installation&.id,
+     name: name, repo: repo, branch: branch, builder: builder}
+  end
 
   def validate_prerequisites
     return unless project

@@ -14,8 +14,13 @@ single-variable service interfaces remain unchanged. Deployment diagnostics/rate
 limits (#77) and real release verification (#78) remain separate gates.
 The shared Ruby boundary
 is ServerAction::Accept.call(token:, endpoint:, target:, key:, request:,
-request_id:, scope:) { |locked_target| ... }, returning exactly one newly
-enqueued ServerActionRun from the existing domain call. Pass validated logical
+request_id:, scope:) { |locked_target| ... }, returning exactly one unsaved
+ServerActionRun from the existing domain service's server_action_run reader.
+Services retain save/save!/destroy results; enqueue: false explicitly transfers
+run persistence/dispatch ownership to Accept. Direct UI calls enqueue by default.
+Accept attaches metadata and persists that one run with dispatch: false, then
+schedules after its commit. Current carries request/auth context only.
+Pass validated logical
 JSON with defaults expanded, a fixed method/route identity, a Project/App reference
 and the server-generated request ID; never pass raw controller parameters. The
 boundary owns commit (no enclosing caller transaction), locks/revalidates token,
@@ -28,8 +33,9 @@ live owned target. render_operation(run, status: :accepted) supplies the shared
 
 Optional prepare: resolves source metadata before row locks, only when no
 committed key exists. Acceptance rechecks the key and authorization, and the
-controller compares prepared repository/installation/server/builder context with
-the locked target before calling the same domain service. Simultaneous initial
+named domain service retains its prepared source identity and compares it with
+the locked target in save/save!, without positional arrays or association-based
+run discovery. Simultaneous initial
 requests may both read GitHub; only one can commit. Committed retries never
 resolve a new branch HEAD or require GitHub availability.
 

@@ -50,6 +50,6 @@ class ServerActions::UpdateEnv
   end
 
   def schedule_restart!
-    ServerAction::Enqueue.call(action: "apps.restart", target: app)
+    ServerAction::Enqueue.call(action: "apps.restart", target: app, executing_run: @run)
   end
 end

@@ -9,7 +9,7 @@ class Api::V1::EnvController < Api::V1::ApplicationController
     accept_operation(App.new(id: params[:id]), endpoint: "PUT /api/v1/apps/:id/env", scope: "env:write", body: body) do |app|
       usable_app!(app)
       command = EnvVariable::WriteEnvVariables.new(app: app, mode: body["mode"], values: body["values"])
-      raise ServerAction::Accept::Error, "validation_failed" unless command.save
+      raise ServerAction::Accept::Error, "validation_failed" unless command.save(enqueue: false)
       command.server_action_run
     end
   end

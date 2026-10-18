@@ -3,7 +3,8 @@ class App::DestroyApp
     @app = app
   end
 
-  def destroy
-    ServerAction::Enqueue.call(action: "apps.destroy", target: @app)
+  def destroy(enqueue: true)
+    run = ServerAction::Enqueue.build(action: "apps.destroy", target: @app)
+    enqueue ? ServerAction::Enqueue.persist(run) : run
   end
 end

@@ -1,7 +1,5 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :account,
-    :accepting_server_action,
-    :executing_server_action,
     :api_token,
     :membership,
     :project,
