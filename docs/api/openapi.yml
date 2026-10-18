@@ -424,7 +424,7 @@ components:
         succeeded requires confirmed primary work and required local finalization.
         failed/repair_required retains known remote completion but blocks conflicting
         app mutations until inspected repair; it never authorizes remote replay.
-        failed/execution_failed before an SSH session is known unsent and does not
+        failed/execution_failed before command dispatch is known unsent and does not
         retain uncertain-work exclusion. Optional notifications/log failures do not
         undo confirmed finalization.
       additionalProperties: false

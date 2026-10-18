@@ -71,7 +71,6 @@ class Github::ProcessEventJob < ApplicationJob
         ServerAction::Runner.report(error, run.id, phase: "webhook accepted dispatch")
       end
     end
-    defer_remaining! unless @github_event.reload.processed?
   end
 
   def matching_repos
@@ -85,11 +84,5 @@ class Github::ProcessEventJob < ApplicationJob
   def settle_target!(app_id)
     pending = @github_event.pending_app_ids - [app_id]
     @github_event.update!(pending_app_ids: pending, processed_at: pending.empty? ? Time.current : nil)
-  end
-
-  def defer_remaining!
-    self.class.set(wait: 30.seconds).perform_later(@github_event)
-  rescue => error
-    ServerAction::Runner.report(error, nil, phase: "webhook retry dispatch")
   end
 end

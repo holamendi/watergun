@@ -43,7 +43,7 @@ class ServerAction::Runner
     primary = nil
     status = :success
     validated = false
-    session_opened = false
+    execution_returned = false
     begin
       @run.reload
       if @run.api_token_id
@@ -59,9 +59,10 @@ class ServerAction::Runner
       validated = true
       @logs = ServerAction::LogPersistence.new(@run, @action)
       @run.server.ssh_session do |session|
-        session_opened = true
+        @session = session
         @logs.start(session)
         @action.execute!(session)
+        execution_returned = true
         unless @run.update_columns(remote_completed_at: Time.current)
           raise ActiveRecord::RecordNotSaved, "Remote completion was not recorded"
         end
@@ -107,9 +108,13 @@ class ServerAction::Runner
       # update_columns mutates and clears the attribute before executing SQL.
       # Only a fresh persisted marker can release uncertain-work exclusion.
       @run.reload
+      # Ssh::Session records a command before dispatch. A live exception with
+      # no command and no returned execute! is known unsent, even after connect.
+      # Recovery cannot infer that from a dead worker's missing in-memory state.
+      remote_attempted = execution_returned || !!@session&.commands&.any?
       @run.update!(status: status, finished_at: Time.current,
-        outcome_uncertain: session_opened && status == :error && !@run.remote_completed_at,
-        dispatch_pending_at: nil, public_error_code: public_error(primary, status, session_opened: session_opened),
+        outcome_uncertain: remote_attempted && status == :error && !@run.remote_completed_at,
+        dispatch_pending_at: nil, public_error_code: public_error(primary, status, remote_attempted: remote_attempted),
         failure_message: (status == :error) ? "Server action failed (#{primary.class.name})" : nil)
     rescue => write_error
       self.class.report(write_error, @run.id, phase: "final persistence")
@@ -122,11 +127,11 @@ class ServerAction::Runner
     @run
   end
 
-  def public_error(primary, status, session_opened:)
+  def public_error(primary, status, remote_attempted:)
     return "repair_required" if @run.repair_required?
     return if @run.finalized_at || status == :success
     return "authorization_failed" if primary.is_a?(ServerAction::Accept::Error)
-    return "execution_failed" unless session_opened
+    return "execution_failed" unless remote_attempted
     (status == :failure) ? "remote_failed" : "outcome_unknown"
   end
 end

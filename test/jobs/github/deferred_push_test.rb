@@ -18,12 +18,34 @@ class Github::DeferredPushTest < ActiveSupport::TestCase
     Github::Installation.any_instance.stubs(:api_client).returns(stub(commit: commit))
   end
 
+  test "repeated busy deliveries do not create growing retry chains" do
+    ServerAction::Enqueue.call(action: "apps.restart", target: @busy)
+    assert_no_enqueued_jobs(only: Github::ProcessEventJob) do
+      2.times { Github::ProcessEventJob.perform_now(@event) }
+    end
+    refute @event.reload.processed?
+    assert_enqueued_with(job: Github::ProcessEventJob, args: [@event]) { Github::ProcessEventJob.recover_pending }
+  end
+
+  test "separate pushes retain separate busy target obligations without coalescing" do
+    ServerAction::Enqueue.call(action: "apps.restart", target: @busy)
+    Github::ProcessEventJob.perform_now(@event)
+    second = @event.dup
+    second.assign_attributes(pending_app_ids: nil, processed_at: nil)
+    second.save!
+    Github::ProcessEventJob.perform_now(second)
+    assert_includes @event.reload.pending_app_ids, @busy.id
+    assert_includes second.reload.pending_app_ids, @busy.id
+    refute_equal @event.id, second.id
+    refute @event.processed?
+    refute second.processed?
+  end
+
   test "a busy target is deferred durably while idle targets progress without duplicate acceptance" do
     restart = ServerAction::Enqueue.call(action: "apps.restart", target: @busy)
 
-    assert_enqueued_with(job: Github::ProcessEventJob, args: [@event]) do
-      Github::ProcessEventJob.perform_now(@event)
-    end
+    Github::ProcessEventJob.perform_now(@event)
+    assert_enqueued_with(job: Github::ProcessEventJob, args: [@event]) { Github::ProcessEventJob.recover_pending }
 
     refute @event.reload.processed?
     idle_deployment = @idle.deployments.find_by!(github_event: @event)

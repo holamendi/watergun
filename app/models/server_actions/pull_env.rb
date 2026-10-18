@@ -37,7 +37,8 @@ class ServerActions::PullEnv
 
       records = app.env_variables.lock.includes(:service_link).to_a
       observed.each do |attributes|
-        record = records.find { |existing| existing.name == attributes.fetch("name") }
+        matching = records.select { |existing| existing.name == attributes.fetch("name") }
+        record = matching.find(&:kept?) || matching.first
         next if record && (record.discarded? || record.account_id != app.account_id)
         next if record&.pending? && record.editable? && record.value != attributes.fetch("value")
 

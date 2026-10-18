@@ -20,6 +20,18 @@ class ServerActionExecutionTruthTest < ActiveSupport::TestCase
     refute_equal run.id, replacement.id
   end
 
+  test "local preparation failure inside an open session but before any send does not freeze work" do
+    run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+    fail_next_domain_update(App, @app.id, "restarting", "test pre-send state failure")
+    transport = mock("unused SSH transport")
+    transport.expects(:exec!).never
+    Net::SSH.expects(:start).yields(transport)
+    assert_raises(IOError) { ServerAction::Runner.new(run).call }
+    refute run.reload.outcome_uncertain?
+    assert_equal "execution_failed", run.public_error_code
+    assert ServerAction::Enqueue.call(action: "apps.restart", target: @app).persisted?
+  end
+
   test "required domain discovery failure is repair required rather than successful creation" do
     run = ServerAction::Enqueue.call(action: "apps.create", target: @app)
     mock_ssh_session(host: @app.server.public_ip, user: SshKey::USER, port: @app.server.ssh_port,
@@ -36,6 +48,18 @@ class ServerActionExecutionTruthTest < ActiveSupport::TestCase
     assert_equal "repair_required", resource.dig("error", :code)
     refute run.outcome_uncertain?, "primary remote completion is known, but required local setup is not"
     assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.destroy", target: @app) }
+  end
+
+  test "legacy remote completed success without finalization remains visible and protected" do
+    # Deliberately seeded historical recovery output, not a claim of execution.
+    run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
+    run.update!(status: :success, remote_completed_at: 1.day.ago, finished_at: 1.day.ago)
+    Net::SSH.expects(:start).never
+    ServerAction::Recovery.recover(run)
+    assert_equal "failed", run.reload.public_status
+    assert_equal "repair_required", Api::V1::OperationResource.new(run).to_h.dig("error", :code)
+    assert_raises(ServerAction::Conflict::Error) { ServerAction::Enqueue.call(action: "apps.restart", target: @app) }
+    assert_raises(ArgumentError) { ServerAction::Recovery.repair_delete!(run) }
   end
 
   test "optional restart toast failure does not require domain repair" do

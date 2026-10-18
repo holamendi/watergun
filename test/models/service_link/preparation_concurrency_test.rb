@@ -19,6 +19,46 @@ class ServiceLink::PreparationConcurrencyTest < ActiveSupport::TestCase
     @app.destroy!
   end
 
+  test "waiting UI edit rechecks service protection after the link writer commits" do
+    entered = Queue.new
+    worker = nil
+    @app.with_lock do
+      connection = App.connection
+      owner = connection.select_value("SELECT pg_backend_pid()")
+      worker = Thread.new do
+        App.connection_pool.with_connection do |other|
+          variable = EnvVariable.find(@variable.id)
+          variable.service_link
+          variable.assign_attributes(name: "UI_RENAMED", internal: false, value: "ui-desired")
+          entered << other.select_value("SELECT pg_backend_pid()")
+          EnvVariable::UpdateEnvVariable.new(variable).save
+        end
+      end
+      pid = Timeout.timeout(10) { entered.pop }
+      refute_equal owner, pid
+      Timeout.timeout(10) do
+        loop do
+          connection.execute("SELECT pg_stat_clear_snapshot()")
+          break if connection.select_value("SELECT #{owner.to_i} = ANY(pg_blocking_pids(#{pid.to_i}))")
+          worker.value unless worker.alive?
+          Thread.pass
+        end
+      end
+      assert ServiceLink::CreateServiceLink.new(app: @app, service: @service).save!
+    end
+    assert worker.join(10), "UI writer did not finish"
+    refute worker.value
+    assert @variable.reload.internal?
+    assert_equal "temp", @variable.value
+    assert_equal 1, @app.service_links.kept.where(env_variable: @variable).count
+    assert_empty ServerActionRun.where(target: @app, action_key: "apps.update_env")
+  ensure
+    if worker&.alive?
+      worker.kill
+      worker.join(10)
+    end
+  end
+
   test "service link preparation takes app before an existing environment row" do
     entered = Queue.new
     worker = nil

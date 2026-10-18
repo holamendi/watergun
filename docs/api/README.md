@@ -305,8 +305,9 @@ The corrective runner records finalized_at only after required succeeded! work
 returns. A known remote completion without this evidence is failed/repair_required,
 not succeeded; it retains conflicting-work exclusion, even on legacy success rows.
 Optional toast/log notification failure after finalization is not required repair.
-Known failures before entering the SSH session are failed/execution_failed (or
-authorization_failed for token checks) and permit a new explicit request. Death
+Known pre-dispatch failures, including local preparation with an open SSH session
+but no recorded command, are failed/execution_failed (or authorization_failed for
+token checks) and permit a new explicit request. Death
 after claim without completion evidence remains outcome_unknown: no guessed replay.
 Recovery never blindly reruns success hooks. An operator may explicitly invoke
 ServerAction::Recovery.repair_delete!(run) for a confirmed remote apps.destroy:
@@ -368,9 +369,10 @@ coalescing. Removed/discarded/retargeted apps settle without deploying to a new
 source. Event preparation resolves GitHub outside locks, then the service checks
 the source identity under the app lock before accepting it.
 
-A scheduled retry is only a wake-up: the retained event is authoritative. The
-recover_deferred_pushes scheduler requeues routed pending events after queue or
-worker failure. Legacy pending_app_ids=NULL events are not automatically replayed;
+A scheduler delivery is only a wake-up: the retained event is authoritative. The
+every-minute recover_deferred_pushes scheduler requeues routed pending events
+after queue or worker failure. Attempts do not spawn self-renewing retry chains.
+Legacy pending_app_ids=NULL events are not automatically replayed;
 old deployments without event linkage cannot be retrospectively deduplicated.
 See corrective-rollout.md for compatibility and cutover constraints.
 

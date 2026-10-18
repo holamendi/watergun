@@ -12,7 +12,7 @@ class EnvVariable::UpdateEnvVariable
     raise ArgumentError, "Environment variable ownership mismatch" unless @env_variable.account_id == @env_variable.app.account_id
     intended = @env_variable.attributes.slice("name", "value")
     ServerAction::Conflict.with_app_lock(@env_variable.app) do |app|
-      @env_variable.reload.lock!
+      @env_variable.reload(lock: true)
       raise ArgumentError, "Environment variable ownership mismatch" unless @env_variable.account_id == app.account_id && @env_variable.app_id == app.id
       raise ArgumentError, "Environment variable is discarded" if @env_variable.discarded?
       unless @env_variable.editable?
@@ -22,11 +22,12 @@ class EnvVariable::UpdateEnvVariable
       @env_variable.assign_attributes(intended)
       return false unless @env_variable.valid?
       changed = @env_variable.name_changed? || @env_variable.value_changed?
+      claimed = !@env_variable.managed?
       @env_variable.managed = true
       @env_variable.status = :pending if changed
       @env_variable.save!
+      app.increment!(:env_generation) if changed || claimed
       if changed
-        app.increment!(:env_generation)
         unset = (@env_variable.saved_change_to_name? && @env_variable.name_before_last_save) ? [@env_variable.name_before_last_save] : []
         @server_action_run = ServerAction::Enqueue.build(action: "apps.update_env", target: @env_variable.app,
           payload: {set: @env_variable.to_h, unset:})

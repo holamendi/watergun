@@ -61,6 +61,22 @@ class EnvVariable::ReconciliationTest < ActiveSupport::TestCase
     assert link.reload.persisted?
   end
 
+  test "an explicit unchanged UI claim invalidates an older missing observation" do
+    variable = @app.env_variables.create!(name: "CLAIMED_DURING_PULL", value: "desired", status: :synced)
+    pull([]) { assert EnvVariable::UpdateEnvVariable.new(variable).save }
+    assert EnvVariable.exists?(variable.id), "old observation erased a newer ownership claim"
+    assert variable.reload.managed?
+  end
+
+  test "pull reconciles a reclaimed name rather than its historical tombstone" do
+    @app.env_variables.create!(name: "RECLAIMED", value: "old", discarded_at: 1.day.ago)
+    current = @app.env_variables.create!(name: "RECLAIMED", value: "desired", managed: true)
+    pull([{"name" => "RECLAIMED", "value" => "desired"}])
+    assert current.reload.synced?
+    assert current.managed?
+    assert_equal "desired", current.value
+  end
+
   test "old export cannot overwrite a newer desired value" do
     variable = @app.env_variables.create!(name: "VALUE", value: "old", status: :synced)
     pull([{"name" => "VALUE", "value" => "old"}]) do

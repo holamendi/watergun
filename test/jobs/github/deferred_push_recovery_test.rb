@@ -17,7 +17,12 @@ class Github::DeferredPushRecoveryTest < ActiveSupport::TestCase
       headers: {"HTTP_X_GITHUB_EVENT" => "push"},
       payload: {"ref" => "refs/heads/main", "after" => "b" * 40, "repository" => {"full_name" => "owner/push-recovery"}})
     commit = stub(sha: "b" * 40, author: nil, commit: stub(author: nil, message: "push"), html_url: "https://example.test/commit")
-    Github::Installation.any_instance.stubs(:api_client).returns(stub(commit: commit))
+    client = Object.new
+    client.define_singleton_method(:commit) do |_repo, _sha|
+      raise "GitHub resolution held row locks" if ApplicationRecord.connection.transaction_open?
+      commit
+    end
+    Github::Installation.any_instance.stubs(:api_client).returns(client)
     @adapter = Github::ProcessEventJob.queue_adapter
     @jobs = SolidQueue::Job.where(class_name: "Github::ProcessEventJob")
       .where("arguments::jsonb -> 'arguments' -> 0 ->> '_aj_globalid' = ?", @event.to_global_id.to_s)
@@ -47,6 +52,7 @@ class Github::DeferredPushRecoveryTest < ActiveSupport::TestCase
       FOR EACH ROW EXECUTE FUNCTION reject_push_retry_test();
     SQL
     Github::ProcessEventJob.perform_now(@event)
+    Github::ProcessEventJob.recover_pending
     assert_equal [@app.id], @event.reload.pending_app_ids
     refute @event.processed?
     entered = Queue.new
