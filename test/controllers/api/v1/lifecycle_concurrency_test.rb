@@ -2,6 +2,7 @@ require "test_helper"
 require "timeout"
 
 class Api::V1::LifecycleConcurrencyTest < ActiveSupport::TestCase
+  # Independent HTTP sessions must contend over committed acceptance state.
   self.use_transactional_tests = false
 
   setup do
@@ -18,8 +19,14 @@ class Api::V1::LifecycleConcurrencyTest < ActiveSupport::TestCase
   end
 
   teardown do
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    runs = ServerActionRun.where(api_token_id: @token.id)
+    created_apps = runs.where(action_key: "apps.create").pluck(:operation_app_id)
+    created_deployments = runs.where(action_key: "apps.deploy").pluck(:operation_deployment_id)
+    runs.destroy_all
+    Deployment.where(id: created_deployments).destroy_all
+    App.where(id: created_apps).destroy_all
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "concurrent HTTP identical create retries persist exactly one app repo and durable operation" do
@@ -102,7 +109,7 @@ class Api::V1::LifecycleConcurrencyTest < ActiveSupport::TestCase
     assert_equal "dockerfile", run.payload.fetch("builder")
   ensure
     2.times { release << "e" * 40 } if release
-    threads&.each { |thread| thread.join(15) || thread.kill }
+    threads&.each { |thread| thread.join(15) || thread.kill.join(10) }
   end
 
   private
@@ -139,8 +146,8 @@ class Api::V1::LifecycleConcurrencyTest < ActiveSupport::TestCase
         end
       end
     end
-    threads.map(&:value)
+    Timeout.timeout(15) { threads.map(&:value) }
   ensure
-    threads.each { |thread| thread.join(15) || thread.kill }
+    threads.each { |thread| thread.join(15) || thread.kill.join(10) }
   end
 end

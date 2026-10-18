@@ -1,20 +1,22 @@
 require "test_helper"
 
 class Api::V1::LifecycleMutationsTest < ActionDispatch::IntegrationTest
+  # These HTTP mutations prove durable acceptance outside a fixture transaction.
   self.use_transactional_tests = false
 
   setup do
-    @app = apps(:domain_test_app)
-    @app.update!(deployed_at: Time.current)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "lifecycle-mutations", status: :active, deployed_at: Time.current)
     @app.server.update!(status: :active)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:read", "apps:write", "deployments:write", "operations:read"])
     @secret = @token.token
   end
 
   teardown do
-    ServerActionLog.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    ServerActionRun.where(api_token_id: @token.id).destroy_all
+    App.find_by(id: @app.id)&.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "restart is durable asynchronous correlated and identical retries precede the busy check" do

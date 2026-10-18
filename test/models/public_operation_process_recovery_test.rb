@@ -2,13 +2,17 @@ require "test_helper"
 require "timeout"
 
 class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
+  # Real queue INSERTs, forked processes and SIGKILL need independently committed rows.
   self.use_transactional_tests = false
 
   setup do
-    @app = apps(:domain_test_app)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "process-recovery", status: :active)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write"])
     @old_adapter = RunServerActionJob.queue_adapter
     RunServerActionJob.queue_adapter = :solid_queue
+    @jobs = SolidQueue::Job.where(class_name: "RunServerActionJob")
+      .where("arguments::jsonb -> 'arguments' ->> 0 IN (SELECT id::text FROM server_action_runs WHERE api_token_id = ?)", @token.id)
   end
 
   teardown do
@@ -19,12 +23,13 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     # Release the killed worker's claims before deleting its jobs, so Solid Queue
     # can release their concurrency semaphores rather than leaking test leases.
     SolidQueue::Process.where(name: "public-operation-crash-#{@app.id}").destroy_all
-    SolidQueue::Job.where(class_name: "RunServerActionJob").destroy_all
+    @jobs.destroy_all
     runs = ServerActionRun.where(operation_app_id: @app.id)
     ServerActionLog.where(server_action_run_id: runs.select(:id)).delete_all
     runs.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    App.find_by(id: @app.id)&.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "real queue insert failure preserves committed acceptance and a new process recovers it" do
@@ -217,11 +222,11 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     refute_match(/child-error/, message)
     if kill
       Process.kill("KILL", pid)
-      _, status = Process.wait2(pid)
+      _, status = Timeout.timeout(15) { Process.wait2(pid) }
       assert status.signaled?
       assert_equal Signal.list.fetch("KILL"), status.termsig
     else
-      _, status = Process.wait2(pid)
+      _, status = Timeout.timeout(15) { Process.wait2(pid) }
       assert status.success?, message
     end
   ensure
@@ -230,7 +235,7 @@ class PublicOperationProcessRecoveryTest < ActiveSupport::TestCase
     if pid
       begin
         Process.kill("KILL", pid)
-        Process.wait(pid)
+        Timeout.timeout(10) { Process.wait(pid) }
       rescue Errno::ESRCH, Errno::ECHILD
       end
     end

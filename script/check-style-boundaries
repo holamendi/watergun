@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+require "prism"
+require "json"
+
+# Two deliberately lexical boundaries, not an information-flow or ownership proof.
+# See docs/coding-and-testing.md and the executable sabotage tests.
+root = File.expand_path(ARGV.fetch(0, Dir.pwd))
+allowed_context = %i[account api_token membership project server session source user]
+findings = []
+walk = lambda do |node, &block|
+  return unless node
+
+  block.call(node)
+  node.compact_child_nodes.each { |child| walk.call(child, &block) }
+end
+Dir.glob(File.join(root, "{app,test}/**/*.rb")).sort.each do |path|
+  relative = path.delete_prefix("#{root}/")
+  result = Prism.parse_file(path)
+  result.errors.each { |error| findings << {rule: "syntax", path: relative, line: error.location.start_line} }
+  nodes = []
+  walk.call(result.value) { |node| nodes << node }
+  committed = nodes.any? do |node|
+    node.is_a?(Prism::CallNode) && node.name == :use_transactional_tests= &&
+      node.arguments&.arguments&.first.is_a?(Prism::FalseNode)
+  end
+  nodes.each do |node|
+    next unless node.is_a?(Prism::CallNode)
+
+    if relative == "app/models/current.rb" && %i[attribute attr_accessor attr_reader attr_writer].include?(node.name)
+      arguments = node.arguments&.arguments || []
+      unless arguments.all? { |argument| argument.is_a?(Prism::SymbolNode) && allowed_context.include?(argument.unescaped.to_sym) }
+        findings << {rule: "current.context_only", path: relative, line: node.location.start_line}
+      end
+    end
+    receiver = node.receiver
+    direct_constant = receiver.is_a?(Prism::ConstantReadNode) || receiver.is_a?(Prism::ConstantPathNode)
+    if relative.start_with?("test/") && committed && direct_constant && %i[delete_all destroy_all].include?(node.name)
+      findings << {rule: "tests.no_table_wide_cleanup", path: relative, line: node.location.start_line}
+    end
+  end
+end
+puts JSON.pretty_generate(findings)
+exit(findings.empty? ? 0 : 1)

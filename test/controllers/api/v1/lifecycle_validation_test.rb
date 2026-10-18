@@ -1,6 +1,7 @@
 require "test_helper"
 
 class Api::V1::LifecycleValidationTest < ActionDispatch::IntegrationTest
+  # Reject through the real acceptance boundary, which must own its commit.
   self.use_transactional_tests = false
 
   setup do
@@ -13,8 +14,10 @@ class Api::V1::LifecycleValidationTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    ServerActionRun.where(api_token_id: @token.id).destroy_all
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
+    @foreign_project&.destroy!
   end
 
   test "all lifecycle routes reject missing insufficient readonly expired and revoked tokens before disclosure" do
@@ -37,7 +40,7 @@ class Api::V1::LifecycleValidationTest < ActionDispatch::IntegrationTest
   end
 
   test "foreign inconsistent discarded and wrong parent resources are nondisclosing" do
-    foreign = Project.create!(account: accounts(:other), server: servers(:other_server), name: "Foreign")
+    foreign = @foreign_project = Project.create!(account: accounts(:other), server: servers(:other_server), name: "Foreign")
     foreign_app = foreign.apps.create!(name: "Foreign")
     assert_no_difference "ServerActionRun.count" do
       post "/api/v1/projects/#{foreign.id}/apps", params: create_body, as: :json, headers: auth

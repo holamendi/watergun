@@ -3,6 +3,7 @@ require "test_helper"
 class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
   include SshTestHelper
 
+  # HTTP acceptance commits independently; these are not serializer-only cases.
   self.use_transactional_tests = false
 
   setup do
@@ -50,7 +51,7 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
     refute_includes row, value
     refute_includes row, Base64.strict_encode64(value)
     mock_ssh_session(host: @app.server.public_ip, user: SshKey::USER, port: @app.server.ssh_port, private_key: @app.server.ssh_key.private_key,
-      commands: [{cmd: Dokku::Config::SetCommand.new(app: @app.dokku_id, env: {"NEW" => value}).cmd, stdout: value, stderr: Base64.strict_encode64(value)},
+      commands: [{cmd: "dokku config:set #{@app.dokku_id} NEW=\"aHR0cC1lbnYtd3JpdGUtc2VjcmV0\n\" --encoded --no-restart", stdout: value, stderr: Base64.strict_encode64(value)},
         {cmd: "dokku config:unset #{@app.dokku_id} OLD --no-restart"}], ordered: true)
     RunServerActionJob.perform_now(run.id, run.resource_key)
     assert run.reload.success?
@@ -71,7 +72,10 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
     assert_equal({"EMPTY" => ""}, run.payload.fetch("set"))
     assert_empty run.payload.fetch("unset")
     assert_equal "kept", @app.env_variables.kept.find_by!(name: "KEEP").value
-    run.update!(status: :success)
+    mock_ssh_session(host: @app.server.public_ip, user: SshKey::USER, port: @app.server.ssh_port, private_key: @app.server.ssh_key.private_key,
+      commands: [{cmd: "dokku config:set #{@app.dokku_id} EMPTY=\"\" --encoded --no-restart"}])
+    RunServerActionJob.perform_now(run.id, run.resource_key)
+    assert_equal "succeeded", run.reload.public_status
     write({mode: "merge", values: {EMPTY: nil}}, key: "delete-empty")
     assert_response :accepted
     assert_nil @app.env_variables.kept.find_by(name: "EMPTY")
@@ -90,7 +94,9 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
     assert_empty run.payload.fetch("set")
     assert_empty run.payload.fetch("unset")
     refute @app.reload.pending_restart?
-    run.update!(status: :success)
+    mock_ssh_session(host: @app.server.public_ip, user: SshKey::USER, port: @app.server.ssh_port, private_key: @app.server.ssh_key.private_key)
+    RunServerActionJob.perform_now(run.id, run.resource_key)
+    assert_equal "succeeded", run.reload.public_status
     write({mode: "replace", values: {}}, key: "replace")
     assert_response :accepted
     run = ServerActionRun.find(json_response.dig("operation", "id"))
@@ -135,31 +141,50 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
     Rails.logger = old_logger if old_logger
   end
 
-  test "invalid mixed batches and protected names cannot mutate any local rows or enqueue work" do
-    record = @app.env_variables.create!(name: "EXISTING", value: "original")
-    internal = @app.env_variables.create!(name: "SYSTEM", value: "private", internal: true)
-    linked = @app.env_variables.create!(name: "DATABASE_URL", value: "private")
-    ServiceLink.create!(app: @app, service: services(:postgres), env_variable: linked)
-    invalid = [{mode: "merge", values: {"OK" => "secret", "bad-name" => "no"}},
-      {mode: "replace", values: {OK: "secret", SYSTEM: nil}},
-      {mode: "replace", values: {OK: "secret", DATABASE_URL: "overwrite"}},
-      {mode: "merge", values: {DOKKU_FOO: "no"}}, {mode: "merge", values: {DOKKU_FOO: nil}},
-      {mode: "merge", values: {"X" * 129 => "no"}}, {mode: "merge", values: {"1BAD" => "no"}},
-      {mode: "merge", values: {BAD: "nul\0secret"}}, {mode: "merge", values: {BAD: "s" * 16_385}},
-      {mode: "merge", values: 101.times.to_h { |i| ["V#{i}", "s"] }},
-      {mode: "merge", values: {BAD: 1}}, {mode: "merge", values: {BAD: true}},
-      {mode: "merge", values: {BAD: {nested: "secret"}}}, {mode: "merge", values: []},
-      {mode: "merge", values: nil}, {mode: "oops", values: {}}, {mode: nil, values: {}}]
-    invalid.each_with_index do |body, index|
+  {
+    "a mixed valid and invalid name" => {mode: "merge", values: {"OK" => "secret", "bad-name" => "no"}},
+    "a reserved name write" => {mode: "merge", values: {DOKKU_FOO: "no"}},
+    "a reserved name deletion" => {mode: "merge", values: {DOKKU_FOO: nil}},
+    "a name over 128 characters" => {mode: "merge", values: {"X" * 129 => "no"}},
+    "a digit-prefixed name" => {mode: "merge", values: {"1BAD" => "no"}},
+    "a NUL value" => {mode: "merge", values: {BAD: "nul\0secret"}},
+    "a value over 16384 characters" => {mode: "merge", values: {BAD: "s" * 16_385}},
+    "more than 100 keys" => {mode: "merge", values: 101.times.to_h { |i| ["V#{i}", "s"] }},
+    "a numeric value" => {mode: "merge", values: {BAD: 1}},
+    "a boolean value" => {mode: "merge", values: {BAD: true}},
+    "a nested value" => {mode: "merge", values: {BAD: {nested: "secret"}}},
+    "an array of values" => {mode: "merge", values: []},
+    "null values" => {mode: "merge", values: nil},
+    "an unknown mode" => {mode: "oops", values: {}},
+    "a null mode" => {mode: nil, values: {}}
+  }.each do |name, body|
+    test "environment batch rejects #{name} without partial intent" do
+      record = @app.env_variables.create!(name: "EXISTING", value: "original")
       assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
-        write(body, key: "invalid-#{index}")
+        write(body)
         assert_response :unprocessable_content
         assert_equal "validation_failed", json_response.dig("error", "code")
       end
       assert_equal "original", record.reload.value
-      [record, internal, linked].each { |row| refute row.reload.discarded? }
+      assert record.kept?
       refute @app.reload.pending_restart?
       refute_includes response.body, "secret"
+    end
+  end
+
+  test "protected internal and linked keys reject replacement atomically" do
+    internal = @app.env_variables.create!(name: "SYSTEM", value: "private", internal: true)
+    linked = @app.env_variables.create!(name: "DATABASE_URL", value: "private")
+    ServiceLink.create!(app: @app, service: services(:postgres), env_variable: linked)
+    [internal, linked].each do |protected|
+      assert_no_difference ["EnvVariable.count", "ServerActionRun.count"] do
+        write({mode: "replace", values: {"OK" => "secret", protected.name => nil}})
+        assert_response :unprocessable_content, protected.name
+      end
+      assert protected.reload.kept?
+      assert_equal "private", protected.value
+      refute @app.env_variables.kept.exists?(name: "OK")
+      refute @app.reload.pending_restart?
     end
   end
 
@@ -199,7 +224,8 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
       write({mode: "merge", values: {B: "two", A: ""}})
       assert_response :conflict
       assert_equal "idempotency_conflict", json_response.dig("error", "code")
-      run.update!(status: :success)
+      # Explicitly seed terminal history to test replay identity, not execution.
+      run.update!(status: :success, finished_at: Time.current)
       write({mode: "merge", values: {B: "two", A: "one"}})
       assert_response :accepted
       assert_equal run.id, json_response.dig("operation", "id")
@@ -294,7 +320,7 @@ class Api::V1::EnvWritesTest < ActionDispatch::IntegrationTest
     assert_equal ["OMITTED"], run.payload.fetch("unset")
     assert_equal({name => value, "EMPTY" => ""}, run.payload.fetch("set"))
     mock_ssh_session(host: @app.server.public_ip, user: SshKey::USER, port: @app.server.ssh_port, private_key: @app.server.ssh_key.private_key,
-      commands: [{cmd: Dokku::Config::SetCommand.new(app: @app.dokku_id, env: {name => value, "EMPTY" => ""}).cmd},
+      commands: [{cmd: "dokku config:set #{@app.dokku_id} #{name}=\"#{Base64.encode64(value)}\" EMPTY=\"\" --encoded --no-restart"},
         {cmd: "dokku config:unset #{@app.dokku_id} OMITTED --no-restart"}], ordered: true)
     RunServerActionJob.perform_now(run.id, run.resource_key)
     assert run.reload.success?

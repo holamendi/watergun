@@ -2,28 +2,37 @@ require "test_helper"
 require "timeout"
 
 class ApiTokenConcurrencyTest < ActiveSupport::TestCase
+  # Token locks and competing HTTP sessions require independent committed state.
   self.use_transactional_tests = false
 
+  setup do
+    @token_ids = []
+    @browsers = []
+  end
+
   teardown do
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
-    Session.delete_all
+    @browsers.each { |browser| browser.delete("/session") }
+    ApiTokenAudit.where(api_token_id: @token_ids).delete_all
+    ApiToken.where(id: @token_ids).delete_all
+    @other&.destroy!
   end
 
   test "competing rotations issue only one replacement and one rotation audit" do
     token = accounts(:default).api_tokens.create!(user: users(:bobby))
+    @token_ids << token.id
     sessions = [browser(users(:bobby)), browser(users(:bobby))]
     results = competing_requests(token, sessions, [:rotate, :rotate])
     assert_equal [201, 404], results.map(&:status).sort
     assert token.reload.revoked_at
     assert_equal 1, ApiTokenAudit.where(api_token: token, action: "rotated").count
-    assert_equal 1, ApiTokenAudit.where(action: "issued").count
+    assert_equal 1, ApiTokenAudit.where(api_token_id: @token_ids, action: "issued").count
     issued = JSON.parse(results.find { |result| result.status == 201 }.body)
     assert ApiToken.authenticate(issued.fetch("secret"))
   end
 
   test "competing rotation and revocation cannot resurrect the original" do
     token = accounts(:default).api_tokens.create!(user: users(:bobby))
+    @token_ids << token.id
     secret = token.token
     sessions = [browser(users(:bobby)), browser(users(:bobby))]
     results = competing_requests(token, sessions, [:rotate, :revoke])
@@ -31,12 +40,13 @@ class ApiTokenConcurrencyTest < ActiveSupport::TestCase
     assert_equal 200, results.last.status
     assert_nil ApiToken.authenticate(secret)
     assert_equal 1, ApiTokenAudit.where(api_token: token).count
-    assert_equal (results.first.status == 201) ? 1 : 0, ApiTokenAudit.where(action: "issued").count
+    assert_equal (results.first.status == 201) ? 1 : 0, ApiTokenAudit.where(api_token_id: @token_ids, action: "issued").count
   end
 
   test "competing legacy claims assign exactly one owner and audit" do
     token = accounts(:default).api_tokens.create!
-    other = User.create!(email: "concurrent-owner@example.test", password: "abc123456")
+    @token_ids << token.id
+    other = @other = User.create!(email: "concurrent-owner@example.test", password: "abc123456")
     Membership.create!(account: accounts(:default), user: other)
     sessions = [browser(users(:bobby)), browser(other)]
     results = competing_requests(token, sessions, [:claim, :claim])
@@ -51,6 +61,7 @@ class ApiTokenConcurrencyTest < ActiveSupport::TestCase
 
   def browser(user)
     session = ActionDispatch::Integration::Session.new(Rails.application)
+    @browsers << session
     session.post "/session", params: {session: {email: user.email, password: "abc123456"}}
     assert_equal 302, session.response.status
     assert session.cookies[:session_token].present?
@@ -91,8 +102,17 @@ class ApiTokenConcurrencyTest < ActiveSupport::TestCase
         end
       end
     end
-    threads.map(&:value)
+    results = Timeout.timeout(15) { threads.map(&:value) }
+    results.select { |response| response.status == 201 }.each do |response|
+      @token_ids << JSON.parse(response.body).dig("api_token", "id")
+    end
+    results
   ensure
-    threads&.each { |thread| thread.join(15) || thread.kill }
+    threads&.each do |thread|
+      unless thread.join(15)
+        thread.kill
+        thread.join(10)
+      end
+    end
   end
 end

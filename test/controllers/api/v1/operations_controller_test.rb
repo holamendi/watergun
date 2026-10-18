@@ -4,6 +4,7 @@ require "json_schemer"
 class Api::V1::OperationsControllerTest < ActionDispatch::IntegrationTest
   include SshTestHelper
 
+  # Setup uses real committed acceptance; the repair case executes its worker.
   self.use_transactional_tests = false
 
   teardown do

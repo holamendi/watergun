@@ -2,20 +2,24 @@ require "test_helper"
 require "timeout"
 
 class PublicOperationConcurrencyTest < ActiveSupport::TestCase
+  # Separate PostgreSQL sessions must observe committed admission and row locks.
   self.use_transactional_tests = false
 
   setup do
-    @app = apps(:domain_test_app)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "operation-concurrency", status: :active)
+    @app_ids = [@app.id]
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write", "operations:read"])
   end
 
   teardown do
-    EnvVariable.delete_all
-    ServerActionLog.where(server_action_run_id: ServerActionRun.where.not(idempotency_digest: nil).select(:id)).delete_all
-    ServerActionRun.where.not(idempotency_digest: nil).delete_all
-    ServerActionRun.where(target: @app).where.not(id: ActiveRecord::FixtureSet.identify(:deploy_running)).delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    keys = @app_ids.map { |id| "app:#{id}" }
+    keys << "project:#{@owned_project.id}" if @owned_project
+    ServerActionRun.where(resource_key: keys).destroy_all
+    App.where(id: @app_ids).destroy_all
+    @owned_project&.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "independent connections accept one canonical duplicate and conflict for changed payload" do
@@ -79,8 +83,9 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
   end
 
   test "project deletion races atomically with app acceptance on independent connections" do
-    project = Project.create!(server: @app.server, account: @app.account, name: "project-race")
+    project = @owned_project = Project.create!(server: @app.server, account: @app.account, name: "project-race")
     @app = project.apps.create!(server: project.server, name: "app-race")
+    @app_ids << @app.id
     results = contend(project) do |index|
       (index == 0) ? accept : Project::DestroyProject.new(Project.find(project.id)).destroy
     rescue ServerAction::Accept::Error, ServerAction::Conflict::Error => error
@@ -128,11 +133,11 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
       command.server_action_run
     end
     assert run.persisted?
-    assert_equal :conflict, ui.value
+    assert_equal :conflict, Timeout.timeout(15) { ui.value }
     assert_equal "api", variable.reload.value
     assert_equal 1, ServerActionRun.where(api_token_id: @token.id).count
   ensure
-    ui&.join(10) || ui&.kill
+    ui&.join(10) || ui&.kill&.join(10)
   end
 
   %i[api ui].each do |source|
@@ -201,7 +206,7 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
           assert variable.reload.discarded?
         end
       end
-      worker.value
+      Timeout.timeout(15) { worker.value }
       assert_equal 1, ServerActionRun.where(target: @app, action_key: "apps.update_env").count
       assert_nil @app.env_variables.find_by(name: "REMOTE_RACE"), "export predates desired intent"
       if mutation == :create
@@ -217,7 +222,7 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
         assert variable.reload.discarded?
       end
     ensure
-      worker&.join(10) || worker&.kill
+      worker&.join(10) || worker&.kill&.join(10)
     end
   end
 
@@ -240,6 +245,9 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
     assert run.reload.running?
   ensure
     release << true if release
+    finished = thread&.join(15)
+    thread&.kill&.join(10) unless finished
+    assert finished if thread
     thread&.value
   end
 
@@ -278,8 +286,8 @@ class PublicOperationConcurrencyTest < ActiveSupport::TestCase
       end
       before_release&.call
     end
-    threads.map(&:value)
+    Timeout.timeout(15) { threads.map(&:value) }
   ensure
-    threads&.each { |thread| thread.join(15) || thread.kill }
+    threads&.each { |thread| thread.join(15) || thread.kill.join(10) }
   end
 end

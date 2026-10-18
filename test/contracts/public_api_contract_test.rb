@@ -70,7 +70,7 @@ class PublicApiContractTest < ActiveSupport::TestCase
     assert_includes output.string, "run_key="
   end
 
-  test "the runnable workflow exercises the complete target sequence with a stable retry key" do
+  test "client unit transport exercises the target sequence with a stable retry key" do
     load Rails.root.join("script/api-workflow")
     document = JSONSchemer.openapi(YAML.safe_load_file(CONTRACT_PATH, aliases: true), regexp_resolver: "ecma")
     calls = []

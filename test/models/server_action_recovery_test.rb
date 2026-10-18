@@ -1,14 +1,21 @@
 require "test_helper"
 
 class ServerActionRecoveryTest < ActiveSupport::TestCase
+  # Recovery must read durable queue/claim markers after independent commits.
   self.use_transactional_tests = false
 
-  setup { @app = apps(:domain_test_app) }
+  setup do
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "recovery", status: :active)
+  end
 
   teardown do
-    ServerActionLog.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    runs = ServerActionRun.where(resource_key: "app:#{@app.id}")
+    tokens = runs.where.not(api_token_id: nil).pluck(:api_token_id)
+    runs.destroy_all
+    @app.destroy!
+    ApiTokenAudit.where(api_token_id: tokens).delete_all
+    ApiToken.where(id: tokens).delete_all
   end
 
   test "durable unsent obligation is dispatched after queue recovery and terminal invalid dispatch is visible" do
@@ -40,13 +47,17 @@ class ServerActionRecoveryTest < ActiveSupport::TestCase
 
   test "known committed remote completion survives log and teardown bookkeeping failure" do
     run = ServerAction::Enqueue.call(action: "apps.restart", target: @app)
-    action = ServerActions::RestartApp.new(run)
-    ServerAction::Registry.stubs(:build).returns(action)
-    action.stubs(:execute!)
-    action.stubs(:succeeded!)
-    Server.any_instance.stubs(:ssh_session).yields(stub(commands: [])).raises(IOError, "private-bookkeeping")
+    transport = mock("SSH transport")
+    transport.expects(:exec!).with do |command, options|
+      options[:status][:exit_code] = 0
+      command == "dokku ps:restart #{@app.dokku_id}"
+    end
+    transport.expects(:loop).raises(IOError, "private-bookkeeping")
+    Net::SSH.expects(:start).yields(transport)
     assert_raises(IOError) { ServerAction::Runner.new(run).call }
     assert run.reload.remote_completed_at
+    assert run.finalized_at
+    assert @app.reload.active?
     assert_equal "succeeded", Api::V1::OperationResource.new(run).to_h.fetch("status")
     assert_nil Api::V1::OperationResource.new(run).to_h.fetch("error")
     run.update!(status: :running, finished_at: nil)

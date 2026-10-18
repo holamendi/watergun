@@ -40,9 +40,11 @@ group :development do
 end
 
 group :test do
+  gem "archspec", "~> 1.1.0", require: false
   gem "json_schemer", "~> 2.5"
   gem "minitest-spec-rails"
   gem "mocha"
+  gem "prism", ">= 1.0", require: false
   gem "selenium-webdriver"
   gem "vcr"
   gem "webmock"

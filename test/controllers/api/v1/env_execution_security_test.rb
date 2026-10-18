@@ -4,6 +4,7 @@ require "stringio"
 class Api::V1::EnvExecutionSecurityTest < ActionDispatch::IntegrationTest
   include SshTestHelper
 
+  # Real claimed queue jobs and committed desired state must survive failures.
   self.use_transactional_tests = false
 
   setup do

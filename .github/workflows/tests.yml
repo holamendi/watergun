@@ -35,6 +35,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Check installer
         run: bash scripts/test-install-smoke.sh
@@ -65,6 +67,19 @@ jobs:
 
       - name: Check Rails autoloading
         run: bundle exec rails zeitwerk:check
+
+      - name: Check lifecycle architecture and lexical boundaries
+        run: |
+          bundle exec archspec check --config Archspec.rb --format json
+          bundle exec ruby script/check-style-boundaries .
+          bundle exec ruby test/architecture/style_boundaries_test.rb
+
+      - name: Standard on changed Ruby files
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          git diff --name-only -z --diff-filter=ACM "$BASE_SHA" HEAD -- '*.rb' Gemfile script/check-style-boundaries | xargs -0 -r bundle exec standardrb --no-fix --
 
       - name: Check UI consistency
         run: script/check-ui-consistency

@@ -2,13 +2,12 @@ require "test_helper"
 require "timeout"
 
 class Api::V1::EnvConcurrencyTest < ActiveSupport::TestCase
+  # Independent HTTP/UI connections must observe real commit and row-lock order.
   self.use_transactional_tests = false
 
   setup do
-    @app = apps(:domain_test_app)
-    @app.env_variables.destroy_all
-    ServerActionRun.where(target: @app).delete_all
-    @app.update!(status: :active, deployed_at: Time.current, pending_restart: false)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "env-concurrency", status: :active, deployed_at: Time.current)
     @app.server.update!(status: :active)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["env:write", "apps:write"])
     @secret = @token.token
@@ -17,11 +16,11 @@ class Api::V1::EnvConcurrencyTest < ActiveSupport::TestCase
   end
 
   teardown do
-    @app.env_variables.destroy_all
-    ServerActionLog.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
-    Session.delete_all
+    ServerActionRun.where(resource_key: "app:#{@app.id}").destroy_all
+    @app.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
+    @browser&.delete("/session")
   end
 
   test "independent HTTP connections canonical duplicates accept one batch while different input has one conflict" do
@@ -56,12 +55,12 @@ class Api::V1::EnvConcurrencyTest < ActiveSupport::TestCase
     assert_empty @app.env_variables.kept
     assert_equal 0, ServerActionRun.where(api_token_id: @token.id).count
   ensure
-    thread&.join(15) || thread&.kill
+    thread&.join(15) || thread&.kill&.join(10)
   end
 
   test "UI env mutation waiting on app lock loses to committed API batch without partial local changes" do
     variable = @app.env_variables.create!(name: "UI_VALUE", value: "before")
-    session = ActionDispatch::Integration::Session.new(Rails.application)
+    session = @browser = ActionDispatch::Integration::Session.new(Rails.application)
     session.post "/session", params: {session: {email: users(:bobby).email, password: "abc123456"}}
     assert session.cookies[:session_token].present?
     pids = Queue.new
@@ -87,7 +86,7 @@ class Api::V1::EnvConcurrencyTest < ActiveSupport::TestCase
     assert_equal "before", variable.value
     assert_equal ["API_VALUE", "UI_VALUE"], @app.env_variables.kept.order(:name).pluck(:name)
   ensure
-    thread&.join(15) || thread&.kill
+    thread&.join(15) || thread&.kill&.join(10)
   end
 
   private
@@ -103,7 +102,7 @@ class Api::V1::EnvConcurrencyTest < ActiveSupport::TestCase
     end
     Timeout.timeout(15) { threads.map(&:value) }
   ensure
-    threads.each { |thread| thread.join(15) || thread.kill }
+    threads.each { |thread| thread.join(15) || thread.kill.join(10) }
   end
 
   def request_thread(request, pids)

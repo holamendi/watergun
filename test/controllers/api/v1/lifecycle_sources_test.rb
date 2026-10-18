@@ -2,6 +2,7 @@ require "test_helper"
 require "json_schemer"
 
 class Api::V1::LifecycleSourcesTest < ActionDispatch::IntegrationTest
+  # Real acceptance owns its commit; an enclosing fixture transaction is invalid.
   self.use_transactional_tests = false
 
   setup do
@@ -15,8 +16,14 @@ class Api::V1::LifecycleSourcesTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    runs = ServerActionRun.where(api_token_id: @token.id)
+    created_apps = runs.where(action_key: "apps.create").pluck(:operation_app_id)
+    created_deployments = runs.where(action_key: "apps.deploy").pluck(:operation_deployment_id)
+    runs.destroy_all
+    Deployment.where(id: created_deployments).destroy_all
+    App.where(id: created_apps).destroy_all
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
   end
 
   test "create pins supported GitHub source and builder and replay skips external prerequisites" do

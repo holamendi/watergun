@@ -3,6 +3,7 @@ require "test_helper"
 class Api::V1::LifecycleExecutionTest < ActionDispatch::IntegrationTest
   include SshTestHelper
 
+  # Actual HTTP acceptance and worker finalization must survive separate commits.
   self.use_transactional_tests = false
 
   setup do
@@ -19,9 +20,13 @@ class Api::V1::LifecycleExecutionTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
-    ServerActionLog.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    ids = @project.apps.pluck(:id) + ServerActionRun.where(api_token_id: @token.id).pluck(:operation_app_id)
+    ServerActionRun.where(resource_key: ids.compact.uniq.map { |id| "app:#{id}" }).destroy_all
+    @project.destroy!
+    @event&.destroy!
+    ApiTokenAudit.where(api_token_id: @token.id).delete_all
+    @token.destroy!
+    sign_out if cookies[:session_token]
   end
 
   test "complete HTTP supported lifecycle prepares creates deploys reads restarts and deletes through actual jobs" do
@@ -133,7 +138,7 @@ class Api::V1::LifecycleExecutionTest < ActionDispatch::IntegrationTest
         app.github_repo.update!(webhook_deploy: true)
         @client.stubs(:commit).with("owner/repo", "c" * 40).returns(stub(sha: "c" * 40, author: nil,
           commit: stub(author: nil, message: "HTTP lifecycle"), html_url: "https://github.com/owner/repo/commit/#{"c" * 40}"))
-        event = Github::Event.create!(account: @project.account, installation: @project.account.github_installation,
+        event = @event = Github::Event.create!(account: @project.account, installation: @project.account.github_installation,
           headers: {"HTTP_X_GITHUB_EVENT" => "push"}, payload: {ref: "refs/heads/main", after: "c" * 40, repository: {full_name: "owner/repo"}})
         Github::ProcessEventJob.perform_now(event)
         assert event.reload.processed?

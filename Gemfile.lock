@@ -78,6 +78,9 @@ GEM
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     alba (4.0.0)
+    archspec (1.1.0)
+      prism (>= 1.0)
+      rubydex (~> 0.4.0)
     ast (2.4.3)
     base64 (0.3.0)
     bcrypt (3.1.22)
@@ -328,6 +331,9 @@ GEM
       ruby-lsp (>= 0.26.0, < 0.27.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    rubydex (0.4.1-aarch64-linux)
+    rubydex (0.4.1-arm64-darwin)
+    rubydex (0.4.1-x86_64-linux)
     rubyzip (3.7.0)
     sawyer (0.9.3)
       addressable (>= 2.3.5)
@@ -417,6 +423,7 @@ PLATFORMS
 
 DEPENDENCIES
   alba
+  archspec (~> 1.1.0)
   bcrypt (~> 3.1.7)
   bootsnap
   bytesize
@@ -439,6 +446,7 @@ DEPENDENCIES
   octokit
   pagy (~> 43.7)
   pg (~> 1.5)
+  prism (>= 1.0)
   propshaft
   puma (>= 5.0)
   rack-mini-profiler

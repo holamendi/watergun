@@ -1,17 +1,24 @@
 require "test_helper"
 
 class ServerActionAcceptTest < ActiveSupport::TestCase
+  # Acceptance must commit domain/run/dispatch state, not an enclosing fixture.
   self.use_transactional_tests = false
 
   teardown do
-    EnvVariable.delete_all
-    ApiTokenAudit.delete_all
-    ApiToken.delete_all
+    accepted = ServerActionRun.where(api_token_id: @token_ids)
+    ids = @app_ids + accepted.where(action_key: "apps.create").pluck(:operation_app_id)
+    ServerActionRun.where(resource_key: ids.compact.uniq.map { |id| "app:#{id}" }).destroy_all
+    App.where(id: ids).destroy_all
+    ApiTokenAudit.where(api_token_id: @token_ids).delete_all
+    ApiToken.where(id: @token_ids).delete_all
   end
 
   setup do
-    @app = apps(:domain_test_app)
+    project = projects(:default)
+    @app = project.apps.create!(server: project.server, name: "acceptance", status: :active)
+    @app_ids = [@app.id]
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write", "operations:read"])
+    @token_ids = [@token.id]
   end
 
   test "acceptance commits audit identity and dispatch intent without relying on queue availability" do
@@ -143,8 +150,10 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     assert_equal "idempotency_conflict", error.code
     first.update!(status: :success, finished_at: Time.current)
     @token = ApiToken.create!(account: @app.account, user: users(:bobby), scopes: ["apps:write"])
+    @token_ids << @token.id
     refute_equal first.id, accept(request: {value: nil}).id
     @app = @app.project.apps.create!(name: "key-namespace")
+    @app_ids << @app.id
     refute_equal first.id, accept(request: {value: nil}).id
     assert_raises(ServerAction::Accept::Error) { accept(key: "invalid key") }
   end
@@ -178,6 +187,7 @@ class ServerActionAcceptTest < ActiveSupport::TestCase
     assert_nil existing.reload.api_token_id
     existing.update!(status: :success, finished_at: Time.current)
     other = @app.project.apps.create!(name: "unrelated-acceptance")
+    @app_ids << other.id
     assert_no_difference "ServerActionRun.count" do
       assert_raises(ArgumentError) do
         ServerAction::Accept.call(token: @token, endpoint: "restart", target: @app, key: "extra",
