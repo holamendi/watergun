@@ -148,11 +148,13 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
   test "deploys apps tracking a branch name that contains slashes" do
     @github_repo.update!(branch: "feature/foo", webhook_deploy: true)
 
+    event = push_event(ref: "refs/heads/feature/foo")
+
     Deployment::CreateDeployment.expects(:new)
-      .with(app: @github_repo.app, commit_sha: "abc123def456")
+      .with(app: @github_repo.app, commit_sha: "abc123def456", github_event: event)
       .returns(stub(save!: true))
 
-    Github::ProcessEventJob.perform_now(push_event(ref: "refs/heads/feature/foo"))
+    Github::ProcessEventJob.perform_now(event)
   end
 
   test "does not deploy apps tracking main when a branch ending in main is pushed" do
@@ -186,6 +188,35 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
     Github::ProcessEventJob.perform_now(event)
 
     assert event.reload.processed?
+  end
+
+  test "links webhook deployments to the push event" do
+    @github_repo.update!(webhook_deploy: true)
+    event = push_event(ref: "refs/heads/main", payload: {"after" => "714b020"})
+
+    VCR.use_cassette("github/valid_commit_with_sha_714b020") do
+      assert_difference -> { @github_repo.app.deployments.count }, 1 do
+        Github::ProcessEventJob.perform_now(event)
+      end
+    end
+
+    assert_equal event, @github_repo.app.deployments.order(:id).last.github_event
+  end
+
+  test "keeps deployments linked to events when the installation is deleted" do
+    deployment = deployments(:success_deployment)
+    deployment.update!(github_event: github_events(:push_event))
+
+    event = Github::Event.create!(
+      account: @account,
+      installation: @installation,
+      headers: {"HTTP_X_GITHUB_EVENT" => "installation"},
+      payload: {"action" => "deleted"}
+    )
+
+    Github::ProcessEventJob.perform_now(event)
+
+    assert_nil deployment.reload.github_event_id
   end
 
   private

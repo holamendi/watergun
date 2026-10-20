@@ -2,6 +2,8 @@ class Github::Event < ApplicationRecord
   belongs_to :account, default: -> { installation.account }
   belongs_to :installation, class_name: "Github::Installation", foreign_key: :github_installation_id, inverse_of: :events
 
+  has_many :deployments, foreign_key: :github_event_id, inverse_of: :github_event, dependent: :nullify
+
   scope :processed, -> { where.not(processed_at: nil) }
 
   def processed?
