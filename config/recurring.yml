@@ -11,6 +11,9 @@ default: &default
   trim_container_checks:
     command: "ContainerCheck.trim_in_batches"
     schedule: every 6 hours
+  trim_server_checks:
+    command: "ServerCheck.trim_in_batches"
+    schedule: every 6 hours
 
 development:
   <<: *default

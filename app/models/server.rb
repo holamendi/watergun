@@ -30,16 +30,18 @@ class Server < ApplicationRecord
   def ssh_session(&)
     connection_attempts = 0
 
-    Ssh::Session.new(
-      host: public_ip,
-      user: SshKey::USER,
-      private_key: ssh_key.private_key,
-      port: ssh_port
-    ).connect(&)
-  rescue Net::SSH::ConnectionTimeout
-    connection_attempts += 1
-    retry if connection_attempts < 4
-    raise
+    begin
+      Ssh::Session.new(
+        host: public_ip,
+        user: SshKey::USER,
+        private_key: ssh_key.private_key,
+        port: ssh_port
+      ).connect(&)
+    rescue Net::SSH::ConnectionTimeout
+      connection_attempts += 1
+      retry if connection_attempts < 4
+      raise
+    end
   end
 
   def execute_ssh_commands(commands)

@@ -39,11 +39,20 @@ module SshTestHelper
     session.expects(:loop).at_least_once
 
     Net::SSH.expects(:start)
-      .with(host, user,
-        port: port,
-        key_data: [private_key],
-        keys_only: true,
-        non_interactive: true)
+      .with(host, user, ssh_connection_options(port:, private_key:))
       .yields(session)
+  end
+
+  def ssh_connection_options(port:, private_key:)
+    {
+      port:,
+      key_data: [private_key],
+      keys_only: true,
+      non_interactive: true,
+      timeout: 10,
+      keepalive: true,
+      keepalive_interval: 15,
+      keepalive_maxcount: 3
+    }
   end
 end

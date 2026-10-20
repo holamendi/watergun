@@ -8,6 +8,6 @@ class ServerActionLog < ApplicationRecord
   end
 
   def to_s
-    ssh_commands.map(&:to_s).join("\n")
+    ssh_commands.join("\n")
   end
 end
