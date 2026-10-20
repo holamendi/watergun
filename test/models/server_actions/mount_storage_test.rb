@@ -179,11 +179,7 @@ class ServerActions::MountStorageTest < ActiveSupport::TestCase
     end.new
 
     Net::SSH.expects(:start)
-      .with(@server.public_ip, SshKey::USER,
-        port: @server.ssh_port,
-        key_data: [@server.ssh_key.private_key],
-        keys_only: true,
-        non_interactive: true)
+      .with(@server.public_ip, SshKey::USER, ssh_connection_options(port: @server.ssh_port, private_key: @server.ssh_key.private_key))
       .yields(stub_session)
 
     server_action = ServerActions::MountStorage.run_now!(@server, @storage_mount, restart: true)

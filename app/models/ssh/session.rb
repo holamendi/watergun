@@ -79,7 +79,11 @@ class Ssh::Session
       port:,
       key_data: [private_key],
       keys_only: true,
-      non_interactive: true
+      non_interactive: true,
+      timeout: 10,
+      keepalive: true,
+      keepalive_interval: 15,
+      keepalive_maxcount: 3
     }
   end
 end
