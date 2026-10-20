@@ -13,8 +13,6 @@ Rails.application.routes.draw do
   resource :first_run, only: %i[edit update]
   get "first-run/:signed_id", to: "first_runs#edit", as: :pretty_first_run
 
-  resources :hooks
-
   concern :log_streamable do
     resources :log_streams, path: :logs, only: %i[index create show update destroy]
   end
