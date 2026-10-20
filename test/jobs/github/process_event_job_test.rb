@@ -144,4 +144,62 @@ class Github::ProcessEventJobTest < ActiveSupport::TestCase
     assert event.reload.processed?
     assert event.processed_at.present?
   end
+
+  test "deploys apps tracking a branch name that contains slashes" do
+    @github_repo.update!(branch: "feature/foo", webhook_deploy: true)
+
+    Deployment::CreateDeployment.expects(:new)
+      .with(app: @github_repo.app, commit_sha: "abc123def456")
+      .returns(stub(save!: true))
+
+    Github::ProcessEventJob.perform_now(push_event(ref: "refs/heads/feature/foo"))
+  end
+
+  test "does not deploy apps tracking main when a branch ending in main is pushed" do
+    @github_repo.update!(webhook_deploy: true)
+
+    Deployment::CreateDeployment.expects(:new).never
+
+    event = push_event(ref: "refs/heads/foo/main")
+    Github::ProcessEventJob.perform_now(event)
+
+    assert event.reload.processed?
+  end
+
+  test "ignores tag pushes" do
+    @github_repo.update!(webhook_deploy: true)
+
+    Deployment::CreateDeployment.expects(:new).never
+
+    event = push_event(ref: "refs/tags/main")
+    Github::ProcessEventJob.perform_now(event)
+
+    assert event.reload.processed?
+  end
+
+  test "ignores branch deletions" do
+    @github_repo.update!(webhook_deploy: true)
+
+    Deployment::CreateDeployment.expects(:new).never
+
+    event = push_event(ref: "refs/heads/main", payload: {"deleted" => true, "after" => "0000000000000000000000000000000000000000"})
+    Github::ProcessEventJob.perform_now(event)
+
+    assert event.reload.processed?
+  end
+
+  private
+
+  def push_event(ref:, payload: {})
+    Github::Event.create!(
+      account: @account,
+      installation: @installation,
+      headers: {"HTTP_X_GITHUB_EVENT" => "push"},
+      payload: {
+        "ref" => ref,
+        "after" => "abc123def456",
+        "repository" => {"full_name" => "holamendi/smol-roda"}
+      }.merge(payload)
+    )
+  end
 end
