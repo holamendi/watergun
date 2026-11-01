@@ -73,11 +73,6 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
-  config.hosts = nil
-
-  # for local tunneling
-  config.action_controller.forgery_protection_origin_check = false
-
   config.action_mailer.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
   config.action_controller.default_url_options = {host: ENV.fetch("DEFAULT_URL", "localhost:3000")}
 end
