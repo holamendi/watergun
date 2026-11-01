@@ -12,7 +12,7 @@ Watergun is a Rails 8 application that manages Dokku-based deployments. It provi
 # Start development server (uses overmind with Procfile.dev)
 bin/dev
 
-# Restart development server (kills and restarts bin/dev)
+# Restart the processes of a running bin/dev (overmind restart)
 bin/dev-restart
 
 # Run all tests
@@ -45,7 +45,7 @@ bin/vite dev
 - **URL**: http://localhost:3000
 - **Dev user**: hola@mendi.cl
 - **Password**: abc123
-- **Ruby version**: Managed by [mise](https://mise.jdx.dev/) (see `.mise.toml`)
+- **Ruby and Node versions**: Managed by [mise](https://mise.jdx.dev/) (see `.tool-versions`)
 
 ## Architecture
 
@@ -162,7 +162,7 @@ PostgreSQL is the single database backend. Solid Queue and Solid Cable tables li
 
 Prefer vanilla Rails patterns over external dependencies.
 
-- **Linting**: StandardRB (run `bundle exec standardrb --fix` to auto-fix)
+- **Linting**: StandardRB (run `bundle exec standardrb --fix` to auto-fix). A pre-commit hook in `.githooks/` auto-fixes staged Ruby files and blocks the commit on remaining offenses; `bin/setup` enables it via `core.hooksPath`
 - **Soft deletes**: Use `Discard::Model` with `.kept` scope for filtering
 - **Multi-tenant defaults**: Use `belongs_to :account, default: -> { parent.account }`
 - **Current context**: Use `Current.account`, `Current.user` for request context

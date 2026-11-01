@@ -1,0 +1,56 @@
+#!/bin/sh
+# Runs StandardRB on staged Ruby files before each commit.
+#
+# Fully staged files are auto-fixed and re-staged. Files that also have
+# unstaged changes are only checked, so the fix can't sweep unstaged work
+# into the commit. The commit is blocked if offenses remain.
+#
+# Enabled by bin/setup (git config core.hooksPath .githooks).
+# Skip once with: git commit --no-verify
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR |
+  grep -E '\.(rb|rake|ru|gemspec)$|(^|/)(Gemfile|Rakefile)$')
+
+[ -z "$staged" ] && exit 0
+
+unstaged=$(git diff --name-only)
+
+fix=""
+check=""
+for file in $staged; do
+  if printf '%s\n' "$unstaged" | grep -qxF "$file"; then
+    check="$check $file"
+  else
+    fix="$fix $file"
+  fi
+done
+
+if command -v mise >/dev/null 2>&1; then
+  standardrb() { mise exec -- bundle exec standardrb --force-exclusion "$@"; }
+else
+  standardrb() { bundle exec standardrb --force-exclusion "$@"; }
+fi
+
+status=0
+
+if [ -n "$fix" ]; then
+  # shellcheck disable=SC2086
+  standardrb --fix $fix || status=1
+  # shellcheck disable=SC2086
+  git add $fix
+fi
+
+if [ -n "$check" ]; then
+  # shellcheck disable=SC2086
+  standardrb $check || {
+    status=1
+    echo "Not auto-fixed (partially staged):$check"
+    echo "Run 'bundle exec standardrb --fix' on them, review, and stage again."
+  }
+fi
+
+if [ "$status" -ne 0 ]; then
+  echo "pre-commit: StandardRB offenses remain. Fix them or commit with --no-verify."
+fi
+
+exit $status
