@@ -135,4 +135,22 @@ class Projects::Apps::DeploymentsControllerTest < ActionDispatch::IntegrationTes
       end
     end
   end
+
+  describe "#logs" do
+    test "renders the deployment log as plain text" do
+      deployment = deployments(:success_deployment)
+      action = ServerActions::DeployApp.create!(server: @server, actionable: deployment)
+      command = Ssh::Command.new("git push dokku main")
+      command.start
+      command.append_output(:stdout, "-----> Deploying smol-roda\n")
+      command.finish(0)
+      action.create_log!(ssh_commands: [command])
+
+      get logs_project_app_deployment_path(@project, @app, deployment)
+
+      assert_response :success
+      assert_equal "text/plain", response.media_type
+      assert_equal "$ git push dokku main\n-----> Deploying smol-roda", response.body
+    end
+  end
 end
