@@ -3,6 +3,8 @@ class ServerActions::UpdateEnv < ServerAction
 
   actionable App
 
+  encrypts :payload
+
   store_attribute :payload, :dokku_app_id, :string
   store_attribute :payload, :set, :json, default: {}
   store_attribute :payload, :unset, :json, default: []
@@ -17,6 +19,10 @@ class ServerActions::UpdateEnv < ServerAction
 
   def concurrency_key
     app
+  end
+
+  def displayed_payload
+    payload.merge("set" => set.transform_values { "[FILTERED]" })
   end
 
   private

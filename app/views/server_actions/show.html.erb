@@ -69,7 +69,7 @@
   <div class="section-label">Payload</div>
   <div class="bg-surface rounded-lg border border-border mb-6">
     <div class="p-4">
-      <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.payload || {}) %></pre>
+      <pre class="p-4 overflow-auto font-mono text-xs rounded-lg bg-elevated text-text-secondary max-h-64"><%= JSON.pretty_generate(@server_action.displayed_payload || {}) %></pre>
     </div>
   </div>
 
