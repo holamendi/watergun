@@ -35,6 +35,10 @@ class ServerAction < ApplicationRecord
     # Subclasses can reconcile their target when connection setup fails.
   end
 
+  def displayed_payload
+    payload
+  end
+
   def run_now
     RunServerActionJob.perform_now(self)
   end

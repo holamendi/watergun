@@ -1,5 +1,5 @@
 class Ssh::Command
-  attr_reader :input, :output, :started_at, :finished_at, :exit_code
+  attr_reader :input, :started_at, :finished_at, :exit_code
 
   def initialize(input)
     @input = input
@@ -41,8 +41,18 @@ class Ssh::Command
     @finished_at.present?
   end
 
+  def output
+    return @output unless sensitive_output?
+
+    @output.map { Ssh::Log.new(timestamp: it.timestamp, stream: it.stream, data: "[FILTERED]") }
+  end
+
+  def sensitive_output?
+    @input.respond_to?(:sensitive_output?) && @input.sensitive_output?
+  end
+
   def text_output
-    @output.map(&:data).join
+    output.map(&:data).join
   end
 
   def redacted_cmd
