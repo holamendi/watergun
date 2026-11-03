@@ -31,7 +31,7 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
 
       user_signed_id = json_response["first_run_url"].split("/").last
-      user = User.find_signed!(user_signed_id, purpose: :first_run)
+      user = User.find_by_token_for!(:first_run, user_signed_id)
 
       assert_equal "bobby.tables@example.com", user.email
 

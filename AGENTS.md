@@ -156,7 +156,7 @@ PostgreSQL is the single database backend. Solid Queue and Solid Cable tables li
 - **API v1**: HTTP Bearer token via `ApiToken`
 - **Internal setup API**: `ACCOUNT_SETUP_TOKEN` env var
 - **GitHub Webhooks**: HMAC-SHA256 signature verification
-- **First run**: Signed user ID (purpose: `:first_run`)
+- **First run**: Password-bound Rails token (`:first_run`), expires after 24 hours and is consumed by changing the password
 
 ## Code Style
 

@@ -25,7 +25,7 @@ namespace :account do
     app.domains.create!(hostname: domain, status: :active, is_default: true, ssl_enabled: true)
     app.create_github_repo!(repo: "holamendi/watergun", branch: "main")
 
-    token = user.signed_id(expires_at: 1.day.from_now, purpose: :first_run)
+    token = user.generate_token_for(:first_run)
     public_key = server.ssh_key.public_key
     response = {token:, public_key:}
 
