@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   resource :session, only: %i[new create destroy]
 
-  resource :first_run, only: %i[new create]
+  resource :first_run, only: %i[edit update]
 
   concern :log_streamable do
     resources :log_streams, path: :logs, only: %i[index create show update destroy]

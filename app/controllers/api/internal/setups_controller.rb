@@ -20,7 +20,7 @@ class Api::Internal::SetupsController < ActionController::API
     end
 
     render json: {
-      first_run_url: new_first_run_url(token: first_run_token),
+      first_run_url: edit_first_run_url(token: first_run_token),
       public_key: @server.ssh_key.public_key
     }
   end
