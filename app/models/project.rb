@@ -9,6 +9,7 @@ class Project < ApplicationRecord
   has_many :services, dependent: :destroy
 
   validates :name, presence: true, uniqueness: {scope: :account_id, conditions: -> { undiscarded }}
+  validate :validate_server_belongs_to_account
 
   def last_deployment
     deployments.success.last
@@ -25,5 +26,11 @@ class Project < ApplicationRecord
     return :error if kept_apps.any?(&:error?)
     return :active if kept_apps.any?(&:active?)
     :pending
+  end
+
+  private
+
+  def validate_server_belongs_to_account
+    errors.add(:server, "must belong to the project account") if server && server.account_id != account_id
   end
 end
