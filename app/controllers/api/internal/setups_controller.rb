@@ -20,7 +20,7 @@ class Api::Internal::SetupsController < ActionController::API
     end
 
     render json: {
-      first_run_url: pretty_first_run_url(signed_id: first_run_token),
+      first_run_url: edit_first_run_url(token: first_run_token),
       public_key: @server.ssh_key.public_key
     }
   end
@@ -116,7 +116,7 @@ class Api::Internal::SetupsController < ActionController::API
   end
 
   def first_run_token
-    @user.signed_id(purpose: :first_run)
+    @user.generate_token_for(:first_run)
   end
 
   def setup_token

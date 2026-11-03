@@ -11,7 +11,6 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
 
   resource :first_run, only: %i[edit update]
-  get "first-run/:signed_id", to: "first_runs#edit", as: :pretty_first_run
 
   concern :log_streamable do
     resources :log_streams, path: :logs, only: %i[index create show update destroy]
