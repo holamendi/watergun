@@ -9,7 +9,7 @@ class FirstRunsController < ApplicationController
 
   def create
     completed = @user.with_lock do
-      not_found! unless User.find_by_token_for(:first_run, params[:signed_id])
+      not_found! unless User.find_by_token_for(:first_run, params[:token])
       @user.assign_attributes(user_params)
       @user.save(context: :first_run)
     end
@@ -25,7 +25,7 @@ class FirstRunsController < ApplicationController
   private
 
   def set_user
-    @user = User.find_by_token_for!(:first_run, params[:signed_id])
+    @user = User.find_by_token_for!(:first_run, params[:token])
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     not_found!
   end

@@ -10,7 +10,8 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
       params: {server: {name: "Test", public_ip: "127.0.0.1", cpu_type: "arm64"}, user: {email: "onboarding@example.com"}},
       headers: {Authorization: "Bearer first-run-test-token"}
     assert_response :success
-    @token = json_response.fetch("first_run_url").split("/").last
+    @first_run_url = json_response.fetch("first_run_url")
+    @token = Rack::Utils.parse_query(URI(@first_run_url).query).fetch("token")
     @user = User.find_by!(email: "onboarding@example.com")
     @password = "new-onboarding-password"
   end
@@ -20,10 +21,11 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "setup link completes onboarding and signs the user in" do
-    get pretty_first_run_path(@token)
+    get @first_run_url
     assert_response :success
     assert_select "form[action='#{first_run_path}'][method='post']" do
       assert_select "input[name='_method']", count: 0
+      assert_select "input[type='hidden'][name='token'][value=?]", @token
     end
 
     assert_difference "Session.count", 1 do
@@ -48,7 +50,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
     travel 1.day + 1.second do
       complete_onboarding
       assert_response :not_found
-      get pretty_first_run_path(@token)
+      get new_first_run_path(token: @token)
       assert_response :not_found
     end
   end
@@ -60,7 +62,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a password is required and validation leaves the link usable" do
-    post first_run_path, params: {signed_id: @token, user: {email: "changed@example.com"}}
+    post first_run_path, params: {token: @token, user: {email: "changed@example.com"}}
     assert_response :unprocessable_content
     assert_equal "onboarding@example.com", @user.reload.email
 
@@ -69,7 +71,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "invalid confirmation leaves the link usable" do
-    post first_run_path, params: {signed_id: @token, user: {password: @password, password_confirmation: "different"}}
+    post first_run_path, params: {token: @token, user: {password: @password, password_confirmation: "different"}}
     assert_response :unprocessable_content
 
     complete_onboarding
@@ -79,7 +81,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   private
 
   def complete_onboarding(password: @password)
-    post first_run_path, params: {signed_id: @token, user: {password:, password_confirmation: password}}
+    post first_run_path, params: {token: @token, user: {password:, password_confirmation: password}}
   end
 end
 
@@ -97,7 +99,7 @@ class FirstRunConsumptionRaceTest < ActionDispatch::IntegrationTest
           ActiveRecord::Base.connection_pool.with_connection do
             client = ActionDispatch::Integration::Session.new(Rails.application)
             password = "onboarding-password-#{index}"
-            client.post first_run_path, params: {signed_id: token, user: {password:, password_confirmation: password}}
+            client.post first_run_path, params: {token:, user: {password:, password_confirmation: password}}
             client.response.status
           end
         end

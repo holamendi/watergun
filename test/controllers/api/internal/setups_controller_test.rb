@@ -30,8 +30,10 @@ class Api::Internal::SetupsControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
 
-      user_signed_id = json_response["first_run_url"].split("/").last
-      user = User.find_by_token_for!(:first_run, user_signed_id)
+      first_run_uri = URI(json_response.fetch("first_run_url"))
+      assert_equal new_first_run_path, first_run_uri.path
+      token = Rack::Utils.parse_query(first_run_uri.query).fetch("token")
+      user = User.find_by_token_for!(:first_run, token)
 
       assert_equal "bobby.tables@example.com", user.email
 
