@@ -9,7 +9,7 @@ class FirstRunsController < ApplicationController
 
   def update
     completed = @user.with_lock do
-      not_found! unless User.where(id: @user.id).find_by_token_for(:first_run, params[:signed_id])
+      not_found! unless User.find_by_token_for(:first_run, params[:signed_id])
       @user.assign_attributes(user_params)
       @user.save(context: :first_run)
     end
