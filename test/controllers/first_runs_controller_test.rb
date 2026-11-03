@@ -22,6 +22,9 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   test "setup link completes onboarding and signs the user in" do
     get pretty_first_run_path(@token)
     assert_response :success
+    assert_select "form[action='#{first_run_path}'][method='post']" do
+      assert_select "input[name='_method']", count: 0
+    end
 
     assert_difference "Session.count", 1 do
       complete_onboarding
@@ -57,7 +60,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a password is required and validation leaves the link usable" do
-    patch first_run_path, params: {signed_id: @token, user: {email: "changed@example.com"}}
+    post first_run_path, params: {signed_id: @token, user: {email: "changed@example.com"}}
     assert_response :unprocessable_content
     assert_equal "onboarding@example.com", @user.reload.email
 
@@ -66,7 +69,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "invalid confirmation leaves the link usable" do
-    patch first_run_path, params: {signed_id: @token, user: {password: @password, password_confirmation: "different"}}
+    post first_run_path, params: {signed_id: @token, user: {password: @password, password_confirmation: "different"}}
     assert_response :unprocessable_content
 
     complete_onboarding
@@ -76,7 +79,7 @@ class FirstRunsControllerTest < ActionDispatch::IntegrationTest
   private
 
   def complete_onboarding(password: @password)
-    patch first_run_path, params: {signed_id: @token, user: {password:, password_confirmation: password}}
+    post first_run_path, params: {signed_id: @token, user: {password:, password_confirmation: password}}
   end
 end
 
@@ -94,7 +97,7 @@ class FirstRunConsumptionRaceTest < ActionDispatch::IntegrationTest
           ActiveRecord::Base.connection_pool.with_connection do
             client = ActionDispatch::Integration::Session.new(Rails.application)
             password = "onboarding-password-#{index}"
-            client.patch first_run_path, params: {signed_id: token, user: {password:, password_confirmation: password}}
+            client.post first_run_path, params: {signed_id: token, user: {password:, password_confirmation: password}}
             client.response.status
           end
         end

@@ -4,10 +4,10 @@ class FirstRunsController < ApplicationController
 
   layout "sessions"
 
-  def edit
+  def new
   end
 
-  def update
+  def create
     completed = @user.with_lock do
       not_found! unless User.find_by_token_for(:first_run, params[:signed_id])
       @user.assign_attributes(user_params)
@@ -18,7 +18,7 @@ class FirstRunsController < ApplicationController
       sign_in(@user)
       redirect_to root_path, notice: "Account created"
     else
-      render :edit, status: :unprocessable_content
+      render :new, status: :unprocessable_content
     end
   end
 
