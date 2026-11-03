@@ -13,10 +13,11 @@ module LogsHelper
   }
 
   def ansi_to_html(data)
-    data.gsub!(/\033\[1m/, "<b>")
-    data.gsub!(/\033\[0m/, "</b></span>")
+    html = String.new(ERB::Util.html_escape(data))
+    html.gsub!(/\033\[1m/, "<b>")
+    html.gsub!(/\033\[0m/, "</b></span>")
 
-    data.gsub!(/\033\[[\d;]{2,}m.*?<\/b><\/span>/) { |data|
+    html.gsub!(/\033\[[\d;]{2,}m.*?<\/b><\/span>/) { |data|
       span = "<span style='"
       content = ""
       /\033\[([\d;]{2,})m(.*?)<\/b><\/span>/.match(data) { |m|
@@ -39,6 +40,6 @@ module LogsHelper
       span += "'>"
       "#{span}#{content}</b></span>"
     }
-    data.html_safe
+    html.html_safe
   end
 end
