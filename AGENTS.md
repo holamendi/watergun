@@ -165,6 +165,7 @@ Prefer vanilla Rails patterns over external dependencies.
 - **Linting**: StandardRB (run `bundle exec standardrb --fix` to auto-fix). A pre-commit hook in `.githooks/` auto-fixes staged Ruby files and blocks the commit on remaining offenses; `bin/setup` enables it via `core.hooksPath`
 - **Soft deletes**: Use `Discard::Model` with `.kept` scope for filtering
 - **Multi-tenant defaults**: Use `belongs_to :account, default: -> { parent.account }`
+- **Custom validations**: Always prefix validation method names with `validate_`.
 - **Current context**: Use `Current.account`, `Current.user` for request context
 - **Store attributes**: Use `store_attribute :payload, :field_name, :type` for JSON column fields
 - **Enums**: Use custom `Enum[:pending, :active, :error]` syntax (generates string-keyed hash)

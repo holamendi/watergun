@@ -135,4 +135,39 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
       assert_includes response.body, "turbo-stream"
     end
   end
+  test "create ignores a submitted server and uses the selected server" do
+    post select_server_path(servers(:amd))
+
+    assert_difference "Project.count", 1 do
+      post projects_path, params: {project: {name: "Foreign", server_id: servers(:other_server).id}}
+    end
+    project = Project.last
+    assert_redirected_to project_path(project)
+    assert_equal servers(:amd).id, project.server_id
+    assert_equal @account.id, project.account_id
+  end
+
+  test "update permits the name but ignores a foreign account server" do
+    patch project_path(@project), params: {project: {name: "Renamed", server_id: servers(:other_server).id}}
+
+    assert_redirected_to project_path(@project)
+    assert_equal servers(:amd).id, @project.reload.server_id
+    assert_equal "Renamed", @project.name
+  end
+
+  test "update ignores another server in the same account" do
+    patch project_path(@project), params: {project: {server_id: servers(:arm).id}}
+
+    assert_redirected_to project_path(@project)
+    assert_equal servers(:amd).id, @project.reload.server_id
+  end
+
+  test "update cannot move an empty project either" do
+    project = @account.projects.create!(name: "Empty", server: servers(:amd))
+
+    patch project_path(project), params: {project: {server_id: servers(:arm).id}}
+
+    assert_redirected_to project_path(project)
+    assert_equal servers(:amd).id, project.reload.server_id
+  end
 end
